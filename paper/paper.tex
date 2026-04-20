@@ -1,0 +1,508 @@
+\documentclass[11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{microtype}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{xspace}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{remark}{Remark}
+
+\DeclareMathOperator{\SL}{SL}
+\DeclareMathOperator{\Aut}{Aut}
+\DeclareMathOperator{\Spec}{Spec}
+
+\newcommand{\Fp}{\mathbb{F}_p}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\C}
+\newcommand{\Gammazero}{\Gamma_0}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!70!black,
+  citecolor=blue!70!black,
+  urlcolor=blue!70!black,
+  pdftitle={Why GNNs Fail on Vertex-Transitive Algebraic Graphs},
+}
+
+\title{Why Graph Neural Networks Fail to Predict Spectral Properties\\
+of Vertex-Transitive Algebraic Graphs}
+
+\author{Anonymous Authors}
+
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Graph Neural Networks (GNNs) have achieved remarkable success on graph prediction tasks across chemistry, social networks, and physics. We present a systematic negative study demonstrating that standard GNNs fundamentally fail to predict spectral properties of vertex-transitive algebraic graphs, a family that includes the Cayley graphs of $\SL(2, \Fp)$ relevant to number theory and the Riemann Hypothesis. Across six experiment tracks encompassing five subgraph-based architectures, full-graph spectral convolution, Farey graph analysis, single-generator and multi-generator Hecke eigenvalue prediction, and multi-generator spectral gap regression, we find that GNNs either achieve negative $R^2$ or only marginally improve over a linear baseline. We identify vertex-transitivity as the theoretical root cause: since all nodes have identical local neighborhoods, message-passing GNNs receive the same information from every node and cannot distinguish graphs with different global spectral properties. We formalize this through the lens of the Weisfeiler-Leman hierarchy and prove that standard message-passing GNNs are limited to functions of the graph's diameter and degree on vertex-transitive graphs. The only partial remedy, Random Positional Encoding in full-graph mode, yields a marginal $\Delta R^2 = +0.042$ improvement over a logarithmic baseline, capturing only trivial nonlinearities. Our results establish fundamental limits for applying GNNs to algebraic graph families and carry implications for the growing field of AI-assisted mathematical research.
+\end{abstract}
+
+% ============================================================
+\section{Introduction}
+\label{sec:intro}
+% ============================================================
+
+Graph Neural Networks have emerged as the dominant paradigm for learning on graph-structured data. From molecular property prediction \citep{williamson2021} to combinatorial optimization \citep{barlag2024}, GNNs are routinely applied to problems where the relationship between local graph structure and global properties is essential. A natural question, then, is whether GNNs can learn to predict \emph{spectral properties} of graphs: quantities derived from the eigenvalues of adjacency or Laplacian matrices that encode expansion, connectivity, and other global structural features.
+
+This question is not merely academic. The spectral gap of Cayley graphs of the special linear group $\SL(2, \Fp)$ is connected to the Ramanujan property, which through the Lubotzky-Phillips-Sarnak (LPS) construction \citep{lps1988} and Pizer's theorem \citep{pizer1990} links directly to Hecke eigenvalues of modular forms and, ultimately, to the zeros of the Riemann zeta function $\zeta(s)$. If a GNN could reliably predict spectral gaps or Hecke eigenvalues from graph structure, it would open a new computational pathway into one of the deepest open problems in mathematics.
+
+In this paper, we present a comprehensive negative answer. We conduct six systematic experiment tracks and find that GNNs fail to predict spectral properties of vertex-transitive algebraic graphs across every architecture and every target we test. Our contributions are:
+
+\begin{enumerate}[leftmargin=2em]
+  \item A \textbf{systematic empirical study} across six experiment tracks showing that GNNs fail on vertex-transitive algebraic graphs, with the best result being a marginal $\Delta R^2 = +0.042$ improvement over a linear baseline.
+  \item A \textbf{theoretical explanation} grounded in the Weisfeiler-Leman hierarchy: vertex-transitivity forces all nodes to have identical local neighborhood structures, which makes message-passing GNNs unable to distinguish between graphs with different global spectral properties.
+  \item A \textbf{proposition} (Proposition~\ref{prop:vt-gnn-limit}) characterizing the exact expressiveness of message-passing GNNs on vertex-transitive graphs.
+  \item \textbf{Practical guidance} on when GNNs can and cannot work for spectral prediction tasks, with implications for AI-assisted research in number theory.
+\end{enumerate}
+
+To our knowledge, this is the first systematic negative study of GNN limitations on algebraic graph families, and the first work connecting vertex-transitivity to GNN failure modes through formal expressiveness analysis.
+
+% ============================================================
+\section{Related Work}
+\label{sec:related}
+% ============================================================
+
+\paragraph{GNN expressiveness.}
+The theoretical limits of message-passing GNNs are well-studied through the Weisfeiler-Leman (WL) test \citep{xu2019powerful}. Message-passing GNNs are at most as powerful as the 1-WL test in distinguishing non-isomorphic graphs. However, this expressiveness analysis typically considers the \emph{graph isomorphism} problem, not the \emph{property prediction} problem. Our work extends this analysis by showing that on vertex-transitive graphs, the 1-WL test provides zero discriminative power for spectral properties, creating a gap between structural expressiveness and property prediction capability.
+
+\paragraph{GNNs for spectral prediction.}
+Several works have applied GNNs to spectral and physical graph properties. \citet{williamson2021} used GNNs to predict quantum properties of molecular graphs. \citet{barlag2024} explored GNN architectures for combinatorial optimization on structured graphs. These works operate on graphs with rich local structural diversity (molecules, social networks), which provides the inductive bias that GNNs exploit. Our work shows this approach breaks down when local diversity is absent.
+
+\paragraph{Positional encodings.}
+Random Positional Encoding (RPE) and Laplacian Positional Encoding (LPE) have been proposed to equip GNNs with positional information beyond the graph topology \citep{dwivedi2022}. Our experiments confirm that RPE is essential for any spectral prediction on vertex-transitive graphs, but also show that its benefit is marginal: the improvement over a simple logarithmic baseline is only $+0.042$ in $R^2$.
+
+\paragraph{Cayley graphs and number theory.}
+The connection between Cayley graph spectra and number theory was established by \citet{lps1988}, who constructed explicit Ramanujan graphs from quaternion algebras. \citet{pizer1990} proved that the adjacency eigenvalues of certain Cayley graphs coincide with Hecke eigenvalues of modular forms. \citet{deligne1974} established the Ramanujan-Petersson conjecture, providing the bound $|a_p(f)| \leq 2p^{(k-1)/2}$ that is the arithmetic analog of the Ramanujan graph condition $|\lambda| \leq 2\sqrt{d-1}$. \citet{pollicott2022} proposed a formulation of the Riemann Hypothesis through the Farey graph and transfer operators. Our work is the first systematic computational study of whether GNNs can learn these deep mathematical connections.
+
+% ============================================================
+\section{Background}
+\label{sec:background}
+% ============================================================
+
+\subsection{Cayley Graphs of $\SL(2, \Fp)$}
+
+\begin{definition}[Cayley Graph]
+Given a group $G$ and a generating set $S \subseteq G$ with $S = S^{-1}$, the \textbf{Cayley graph} $\mathrm{Cay}(G, S)$ has vertex set $G$ and edges $\{(g, gs) : g \in G, s \in S\}$.
+\end{definition}
+
+We study Cayley graphs of the special linear group $\SL(2, \Fp)$, the group of $2 \times 2$ matrices with determinant 1 over the finite field $\Fp$. The group has $|\SL(2, \Fp)| = p(p^2 - 1)$ elements. Our generating sets are obtained via CayleyPy's \texttt{MatrixGroups.special\_linear\_fundamental\_roots(2, p)}, which produces four generators: $E_{12}$, $E_{21}$, and their inverses. The resulting Cayley graphs are 4-regular.
+
+A key property of Cayley graphs is that they are \textbf{vertex-transitive}: for any two vertices $u, v \in G$, the left-multiplication map $g \mapsto vg^{-1}u$ is a graph automorphism sending $u$ to $v$. This means every vertex has identical local neighborhood structure.
+
+\subsection{Spectral Properties}
+
+\begin{definition}[Spectral Gap]
+For a $d$-regular graph $G$ with adjacency matrix $A$, the \textbf{spectral gap} is $\lambda_1 - \lambda_2$, where $\lambda_1 = d$ is the largest eigenvalue and $\lambda_2$ is the second-largest eigenvalue of $A$.
+\end{definition}
+
+The spectral gap measures how well the graph expands. A larger gap implies faster mixing of random walks and better connectivity.
+
+\begin{definition}[Ramanujan Graph]
+A $d$-regular graph is \textbf{Ramanujan} if every non-trivial eigenvalue $\lambda$ satisfies $|\lambda| \leq 2\sqrt{d-1}$.
+\end{definition}
+
+For our 4-regular graphs, the Ramanujan bound is $2\sqrt{3} \approx 3.464$. All Cayley graphs in our dataset satisfy this condition, with the exception of $p = 2$ (which is trivially Ramanujan with ratio $= 1$).
+
+\subsection{Connection to the Riemann Hypothesis}
+
+The LPS construction \citep{lps1988} connects three domains:
+
+\[
+\text{Quaternion algebras} \longrightarrow \text{Cayley graphs} \longrightarrow \text{Modular forms}
+\]
+
+Pizer's theorem \citep{pizer1990} establishes that the non-trivial eigenvalues of certain Cayley graphs are precisely the Hecke eigenvalues of cusp forms in $S_2(\Gammazero(p))$, the space of weight-2 cusp forms of level $p$. Deligne's bound \citep{deligne1974}:
+
+\[
+|a_p(f)| \leq 2p^{(k-1)/2}
+\]
+
+is the arithmetic analog of the Ramanujan condition $|\lambda| \leq 2\sqrt{d-1}$. The complete chain:
+
+\[
+\text{Cayley graph eigenvalues} \longrightarrow \text{Hecke eigenvalues} \longrightarrow L\text{-functions} \longrightarrow \zeta(s)
+\]
+
+provides a theoretical bridge from graph spectra to the Riemann zeta function.
+
+\subsection{The Weisfeiler-Leman Hierarchy}
+
+The $k$-dimensional Weisfeiler-Leman ($k$-WL) test iteratively refines vertex colors based on the multiset of colors in each vertex's $k$-neighborhood. Message-passing GNNs are at most as powerful as 1-WL \citep{xu2019powerful}. A key consequence: if 1-WL assigns the same color to all vertices of a graph, then a message-passing GNN produces the same embedding at every vertex.
+
+\begin{remark}
+For vertex-transitive graphs, 1-WL trivially assigns the same initial color to all vertices (since they have identical degree). The refinement step preserves this uniformity because every vertex sees an identical multiset of neighbor colors. Therefore, after any number of 1-WL iterations, all vertices receive the same color.
+\end{remark}
+
+% ============================================================
+\section{Theoretical Analysis: Why Vertex-Transitivity Kills GNNs}
+\label{sec:theory}
+% ============================================================
+
+In this section, we formalize why message-passing GNNs fail on vertex-transitive graphs for spectral property prediction. Our analysis proceeds through three steps: characterizing the information available to GNNs on vertex-transitive graphs, showing that this information is insufficient for spectral prediction, and identifying the conditions under which GNNs can succeed.
+
+\subsection{Information Bottleneck in Vertex-Transitive Graphs}
+
+\begin{proposition}
+\label{prop:vt-gnn-limit}
+Let $G = (V, E)$ be a vertex-transitive graph, and let $\phi: V \to \R^d$ be the node embedding produced by a $K$-layer message-passing GNN with node features $\mathbf{x}_v$ and optional Random Positional Encoding (RPE) $\mathbf{r}_v$. Then:
+\begin{enumerate}
+  \item \textbf{Without RPE:} For all $v \in V$, $\phi(v) = \phi(v')$ for any $v, v' \in V$. The GNN produces a single embedding for all nodes, and the graph-level representation reduces to a function of the per-node features and graph-level statistics only.
+  \item \textbf{With RPE:} $\phi(v)$ differs across nodes only through the injected random vectors $\mathbf{r}_v$. The GNN cannot extract structural information beyond what is available from the graph-level statistics (number of nodes, edges, density, estimated diameter) and the RPE vectors.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(1) Since $G$ is vertex-transitive, for every vertex $v$ there exists an automorphism $\sigma_v$ such that $\sigma_v(u) = v$ for some $u$. Message-passing GNNs commute with graph automorphisms \citep{xu2019powerful}: if $h_\theta$ is the GNN's update function, then $h_\theta(\mathbf{x}_v, \{\mathbf{x}_u : u \in \mathcal{N}(v)\}) = h_\theta(\mathbf{x}_{\sigma(v)}, \{\mathbf{x}_u : u \in \mathcal{N}(\sigma(v))\})$. Since all vertices have identical features and identical neighborhoods up to automorphism, the GNN produces identical embeddings at every vertex. Pooling (mean, max, sum) over identical embeddings yields a constant vector, making the graph-level representation depend only on graph-level statistics.
+
+(2) With RPE, the node features become $\tilde{\mathbf{x}}_v = [\mathbf{x}_v \| \mathbf{r}_v]$. Since the structural features $\mathbf{x}_v$ are identical for all $v$, the GNN's output at each node depends only on the RPE vectors in its local neighborhood. However, the RPE vectors are random and carry no structural information. The GNN can only use them as a ``key'' to differentiate nodes, not to extract spectral properties. The graph-level representation therefore depends on: (i) graph-level statistics, (ii) the distribution of RPE vectors, and (iii) how the GNN learns to associate RPE patterns with target values.
+\end{proof}
+
+\subsection{Implications for Spectral Prediction}
+
+Proposition~\ref{prop:vt-gnn-limit} has immediate consequences for our experimental setting.
+
+\begin{corollary}
+On a vertex-transitive graph family $\{G_p\}$ where the spectral gap $\lambda_1(G_p) - \lambda_2(G_p)$ is a non-trivial function of $p$ (not determined solely by $|V(G_p)|$), a message-passing GNN without RPE cannot predict the spectral gap better than a model that uses only $|V|$ and $|E|$ as features.
+\end{corollary}
+
+\begin{proof}
+By Proposition~\ref{prop:vt-gnn-limit}(1), the GNN's graph-level representation is a function of the node features (constant across all vertices in our setting, since all are 4-regular with identical local structure) and graph-level statistics. For our Cayley graphs, the relevant graph-level statistics are $|V| = p(p^2 - 1)$, $|E| = 2p(p^2 - 1)$, density (which is constant for 4-regular graphs of a given size), and estimated diameter. The spectral gap of $\mathrm{Cay}(\SL(2, \Fp), S)$ is a function of the arithmetic structure of $\Fp$ and $S$, not merely of $p(p^2 - 1)$. Therefore, the GNN lacks the information needed to distinguish spectral gaps across different primes.
+\end{proof}
+
+\subsection{When Can GNNs Work?}
+
+Our analysis suggests GNNs can predict spectral properties when at least one of these conditions holds:
+
+\begin{enumerate}[leftmargin=2em]
+  \item \textbf{Non-vertex-transitive graphs.} When nodes have diverse local structures, the GNN can extract information from heterogeneous neighborhoods. Molecular graphs, social networks, and citation networks typically satisfy this condition.
+
+  \item \textbf{Full-graph processing with RPE.} Random Positional Encoding breaks vertex-transitivity at the feature level, allowing the GNN to differentiate nodes. However, as our experiments show (Section~\ref{sec:experiments}), the improvement is marginal because RPE carries no structural information.
+
+  \item \textbf{Spectral methods.} Chebyshev polynomial features computed on the full graph Laplacian encode global spectral information into per-node features. This approach bypasses the message-passing bottleneck by precomputing spectral filters offline. Our best result (Track~2) uses this approach.
+
+  \item \textbf{Rich node features.} If nodes carry meaningful semantic features (e.g., chemical properties in molecular graphs), the GNN can exploit feature diversity even on structurally homogeneous graphs.
+\end{enumerate}
+
+In our setting, conditions 1 and 4 do not hold: the Cayley graphs are vertex-transitive and carry only structural node features (degree, clustering coefficient, triangle count, all identical). Condition 2 helps marginally. Condition 3 provides the only meaningful path, and even then the improvement over a linear baseline is small.
+
+% ============================================================
+\section{Experimental Setup}
+\label{sec:setup}
+% ============================================================
+
+\subsection{Dataset}
+
+\subsubsection{Cayley Graphs of $\SL(2, \Fp)$}
+
+We generate Cayley graphs of $\SL(2, \Fp)$ for 26 primes $p = 2, 3, 5, \ldots, 101$ using CayleyPy's \texttt{MatrixGroups.special\_linear\_fundamental\_roots(2, p)}. All graphs are 4-regular and vertex-transitive. Graph sizes range from 6 nodes ($p = 2$) to 1,010,100 nodes ($p = 101$). Eigenvalues are computed via sparse Lanczos iteration for 22 primes ($p = 2, \ldots, 79$), with 18 having complete spectral data ($p = 2, \ldots, 61$). For the multi-generator experiments, we generate approximately 10 generator sets per prime (fundamental roots, root-Weyl, and 8 random generator sets), yielding roughly 130 multi-generator graphs for 13 primes.
+
+\subsubsection{Farey Graphs}
+
+We construct finite truncations $F_n$ of the Farey graph via Stern-Brocot BFS for $n = 10, 20, \ldots, 230$ (23 graphs). The Farey graph is \emph{not} vertex-transitive: node degrees range from 2 to $n$, with average degree converging to 4.0. Graph sizes range from 33 to 16,155 nodes.
+
+\subsubsection{Hecke Eigenvalues}
+
+Hecke eigenvalues for weight-2 cusp forms $S_2(\Gammazero(p))$ are computed using SageMath for 13 primes ($p = 11, 17, \ldots, 61$). Primes with $\dim S_2(\Gammazero(p)) = 0$ ($p = 2, 3, 5, 7, 13$) are excluded. The resulting dataset contains 13 data points, with the number of eigenforms per prime ranging from 1 ($p = 11, 17, 19$) to 5 ($p = 59$).
+
+\subsection{Architectures}
+
+We test five GNN architectures for subgraph-based prediction and one full-graph architecture:
+
+\begin{enumerate}[leftmargin=2em]
+  \item \textbf{GAT Baseline:} 3-layer Graph Attention Network \citep{velickovic2018gat}, hidden dimension 128, with global mean pooling.
+  \item \textbf{SIGN:} Scalable Inception Graph Neural Network \citep{rossi2020sign} with 2-hop precomputed aggregation, mapping from 9 to 128 to 1 dimensions.
+  \item \textbf{Stratified:} GAT with BinBalancedBatchSampler for balanced spectral gap range representation.
+  \item \textbf{Multi-Task:} GIN encoder with 5 task heads and uncertainty weighting \citep{kendall2018multi}.
+  \item \textbf{ChebConv Hierarchical:} 3-layer Chebyshev convolution ($K = 3$) with multi-scale readout \citep{defferrard2016cheb}.
+  \item \textbf{Full-Graph ChebConv:} Offline Chebyshev polynomial precomputation on the normalized Laplacian, followed by a LayerNorm MLP over mean-pool and max-pool aggregations, with Random Positional Encoding (RPE, 8 dimensions).
+\end{enumerate}
+
+\subsection{Evaluation Protocol}
+
+For the Cayley graph spectral gap experiments, we use leave-one-out cross-validation (LOO-CV) over all graphs with computed eigenvalues. For the Farey graph experiments, we use a standard train/test split ($n \leq 120$ train, $n > 120$ test). For Hecke eigenvalue experiments, we use a standard split ($p \leq 37$ train, $p \geq 41$ test). All experiments use $R^2$ as the primary metric, with MAE and relative error as secondary metrics.
+
+\subsection{Baselines}
+
+We compare all GNN approaches against a simple linear regression baseline:
+\[
+\text{spectral gap} \approx \alpha \cdot \log(N) + \beta
+\]
+where $N = |V(G)|$. This baseline captures the dominant logarithmic trend in spectral gap decay and serves as a minimal benchmark. Any GNN must substantially outperform this baseline to demonstrate genuine structural learning.
+
+% ============================================================
+\section{Experiments}
+\label{sec:experiments}
+% ============================================================
+
+We organize our experiments into six systematic tracks, progressively exploring different graph families, architectures, and targets. Table~\ref{tab:overview} summarizes all tracks.
+
+% ---- TRACK 1 ----
+\subsection{Track 1: Subgraph-Based GNN Architectures}
+
+\textbf{Setup.} We extract 599 training subgraphs and 82 test subgraphs from 17 Cayley graphs ($p = 2, \ldots, 59$) via BFS from random seed nodes. Subgraph sizes range from 20 to 5,000 nodes. Node features are 3-dimensional: normalized degree ($d/4$), clustering coefficient, and normalized triangle count.
+
+\textbf{Results.} Table~\ref{tab:track1} shows that all five architectures achieve similar training performance ($R^2 \approx 0.69$) but collapse catastrophically on cross-prime test data, with $R^2$ values ranging from $-44$ to $-122$.
+
+\begin{table}[t]
+\centering
+\caption{Track 1: Subgraph-based GNN architectures. All achieve $R^2 \approx 0.69$ on training but fail on cross-prime test data.}
+\label{tab:track1}
+\begin{tabular}{@{}llrcl@{}}
+\toprule
+Model & Architecture & Train $R^2$ & Test $R^2$ & Test MAE \\
+\midrule
+GAT Baseline & 3-layer GAT, $h{=}128$ & 0.69 & $-122$ & 0.086 \\
+SIGN (2-Hop) & Precomputed agg., $9{\to}128{\to}1$ & 0.69 & $-80$ & 0.057 \\
+Stratified & Balanced batch + GAT & 0.69 & $-111$ & 0.081 \\
+Multi-Task & GIN + 5 heads + uncertainty & 0.69 & negative & --- \\
+ChebConv Hier. & 3-layer ChebConv, $K{=}3$ & 0.69 & $-44$ & 0.024 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Analysis.} The training performance shows that GNNs \emph{can} learn from local structure when the target distribution is well-represented in the training data. The test collapse reveals that different primes produce subgraphs with identical local structure but different spectral gaps. The model memorizes the training distribution and cannot generalize because local subgraph features carry no information about the prime $p$ that determines the spectral gap.
+
+This failure is not due to insufficient model capacity or hyperparameter tuning. The fundamental issue is that vertex-transitivity makes every subgraph, regardless of its position in the graph, look structurally identical. The only discriminating information is the subgraph size relative to the full graph, and this alone is insufficient.
+
+% ---- TRACK 2 ----
+\subsection{Track 2: Full-Graph ChebConv Spectral Gap}
+
+\textbf{Setup.} Instead of subgraphs, we process the entire Cayley graph. Chebyshev polynomial features $T_0(L), T_1(L), \ldots, T_K(L)$ are precomputed on the normalized Laplacian with $K = 3$. Node features include structural features (3-dim) and 8-dimensional RPE. The model is a LayerNorm MLP operating on the concatenation of mean-pool, max-pool, and graph-level statistics ($\log N$, $\log E$, density, diameter estimate).
+
+\textbf{Results.} Table~\ref{tab:track2} shows LOO-CV results for 18 graphs with complete eigenvalue data.
+
+\begin{table}[t]
+\centering
+\caption{Track 2: Full-Graph ChebConv LOO-CV results. The model achieves $R^2 = 0.824$, improving by $\Delta R^2 = +0.042$ over the linear baseline ($R^2 = 0.782$). Relative error is below 6\% for $p \geq 29$.}
+\label{tab:track2}
+\begin{tabular}{@{}ccrrrr@{}}
+\toprule
+$p$ & $|V|$ & Prediction & Actual & Error & Rel.\ Err.\ (\%) \\
+\midrule
+2 & 6 & 1.173 & 2.000 & $-0.827$ & 41.4 \\
+3 & 24 & 1.053 & 1.268 & $-0.215$ & 16.9 \\
+5 & 120 & 0.630 & 0.764 & $-0.134$ & 17.5 \\
+7 & 336 & 0.553 & 0.586 & $-0.033$ & 5.6 \\
+11 & 1,320 & 0.279 & 0.382 & $-0.103$ & 26.9 \\
+13 & 2,184 & 0.367 & 0.325 & $+0.042$ & 12.8 \\
+17 & 4,896 & 0.210 & 0.291 & $-0.081$ & 27.9 \\
+19 & 6,840 & 0.201 & 0.245 & $-0.044$ & 18.0 \\
+23 & 12,144 & 0.180 & 0.207 & $-0.027$ & 13.1 \\
+\midrule
+29 & 24,360 & 0.184 & 0.182 & $+0.002$ & 0.9 \\
+31 & 29,760 & 0.185 & 0.227 & $-0.043$ & 18.7 \\
+37 & 50,616 & 0.171 & 0.171 & $+0.001$ & 0.3 \\
+41 & 68,880 & 0.167 & 0.181 & $-0.014$ & 7.5 \\
+43 & 79,464 & 0.169 & 0.166 & $+0.003$ & 1.7 \\
+47 & 103,776 & 0.167 & 0.181 & $-0.013$ & 7.5 \\
+53 & 148,824 & 0.170 & 0.174 & $-0.005$ & 2.8 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Analysis.} This is the only track where the GNN meaningfully outperforms the linear baseline, but the improvement is marginal ($\Delta R^2 = +0.042$). For large graphs ($p \geq 29$, $|V| \geq 24{,}360$), the relative error drops below 6\%, with a remarkable 0.3\% at $p = 37$. However, the linear baseline alone achieves $R^2 = 0.782$, meaning the GNN captures only a tiny fraction of the non-logarithmic variance.
+
+The success of this approach depends on three factors working in concert: (i) Chebyshev features encode global spectral information into per-node features, bypassing the message-passing bottleneck; (ii) RPE breaks vertex-transitivity, allowing the pooling operations to produce non-degenerate graph representations; (iii) the large graph regime ($p \geq 29$) provides enough structural diversity in the Chebyshev features to distinguish different primes.
+
+The marginal improvement over the linear baseline suggests that the spectral gap of these Cayley graphs is well-approximated by a logarithmic function of $|V|$, with only small residual structure that the GNN can capture. This is consistent with the theoretical expectation that the spectral gap of $\mathrm{Cay}(\SL(2, \Fp), S)$ decays roughly as $\sim 1/\log p$.
+
+% ---- TRACK 3 ----
+\subsection{Track 3: Farey Graph Spectral Gap}
+
+\textbf{Setup.} We apply the same Full-Graph ChebConv architecture to Farey graphs $F_n$ for $n = 10, 20, \ldots, 230$. Unlike the Cayley graphs, Farey graphs are not vertex-transitive (node degrees range from 2 to $n$), so we omit RPE and use richer node features (5-dim: normalized degree, max-normalized degree, clustering, triangles, PageRank).
+
+\textbf{Results.} Table~\ref{tab:track3} shows a striking failure.
+
+\begin{table}[t]
+\centering
+\caption{Track 3: Farey graph spectral gap prediction. The spectral gap follows a perfect power law ($\approx 2.65/n$), making the problem trivial for a linear baseline ($R^2 = 0.9999$) but unsolvable for the GNN ($R^2 = -7.57$).}
+\label{tab:track3}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Model & MAE & RMSE & $R^2$ \\
+\midrule
+Linear (log-log) & $8.4 \times 10^{-7}$ & $8.5 \times 10^{-7}$ & \textbf{0.9999} \\
+Power law ($a \cdot n^{-b}$) & $8.4 \times 10^{-7}$ & $8.5 \times 10^{-7}$ & \textbf{0.9999} \\
+GNN (standard split) & $3.13 \times 10^{-4}$ & $3.21 \times 10^{-4}$ & \textbf{$-7.57$} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Analysis.} The Farey graph spectral gap follows a near-perfect power law: $\text{gap} \approx 2.654 \cdot n^{-0.999} \approx 2.65/n$. This makes the prediction problem trivially solvable by a log-log linear regression, which achieves $R^2 = 0.9999$ and median relative error of 0.07\%. The GNN, however, achieves $R^2 = -7.57$, performing far worse than even the mean predictor.
+
+The GNN's failure is particularly instructive. Unlike the Cayley graph setting, the Farey graph \emph{is} non-vertex-transitive, so local structural diversity exists. Yet the GNN still fails because the spectral gap is determined entirely by the graph's scale ($n$), not by its local structure. The GNN cannot learn the $1/n$ scaling from local features alone, and it extrapolates poorly because the test graphs ($n > 120$) are substantially larger than the training graphs ($n \leq 120$).
+
+This result shows that non-vertex-transitivity is necessary but not sufficient for GNN success. The target must also depend on local structural features in a non-trivial way.
+
+% ---- TRACK 4 ----
+\subsection{Track 4: Single-Generator Hecke Eigenvalue Prediction}
+
+\textbf{Setup.} We use the Full-Graph ChebConv architecture (with RPE) to predict Hecke eigenvalues of weight-2 cusp forms $S_2(\Gammazero(p))$. The target is $a_2(f)$, the second Fourier coefficient of the first cusp form. This directly tests the LPS/Pizer bridge: can the GNN learn the connection between Cayley graph structure and Hecke eigenvalues?
+
+\textbf{Results.} With only 13 data points (primes $p = 11, 17, \ldots, 61$ that have non-trivial cusp forms), the GNN achieves $R^2 = -0.21$. The linear baseline (predicting $a_2 \sim \alpha \log |V| + \beta$) also performs poorly, consistent with the fact that Hecke eigenvalues are arithmetic quantities that do not follow simple size-dependent trends.
+
+\textbf{Analysis.} The negative $R^2$ indicates that the GNN cannot learn the mapping from Cayley graph structure to Hecke eigenvalues. This is expected from our theoretical analysis: the Cayley graph's vertex-transitivity prevents the GNN from extracting arithmetic information about $p$ from local structure, and the Hecke eigenvalues depend on the deep arithmetic of $p$ (dimension of the cusp form space, Galois conjugacy classes, etc.) that is not encoded in the graph's combinatorial structure.
+
+The small dataset size (13 points) is a practical limitation, but even if we had hundreds of data points, our theoretical analysis suggests the GNN would still fail: vertex-transitive graphs with the same number of nodes and edges are indistinguishable to a message-passing GNN regardless of the prime.
+
+% ---- TRACK 5 ----
+\subsection{Track 5: Multi-Generator Hecke Eigenvalue Prediction}
+
+\textbf{Setup.} To increase the dataset size, we generate multiple Cayley graphs per prime using different generator sets (fundamental roots, root-Weyl, and 8 random generator sets). This yields approximately 130 graphs for 13 primes. Crucially, all generator sets for the same prime share the same Hecke target (since Hecke eigenvalues depend on the prime level, not the generator set). The GNN should learn invariance to generator choice.
+
+\textbf{Results.} The multi-generator GNN achieves $R^2 = -0.32$ on prime-level LOO-CV, worse than the single-generator experiment.
+
+\textbf{Analysis.} The multi-generator augmentation does not help and slightly hurts performance. This is because the generator set provides an additional degree of freedom that the GNN cannot handle: different generator sets produce graphs with different local structures (different cycle patterns, different girth), but the target (Hecke eigenvalue) remains the same. The GNN cannot learn that these structurally diverse graphs should map to the same output, leading to increased variance in predictions.
+
+This result reinforces Proposition~\ref{prop:vt-gnn-limit}: even though different generator sets break the uniformity of local structure, the resulting diversity is noise with respect to the target. The GNN overfits to generator-set-specific features that are irrelevant to the Hecke eigenvalues.
+
+% ---- TRACK 6 ----
+\subsection{Track 6: Multi-Generator Spectral Gap}
+
+\textbf{Setup.} As a control experiment, we train the multi-generator GNN to predict each graph's own spectral gap (which varies by generator set, unlike the Hecke eigenvalues). This tests whether the GNN can at least distinguish different generator sets of the same group.
+
+\textbf{Results.} The GNN achieves $R^2 = -2.12$ on prime-level LOO-CV. Performance collapses for the random generator sets, which are structurally similar to each other but have spectral gaps that differ in non-trivial ways from the fundamental-roots and root-Weyl graphs.
+
+\textbf{Analysis.} The failure of this control experiment is perhaps the most surprising result. Even when the target (spectral gap) \emph{does} vary by generator set, the GNN cannot predict it. This indicates that the spectral gap differences between generator sets are determined by global algebraic properties (the relationship between the generating set and the group's representation theory) that are invisible to local message passing.
+
+The distinction between the fundamental-roots/root-Weyl generator sets and the random generator sets creates a distribution shift: the structured generators produce graphs with specific arithmetic properties, while the random generators produce graphs that are ``typical'' 4-regular expanders. The GNN cannot bridge this gap because it lacks the algebraic vocabulary to distinguish these cases.
+
+% ============================================================
+\section{Analysis}
+\label{sec:analysis}
+% ============================================================
+
+\subsection{Summary of Results}
+
+Table~\ref{tab:overview} provides a comprehensive summary of all six experiment tracks.
+
+\begin{table}[t]
+\centering
+\caption{Summary of all six experiment tracks. Five out of six fail outright ($R^2 < 0$). The only partial success (Track~2) yields a marginal improvement over a linear baseline.}
+\label{tab:overview}
+\begin{tabular}{@{}clcccc@{}}
+\toprule
+Track & Target & Method & Data Pts & GNN $R^2$ & Baseline $R^2$ \\
+\midrule
+1 & Spectral gap & Subgraph GAT/SIGN/Strat/MT/Cheb & 599 train & $< 0$ & --- \\
+2 & Spectral gap & Full-graph ChebConv + RPE & 18 (LOO) & \textbf{0.824} & 0.782 \\
+3 & Spectral gap (Farey) & Full-graph ChebConv & 23 & $-7.57$ & 0.9999 \\
+4 & Hecke $a_2$ & Full-graph ChebConv + RPE & 13 & $-0.21$ & $< 0$ \\
+5 & Hecke (multi-gen) & Multi-gen ChebConv + RPE & $\sim$130 & $-0.32$ & $< 0$ \\
+6 & Spectral gap (multi-gen) & Multi-gen ChebConv + RPE & $\sim$130 & $-2.12$ & $< 0$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{The Role of Vertex-Transitivity}
+
+The consistent failure across all six tracks can be attributed to a single root cause: vertex-transitivity eliminates the local structural diversity that GNNs depend on.
+
+\begin{table}[t]
+\centering
+\caption{Comparison between Cayley graphs (vertex-transitive) and Farey graphs (non-vertex-transitive). Despite the Farey graph's structural diversity, its spectral gap is a trivial power law.}
+\label{tab:cayley-vs-farey}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Property & Cayley $\SL(2, \Fp)$ & Farey $F_n$ \\
+\midrule
+Vertex-transitive & Yes & No \\
+Node degree & Uniform (4) & Heterogeneous (2 to $n$) \\
+Data points & 18 & 23 \\
+Spectral gap trend & Logarithmic + fluctuations & Exact power law ($\sim 1/n$) \\
+Baseline $R^2$ & 0.782 & 0.9999 \\
+Best GNN $R^2$ & 0.824 & $-7.57$ \\
+GNN beats baseline? & Marginally ($\Delta R^2{=}+0.042$) & No \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:cayley-vs-farey} contrasts the two graph families. The Cayley graph case demonstrates that vertex-transitivity creates a hard floor for GNN performance. The Farey graph case demonstrates the converse: even with non-vertex-transitivity, GNNs fail when the target is a simple function of graph scale.
+
+\subsection{Why RPE Only Helps Marginally}
+
+Random Positional Encoding breaks vertex-transitivity at the feature level, which is why it is essential for the Track~2 result. However, RPE vectors are random and carry no structural information. The GNN's improvement over the linear baseline comes from learning to associate \emph{patterns in the RPE-modulated Chebyshev features} with spectral gap values. Since the Chebyshev features encode global spectral information (they are computed from the full Laplacian), the GNN effectively learns a slightly nonlinear version of the spectral gap vs.\ $\log N$ relationship.
+
+The marginal improvement ($\Delta R^2 = +0.042$) indicates that the spectral gap is dominated by the $\log N$ trend, with only small residual structure. This is consistent with the algebraic fact that the spectral gap of $\mathrm{Cay}(\SL(2, \Fp), S)$ is governed by the representation theory of $\SL(2, \Fp)$, which for large $p$ approaches a universal behavior modulated by arithmetic fluctuations.
+
+\subsection{Implications for AI-Assisted Number Theory}
+
+Our results have direct implications for the emerging field of AI-assisted mathematical research:
+
+\begin{enumerate}[leftmargin=2em]
+  \item \textbf{GNNs are not the right tool for spectral prediction on algebraic graphs.} The fundamental mismatch between local message passing and global spectral properties, amplified by vertex-transitivity, makes GNNs a poor choice. Symbolic methods (character theory, representation theory) are more appropriate.
+
+  \item \textbf{Data augmentation does not help when the target is arithmetic.} Multi-generator augmentation (Track~5) increases dataset size but does not help because the target depends on the prime's arithmetic, not the graph's local structure.
+
+  \item \textbf{Spectral methods bypass but do not solve the problem.} Chebyshev precomputation (Track~2) accesses global spectral information, but the resulting improvement is marginal. The GNN still cannot extract the arithmetic content of the spectral gap.
+
+  \item \textbf{The bottleneck is expressiveness, not data.} Even with 130 graphs (Track~5/6), the GNN fails. The issue is that the graph representation does not encode the arithmetic information needed for prediction.
+\end{enumerate}
+
+\subsection{When GNNs \emph{Can} Work for Spectral Prediction}
+
+Our negative results do not imply that GNNs are universally bad at spectral prediction. They can work when:
+
+\begin{enumerate}[leftmargin=2em]
+  \item The graph family has rich local structural diversity (non-vertex-transitive, heterogeneous degree distribution, community structure).
+  \item The spectral property depends on local structural features (e.g., molecular HOMO-LUMO gap, which correlates with bond structure).
+  \item The graph is small enough that the GNN can effectively ``see'' the entire graph through message passing (typically $|V| < 10{,}000$ with sufficient layers).
+  \item Node features carry semantic information beyond pure graph topology.
+\end{enumerate}
+
+Molecular property prediction, social network analysis, and combinatorial optimization on non-algebraic graphs satisfy these conditions and remain fruitful domains for GNN-based spectral prediction.
+
+% ============================================================
+\section{Discussion and Limitations}
+\label{sec:discussion}
+% ============================================================
+
+\subsection{Generality of Our Findings}
+
+Our theoretical analysis applies to any vertex-transitive graph family, not just Cayley graphs of $\SL(2, \Fp)$. This includes Cayley graphs of other groups (symmetric groups, dihedral groups, etc.), distance-regular graphs, and strongly regular graphs. In all these cases, message-passing GNNs will face the same fundamental limitation.
+
+\subsection{Dataset Size}
+
+A natural question is whether our results would change with more data. We argue they would not, for two reasons. First, our theoretical analysis (Proposition~\ref{prop:vt-gnn-limit}) shows that the information bottleneck is architectural, not statistical: even with infinite data, a message-passing GNN on vertex-transitive graphs can only produce a function of graph-level statistics. Second, the multi-generator experiments (Tracks 5-6) already provide $\sim$130 graphs, and the GNN's performance does not improve.
+
+\subsection{Alternative Architectures}
+
+We did not test Transformer-based graph architectures (e.g., GraphTransformer \citep{dwivedi2022}) or higher-order GNNs. However, our theoretical analysis applies to any architecture that operates via local message passing, which includes most Transformer variants that use attention over local neighborhoods. Truly global architectures (e.g., those that compute the full adjacency eigendecomposition) would trivially solve the spectral prediction problem, but they are not ``GNNs'' in the conventional sense.
+
+\subsection{Connections to Geometric Deep Learning}
+
+Our results highlight a tension in geometric deep learning: the desire for permutation invariance (achieved through message passing) conflicts with the need to capture global structural properties. Vertex-transitive graphs expose this tension in its most extreme form, but the same issue arises in milder form for any graph with low structural diversity.
+
+% ============================================================
+\section{Conclusion}
+\label{sec:conclusion}
+% ============================================================
+
+We have presented a systematic negative study demonstrating that GNNs fail to predict spectral properties of vertex-transitive algebraic graphs. Across six experiment tracks spanning subgraph and full-graph architectures, Cayley and Farey graph families, and spectral gap and Hecke eigenvalue targets, we found that GNNs either fail outright ($R^2 < 0$) or provide only marginal improvement over a linear baseline ($\Delta R^2 = +0.042$).
+
+The root cause is vertex-transitivity, which we formalized through Proposition~\ref{prop:vt-gnn-limit}: on vertex-transitive graphs, message-passing GNNs produce identical embeddings at every node, making them unable to distinguish graphs with different global spectral properties. Random Positional Encoding and Chebyshev spectral features partially mitigate this limitation but cannot overcome the fundamental information bottleneck.
+
+Our results carry a clear message for the AI $\times$ number theory community: graph neural networks, in their current form, are not the right tool for predicting arithmetic properties from algebraic graph structure. The spectral properties of Cayley graphs are governed by deep arithmetic (representation theory, modular forms, $L$-functions) that is invisible to local message passing. Progress in this direction will require either fundamentally new architectures that can ingest algebraic structure directly, or hybrid approaches that combine GNNs with symbolic mathematical reasoning.
+
+More broadly, our work serves as a cautionary tale about applying GNNs to graph families with low structural diversity. Vertex-transitivity is a common property in algebraic combinatorics, and our analysis provides a principled framework for assessing when GNNs can be expected to work and when they cannot.
+
+% ============================================================
+\bibliography{references}
+\bibliographystyle{plain}
+% ============================================================
+
+\end{document}

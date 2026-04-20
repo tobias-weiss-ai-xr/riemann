@@ -1,0 +1,103 @@
+# ── Python ────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+
+# ── Virtual environments ─────────────────────────────────────────
+venv/
+.venv/
+
+# ── IDE ──────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── OS ───────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Data (generated, not committed) ─────────────────────────────
+data/cayley-graphs/*.npz
+data/cayley-graphs/*.pt
+data/cayley-graphs/*.graphml
+data/eigenvalues/*.npy
+data/eigenvalues/*.npz
+data/models/*.pt
+data/models/*.pth
+data/models/*.ckpt
+data/models/wandb/
+
+# ── Neo4j ────────────────────────────────────────────────────────
+neo4j-data/
+neo4j-logs/
+
+# ── Jupyter ──────────────────────────────────────────────────────
+.ipynb_checkpoints/
+
+# ── Environment ──────────────────────────────────────────────────
+.env
+
+# ── Logs ─────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── Keep directory structure ─────────────────────────────────────
+!data/cayley-graphs/.gitkeep
+!data/eigenvalues/.gitkeep
+!data/models/.gitkeep
+
+# ── LMFDB data (very large: 920MB+ JSON, 215MB+ NPY) ───────────
+data/lmfdb/
+
+# ── Other large data dirs ──────────────────────────────────────
+data/pizer/
+data/hecke/
+data/farey-graphs/
+data/augmented/
+data/backups/
+data/cayley-multigen*/
+data/cheb_*/
+data/farey-*/
+data/sign_precomputed/
+data/*.json
+
+# ── Output / temp files ────────────────────────────────────────
+output*.txt
+check_*.txt
+ps_*.txt
+*_out.txt
+*_test.txt
+collect_out.txt
+lmfdb_test.txt
+test_snip.txt
+network_test.txt
+docker_check.txt
+nslookup_test.txt
+schema.txt
+hi.txt
+tea_debug.log
+
+# ── Temp scripts (root) ────────────────────────────────────────
+quick_test*.py
+run_collect*.py
+run_collect*.sh
+run_verify*.sh
+wait_training*.py
+test_docker.sh
+
+# ── Temp scripts (scripts/) ────────────────────────────────────
+scripts/_*.py
+scripts/_*.sh
+
+# ── Sisyphus / wandb / caches ──────────────────────────────────
+.sisyphus/
+wandb/
+.playwright-mcp/
+.ruff_cache/
+%TEMP%/
+funsearch/

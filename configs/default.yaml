@@ -1,0 +1,25 @@
+# GNN Training Configuration — SL(2,F_p) Cayley Graph Spectral Prediction
+
+model:
+  type: "gat"              # gcn or gat
+  hidden_channels: 64
+  num_layers: 3
+  dropout: 0.1
+
+training:
+  epochs: 200
+  batch_size: 8
+  learning_rate: 0.001
+  weight_decay: 1.0e-5
+
+data:
+  target: "spectral_gap"   # spectral_gap, ramanujan_ratio, is_ramanujan
+  train_primes: "2-50"     # Primes for training set
+  test_primes: "53-101"    # Primes for test set
+
+eigenvalues:
+  k: 100                   # Top-k eigenvalues to compute (null = all)
+
+output:
+  model_dir: "data/models"
+  log_dir: "data/models/logs"
