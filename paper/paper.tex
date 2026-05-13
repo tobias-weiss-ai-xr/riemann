@@ -158,7 +158,9 @@ The core idea: given a newform $f$ with Fourier coefficients $\{a_1(f), \ldots, 
 Given a newform $f$ with Fourier coefficients $\{a_1(f), \ldots, a_{1000}(f)\}$, the \textbf{trace-index graph} $G_f$ has:
 \begin{itemize}
   \item \textbf{Nodes:} $V = \{1, \ldots, 1000\}$, with 5-dimensional features
-    $\mathbf{x}_i = \bigl(\log(i),\; a_i(f),\; a_i(f)/(2\sqrt{i}),\; \mathbf{1}[\text{$i$ is prime}],\;\sqrt{i}\bigr)$.
+    \[
+      \mathbf{x}_i = (\log(i),\; a_i(f),\; a_i(f)/(2\sqrt{i}),\; \mathbf{1}_{i\text{ prime}},\; \sqrt{i})^{\!\top}.
+    \]
   \item \textbf{Edges} from three sources:
     \begin{enumerate}
       \item \textbf{Sequential:} $(i, i+1)$ for $i = 1, \ldots, 999$ — captures local autocorrelation in the trace sequence.
