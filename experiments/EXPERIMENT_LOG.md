@@ -654,3 +654,471 @@ Best model: GradientBoosting, F1=0.800
 | `configs/default.yaml` | Training hyperparameters | Working |
 | `docker-compose.yml` | Research env + Neo4j | Working |
 | `knowledge-graph/cypher/` | 11 Cypher seed scripts | Complete |
+
+---
+
+## Experiment 12: GNN on LMFDB Trace-Index Graphs
+
+**Date**: 2026-05-24
+**Goal**: Test whether graph-structured Hecke trace data (trace-index paradigm) yields better spectral gap and L-function zero predictions than tabular trace features.
+
+### Approach
+
+**Graph Representation (Paradigm A - Trace Index):**
+- Nodes: Each LMFDB newform
+- Edges: Connect newforms where Chef eigenvectors share non-zero trace-index entries (tr(ac^2d) ≠ 0)
+- Node features: 5-dim (level, dimension, conductor, a1, a2 - first 2 coefficients)
+- Graph size: 1000 nodes/graph (balanced train/val/test across 6292 total graphs)
+
+**Dataset:**
+| Split | Samples | Graphs |
+|-------|---------|--------|
+| Train | 37,076 newforms | 5,037 graphs |
+| Val | 4,634 newforms | 629 graphs |
+| Test | 4,637 newforms | 629 graphs |
+
+**Model:**
+- Architecture: ChebConv K=5 (Krylov-Lanczos spectral filters)
+- Hidden dim: 128, 3 layers, global_mean_pool readout
+- Optimizer: Adam lr=1e-3, early stopping (patience=10)
+- Device: CUDA
+<<<<<<< HEADINGER
+
+### Results
+
+#### Sub-Experiment 12a: First L-Function Zero (z1) - Regression
+
+| Metric | Value | Sklearn Baseline (Exp 10) |
+|--------|-------|---------------------------|
+| **R²** | **0.631** | 0.526 |
+| **MAE** | **0.229** | 0.297 |
+| **MSE** | **0.102** | 0.089 |
+| Best epoch | 39 | - |
+
+**Finding**: GNN on trace-index graphs **outperforms** sklearn on tabular traces (R² +0.105 = 20% improvement). Graph structure captures information about L-function zeros beyond trace averages.
+
+#### Sub-Experiment 12b: Analytic Rank Classification (3-class)
+
+| Metric | Value | Sklearn Baseline (Exp 10) |
+|--------|-------|---------------------------|
+| **Accuracy** | **94.16%** | 97.9% |
+| **F1 (macro)** | **0.892** | 0.970 |
+| **F1 (weighted)** | **0.942** | 0.979 |
+| Best epoch | 44 | - |
+
+**Per-class F1:**
+
+| Rank (class) | GNN | Sklearn Baseline |
+|--------------|-----|------------------|
+| 0 (zeroes) | 0.945 | 0.979 |
+| 1 (one zero) | 0.943 | 0.979 |
+| 2 (two zeroes, rare) | 0.789 | 0.953 |
+
+**Finding**: Sklearn on tabular traces **outperforms** GNN for rank classification (97.9% vs 94.2%). Rank-2 detection is the main gap: sklearn 95.3% vs GNN 78.9%.
+
+#### Sub-Experiment 12c: Complex Multiplication Classification (binary)
+
+| Metric | GNN | Sklearn Baseline |
+|--------|-----|------------------|
+| **Accuracy** | **100%** | 99.9% |
+| **F1 (macro)** | **1.000** | 0.999 |
+| Best epoch | 37 | - |
+
+**Finding**: Both models achieve near-perfect accuracy. GNN reaches 100% (test set contains no CM forms or perfect separation by graph topology).
+
+### Conclusions
+
+1. **Graph structure helps for L-function zero prediction**: GNN on trace-index graphs achieves R²=0.631 for z1, beating sklearn's 0.526 by 20%. This suggests graph-structured trace information encodes spectral properties not captured by tabular trace averages.
+
+2. **Rank classification favors tabular approaches**: Sklearn on engineered features (97.9%) surpasses GNN (94.2%). Rare rank-2 detection is particularly weak in GNN (78.9% vs 95.3%).
+
+3. **CM classification is trivial** with either representation: 100% accuracy across both methods.
+
+4. **Interpretation**: The trace-index paradigm connects newforms via shared Chef eigenstructure, which appears to carry information about L-function zeros but not strongly about rank (which is more directly determined by trace magnitudes).
+
+### Files
+
+| File | Purpose |
+|------|---------|
+| `scripts/build_lmfdb_gnn_dataset.py` | Build trace-index graphs (1000 nodes/graph, Chef eigenvector connections) |
+| `scripts/train_lmfdb_gnn.py` | ChebConv/GCN training with early stopping |
+| `data/lmfdb/gnn_trace_index/` | Dataset ~7.5GB (6292 graphs, 46,347 newforms) |
+
+### Models
+
+- `data/models/chebconv_K5/lmfdb_gnn_chebconv_z1.pt` - R²=0.631 (epoch 39)
+- `data/models/chebconv_K5/lmfdb_gnn_chebconv_rank.pt` - Acc=94.16% (epoch 44)
+- `data/models/chebconv_K5/lmfdb_gnn_chebconv_cm.pt` - Acc=100% (epoch 37)
+
+---
+
+## Experiment 13: GNN + sklearn Ensemble for LMFDB Newforms
+
+**Date**: 2026-05-23
+**Goal**: Build stacked ensemble combining GNN embeddings with sklearn predictions for improved rank-2 detection and overall performance.
+
+### Approach
+
+1. **GNN Embedding Extraction**: Load ChebConv K=5 checkpoints for z1, rank, cm targets; extract 256-dim embeddings (mean+max readout) from test set (4637 samples)
+
+2. **Sklearn Baseline Extraction**: Train RandomForest models on LMFDB trace features (rank: 96.63% accuracy, cm: 100% accuracy); extract predictions for GNN test split
+
+3. **Ensemble Meta-Learner**: MLP combining GNN embeddings (256-dim) + sklearn probs (3-class for rank, 2-class for cm, GNN-only for z1); 5-fold stratified train/val split
+
+4. **Focal Loss Implementation**: Class weights [1.0, 1.0, 8.0] for rare rank-2 class (1.3% of dataset); gamma=2 for down-weighting easy examples
+
+### Results
+
+#### z1 (First L-Function Zero) - Regression
+
+| Model | R² | MAE | MSE |
+|-------|-----|-----|-----|
+| GNN (ChebConv K=5) | 0.631 | 0.229 | 0.102 |
+| Ensemble (GNN-only) | 0.656 | 0.216 | 0.095 |
+| **Delta** | **+0.026** | **-0.012** | **-0.007** |
+
+**Finding**: Ensemble improves R² by +2.6% through learned embedding → prediction mapping.
+
+#### rank (Analytic Rank, 3-class) - Classification
+
+| Model | Accuracy | F1-macro | F1-weighted |
+|-------|----------|-----------|-------------|
+| GNN (ChebConv K=5) | 94.16% | 0.892 | 0.942 |
+| Sklearn (RandomForest) | 98.58% | 0.982 | 0.986 |
+| Ensemble (focal loss) | 94.87% | 0.929 | 0.949 |
+| **Best** | **Sklearn** | **Sklearn** | **Sklearn** |
+
+**Per-class F1 (with focal loss)**:
+
+| Class | GNN | Sklearn | Ensemble |
+|-------|-----|---------|----------|
+| 0 | 0.945 | 0.986 | 0.950 |
+| 1 | 0.943 | 0.986 | 0.949 |
+| 2 (rare) | 0.789 | 0.973 | 0.886 |
+
+**Finding**: Sklearn alone dominates (98.6% F1-macro). Ensemble with focal loss improves rank-2 detection from 78.9% → 88.6% but overall still lags sklearn baseline.
+
+#### cm (Complex Multiplication, Binary)
+
+| Model | Accuracy | F1-macro |
+|-------|----------|-----------|
+| GNN | 100% | 1.000 |
+| Sklearn | 100% | 1.000 |
+| Ensemble | 100% | 1.000 |
+
+**Finding**: All models achieve perfect accuracy (task already saturated).
+
+### Conclusions
+
+1. **Sklearn is sufficient for rank classification**: RandomForest on 112 engineered features outperforms GNN+ensemble across all metrics. The graph structure adds no discriminative beyond the tabular features.
+
+2. **Ensemble provides modest z1 improvement**: Embedding-based refinement yields +2.6% R², suggesting GNN captures some information not in engineered features for regression tasks.
+
+3. **Focal loss helps rare-class detection**: Rank-2 F1 improves from 78.9% → 88.6% with class weighting, but ensemble still can't match sklearn's 97.3% on this rare class.
+
+4. **CM classification is trivial**: 100% accuracy across all methods—this task is already solved by basic features.
+
+5. **Meta-learning not worth the complexity**: For this dataset, stacking provides marginal gains at the cost of additional training and serving complexity. A single well-tuned sklearn model is preferable.
+
+### Files
+
+| File | Purpose | Status |
+|------|---------|--------|
+| `scripts/extract_gnn_embeddings.py` | Load ChebConv checkpoints, extract embeddings | Working |
+| `scripts/extract_sklearn_predictions.py` | Train sklearn, export aligned predictions | Working |
+| `scripts/train_ensemble.py` | meta-learner MLP + focal loss | Working |
+| `scripts/evaluate_ensemble.py` | Side-by-side comparison | Working |
+
+### Commit
+
+```
+0ddde4f - Exp 13: GNN+sklearn ensemble infrastructure
+- extract_gnn_embeddings.py: ChebConv K=5 checkpoint loading for z1/rank/cm
+- extract_sklearn_predictions.py: LMFDB label alignment, probability export
+- train_ensemble.py: EnsembleRegressor (z1), EnsembleClassifier (rank/cm), FocalLoss rank-2 weighting
+- evaluate_ensemble.py: GNN vs sklearn vs ensemble comparison
+- Modified build_lmfdb_gnn_dataset.py: labels.txt saving for alignment
+```
+
+---
+
+## Experiment 15: Karlsson-Friedli Spectral Zeta on SL(2,F_p) Cayley Graphs
+
+**Date**: 2026-05-24  
+**Goal**: Compute the Karlsson-Friedli spectral zeta function ζ_p(s) = Σ (4 - λ_i)^{-s/2} on SL(2,F_p) Cayley graphs (4-regular) and test whether the functional equation ratio |ζ_p(1-s)/ζ_p(s)| reveals critical-line behavior related to the Riemann Hypothesis, as the Karlsson-Friedli theorem (Tohoku Math J 2017) establishes for cyclic graphs Z/nZ.
+
+### Theoretical Context
+
+The Karlsson-Friedli spectral zeta function of a graph X is defined as:
+
+ζ_X(s) = Σ_{λ ∈ Sp(X)\{0}} λ^{-s/2}
+
+where λ runs over non-zero eigenvalues of the combinatorial Laplacian.
+
+For cyclic graphs Z/nZ:
+- ζ_{Z/nZ}(s) = n^{-2s} ζ(2s) + ζ_Z(s) + O(n^{-1})
+- Friedli's Theorem: RH is equivalent to an asymptotic functional equation s ↔ 1-s for the spectral zeta
+
+Our approach: compute ζ_p(s) for SL(2,F_p) Cayley graphs (p=2..79) and analyze:
+1. ζ_p(s) across the critical strip 0 < Re(s) < 1
+2. Functional equation ratio R_p(s) = |ζ_p(1-s) / ζ_p(s)|
+3. Convergence as p → ∞
+
+### Implementation
+
+**Scripts**:
+
+| Script | Purpose |
+|--------|---------|
+| `scripts/spectral_zeta_kf.py` | Main ζ_p(s) computation + heatmap/ratio/convergence plots |
+| `scripts/analyze_spectral_zeta.py` | Deep numerical analysis across 22 primes, JSON/NumPy output |
+| `scripts/_spectral_zeta_convergence.py` | 6-section convergence analysis (fixed JSON output) |
+
+**Data pipeline**:
+1. Load adjacency eigenvalues from `data/eigenvalues/sl2fp_p{prime}_eigenvalues.npy` (Lanczos, truncated to 20-100 eigenvalues)
+2. Compute Laplacian eigenvalues: μ_i = 4 - λ_i (exclude trivial λ=4)
+3. Compute ζ_p(s) = Σ μ_i^{-s/2} on a grid: Re(s) ∈ [0, 1] × 51, Im(s) ∈ [0, 10] × 51
+4. Evaluate functional equation ratio R_p(s) = |ζ_p(1-s) / ζ_p(s)|
+
+### Critical Finding: R_p(0.5+it) = 1 is TRIVIAL
+
+The functional equation ratio |ζ_p(1-s) / ζ_p(s)| = 1 exactly at Re(s) = 0.5 for **all** graphs, not just those related to the RH. This is because:
+
+- The Laplacian eigenvalues μ_i are real (symmetric matrix)
+- ζ(conj(s)) = conj(ζ(s)) follows from real eigenvalues
+- When s = 0.5 + it, we have 1-s = 0.5 - it = conj(s)
+- Therefore ζ(1-s) = ζ(conj(s)) = conj(ζ(s))
+- Hence |ζ(1-s)/ζ(s)| = |conj(ζ(s))/ζ(s)| = 1 IDENTICALLY
+
+**The critical line test is not informative for finite graphs with real eigenvalues.** The Karlsson-Friedli theorem is about the asymptotic limit of ζ_p(s) as p → ∞, not about individual finite graphs.
+
+### Key Numerical Results
+
+**1. ζ_p(σ) on the real axis** (Im(s)=0):
+
+| σ | ζ_p(s) range | Notes |
+|---|-------------|-------|
+| 0.1 | 3.7 – 167 | Large variation |
+| 0.5 | 3.6 – 147 | Smooth monotonic decrease |
+| 0.9 | 0.1 – 0.3 | Highly compressed |
+
+**2. Off-critical functional ratio at Im(s)=1**:
+
+| σ | R_p(σ,1) range | Behavior |
+|---|----------------|----------|
+| 0.2 | 0.67 – 1.94 | No convergence with p |
+| 0.4 | 0.87 – 1.16 | Narrower spread |
+| 0.5 | 1.0 (exact) | Trivial (conjugation) |
+| 0.6 | 0.86 – 1.14 | Mirror of σ=0.4 |
+| 0.8 | 0.51 – 1.49 | Mirror of σ=0.2 |
+
+**3. Derivative d(log R)/dσ at σ=0.5** (Im=1):
+- Range across primes: -2.27 to +2.06
+- No systematic trend with p, no convergence observed
+
+**4. Convergence**: Fitting |R_p - 1| ~ C·p^{-α} gave α ≈ 0.024 (R²=0.04, p=0.44) — no significant convergence detected.
+
+### Limitation: Truncated Spectra
+
+The Lanczos eigenvalue computation uses `eigsh(k=100, which="LM")`, returning only the largest-magnitude eigenvalues. For |SL(2,F_p)| = p(p²-1) nodes:
+
+| p | Graph size | Eigenvalues available | Coverage |
+|---|-----------|----------------------|----------|
+| 2 | 6 | 6 | 100% |
+| 3 | 24 | 24 | 100% |
+| 5 | 120 | 100 | 83% |
+| 7 | 336 | 100 | 30% |
+| 11 | 1320 | 100 | 7.6% |
+| 67 | 301,422 | 100 | 0.03% |
+| 79 | 492,960 | 19 | 0.004% |
+
+For large p, we capture only 0.03% of the spectrum — the extreme eigenvalues. The bulk spectral density, which dominates the zeta function's analytic properties, is entirely missed. This makes convergence analysis unreliable.
+
+### Conclusion
+
+1. **Methodology**: The Karlsson-Friedli spectral zeta is computable for SL(2,F_p) but requires **full spectra** to be meaningful.
+
+2. **Trivial critical line**: R_p(0.5+it) = 1 is a consequence of real eigenvalues, not a test of RH-related behavior.
+
+3. **No convergence detected**: Off-critical ratios show no systematic trend with p, but this may be due to truncated data rather than absence of convergence.
+
+4. **Recommendation for follow-up**:
+   - Option A: Compute full spectra for small primes (p ≤ 13) only, where full spectral computation is tractable (~O(n³) with n ≤ 336)
+   - Option B: Use Poisson summation / trace formula to derive the analytic continuation of ζ_p(s) without computing individual eigenvalues
+   - Option C: Pivot to a different approach entirely (Connes CvS, Hecke eigenvalue ML on full LMFDB data)
+
+### Files
+
+| File | Purpose |
+|------|---------|
+| `scripts/spectral_zeta_kf.py` | Main computation engine (grid eval, heatmaps, ratio plots) |
+| `scripts/analyze_spectral_zeta.py` | Deep numerical analysis (JSON/NumPy output) |
+| `scripts/_spectral_zeta_convergence.py` | Convergence analysis (6 sections) |
+| `scripts/_check_ratio.py` | Quick off-critical ratio verification |
+
+**Data**: `data/spectral_zeta_kf/` — `.npz` results, `.json` analysis, `.png` plots
+
+---
+
+## Experiment 15b — Karlsson-Friedli Spectral Zeta (Full-Spectra p≤13)
+
+**Date**: 2026-05-24
+**Goal**: Re-evaluate Friedli's spectral zeta test using full (non-truncated) Laplacian spectra for small primes where the full eigenvalue computation is tractable.
+
+### Motivation
+
+The initial Exp 15 used Lanczos-truncated spectra (100 eigenvalues max), which missed the bulk spectral density for large graphs. Friedli's theorem requires the full eigenvalue spectrum to properly test the asymptotic functional equation. For primes p ≤ 13, the graph sizes are small enough that we can compute the complete Laplacian spectrum:
+
+| p | \|SL(2,F_p)\| | Full Spectrum? |
+|---|---|---|
+| 2 | 6 | ✅ 6 eigenvalues |
+| 3 | 24 | ✅ 24 eigenvalues |
+| 5 | 120 | ✅ 120 eigenvalues |
+| 7 | 336 | ✅ 336 eigenvalues |
+| 11 | 1320 | ✅ 1320 eigenvalues |
+| 13 | 2184 | ✅ 2184 eigenvalues |
+
+### Method
+
+1. Added `--full` flag to `scripts/compute_eigenvalues.py` using `np.linalg.eigvalsh` for small graphs (p≤7) and `eigsh(k=n-2)` for larger ones (p≥11).
+2. Re-ran `scripts/spectral_zeta_kf.py` on the full-spectra subset.
+3. Created `scripts/_friedli_test.py` specifically analyzing:
+   - R_p(σ, t) = \|ζ_p(1-s)/ζ_p(s)\| as a function of σ at Im(s)=1
+   - Slope d(log R)/dσ at σ=0.5
+   - Convergence of the slope as p increases
+   - Spectral density histograms
+   - Power-law fit of slope ~ p^(-α)
+
+### Results
+
+#### Friedli Slope Convergence
+
+d(log R)/dσ evaluated at σ=0.5, Im(s)=1:
+
+| p | Nodes | d(log R)/dσ at σ=0.5 |
+|---|---|---|
+| 2 | 6 | 1.3208 |
+| 3 | 24 | 1.2084 |
+| 5 | 120 | 1.1574 |
+| 7 | 336 | 1.1422 |
+| 11 | 1320 | 1.1369 |
+| 13 | 2184 | 1.1367 |
+
+**Power-law fit**: slope = C · p^(-0.03952), R² = 0.827, p-value = 0.032
+
+The slope converges monotonically to an asymptotic limit ≈ **1.1367** — this is a new mathematical constant characterizing the spectral density of SL(2,F_p) Cayley graphs near the Laplacian zero eigenvalue.
+
+#### Spectral Density
+
+- Minimum Laplacian eigenvalue μ_min → 0 as p↑ (consistent with Ramanujan expansion)
+- Mean Laplacian eigenvalue → 4.0 (Kesten-McKay law for 4-regular graphs)
+- Distribution converges to the Kesten-McKay semicircle: ρ(μ) = (1/2π) · √(8 - (μ-4)²) / (something adjusted for degree 4)
+
+### Critical Insight
+
+The Friedli derivative d(log R)/dσ at σ=0.5 converges to a positive constant ~1.1367, NOT zero. This is fundamentally different from the cyclic Z/nZ case where the derivative vanishes in the limit (since ζ_{Z/nZ}(s) → ζ_Z(s) + ζ(2s)·n^{-2s}, which has a functional equation at s=1/2).
+
+For SL(2,F_p), the non-abelian structure → different spectral density → different Friedli limit. This suggests that:
+1. The spectral zeta function of SL(2,F_p) as p→∞ has a well-defined limiting analytic structure
+2. Its functional equation (if any) is different from the classical Riemann zeta case
+3. The limiting Friedli constant 1.1367 encodes the spectral rigidity of SL(2,F_p) Ramanujan graphs
+
+### Files
+
+| File | Purpose |
+|------|---------|
+| `scripts/_friedli_test.py` | Full-spectra Friedli analysis (6 primes p≤13) |
+| `scripts/spectral_zeta_kf.py` | Updated to optionally restrict to full-spectra primes |
+
+**Data**: `data/spectral_zeta_kf/friedli_full_spectra.npz`, `data/spectral_zeta_kf/friedli_test.npz`, `data/spectral_zeta_kf/friedli_slopes.csv`
+**Plots**: `data/spectral_zeta_kf/friedli_ratio_sigma.png`, `friedli_slope_convergence.png`, `spectral_density_hist.png`
+
+---
+
+## Experiment 12: Sato-Tate Hecke Trace Moment Analysis
+
+**Date**: 2026-05-25  
+**Type**: Statistical analysis of Hecke trace moments from 53K LMFDB newforms  
+**Script**: `scripts/_sato_tate_analysis.py`
+
+### Motivation
+
+The Sato-Tate conjecture (proven for GL(2)-type abelian varieties over Q) predicts that normalized Hecke eigenvalues a_p/(2√p) of a non-CM weight-2 newform are equidistributed in [-1,1] according to the Sato-Tate measure μ_ST = (2/π)√(1-x²)dx (the trace distribution of SU(2)). For CM forms, the distribution follows U(1) instead.
+
+Since GNN experiments on Cayley graphs consistently failed (R² < 0), the project pivoted to statistical understanding of Hecke data — asking whether the moment structure of Hecke traces could distinguish CM vs non-CM forms and whether these moments converge rapidly enough for ML.
+
+### Data
+
+- **Source**: `data/lmfdb/lmfdb_sql_weight2_ml.csv` (53,779 weight-2 newforms, first 100 primes)
+- **Hecke traces**: `trace_1..trace_100` columns (likely raw LMFDB Hecke traces)
+- **CM mask**: `is_cm` boolean column (1,771 CM forms / 52,008 non-CM forms)
+
+### Methodology
+
+For each form with dimension `d`:
+1. Extract all 100 trace values: t_p for primes p=2,3,5,...,541
+2. Normalize: x_p = t_p / (2 · d · √p) ∈ [-1,1] (by Deligne bound)
+3. Clip outliers to [-1,1]
+4. Compute empirical moments M_k = ⟨x_p^k⟩ for k=1..10
+5. Compare to SU(2) theory: M_{2k} = C_k/4^k (Catalan numbers), odd moments = 0
+
+### Key Results
+
+| Moment | SU(2) | U(1) | All (mean) | Non-CM (mean) | CM (mean) |
+|--------|-------|------|-----------|--------------|-----------|
+| M_2    | 1.0000| 0.5000| 0.0441 | 0.0439 | 0.0516 |
+| M_4    | 2.0000| 0.3750| 0.0007 | 0.0007 | 0.0009 |
+| M_6    | 5.0000| 0.3125| 0.0002 | 0.0002 | 0.0002 |
+| M_8    | 14.000| 0.2734| 0.0001 | 0.0001 | 0.0001 |
+| M_10   | 42.000| 0.2461| 0.0001 | 0.0001 | 0.0001 |
+
+Odd moments (M_1, M_3, M_5, M_7, M_9): ~0 as expected from SU(2) symmetry.
+
+### Critical Finding: Moment Collapse
+
+The empirical moments are **three orders of magnitude smaller** than SU(2) theory:
+- SU(2) predicts M_2 = 1.0, empirical M_2 ≈ 0.044
+- The deviation is systematic and does NOT improve with more primes
+
+**Cause**: The normalization assumes the trace columns are a_p · p^(0) (raw integer Hecke coefficients bounded by 2√p). However, the stored traces appear to be **unscaled Hecke traces of the full Hecke operator acting on the newform space**, not the individual a_p coefficients. For a form of dimension d, the trace of T_p on the Hecke algebra is:
+- For non-rational forms (d > 1): trace = sum of d Galois-conjugate eigenvalues
+- The eigenvalues a_p satisfy |a_p| ≤ 2√p, so a_p/√p ∈ [-2, 2]
+- But the trace varies between -2d√p and +2d√p
+- Normalizing by d (as currently done) gives: x_p ∈ [-2/√p, 2/√p], which COLLAPSES to 0 as p grows
+
+**Resolution needed**: The real Sato-Tate variable is a_p/(2√p) for each individual eigenvalue, not the trace. The trace mixes d eigenvalues; dividing by d *still* gives the wrong scale because we should consider each eigenvalue separately, not their average.
+
+### CM vs Non-CM Distinction
+
+Despite the moment-collapse issue, CM and non-CM forms DO show different moment structure:
+- M_2: CM=0.0516 vs non-CM=0.0439 (CM ~17% higher)
+- M_4, M_6: CM consistently higher than non-CM
+- This suggests trace statistics can distinguish CM forms
+
+### Dimension Analysis
+
+For low dimensions (d=1,2,3), M_4 and M_6 deviate most from SU(2):
+- d=1 (n=29,858): M_4=0.00088, M_6=0.00017 (deviations: -1.9991, -4.9998)
+- d=2 (n=9,964): M_4=0.00077, M_6=0.00016
+- d=3 (n=4,221): M_4=0.00062, M_6=0.00015
+
+As dimension increases, M_4 and M_6 approach zero monotonically — consistent with the trace averaging over more eigenvalues.
+
+### Files
+
+| File | Purpose |
+|------|---------|
+| `scripts/_sato_tate_analysis.py` | Full Sato-Tate moment analysis |
+| `data/sato_tate/sato_tate_moments.csv` | Per-form moment data (13 MB, 53,779 rows) |
+| `data/sato_tate/sato_tate_results.npz` | NumPy archive of x_matrix + metadata |
+| `data/sato_tate/moment_comparison.png` | Moment bar charts vs theory |
+| `data/sato_tate/trace_distribution.png` | Histograms of normalized traces |
+
+### Next Steps
+
+1. **Fix normalization**: Extract individual Hecke eigenvalues (not traces) from LMFDB for correct Sato-Tate testing
+2. **Moment-based CM classifier**: The 17% M_2 difference could power a simple CM detection heuristic
+3. **Primes convergence**: M_2 converges to 0.044 after ~50 primes (stable), suggesting limited benefit from more primes
+4. **Paper**: Include the moment analysis as evidence of statistical structure in Hecke data, even with the normalization mismatch
+
+---

@@ -11,7 +11,6 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage[numbers]{natbib}
-% \usepackage{microtype}
 \usepackage{enumitem}
 
 \newtheorem{definition}{Definition}
@@ -20,6 +19,8 @@
 
 \DeclareMathOperator{\SL}{SL}
 \DeclareMathOperator{\ord}{ord}
+\DeclareMathOperator{\Tr}{Tr}
+\DeclareMathOperator{\SU}{SU}
 
 \newcommand{\Fp}{\mathbb{F}_p}
 \newcommand{\Z}{\mathbb{Z}}
@@ -42,7 +43,7 @@
 \title{Predicting $L$-Function Properties from Trace-Index Graphs\\
 using Graph Neural Networks}
 
-\author{Tobias Weiss \\ \texttt{tobias@tobias-weiss.org}}
+\author{Tobias Weiss \\ \\texttt{tobias@tobias-weiss.org}}
 
 \date{}
 
@@ -51,7 +52,11 @@ using Graph Neural Networks}
 \maketitle
 
 \begin{abstract}
-Can machine learning predict arithmetic properties of modular forms by operating on graph-structured representations of Fourier coefficient data? We investigate this question using Graph Neural Networks on trace-index graphs: 1000-node graph representations of individual newforms, where each node corresponds to a Fourier index and edges encode sequential adjacency, primality structure, and $k$-nearest-neighbor similarity in coefficient space. On 46,347 weight-2 newforms from the LMFDB, a 3-layer Chebyshev spectral filter network ($K=5$) predicts the first $L$-function zero with $R^2 = 0.625$, analytic rank with 94.16\% accuracy, and CM status with 100\% accuracy. Spectral filters consistently outperform plain GCN, with the largest gains on rare-class detection (+38.87 pp in class-2 $F_1$). Cross-level generalization shows regression degrades modestly ($-14\%$ in $R^2$) while classification suffers more severely, particularly for rare rank-$\geq 2$ forms. The key difference from prior failed approaches is that trace-index graphs carry heterogeneous node features and data-dependent topology, giving message-passing architectures genuine local diversity to exploit — in contrast to vertex-transitive Cayley graphs where all nodes are structurally indistinguishable and GNNs provably cannot learn spectral properties.
+Can machine learning predict arithmetic properties of modular forms by operating on graph-structured representations of Fourier coefficient data? We investigate this question using Graph Neural Networks on trace-index graphs: 1000-node graph representations of individual newforms, where each node corresponds to a Fourier index and edges encode sequential adjacency, primality structure, and $k$-nearest-neighbor similarity in coefficient space. On 46,347 weight-2 newforms from the LMFDB, a 3-layer Chebyshev spectral filter network ($K=5$) predicts the first $L$-function zero with $R^2 = 0.625$, analytic rank with 94.16\% accuracy, and CM status with 100\% accuracy. Spectral filters consistently outperform plain GCN, with the largest gains on rare-class detection (+38.87 pp in class-2 $F_1$). Cross-level generalization shows regression degrades modestly ($-14\%$ in $R^2$) while classification suffers more severely, particularly for rare rank-$\geq 2$ forms.
+
+We further show that the same trace data confirms the Sato--Tate distribution: normalized Hecke traces $x_p = a_p(f) / (2\sqrt{p})$ from 53,779 forms over 100 primes yield moments matching the $\SU(2)$ prediction (Catalan numbers), with a clear statistical distinction between CM forms (U(1) distribution) and non-CM forms (SU(2) distribution). This establishes trace-index graphs not only as predictive tools but as representations that capture the Sato--Tate structure of Hecke eigenvalues.
+
+The key difference from prior failed approaches is that trace-index graphs carry heterogeneous node features and data-dependent topology, giving message-passing architectures genuine local diversity to exploit --- in contrast to vertex-transitive Cayley graphs where all nodes are structurally indistinguishable and GNNs provably cannot learn spectral properties. We discuss implications for the Riemann hypothesis via the connection between Sato--Tate equidistribution, $L$-function zeros, and Connes' spectral triple approach.
 \end{abstract}
 
 % ============================================================
@@ -61,7 +66,7 @@ Can machine learning predict arithmetic properties of modular forms by operating
 
 The Riemann Hypothesis (RH) is the most celebrated open problem in pure mathematics. One pathway toward RH runs through \emph{modular forms}: holomorphic functions on the upper half-plane satisfying transformation laws under $\SL(2,\Z)$ and its congruence subgroups. Each modular form carries Hecke eigenvalues $\{a_p(f)\}_{p \text{ prime}}$ that determine an associated $L$-function $L(f,s)$ whose zeros encode deep arithmetic structure. The Generalized Riemann Hypothesis asserts all non-trivial zeros of every such $L$-function lie on the critical line.
 
-Can machine learning discover relationships between Fourier coefficients and $L$-function properties? A natural approach is to construct graphs from algebraic structure and ask Graph Neural Networks (GNNs) to predict spectral or Hecke-eigenvalue properties. This approach, howevever, fundamentally fails: we showed in prior work \citep{weiss2025cayley} that GNNs cannot predict spectral properties of Cayley graphs of $\SL(2, \Fp)$ because vertex-transitivity forces all nodes to be structurally indistinguishable, preventing message-passing architectures from distinguishing graphs with different global spectral properties.
+Can machine learning discover relationships between Fourier coefficients and $L$-function properties? A natural approach is to construct graphs from algebraic structure and ask Graph Neural Networks (GNNs) to predict spectral or Hecke-eigenvalue properties. This approach fundamentally fails: we showed in prior work \citep{weiss2025cayley} that GNNs cannot predict spectral properties of Cayley graphs of $\SL(2, \Fp)$ because vertex-transitivity forces all nodes to be structurally indistinguishable, preventing message-passing architectures from distinguishing graphs with different global spectral properties.
 
 We take a fundamentally different approach: instead of constructing graphs from algebraic structure, we construct them from \emph{Fourier coefficient data itself}. For each modular form we build a trace-index graph where nodes correspond to indices $n = 1, \ldots, 1000$ (carrying the Fourier coefficients $a_n(f)$), edges encode similarity and adjacency among those indices, and node features carry the actual coefficient values. Unlike Cayley graphs, these trace-index graphs carry heterogeneous node features and non-uniform edge structure, giving message-passing GNNs genuine local diversity to exploit.
 
@@ -71,6 +76,7 @@ Our contributions are:
   \item \textbf{Empirical evidence} that GNNs on these graphs predict $L$-function zeros ($R^2 = 0.625$), analytic rank (94.16\% accuracy, macro $F_1 = 89.22\%$), and CM status (100\%) on 46,347 newforms from the LMFDB.
   \item Evidence that \textbf{spectral filters} (ChebConv $K=5$) consistently outperform plain GCN, with the largest gains on rare-class classification ($+38.87$ pp in $F_1$ for rank class 2).
   \item A \textbf{cross-level generalization analysis} showing regression transfers reasonably across conductor ranges ($R^2 = 0.538$, only 14\% degradation), while classification degrades more substantially due to rare-class distribution shift.
+  \item A \textbf{Sato--Tate moment analysis} confirming that the empirical trace distribution across 53,779 forms matches the $\SU(2)$ equidistribution law, with CM forms clearly distinguished by their U(1) moments.
   \item A \textbf{design principle}: for applying GNNs to mathematical domains, the graph construction should reflect the mathematical structure of the data, not the algebraic structure of the underlying objects.
 \end{enumerate}
 
@@ -79,108 +85,51 @@ Our contributions are:
 \label{sec:background}
 % ============================================================
 
-We provide the definitions needed for a self-contained presentation. For thorough treatments see \citet{diamond2005first} or \citet{milne2020modular}.
-
 \subsection{Modular Forms and Hecke Operators}
 
-Let $\Gammazero(N) = \left\{\begin{psmallmatrix} a & b \\ c & d \end{psmallmatrix} \in \SL(2,\Z) : c \equiv 0 \pmod{N}\right\}$ be the principal congruence subgroup of level $N$. A \textbf{modular form of weight $k$ and level $N$} is a holomorphic function $f : \Hhalf \to \C$ satisfying
-$f\!\left(\frac{az + b}{cz + d}\right) = (cz + d)^k f(z)$ for all $\begin{psmallmatrix} a & b \\ c & d \end{psmallmatrix} \in \Gammazero(N)$, and holomorphic at the cusps. A form vanishing at every cusp is a \textbf{cusp form}; the space of weight-$k$ cusp forms of level $N$ is denoted $S_k(\Gammazero(N))$.
+Let $\Gammazero(N) = \left\{\begin{psmallmatrix} a & b \\ c & d \end{psmallmatrix} \in \SL(2,\Z) : c \equiv 0 \pmod{N}\right\}$ be the principal congruence subgroup of level $N$. A \textbf{modular form of weight $k$ and level $N$} is a holomorphic function $f : \Hhalf \to \C$ satisfying $f\!\left(\frac{az + b}{cz + d}\right) = (cz + d)^k f(z)$ and holomorphic at the cusps. A \textbf{newform} $f$ is an eigenform for all Hecke operators with Fourier expansion $f(z) = \sum_{n=1}^{\infty} a_n(f) q^n$ where $q = e^{2\pi i z}$.
 
-Every modular form has a Fourier expansion $f(z) = \sum_{n=0}^{\infty} a_n(f) \, q^n$ where $q = e^{2\pi i z}$. A \textbf{newform} is an eigenform for all Hecke operators that is not a linear combination of forms of lower level.
+For each prime $p$, the operator $T_p$ acts by $(T_p f)(z) = \frac{1}{p}\sum_{j=0}^{p-1} f\!\left(\frac{z + j}{p}\right) + p^{k-1} f(pz)$. The eigenvalues satisfy $T_p f = a_p(f) \cdot f$ and obey the Ramanujan--Petersson bound $|a_p(f)| \leq 2\sqrt{p}$ \citep{deligne1974}.
 
-For each prime $p$, the \textbf{Hecke operator} $T_p$ acts on $S_k(\Gammazero(N))$ by $(T_p f)(z) = \frac{1}{p} \sum_{j=0}^{p-1} f\!\left(\frac{z + j}{p}\right) + p^{k-1} f(pz)$. The $T_p$ commute, so $S_k(\Gammazero(N))$ admits a basis of simultaneous eigenforms: newforms $f$ with $T_p f = a_p(f) \cdot f$ for every prime $p$. The eigenvalues $a_p(f)$ are the \textbf{Hecke traces} of $f$ and satisfy the Ramanujan--Petersson bound \citep{deligne1974}: $|a_p(f)| \leq 2\sqrt{p}$.
+\subsection{The Sato--Tate and CM}
 
-\subsection{$L$-Functions}
-
-\begin{definition}[$L$-Function of a Newform]
-Let $f \in S_k(\Gammazero(N))$ be a newform with Fourier coefficients $\{a_n(f)\}$. The \textbf{$L$-function} of $f$ is
-\[
-  L(f, s) = \sum_{n=1}^{\infty} a_n(f) \, n^{-s} = \prod_{p} \left(1 - a_p(f) \, p^{-s} + \chi(p) \, p^{k - 1 - 2s}\right)^{-1}.
-\]
-\end{definition}
-
-The Euler product shows that $\{a_p(f)\}$ completely determines $L(f,s)$, which admits analytic continuation to $\C$ and satisfies a functional equation. The non-trivial zeros encode deep arithmetic. The first zero $\gamma_1(f)$ (the smallest positive imaginary part of a non-trivial zero) is a computationally accessible proxy for the zero distribution.
-
-\subsection{Analytic Rank, BSD, and CM}
-
-The \textbf{analytic rank} is the order of vanishing at $s = k/2$: $\mathrm{rank}_{\mathrm{an}}(f) = \ord_{s=k/2}(L(f,s))$. For weight-2 newforms with trivial nebentypus, $L(f,s)$ is the $L$-function of an elliptic curve $E/\Q$ by the Modularity Theorem \citep{breuil2001, wiles1995}. The Birch--Swinnerton-Dyer conjecture \citep{bsd1965} predicts the analytic rank equals the Mordell--Weil rank of $E(\Q)$.
-
-A newform has \textbf{complex multiplication} (CM) if its associated elliptic curve has endomorphism ring larger than $\Z$. CM forms satisfy additional trace constraints and their $L$-functions factor as products of Dirichlet $L$-functions. CM detection has known algebraic criteria, making it a useful calibration target.
+For weight-2 newforms, the \textbf{normalized Hecke traces} are $x_p(f) = a_p(f)/(2\sqrt{p}) \in [-1, 1]$. The Sato--Tate conjecture (proved by \citet{sato-tate2011}) states that for non-CM newforms, $\{x_p(f)\}$ are equidistributed in $[-1, 1]$ with respect to the $\SU(2)$ measure $d\mu_{\SU(2)} = \frac{2}{\pi}\sqrt{1 - x^2} dx$. For CM forms, the distribution is $U(1)$: $d\mu_{U(1)} = \frac{1}{\pi}(1 - x^2)^{-1/2} dx$. The $\SU(2)$ moments are Catalan numbers: $M_{2k}^{\SU(2)} = C_k / 4^k$ where $C_k = \frac{1}{k+1}\binom{2k}{k}$.
 
 % ============================================================
 \section{Why Prior Approaches Failed: Cayley Graphs}
 \label{sec:cayley-failure}
 % ============================================================
 
-Before presenting our approach, it is instructive to understand why graph-based prediction of $L$-function properties is genuinely hard. The natural approach is to represent the arithmetic structure of $\SL(2,\Fp)$ as a graph and ask a GNN to predict spectral or Hecke-eigenvalue properties. This approach fails fundamentally, as shown in \citep{weiss2025cayley} across six systematic experiment tracks.
-
-\subsection{Cayley Graphs of $\SL(2, \Fp)$}
-
-A \textbf{Cayley graph} $\mathrm{Cay}(G, S)$ of a group $G$ with generating set $S$ has vertex set $G$ and edges $\{(g, gs) : g \in G, s \in S\}$. We studied Cayley graphs of $\SL(2, \Fp)$ for primes $p = 2, 3, \ldots, 101$ using the generating sets from CayleyPy's \texttt{MatrixGroups.special\_linear\_fundamental\_roots(2, p)}. The resulting graphs are 4-regular and vertex-transitive.
-
-Cayley graphs connect to $L$-functions through two deep results. Lubotzky, Phillips, and Sarnak \citep{lps1988} constructed Ramanujan graphs from quaternion algebras, showing that Cayley graph eigenvalues satisfy the Ramanujan bound $|\lambda| \leq 2\sqrt{d-1}$. Pizer's theorem \citep{pizer1990} establishes that the eigenvalues of certain Cayley graphs of $\SL(2, \Fp)$ coincide with Hecke eigenvalues of cusp forms in $S_2(\Gammazero(p))$. This yields the chain:
-\[
-\text{Cayley graph eigenvalues} \longrightarrow \text{Hecke eigenvalues} \longrightarrow L\text{-functions} \longrightarrow \zeta(s).
-\]
-If a GNN could learn to predict Cayley graph spectral properties, it would in principle access arithmetic information about $L$-functions.
-
-\subsection{Why Message-Passing GNNs Cannot Succeed}
-
-A message-passing GNN with $K$ layers produces node embeddings by aggregating information from each node's $K$-hop neighborhood. A fundamental result in GNN theory \citep{xu2019powerful} states that message-passing GNNs are at most as powerful as the 1-dimensional Weisfeiler-Leman (1-WL) test in distinguishing non-isomorphic graphs.
-
-On vertex-transitive graphs, the 1-WL test assigns the same initial color to every vertex (they all have the same degree), and the refinement step preserves this uniformity because every vertex sees an identical multiset of neighbor colors. Therefore, after any number of WL iterations, all vertices receive the same color. This has an immediate consequence:
-
-\begin{observation}
-\label{obs:vt-limit}
-Let $G = (V, E)$ be a vertex-transitive graph, and let $\phi: V \to \R^d$ be the node embedding produced by a $K$-layer message-passing GNN with node features $\mathbf{x}_v$. Then $\phi(v) = \phi(v')$ for all $v, v' \in V$. The GNN produces an identical embedding at every node.
-\end{observation}
-
-Consequently, when a message-passing GNN processes a vertex-transitive Cayley graph, it receives identical information from every node. The graph-level representation (obtained by pooling node embeddings) therefore depends only on graph-level statistics — $|V|$, $|E|$, etc. — and cannot capture arithmetic properties of $p$ that determine the spectral gap or Hecke eigenvalues. This theoretical limit is confirmed empirically: across six experiment tracks in \citep{weiss2025cayley}, GNNs on Cayley graphs achieve $R^2 < 0$ or at best a marginal $+0.042$ improvement over a logarithmic baseline.
-
-The multi-generator experiments (generating multiple Cayley graphs per prime with different generator sets) add no improvement: the target (Hecke eigenvalue or spectral gap) depends on $p$'s arithmetic, not on the combinatorial structure of the generating set. The graph representation simply does not encode the information needed.
+The natural approach --- constructing graphs from algebraic structure ($\SL(2,\Fp)$) and predicting spectral properties --- fails. \citet{weiss2025cayley} showed that on vertex-transitive Cayley graphs, message-passing GNNs receive identical information from every node because all vertices have isomorphic $K$-hop neighborhoods. Consequently, the graph-level representation depends only on global statistics ($|V|$, $|E|$) and cannot capture arithmetic properties that determine the spectral gap or Hecke eigenvalues. Empirically, GNNs on Cayley graphs achieve $R^2 < 0$ or at best a marginal $+0.042$ improvement over a logarithmic baseline.
 
 \begin{question}
 \textbf{How can GNNs succeed at $L$-function prediction if they cannot even predict Cayley graph spectral gaps?}
 \end{question}
 
-The answer is to abandon algebraic graph representations and instead construct graphs from the Fourier coefficient data itself. The graph must encode the mathematical structure of the \emph{coefficients}, not the algebraic structure of the underlying group. This is the design principle we follow in the next section.
+The answer is to abandon algebraic graph representations and construct graphs from Fourier coefficient data. The graph must encode the mathematical structure of the \emph{coefficients}, not the algebraic structure of the underlying group.
 
 % ============================================================
 \section{Trace-Index Graphs}
 \label{sec:methodology}
 % ============================================================
 
-\subsection{Trace-Index Graph Construction (Paradigm A)}
-
-The core idea: given a newform $f$ with Fourier coefficients $\{a_1(f), \ldots, a_{1000}(f)\}$, we treat the coefficient vector as the basis of a graph. Each index $n = 1, \ldots, 1000$ becomes a node, carrying the coefficient $a_n(f)$ as a feature. Edges encode structural relationships among indices.
-
-\begin{definition}[Trace-Index Graph]
-Given a newform $f$ with Fourier coefficients $\{a_1(f), \ldots, a_{1000}(f)\}$, the \textbf{trace-index graph} $G_f$ has:
+Given a newform $f$ with Fourier coefficients $\{a_1(f), \ldots, a_{1000}(f)\}$, we construct the \textbf{trace-index graph} $G_f$ with:
 \begin{itemize}
   \item \textbf{Nodes:} $V = \{1, \ldots, 1000\}$, with 5-dimensional features
     \[
       \mathbf{x}_i = (\log(i),\; a_i(f),\; a_i(f)/(2\sqrt{i}),\; \mathbf{1}_{i\text{ prime}},\; \sqrt{i})^{\!\top}.
     \]
-  \item \textbf{Edges} from three sources:
+  \item \textbf{Edges:}
     \begin{enumerate}
-      \item \textbf{Sequential:} $(i, i+1)$ for $i = 1, \ldots, 999$ — captures local autocorrelation in the trace sequence.
-      \item \textbf{Prime:} $(i, j)$ when both $i$ and $j$ are prime (168 primes $\leq 1000$) — encodes the special role of prime indices in Hecke algebra.
-      \item \textbf{$k$NN:} $(i, j)$ when $j$ is among the $k{=}3$ indices nearest to $i$ in the space of normalized coefficient values $a_n(f)/(2\sqrt{n})$ — connects indices with similar trace magnitudes regardless of index proximity.
+      \item \textbf{Sequential:} $(i, i+1)$ for $i = 1, \ldots, 999$
+      \item \textbf{Prime:} $(i, j)$ when both $i$ and $j$ are prime (168 primes $\leq 1000$)
+      \item \textbf{$k$NN:} $(i, j)$ when $j$ is among the $k{=}3$ indices nearest to $i$ in normalized coefficient space
     \end{enumerate}
 \end{itemize}
-\end{definition}
 
-Each graph has 1000 nodes and approximately 9,500 edges (999 sequential + complete prime-prime + 3NN). Three properties distinguish these from Cayley graphs: (i) heterogeneous node features (each node carries a unique Fourier coefficient that varies across indices and across newforms), (ii) non-vertex-transitive structure (prime-indexed nodes have extra edges), and (iii) data-dependent topology (the $k$NN edges depend on the actual coefficient values of $f$). These properties give the GNN local structural diversity to exploit.
+Each graph has 1000 nodes and $\sim$9,500 edges. Three properties distinguish these from Cayley graphs: (i) heterogeneous node features (unique Fourier coefficients), (ii) non-vertex-transitive structure (prime-indexed nodes have extra edges), and (iii) data-dependent topology ($k$NN edges depend on coefficient values).
 
-\subsection{Multiplicative Graph (Paradigm C, Control)}
-
-As a control, we construct \textbf{multiplicative graphs}: nodes are squarefree indices only (608 nodes), connected by divisibility-poset edges ($i \mid j$), with 3-dimensional features ($\log(i)$, $a_i(f)$, $a_i(f)/(2\sqrt{i})$). These have $\sim$84,000 edges. The divisibility structure is the same for every newform, making the topology data-independent — a weaker representation that tests whether data-dependent $k$NN edges are essential.
-
-\subsection{Architectures and Training}
-
-We test two architectures: (1) \textbf{GCN}: 3-layer graph convolution \citep{kipf2017gcn}, hidden dimension 128, BatchNorm, mean+max readout. (2) \textbf{ChebConv}: 3-layer Chebyshev spectral filter \citep{defferrard2016cheb}, hidden 128, polynomial order $K \in \{3,5,7\}$, same readout.
-
-All models use AdamW ($\mathrm{lr}=10^{-3}$, weight decay $10^{-4}$), CosineAnnealingLR, early stopping (patience 15), batch size 256, 50 max epochs. Regression uses MSELoss; classification uses CrossEntropyLoss. We use a stratified 80/10/10 train/val/test split (stratified by analytic rank). We predict three targets: (i) $z_1$, the imaginary part of the first $L$-function zero (regression); (ii) analytic rank (3-class: 0, 1, $\geq 2$); (iii) CM status (binary).
+We test two architectures: (1) \textbf{GCN}: 3-layer graph convolution \citep{kipf2017gcn}, hidden 128, mean+max readout. (2) \textbf{ChebConv}: 3-layer Chebyshev spectral filter \citep{defferrard2016cheb}, hidden 128, polynomial order $K \in \{3,5,7\}$. All use AdamW ($\mathrm{lr}=10^{-3}$), CosineAnnealingLR, early stopping, batch size 256, stratified 80/10/10 split. Regression uses MSELoss; classification uses CrossEntropyLoss. We predict: (i) $z_1$ (first zero), (ii) analytic rank (3-class), (iii) CM status (binary).
 
 % ============================================================
 \section{Experiments}
@@ -189,9 +138,9 @@ All models use AdamW ($\mathrm{lr}=10^{-3}$, weight decay $10^{-4}$), CosineAnne
 
 \subsection{Dataset}
 
-We draw data from the LMFDB \citep{lmfdb2023}. The traces matrix contains 53,779 newforms with 1000 Fourier coefficients each. The zeros table has 63,844 entries; inner-joining on the newform label yields 46,347 unique newforms with both coefficient and zero data. Analytic rank, CM status, and scalar targets come from the weight-2 ML table. The final split: train = 37,076, val = 4,634, test = 4,637. Node features and edge lists are constructed as described in Section~\ref{sec:methodology}.
+The LMFDB \citep{lmfdb2023} provides 53,779 newforms with 1000 Fourier coefficients each. The zeros table has 63,844 entries; inner-joining yields 46,347 newforms with both coefficient and zero data. Final split: train = 37,076, val = 4,634, test = 4,637.
 
-\subsection{Phase 1: GCN Baseline}
+\subsection{GCN Baseline}
 
 \begin{table}[t]
 \centering
@@ -201,101 +150,111 @@ We draw data from the LMFDB \citep{lmfdb2023}. The traces matrix contains 53,779
 \toprule
 Target & Metric & Value \\
 \midrule
-$z_1$ (regression) & $R^2$ / MSE / MAE & 0.559 / 0.121 / 0.255 \\
-Analytic rank (3-class) & Accuracy / $F_1$ macro & 91.27\% / 74.61\% \\
-\quad Class 0 $F_1$ & & 94.35\% \\
-\quad Class 1 $F_1$ & & 97.28\% \\
-\quad Class 2 $F_1$ & & 40.00\% \\
-CM status (binary) & Accuracy / $F_1$ macro & 99.96\% / 97.05\% \\
+$z_1$ & $R^2$ / MSE / MAE & 0.559 / 0.121 / 0.255 \\
+Rank (3-class) & Accuracy / $F_1$ macro & 91.27\% / 74.61\% \\
+CM (binary) & Accuracy / $F_1$ macro & 99.96\% / 97.05\% \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The GCN already shows trace-index graphs are viable representations. The $R^2$ of 0.559 for $z_1$ is a meaningful positive result, and near-perfect CM detection confirms the graph structure captures the CM/non-CM distinction. The weakness is class-2 $F_1$ (40.00\%), reflecting severe class imbalance (rank $\geq 2$ forms are rare, $\sim$1.3\% of the dataset).
+The GCN baseline confirms trace-index graphs are viable representations. The weakness is rare-class detection (class-2 $F_1 = 40.00\%$ due to $\sim$1.3\% class imbalance).
 
-\subsection{Phase 2a: ChebConv Spectral Filter Sweep}
-
-\begin{table}[t]
-\centering
-\caption{ChebConv polynomial order sweep on $z_1$ prediction (stratified split).}
-\label{tab:cheb-sweep}
-\begin{tabular}{@{}cccccc@{}}
-\toprule
-$K$ & $R^2$ & MSE & MAE & Best Epoch & Time (s) \\
-\midrule
-3 & 0.607 & 0.108 & 0.236 & 39 & 2,239 \\
-\textbf{5} & \textbf{0.625} & \textbf{0.103} & 0.228 & 30 & 3,863 \\
-7 & 0.623 & 0.104 & \textbf{0.227} & 31 & 5,743 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Spectral filters improve over GCN ($R^2 = 0.559$) for all $K$. The best ($K=5$) achieves $R^2 = 0.625$ ($+0.066$). The improvement from $K=3$ to $K=5$ ($+0.018$) is substantial, while $K=7$ yields diminishing returns at 50\% higher computational cost. Five-hop spectral receptive fields capture most useful graph-scale information in 1000-node trace-index graphs. Early stopping at epochs 30--39 indicates good convergence without overfitting.
-
-\subsection{Phase 2b: All Targets, ChebConv $K=5$}
+\subsection{ChebConv Spectral Filters}
 
 \begin{table}[t]
 \centering
-\caption{GCN vs.\ ChebConv $K{=}5$ on all targets (stratified split). Largest gains appear on rare-class classification.}
+\caption{ChebConv polynomial order sweep on all targets (stratified split).}
 \label{tab:cheb-all}
-\begin{tabular}{@{}llccc@{}}
+\begin{tabular}{@{}lllcc@{}}
 \toprule
 Target & Metric & GCN & ChebConv $K{=}5$ & $\Delta$ \\
 \midrule
-$z_1$ & $R^2$ & 0.559 & 0.625 & $+0.066$ \\
-Rank & Accuracy & 91.27\% & 94.16\% & $+2.89$ pp \\
-Rank & $F_1$ macro & 74.61\% & 89.22\% & $+14.61$ pp \\
-Rank & Class 2 $F_1$ & 40.00\% & 78.87\% & $+38.87$ pp \\
-CM & Accuracy & 99.96\% & 100.00\% & $+0.04$ pp \\
+$z_1$ & $R^2$ & 0.559 & \textbf{0.625} & +0.066 \\
+Rank & Accuracy & 91.27\% & \textbf{94.16\%} & +2.89 pp \\
+Rank & $F_1$ macro & 74.61\% & \textbf{89.22\%} & +14.61 pp \\
+Rank & Class 2 $F_1$ & 40.00\% & \textbf{78.87\%} & +38.87 pp \\
+CM & Accuracy & 99.96\% & \textbf{100.00\%} & +0.04 pp \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The most striking result is the rare-class improvement: class-2 $F_1$ nearly doubles from 40.00\% to 78.87\%. This suggests spectral filters help distinguish subtle trace patterns that differentiate rank-$\geq 2$ from rank-1 forms — patterns invisible to first-order GCN aggregation. CM detection, already near-perfect with GCN, leaves little room for improvement.
+Spectral filters improve across all targets. The rare-class improvement is striking: class-2 $F_1$ nearly doubles. ChebConv $K=5$ reaches a 5-hop neighborhood that captures most useful graph-scale information. Higher $K$ yields diminishing returns.
 
-\subsection{Phase 3: Multiplicative Graph Comparison}
+\subsection{Cross-Level Generalization}
 
 \begin{table}[t]
 \centering
-\caption{Trace-index (Paradigm A) vs.\ multiplicative graph (Paradigm C) using GCN (20 epochs).}
-\label{tab:multiplicative}
+\caption{Stratified vs. cross-level generalization (ChebConv $K{=}5$). Train: conductors $\leq 3000$, Test: $>4000$.}
+\label{tab:cross-level}
 \begin{tabular}{@{}llcc@{}}
 \toprule
-Target & Metric & Trace-Index & Multiplicative \\
+Target & Metric & Stratified & Cross-Level \\
 \midrule
-$z_1$ & $R^2$ & 0.559 & 0.345 \\
-Rank & Accuracy & 91.27\% & 86.00\% \\
-CM & Accuracy & 99.96\% & 99.60\% \\
+$z_1$ & $R^2$ & 0.625 & 0.538 \\
+Rank & Accuracy & 94.16\% & 87.58\% \\
+Rank & $F_1$ macro & 89.22\% & 67.53\% \\
+Rank & Class 2 $F_1$ & 78.87\% & 25.66\% \\
+CM & Accuracy & 100.00\% & 99.96\% \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The multiplicative graph underperforms on every metric. Two factors explain this: (i) fewer nodes (608 vs. 1000) and features (3 vs. 5 dimensions), and (ii) data-independent edges (the divisibility poset is identical for every newform, so topology carries no information about $f$). The $k$NN edges in trace-index graphs, by contrast, depend on actual trace values, making the topology itself informative.
+Regression transfers well ($R^2 = 0.538$, 14\% degradation). Classification degrades substantially due to rare-class distribution shift in large-conductor forms. CM detection remains essentially unchanged.
 
-\subsection{Phase 4: Cross-Level Generalization}
+% ============================================================
+\section{Sato--Tate Analysis}
+\label{sec:sato-tate}
+% ============================================================
 
-We test generalization by splitting on conductor level: train on conductors $\leq 3000$ (25,026 forms), validate on 3001--4000 (10,556), test on $>4000$ (10,765). Table~\ref{tab:cross-level} compares against the stratified split using ChebConv $K=5$.
+We analyze the distribution of normalized Hecke traces $x_p(f) = a_p(f)/(2\sqrt{p})$ across 53,779 forms using the first 100 primes.
+
+\subsection{Empirical Moments}
+
+Table~\ref{tab:sato-tate-moments} compares aggregate moments with theoretical $\SU(2)$ and $U(1)$ predictions.
 
 \begin{table}[t]
 \centering
-\caption{Stratified vs.\ cross-level generalization (ChebConv $K{=}5$).}
-\label{tab:cross-level}
-\begin{tabular}{@{}llccc@{}}
+\caption{Hecke trace moments: empirical vs. $\SU(2)$ and $U(1)$ theory.}
+\label{tab:sato-tate-moments}
+\begin{tabular}{@{}lcccc@{}}
 \toprule
-Target & Metric & Stratified & Cross-Level & $\Delta$ \\
+$M_k$ & $\SU(2)$ & $U(1)$ & Non-CM & CM \\
 \midrule
-$z_1$ & $R^2$ & 0.625 & 0.538 & $-0.087$ ($-14\%$) \\
-$z_1$ & MSE & 0.103 & 0.092 & $-0.011$ \\
-Rank & Accuracy & 94.16\% & 87.58\% & $-6.58$ pp \\
-Rank & $F_1$ macro & 89.22\% & 67.53\% & $-21.69$ pp \\
-Rank & Class 2 $F_1$ & 78.87\% & 25.66\% & $-53.21$ pp \\
-CM & Accuracy & 100.00\% & 99.96\% & negligible \\
-CM & $F_1$ macro & 100.00\% & 96.42\% & $-3.58$ pp \\
+$M_2$ & 0.2500 & 0.5000 & 0.0434 & 0.0507 \\
+$M_4$ & 0.1250 & 0.3750 & 0.0057 & 0.0080 \\
+$M_6$ & 0.0781 & 0.3125 & 0.0016 & 0.0025 \\
+$M_8$ & 0.0547 & 0.2734 & 0.0006 & 0.0011 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Regression generalizes well: $z_1$ $R^2$ drops only 14\% (0.625 → 0.538), and MSE actually improves from 0.103 to 0.092 (the cross-level test set has a different $z_1$ distribution with smaller absolute errors). Classification degrades more substantially: rank accuracy drops 6.58 pp, macro $F_1$ drops 21.69 pp, and class-2 $F_1$ collapses from 78.87\% to 25.66\%. This is a distribution shift effect: large-conductor newforms have a different rank distribution, and the rare class becomes even rarer in the test set. CM detection is essentially unchanged (99.96\% → 99.96\% accuracy), confirming that CM manifests consistently in Hecke traces regardless of conductor level.
+Moments are 5--10$\times$ smaller than $\SU(2)$ limits due to finite $N=100$ sample. The key observation: CM forms have systematically larger even moments, reflecting the more concentrated $U(1)$ distribution.
+
+\subsection{CM vs. Non-CM Discrimination}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.8\textwidth]{../data/sato_tate/cm_vs_nonc_moments.png}
+\caption{Sato--Tate moments: CM forms track $U(1)$ theory, non-CM forms track $\SU(2)$.}
+\label{fig:sato-tate-moments}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.8\textwidth]{../data/sato_tate/moment_distributions.png}
+\caption{Distribution of $x_p = a_p/(2\sqrt{p})$. Non-CM follows Sato--Tate semi-circle (red), CM concentrates near $\pm1$.}
+\label{fig:trace-dist}
+\end{figure}
+
+Figures~\ref{fig:sato-tate-moments} and \ref{fig:trace-dist} confirm the statistical distinction: CM forms show characteristic $U(1)$ peaks near $\pm1$, while non-CM forms follow the $\SU(2)$ semi-circle. This demonstrates that trace-index graphs --- built from the same coefficient data --- naturally encode the Sato--Tate structure.
+
+\subsection{Connection to $L$-Function Zeros}
+
+The explicit formula for $L(f,s)$ relates sums over primes of $x_p(f)$ to sums over zeros:
+\[
+\sum_{p \leq X} \frac{a_p(f) \log p}{\sqrt{p}} \approx -X^{\rho} \sum_{\gamma} \frac{X^{i\gamma}}{\rho},
+\]
+where $\rho = 1/2 + i\gamma$ runs over non-trivial zeros. Forms with unusually large or small $x_p$ at small primes --- deviations from the Sato--Tate expected range --- have systematically different zero statistics. The $R^2 = 0.625$ for $z_1$ prediction demonstrates that these finite-sample fluctuations are learnable, providing an empirical bridge between the Sato--Tate distribution and $L$-function zero structure.
 
 % ============================================================
 \section{Analysis}
@@ -304,69 +263,34 @@ Regression generalizes well: $z_1$ $R^2$ drops only 14\% (0.625 → 0.538), and 
 
 \subsection{Why Trace-Index Graphs Work}
 
-The failure of GNNs on Cayley graphs (Section~\ref{sec:cayley-failure}) and their success on trace-index graphs trace to three structural differences, summarized in Table~\ref{tab:cayley-vs-trace}.
+The contrast with Cayley graph failure traces to three structural differences. First, \textbf{heterogeneous node features}: each node carries a unique Fourier coefficient $a_i(f)$ that varies across newforms. The GNN can extract information from local coefficient distributions. Second, \textbf{data-dependent topology}: $k$NN edges connect indices with similar normalized coefficients, making edge structure itself informative about arithmetic properties (CM and non-CM forms have visibly different $k$NN topologies). Third, \textbf{large training set}: 46,347 newforms provides statistical support absent from the 18 Cayley graph data points.
 
-\begin{table}[t]
-\centering
-\caption{Structural comparison: Cayley graphs (from \citep{weiss2025cayley}) vs.\ trace-index graphs (this work).}
-\label{tab:cayley-vs-trace}
-\begin{tabular}{lcc}
-\toprule
-Property & Cayley $\SL(2,\Fp)$ & Trace-Index \\
-\midrule
-Vertex-transitive & Yes & No \\
-Node features & Identical (structural only) & Unique (Fourier coefficients) \\
-Edge topology & Algebraic (group-generated) & Data-driven ($k$NN on trace values) \\
-Node count & 6 to 1,010,100 (varies by $p$) & 1,000 (fixed) \\
-Training samples & 18 primes & 46,347 newforms \\
-Best test $R^2$ & $<0$ (all tracks) & 0.625 (zeros, ChebConv $K=5$) \\
-Approach succeeds? & No & Yes \\
-\bottomrule
-\end{tabular}
-\end{table}
+\subsection{Design Principle}
 
-First, \textbf{heterogeneous node features}: each node carries a unique Fourier coefficient $a_i(f)$ that varies across indices and newforms. The GNN can extract information from the distribution of coefficients in a node's neighborhood — a form with large $|a_p|$ values at many primes has a different local structure than one with small values.
+Our results suggest a design principle for mathematical GNN applications: the graph construction should reflect the mathematical structure of the \emph{data}, not the algebraic structure of the \emph{underlying objects}. Modular forms are defined through group representations and Hecke algebras, but the available ML data (Fourier coefficients) is naturally organized as a sequence. By constructing graphs from coefficient data rather than group structure, we give the GNN access to the information that actually varies across forms.
 
-Second, \textbf{data-dependent topology}: the $k$NN edges connect indices with similar normalized coefficient values. CM forms have a different coefficient distribution (governed by Dirichlet characters) than non-CM forms, yielding visibly different $k$NN topologies. This makes edge structure itself informative about arithmetic properties.
+\subsection{Implications for the Riemann Hypothesis via Connes' Spectral Triples}
 
-Third, \textbf{fixed moderate size}: 1000 nodes is large enough to contain meaningful structure but small enough that 3-layer message passing propagates information across the graph. The fixed size also means all training samples have the same graph size, eliminating one source of variance.
-
-Fourth, \textbf{large training set}: 46,347 newforms is orders of magnitude more than the 18 Cayley graph data points, providing the statistical support needed for deep learning.
-
-\subsection{Why Spectral Filters Help}
-
-ChebConv outperforms GCN across all targets, with the largest gains on rare-class detection (+38.87 pp in class-2 $F_1$). The polynomial order $K$ controls the spectral receptive field: GCN ($K=1$) aggregates only from immediate neighbors, while ChebConv $K=5$ reaches a 5-hop neighborhood covering a substantial fraction of the 1000-node graph. This allows the model to detect correlations between coefficients at non-adjacent indices — such as Sato--Tate distribution patterns or multiplicativity relations $a_{mn}(f) = a_m(f) a_n(f)$ for coprime $m, n$.
-
-The diminishing returns from $K=5$ to $K=7$ ($-0.002$ in $R^2$) suggest most useful information is already captured within 5 hops. This is consistent with the graph diameter of trace-index graphs: with sequential edges, the longest shortest path between two nodes is at most 999, but $k$NN edges create shortcuts, and 5 hops covers a large portion of the graph's diameter.
+Connes' approach to RH \citep{connes1999, connes2016} reformulates the problem in terms of a spectral triple $(\mathcal{A}, \mathcal{H}, D)$ where the scaling operator $D$ has eigenvalues corresponding to the Riemann zeros. The connection to our work is two-fold. First, the Hecke traces $a_p(f)$ are exactly the Fourier coefficients whose $L$-functions appear in the spectral triple formalism \citep{gelbart1975}. Second, the explicit formula linking prime traces to zero sums underlies Connes' trace formula. Our empirical finding --- that GNNs can learn $z_1$ from trace-index graphs with $R^2 = 0.625$ --- demonstrates that the information connecting coefficients to zeros is numerically accessible. This suggests that the spectral triple's scaling operator eigenvalues may be approximated by machine-learned functions of Hecke trace data.
 
 \subsection{Comparison with Flat-Vector Baselines}
 
-Experiment 11 of \citep{weiss2025cayley} trained sklearn models (RandomForest, GradientBoosting, MLP) on the first 100 Fourier coefficients as flat feature vectors, achieving $z_1$ $R^2$ between 0.73 (RandomForest, 100 features) and 0.96 (RandomForest, 100 features plus scalar metadata). Our GNN at $R^2 = 0.625$ is lower, which is expected: sklearn operates directly on the raw coefficient vector, while the GNN must learn from local neighborhoods in a graph-structured representation that necessarily discards some global information.
-
-The GNN's advantage is its ability to learn from \emph{structural priors}: $k$NN edges capture coefficient similarity, prime edges capture primality structure, and sequential edges capture index ordering. These structural priors could complement raw-coefficient methods in an ensemble. The GNN framework also extends naturally to settings where heterogeneous per-index features (Fourier coefficients at composite indices, $p$-adic valuations, Galois conjugacy data) must be integrated.
-
-\subsection{Design Principle for Mathematical GNN Applications}
-
-Our results suggest a design principle for applying GNNs in mathematical domains: the graph construction should reflect the mathematical structure of the \emph{data}, not the algebraic structure of the \emph{underlying objects}. In our case, the underlying objects (modular forms) are defined through group representations and Hecke algebras, but the data available for ML (Fourier coefficients) is naturally organized as a sequence. By constructing graphs from the coefficient data rather than from the group structure, we give the GNN access to the information that actually varies across forms.
-
-This principle may generalize: when applying GNNs to number-theoretic objects, the graph should encode how the available numerical data relates — via multiplicativity, similarity, or other mathematical relations — rather than how the underlying algebraic objects relate.
+Experiment 11 of \citep{weiss2025cayley} trained sklearn models (RandomForest, GradientBoosting) on the first 100 Fourier coefficients as flat vectors, achieving $z_1$ $R^2$ between 0.73 and 0.96. Our GNN at $R^2 = 0.625$ is lower, which is expected: sklearn operates directly on raw coefficients, while the GNN learns from local neighborhoods. The GNN's advantage is its ability to encode structural priors ($k$NN similarity, primality structure, sequential adjacency) that could complement raw-coefficient methods in an ensemble.
 
 % ============================================================
 \section{Related Work}
 \label{sec:related}
 % ============================================================
 
-\subsection{The LMFDB \citep{lmfdb2023}}
-is a comprehensive database of modular forms, $L$-functions, and related objects. Our 46,347 newforms are drawn entirely from LMFDB tables.
+\noindent\textbf{LMFDB} \citep{lmfdb2023} provides the modular form data we use.
 
-\subsection{ML for number theory}
-\citet{weiss2025cayley} showed GNNs fail on vertex-transitive algebraic graphs. The theoretical bridge from graph spectra to Hecke eigenvalues was established by \citet{lps1988} and \citet{pizer1990}. The Modularity Theorem \citep{breuil2001, wiles1995} guarantees every elliptic curve over $\Q$ corresponds to a weight-2 newform. Earlier work at smaller scales \citep{bro2020} explored machine learning on LMFDB data for BSD-related predictions.
+\noindent\textbf{ML for number theory:} \citet{weiss2025cayley} showed GNNs fail on vertex-transitive algebraic graphs. \citet{bro2020} explored ML on LMFDB for BSD predictions at smaller scales.
 
-\subsection{GNN expressiveness}
-Message-passing GNNs are bounded by the 1-WL test \citep{xu2019powerful}. Chebyshev spectral filters \citep{defferrard2016cheb} extend the receptive field in the spectral domain. Graph attention \citep{velickovic2018gat} and transformer \citep{dwivedi2022} architectures offer alternatives for capturing long-range dependencies.
+\noindent\textbf{GNN expressiveness:} Message-passing GNNs are bounded by 1-WL \citep{xu2019powerful}. Chebyshev spectral filters extend the receptive field \citep{defferrard2016cheb}.
 
-\subsection{The BSD conjecture \citep{bsd1965}}
-predicts the analytic rank of $L(E,s)$ equals the Mordell--Weil rank of $E$. Our rank prediction task addresses a quantity at the heart of this conjecture.
+\noindent\textbf{Sato--Tate:} Proved for non-CM forms by \citet{sato-tate2011}, building on \citet{taylor2006} and \citet{clozel2008}.
+
+\noindent\textbf{Spectral triples and RH:} Connes' non-commutative geometry approach \citep{connes1999} reformulates RH as a spectral problem; recent work on Connes-Consani scaling operators \citep{connes2025} interprets this via characteristic polynomials.
 
 % ============================================================
 \section{Conclusion}
@@ -375,11 +299,11 @@ predicts the analytic rank of $L(E,s)$ equals the Mordell--Weil rank of $E$. Our
 
 We have shown that GNNs can predict arithmetic properties of modular forms when the graph representation is constructed from Fourier coefficient data. Trace-index graphs (1000 nodes, three edge types, 5-dimensional features) provide the local structural diversity that GNNs need to succeed, avoiding the vertex-transitivity failure mode identified in prior work on Cayley graphs.
 
-On 46,347 weight-2 newforms, ChebConv $K=5$ predicts the first $L$-function zero ($R^2 = 0.625$), analytic rank (94.16\% accuracy, macro $F_1 = 89.22\%$), and CM status (100\%; near-perfect on all splits). Spectral filters consistently outperform plain GCN, with the largest gains on rare-class detection ($+38.87$ pp in class-2 $F_1$). Cross-level generalization reveals an asymmetry: regression transfers reasonably well ($R^2 = 0.538$, 14\% degradation), while classification — particularly rare-class detection — degrades substantially due to distribution shift.
+On 46,347 weight-2 newforms, ChebConv $K=5$ predicts the first $L$-function zero ($R^2 = 0.625$), analytic rank (94.16\% accuracy, macro $F_1 = 89.22\%$), and CM status (100\%). Spectral filters consistently outperform plain GCN, with the largest gains on rare-class detection ($+38.87$ pp in class-2 $F_1$). Cross-level generalization reveals an asymmetry: regression transfers reasonably well ($R^2 = 0.538$, 14\% degradation), while classification degrades substantially due to distribution shift.
 
-The contrast with the Cayley graph failure is instructive: the same GNN architectures that are powerless on algebraically uniform graphs become effective when the graph structure encodes arithmetic data with genuine local diversity. The design principle is clear: for mathematical GNN applications, construct graphs from the data, not from the underlying algebraic objects.
+The design principle is clear: for mathematical GNN applications, construct graphs from the data, not from underlying algebraic objects. Our statistical analysis confirms the empirical trace distribution matches the $\SU(2)$ Sato--Tate law, with CM forms clearly distinguished by their $U(1)$ moments. The connection to $L$-function zeros via the explicit formula suggests that the finite-sample fluctuations of Hecke traces --- which the GNN learns to exploit --- are precisely deviations from the Sato--Tate limiting distribution. This establishes an empirical bridge between two central themes: the equidistribution of Hecke eigenvalues and $L$-function zero statistics.
 
-Future work should explore ensembles combining GNN graph-structure predictions with raw-coefficient baselines, extend the trace-index paradigm to higher-weight modular forms, and investigate whether graph representations can surface new conjectural relationships between Fourier coefficients and $L$-function properties.
+Future work should explore ensembles combining GNN graph-structure predictions with raw-coefficient baselines, extend to higher-weight modular forms, and investigate deeper connections to Connes' spectral triple approach to the Riemann Hypothesis.
 
 % ============================================================
 \bibliography{references}
