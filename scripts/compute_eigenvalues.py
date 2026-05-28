@@ -47,7 +47,7 @@ def load_graph(prime: int) -> tuple[np.ndarray, int]:
 
 
 def compute_spectrum(
-    edges: np.ndarray, num_nodes: int, k: int | None = None
+    edges: np.ndarray, num_nodes: int, k: int | None = None, full: bool = False
 ) -> np.ndarray:
     """
     Compute eigenvalues of the adjacency matrix.
@@ -56,6 +56,7 @@ def compute_spectrum(
         edges: shape (2, E)
         num_nodes: number of nodes
         k: number of eigenvalues to compute (None = all). For large graphs, use k << num_nodes.
+        full: If True, compute the full spectrum.
     """
     # Build sparse adjacency matrix
     adj = csr_matrix(
@@ -65,14 +66,24 @@ def compute_spectrum(
     # Symmetrize (Cayley graphs are undirected)
     adj = adj.maximum(adj.T)
 
-    if k is not None and k < num_nodes:
+    if full:
+        if num_nodes < 3000:
+            # For small graphs, use dense solver for stability and speed
+            logger.info(f"Computing FULL spectrum for {num_nodes} nodes via dense eigvalsh")
+            eigenvalues = np.linalg.eigvalsh(adj.toarray())
+        else:
+            # For larger graphs, use eigsh to get almost all eigenvalues
+            # k must be < n-1 for eigsh
+            logger.info(f"Computing FULL spectrum for {num_nodes} nodes via eigsh(k=n-2)")
+            k_eigsh = num_nodes - 2
+            eigenvalues, _ = eigsh(adj, k=k_eigsh, which="LM")
+    elif k is not None and k < num_nodes:
         # Compute only extreme eigenvalues (fastest via Lanczos)
         # k must be < n-1 for eigsh
         k = min(k, num_nodes - 2)
         eigenvalues, _ = eigsh(adj, k=k, which="LM")  # Largest magnitude
     else:
-        # Full spectrum (only for small graphs)
-        logger.warning(f"Computing FULL spectrum for {num_nodes} nodes — may be slow")
+        # Default fallback (should not be hit if k/full are handled correctly)
         eigenvalues = np.linalg.eigvalsh(adj.toarray())
 
     return np.sort(eigenvalues)[::-1]  # Descending
@@ -139,6 +150,26 @@ def main():
         default=None,
         help="Number of eigenvalues to compute (default: all)",
     )
+    parser.add_argument(
+        "--full", action="store_true", help="Compute full spectrum instead of top-k"
+    )
+    args = parser.parse_args()
+
+def main():
+    parser = argparse.ArgumentParser(description="Compute eigenvalues of Cayley graphs")
+    parser.add_argument(
+        "--all", action="store_true", help="Process all generated graphs"
+    )
+    parser.add_argument("--primes", type=str, help="Specific primes (e.g. '2,3,5,7')")
+    parser.add_argument(
+        "--k",
+        type=int,
+        default=None,
+        help="Number of eigenvalues to compute (default: all)",
+    )
+    parser.add_argument(
+        "--full", action="store_true", help="Compute full spectrum instead of top-k"
+    )
     args = parser.parse_args()
 
     if args.all:
@@ -153,7 +184,13 @@ def main():
     for prime in tqdm(primes, desc="Computing eigenvalues"):
         try:
             edges, num_nodes = load_graph(prime)
-            eigenvalues = compute_spectrum(edges, num_nodes, k=args.k)
+            
+            full_mode = args.full
+            k_val = None
+            if not full_mode and args.k is not None:
+                k_val = args.k
+                
+            eigenvalues = compute_spectrum(edges, num_nodes, k=k_val, full=full_mode)
             stats = compute_stats(
                 eigenvalues, degree=4
             )  # 4 fundamental root generators

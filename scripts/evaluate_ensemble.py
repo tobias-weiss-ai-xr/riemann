@@ -81,11 +81,8 @@ def load_sklearn_predictions(target: str, data_dir: Path) -> np.ndarray:
         return None
 
     preds = np.load(pred_path)
-    n_samples = preds.shape[0]
-    n_classes = {"rank": 3, "cm": 2}[target]
-    one_hot = np.zeros((n_samples, n_classes), dtype=np.float32)
-    one_hot[np.arange(n_samples), preds.astype(int)] = 1.0
-    return one_hot
+    # Already in probability format from predict_proba()
+    return preds.astype(np.float32)
 
 
 # ---------------------------------------------------------------------------
@@ -245,7 +242,7 @@ def print_comparison_table(target: str, gnn_metrics, sklearn_metrics, ensemble_m
             gnn_val = gnn_metrics[metric]
             ens_val = ensemble_metrics[metric]
             delta = ens_val - gnn_val
-            print(f"  {metric:<12s} | {fmt(gnn_val):>10s} | {fmt(ens_val):>10s} | {fmt(delta, 3):>+10s}")
+            print(f"  {metric:<12s} | {fmt(gnn_val):>10s} | {fmt(ens_val):>10s} | {delta:+.3f}")
     else:
         print(f"{'Metric':<16s} | {'GNN':>10s} | {'Sklearn':>10s} | {'Ensemble':>10s} | {'Best':>10s}")
         print(f"{'-'*16} | {'-'*10} | {'-'*10} | {'-'*10} | {'-'*10}")
@@ -278,7 +275,7 @@ def print_comparison_table(target: str, gnn_metrics, sklearn_metrics, ensemble_m
         print(f"  {'Class':>8s} | " + " | ".join(f"{s:>8s}" for s in ["GNN", "Sklearn", "Ensemble"]))
         print(f"  {'-'*8} | " + " | ".join(f"{'-'*8}" for _ in range(3)))
         for i, c in enumerate(classes):
-            print(f"  {c:>8s} | {fmt(gnn_f1[i]):>8s} | {fmt(skl_f1[i]):>8s} | {fmt(ens_f1[i]):>8s}")
+            print(f"  {c:>8d} | {fmt(gnn_f1[i]):>8s} | {fmt(skl_f1[i]):>8s} | {fmt(ens_f1[i]):>8s}")
 
     print()
 

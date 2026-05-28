@@ -227,7 +227,7 @@ def load_gnn_predictions(target: str, data_dir: Path) -> dict:
 
 
 def load_sklearn_predictions(target: str, data_dir: Path) -> np.ndarray:
-    """Load sklearn predictions as one-hot vectors."""
+    """Load sklearn predictions as probability vectors (from predict_proba)."""
     pred_path = data_dir / f"sklearn_preds_{target}.npy"
 
     if not pred_path.exists():
@@ -238,12 +238,8 @@ def load_sklearn_predictions(target: str, data_dir: Path) -> np.ndarray:
 
     preds = np.load(pred_path)
 
-    # Sparse to one-hot
-    n_samples = preds.shape[0]
-    n_classes = {"rank": 3, "cm": 2}[target]
-    one_hot = np.zeros((n_samples, n_classes), dtype=np.float32)
-    one_hot[np.arange(n_samples), preds.astype(int)] = 1.0
-    return one_hot
+    # Already in probability format from predict_proba()
+    return preds.astype(np.float32)
 
 
 # ---------------------------------------------------------------------------
@@ -267,7 +263,9 @@ def train_single_target(
     logger.info(f"Loading GNN data for {target}")
     gnn_data = load_gnn_predictions(target, data_dir)
     gnn_emb = torch.from_numpy(gnn_data["embeddings"]).float()
-    targets = torch.from_numpy(gnn_data["targets"]).long()
+    # Use float for regression (z1), long for classification
+    targets_dtype = torch.float if target == "z1" else torch.long
+    targets = torch.from_numpy(gnn_data["targets"]).to(targets_dtype)
 
     # sklearn predictions
     sklearn_preds = load_sklearn_predictions(target, data_dir)
