@@ -96,8 +96,37 @@ scripts/_*.sh
 
 # ── Sisyphus / wandb / caches ──────────────────────────────────
 .sisyphus/
+plans/
 wandb/
 .playwright-mcp/
 .ruff_cache/
 %TEMP%/
 funsearch/
+
+# ── Generated model outputs (not committed) ──────────────────
+data/connes_cvs/
+data/sato_tate/
+data/spectral_zeta_kf/
+data/models/*.joblib
+data/models/*.pkl
+data/models/*.npy
+data/models/*.json
+data/models/*.png
+data/models/chebconv_*/
+data/models/cross_level_*/
+data/models/multiplicative_*/
+
+# ── TeX build artifacts ─────────────────────────────────────
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.out
+paper/*.pdf
+
+# ── Root temp / test files ──────────────────────────────────
+.temp_plots/
+check_*.py
+test_*.py
+test_*.txt
+verify.txt
+_cols.txt

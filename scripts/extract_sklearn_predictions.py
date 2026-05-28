@@ -120,6 +120,7 @@ def extract_predictions(
     target: str,
     data_path: Path = None,
     output_dir: Path = None,
+    gnn_labels_path: Path = None,
 ) -> dict:
     """Extract sklearn predictions aligned to GNN test split."""
     # Skip z1 - GNN-only target (not in sklearn features)
@@ -132,24 +133,38 @@ def extract_predictions(
 
     data_path = data_path or L2_CSV_PATH
     output_dir = output_dir or MODEL_DIR
+    gnn_labels_path = gnn_labels_path or DATA_DIR / "lmfdb" / "gnn_trace_index" / "test" / "labels.txt"
 
-    # Load data
+    # Load GNN test labels
+    logger.info(f"Loading GNN test labels from {gnn_labels_path}")
+    with open(gnn_labels_path, "r") as f:
+        gnn_test_labels = [line.strip() for line in f if line.strip()]
+    logger.info(f"  GNN test set size: {len(gnn_test_labels)}")
+
+    # Load full LMFDB ML data
     df = load_lmfdb_ml_data(data_path)
 
-    # Extract ranks for stratified split
-    ranks = df['analytic_rank'].values
-
-    # Reproduce GNN's stratified split
-    logger.info("Reproducing GNN's 80/10/10 stratified split (seed=42)")
-    train_idx, val_idx, test_idx = stratified_split_by_rank(ranks)
-    logger.info(f"  Train: {len(train_idx)}, Val: {len(val_idx)}, Test: {len(test_idx)}")
-
-    # Save test indices for verification
-    np.save(GNN_TEST_INDICES_PATH, test_idx)
-    logger.info(f"  Saved GNN test indices: {GNN_TEST_INDICES_PATH}")
+    # Find matching rows in LMFDB data
+    logger.info("Matching GNN test labels to LMFDB data...")
+    gnn_labels_set = set(gnn_test_labels)
+    df_labeled = df.set_index("label")
+    
+    # Select rows that match GNN test labels (preserving GNN order)
+    matched_data = []
+    for label in gnn_test_labels:
+        if label in df_labeled.index:
+            matched_data.append(df_labeled.loc[label])
+        else:
+            logger.warning(f"  Label not found in LMFDB data: {label}")
+    
+    if len(matched_data) < len(gnn_test_labels):
+        missing = len(gnn_test_labels) - len(matched_data)
+        logger.warning(f"  {missing} labels not found (proceeding with {len(matched_data)} samples)")
+    
+    df_test = pd.DataFrame(matched_data)
+    logger.info(f"  Matched {len(df_test)} samples")
 
     # Prepare test features
-    df_test = df.iloc[test_idx].copy()
     trace_cols = get_trace_columns(100)
     scalar_cols = get_scalar_columns()
     feature_cols = trace_cols + scalar_cols
@@ -184,6 +199,9 @@ def extract_predictions(
         logger.warning(f"Model {type(model).__name__} does not have predict_proba, using predict")
         preds = model.predict(X_test).reshape(-1, 1)
 
+    # Note: Some labels were missing, save unmatched count for verification
+    missing_count = len(gnn_test_labels) - len(df_test)
+
     # Save predictions
     output_dir.mkdir(parents=True, exist_ok=True)
     pred_path = output_dir / f"sklearn_preds_{target}.npy"
@@ -191,11 +209,14 @@ def extract_predictions(
     np.save(pred_path, preds)
 
     logger.info(f"✓ Saved predictions: {pred_path} (shape: {preds.shape})")
+    if missing_count > 0:
+        logger.warning(f"  Note: {missing_count} GNN test labels not in LMFDB ML data (predictions truncated)")
 
     return {
         "predictions_path": str(pred_path),
         "num_samples": preds.shape[0],
         "prediction_shape": preds.shape[1:],
+        "missing_labels": missing_count,
     }
 
 
@@ -223,6 +244,12 @@ def main():
         default=None,
         help="Directory to save extracted predictions",
     )
+    parser.add_argument(
+        "--gnn-labels-path",
+        type=str,
+        default=None,
+        help="Path to GNN test labels file (labels.txt)",
+    )
     args = parser.parse_args()
 
     if not args.all and not args.target:
@@ -241,6 +268,7 @@ def main():
             target=target,
             data_path=Path(args.data_path) if args.data_path else None,
             output_dir=Path(args.output_dir) if args.output_dir else None,
+            gnn_labels_path=Path(args.gnn_labels_path) if args.gnn_labels_path else None,
         )
         results[target] = result
 
