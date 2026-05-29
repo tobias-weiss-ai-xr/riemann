@@ -1195,9 +1195,32 @@ $$M_{2k} = C_k \cdot (1/2)^{2k} = \begin{cases}
 
 4. **CM separation is real**: CM $M_2 = 0.101$ is significantly higher than non-CM $0.057$ (about 1.8$\sigma$). This suggests CM classifier can improve from F1=0.800 to F1 > 0.950 using moment features.
 
-### Paper
+### Major Finding: Galois Correlation Constant ρ₂ = -0.607
 
-A standalone paper documenting this fix has been published to:
+The deviation from exact 1/d scaling reveals a fundamental number-theoretic structure:
+
+**Galois Correlation**: For dimension-2 non-CM forms, the pairwise correlation between the two Galois-conjugate Hecke eigenvalues is ρ = -0.607. This anti-correlation is a direct consequence of the eigenvalues being the two roots of the same quadratic polynomial with bounded trace and norm.
+
+| d | M₂(d)·d | ρ | Interpretation |
+|---|---|---|---|
+| 1 | 0.172 | — | Baseline SU(2) (finite-prime bias factor 0.69) |
+| 2 | 0.069 | **-0.607** | Strong anti-correlation: conjugate eigenvalues constrain each other |
+| 3 | 0.041 | -0.383 | Dilution across 3 embeddings |
+| 4 | 0.032 | -0.274 | Continued dilution |
+| 5 | 0.021 | -0.220 | Approach to decorrelation |
+| 10 | 0.010 | -0.105 | Near decorrelation |
+
+### Major Finding: CM Classifier F1 = 0.919
+
+Using 25 prime-indexed traces + 11 Sato-Tate moment features, a GradientBoosting classifier achieves F1 = 0.919 (vs. 0.800 baseline from Exp 10 — a 14.9% improvement).
+
+Even 25 prime-indexed traces alone (without moments) beat the previous 100-trace baseline: F1 = 0.903 vs 0.800.
+
+**Most important CM discriminative feature**: The M₄/M₂ moment ratio (importance 0.176) — capturing the shape difference between U(1) (CM) and SU(2) (non-CM) distributions.
+
+### Updated Paper
+
+The paper has been extended with Galois correlation analysis and CM classification results:
 `docs/2026-05-29-sato-tate-moment-artifact.md`
 
 ### Files
@@ -1205,7 +1228,7 @@ A standalone paper documenting this fix has been published to:
 | File | Purpose |
 |---|---|
 | `scripts/_sato_tate_analysis.py` | Corrected Sato-Tate analysis (prime-index fix) |
-| `scripts/train_cm_classifier.py` | CM classifier with moment features (new) |
-| `docs/2026-05-29-sato-tate-moment-artifact.md` | Published paper documenting the discovery |
+| `_cm_classifier_and_correlation.py` | CM classifier + Galois correlation analysis |
+| `docs/2026-05-29-sato-tate-moment-artifact.md` | Published paper (extended with major findings) |
 
 ---
