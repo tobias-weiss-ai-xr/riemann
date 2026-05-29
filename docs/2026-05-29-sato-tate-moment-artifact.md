@@ -1,9 +1,10 @@
 # Sato-Tate Moment Collapse in LMFDB Newforms is a Data Artifact
 
-> **Date**: 2026-05-29
+> **Date**: 2026-05-29 (updated 2026-05-30)
 > **Context**: Riemann Project (GNN × Number Theory), Experiment F — Sato-Tate Moment Analysis
 > **Status**: Published
 > **Commit**: `04af07a`
+> **Comprehensive project paper**: `docs/2026-05-30-comprehensive-project-paper.md` (sections 5.4–5.6)
 
 ## Abstract
 

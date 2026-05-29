@@ -1,8 +1,9 @@
 # Research Roadmap: GNN × Number Theory — Future Directions
 
-> **Date**: 2026-05-29
-> **Status**: DRAFT — Awaiting user review
+> **Date**: 2026-05-29 (updated 2026-05-30)
+> **Status**: PUBLISHED — Thread I completed; comprehensive paper written
 > **Scope**: Comprehensive roadmap covering ALL open threads from 15+ experiments
+> **Comprehensive paper**: `docs/2026-05-30-comprehensive-project-paper.md`
 
 ---
 
@@ -308,18 +309,18 @@
 
 ---
 
-### Thread I: Paper Writing (When Ready) ⭐ LOW (Not yet)
+### Thread I: Paper Writing ⭐⭐ COMPLETED (v1.0)
 
-**Current state**: Results are publishable but not yet synthesized into a coherent narrative.
-**Goal**: Write a paper on "ML for Number Theory: Hecke Traces, Graph Neural Networks, and the Riemann Hypothesis"
+**Current state**: Comprehensive project paper written to `docs/2026-05-30-comprehensive-project-paper.md`.
+**Content**: 11 sections covering all experiments (1–15), trace-index GNN (R²=0.631), Sato-Tate moment analysis (Galois correlation ρ₂=-0.607, CM classifier F1=0.919), Friedli constant 1.1367, literature survey, and 9-thread roadmap.
 
-**Specific steps** (deferred until Threads A-D have more results):
-1. Structure: Introduction → Related Work → Methods → Experiments → Discussion → Conclusion
-2. Key narrative: "Data scaling solved GNN failures on Cayley graphs"
-3. Figures: experiment comparison table, z1 predictions, rank confusion matrices
-4. Target venues: NeurIPS 2026 workshop, ICLR 2027, or Number Theory journals
+**Findings synthesized**:
+1. Three eras of the project: Cayley GNN failures → Data-scaled LMFDB ML success → Statistical discovery
+2. All metrics, results, and comparisons organized in tables
+3. Updated success metrics with concrete targets
+4. Literature context: Connes spectral triples, Friedli, murmurations, ML-for-number-theory competition
 
-**Note**: Paper writing is NOT a current priority. Focus on research first.
+**Next**: Venue targeting (NeurIPS workshop 2026, ICLR 2027, or number theory journal) — deferred until Phase 1 results improve metrics.
 
 ---
 
