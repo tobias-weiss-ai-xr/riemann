@@ -22,7 +22,7 @@ We discover and fix a systematic normalization error in the Sato-Tate moment ana
 
 3. **CM Classifier F1 = 0.919**: Using 25 prime-indexed Hecke traces and 11 Sato-Tate moment features, the $M_4/M_2$ ratio emerges as the single most discriminative feature (importance 0.176), capturing the SU(2) versus U(1) distributional difference.
 
-We contextualize these results against recent developments in noncommutative geometry (Connes' spectral triples, 2024–2026), spectral graph theory (Friedli constant 1.1367), and the wider ML-for-number-theory landscape, concluding with a prioritized 9-thread roadmap for future work.
+We contextualize these results against recent developments in noncommutative geometry (Connes' spectral triples, 2024–2026), spectral graph theory (Friedli constant 1.1367), and the wider ML-for-number-theory landscape, concluding with a prioritized 19-thread roadmap (Threads A–S) for future work.
 
 ---
 
@@ -60,7 +60,7 @@ Our contributions are:
 
 5. **Literature synthesis**: Connecting our results to Connes' spectral triples (2024–2026), the Friedli spectral zeta constant 1.1367, and the broader ML-for-number-theory landscape.
 
-6. **9-thread roadmap**: A prioritized research agenda for scaling to 200K+ forms, GNN architecture search, Connes triple computation, and theoretical analysis.
+6. **19-thread roadmap (Threads A–S)**: A prioritized research agenda for scaling to 200K+ forms, GNN architecture search, Connes CvS scaling, FunSearch program discovery, GUE zero statistics, and theoretical analysis.
 
 ---
 

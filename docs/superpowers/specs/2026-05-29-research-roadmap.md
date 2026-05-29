@@ -1,8 +1,8 @@
 # Research Roadmap: GNN × Number Theory — Future Directions
 
-> **Date**: 2026-05-29 (updated 2026-05-30)
-> **Status**: PUBLISHED — Thread I completed; comprehensive paper written
-> **Scope**: Comprehensive roadmap covering ALL open threads from 15+ experiments
+> **Date**: 2026-05-29 (updated 2026-05-31)
+> **Status**: EXPANDED — Threads J–S added; Thread C rewritten from "theoretical" to "already working"; 19 threads total
+> **Scope**: Comprehensive roadmap covering 19 open threads (A–S) from 15+ experiments
 > **Comprehensive paper**: `docs/2026-05-30-comprehensive-project-paper.md`
 
 ---
@@ -95,63 +95,69 @@
 
 ---
 
-### Thread C: Connes' Noncommutative Geometry Approach ⭐⭐⭐ HIGH (Theoretical)
+### Thread C: Connes CvS — Characteristic Values of the Schwarzian ⭐⭐⭐ HIGH (REVISED: ALREADY WORKING)
 
-**Current state**: Oracle recommended Connes' spectral triples as alternative to Cayley GNNs. Latest papers discovered during research provide clear computational entry points.
+**⚠️ CRITICAL UPDATE (May 2026)**: This is NOT a theoretical thread. The `connes_cvs` package (v0.2.2) is **already implemented, published to PyPI, and producing ζ zeros to machine precision**. See `scripts/test_connes_cvs.py` and `scripts/_connes_n100.py`.
 
-**Why it matters**: Connes' program spans 25+ years connecting RH to noncommutative geometry. Recent breakthroughs (2024-2026) make computation feasible for the first time.
+**Implementation status**:
 
-**Key Findings from Literature**:
+The package implements the Connes–van Suijlekom Galerkin matrix Q(c) from arXiv:2511.23257 with three operator components:
+1. **Prime piece**: von Mangoldt sums over prime powers up to cutoff c
+2. **Pole piece**: contribution from trivial zeta zeros
+3. **Archimedean piece**: digamma integrals accelerated via `python-flint` (144× speedup vs naive)
 
-1. **⬆️ PRIORITY: Spectral triples & Prolate wave operators (Nov 2025)**: Connes, Consani & Moscovici (arXiv:2511.22755) — Construct **self-adjoint operators whose spectra coincide with striking numerical accuracy with the lowest non-trivial zeros of ζ(1/2+is)**. This is the latest and most directly applicable paper. The operators are semilocal — defined on the adele class space but with finite-dimensional approximations.
+The pipeline is 3-step: `build_galerkin_matrix(c, N, T, dps)` → `compute_ground_state(Q)` → `extract_zeros(eigvec, L, n_zeros)`, implemented in `connes_cvs` v0.2.2.
 
-2. **⭐ COMPUTATIONAL ENTRY: Semilocal adelic operators (2023)**: Connes & Consani (arXiv:2310.18423) — "Zeta zeros and prolate wave operators". The semilocal trace formula unifies the infrared (low-lying zeros from adeles) and ultraviolet (Sonin space/prolate) parts. **This may be directly implementable on our SL(2,F_p) framework** as a finite adele approximation.
+**Published Artifacts**:
+- PyPI: `connes-cvs` v0.2.2 (2026-04-19)
+- Zenodo: V2 DOI with bit-identity regression tests
+- GitHub: full source with sweep support and multiprocessing
 
-3. **Prolate Wave Operator (PNAS 2022)**: Connes & Moscovici — Original discovery that negative eigenvalues of the prolate spheroidal wave operator reproduce squares of ζ zeros. Eigenfunctions belong to the **Sonin space** (the same space where classical RH criteria live).
+**Current numerical results**:
 
-4. **Prolate Wave Operator (2024)**: Connes & Consani (arXiv:2412.06605) — Won the **2025 AOFA Best Paper Award**. Extended the theory with explicit formulas.
+| Configuration | Matrix Size | Error (first 5 zeros) | Computational Cost |
+|--------------|-------------|----------------------|--------------------|
+| c=30, N=100, T=400, dps=150 | 201×201 | **3 × 10⁻¹⁶** (machine precision) | ~tens of minutes |
+| c=30, N=50, T=200, dps=80 | 101×101 | **10⁻¹¹** | ~minutes |
+| c=10, N=30, T=50 | 61×61 | 10⁻⁵ | ~seconds |
 
-5. **On the Jacobian of Spec Z (2026)**: Connes, Consani & Moscovici (arXiv:2603.01625) — Deepens algebraic cycle connections.
+**Why it matters**: Connes' noncommutative geometry program spans 25+ years connecting RH to the geometry of adele class spaces. The fact that we now have a **working, published numerical implementation** that extracts ζ zeros to machine precision is transformative — it moves from "can we compute this?" to "what can we learn from scaling it?"
 
-6. **The Riemann Hypothesis survey (Feb 2026)**: Connes (arXiv:2602.04022) — *"The Riemann Hypothesis: Past, Present and a Letter Through Time"* — Comprehensive survey connecting Weil quadratic form, prolate operator, and the full program. Best overview document.
+**Key Findings from Literature (context for Threads J & O)**:
 
-7. **Spectral triples and zeta-cycles (2021)**: Connes & Consani (arXiv:2106.01715) — Connects spectral triples to zeta zeros systematically.
+1. **Spectral triples & Prolate wave operators (Nov 2025)**: Connes, Consani & Moscovici (arXiv:2511.22755) — The theoretical foundation for Q(c). Won **2025 AOFA Best Paper Award**.
+2. **Semilocal adelic operators (2023)**: Connes & Consani (arXiv:2310.18423) — Unifies infrared (adele) and ultraviolet (Sonin) parts.
+3. **The Riemann Hypothesis survey (Feb 2026)**: Connes (arXiv:2602.04022) — Comprehensive overview.
+4. **On the Jacobian of Spec Z (2026)**: Connes, Consani & Moscovici (arXiv:2603.01625) — Deepens algebraic cycle connections.
+5. **Zeta Spectral Triples (to appear 2025)**: Connes, Consani & van Suijlekom — New framework for spectral computation of zeta zeros.
 
-8. **Weil positivity at archimedean place (2020)**: Connes & Consani (arXiv:2006.13771) — Foundational trace formula.
+**Revised Specific Steps**:
+1. **⬆️ Run Thread J first** (Connes CvS scaling analysis — see below):
+   - Characterize N→accuracy convergence rate
+   - Determine saturation point (is N=100 already optimal?)
+   - Extract zeros 6–20+ by increasing N
+   - Measure computational cost curve as N grows
 
-9. **IHS Axioms (2004—)**: Original framework (arXiv:math/0402325): spectral triple (A, H, D) where A = GL(2, adeles)/GL(2,Q), H = L^2(A), D = Dirac operator. RH ≡ positivity of curvature.
+2. **CvS × Modular Forms** (Thread O — see below):
+   - Generalize the Galerkin matrix construction from ζ(s) to L-functions of modular forms
+   - This would connect the Connes approach directly to our LMFDB dataset
+   - Most high-risk/high-reward direction in the project
 
-10. **Your own negative study (2026)**: "When Graph Neural Networks Meet the Riemann Hypothesis: A Systematic Negative Study" — 7 experiment tracks, all failed. Root cause: vertex-transitivity kills local GNN signal. Pizer graphs gave exactly zero cross-prime generalization. This motivates the noncommutative geometry alternative.
-
-**Specific steps**:
-1. **⬆️ PRIORITY: Implement semilocal operators (arXiv:2310.18423)**:
-   - Start from the concrete operator construction in the semilocal paper
-   - Implement for finite adele approximation using our existing SL(2,F_p) Cayley graph framework
-   - Compute low-lying eigenvalues and compare to ζ zeros
-   - Validate against the numerical results reported in arXiv:2511.22755
-   - **This is the most accessible computational entry point** — the paper includes explicit formulas
-
-2. **Compute the prolate operator numerically**:
-   - Implement the prolate spheroidal wave operator for small prime approximations
-   - Reproduce the negative eigenvalues and compare to ζ(zero)^2
-   - Uses the Sonin space formulation
-
-3. **Implement Connes' trace formula for SL(2,F_p)**:
-   - Compute spectral triple (A_p, H_p, D_p) for finite adele approximation
-   - Verify IHS positivity numerically for p=2..79
-   - Test whether positivity correlates with graph spectral gap
+3. **CvS sweep analysis**:
+   - Run `sweep.py` module (already implemented) with multi-cutoff analysis
+   - Study Q(c) ground state as function of c (cutoff)
+   - Look for structural transitions in the eigenvector
 
 4. **Bridge to ML**:
-   - Use semilocal operator eigenvalues as features for sklearn/GNN
-   - Train on 53k LMFDB data
-   - Compare to Hecke trace features
+   - Use CvS-derived zero predictions as an additional feature for LMFDB GNN training
+   - Compare Connes-based zero extraction vs GNN-predicted zeros
 
 **Success criteria**:
-- Reproduce semilocal operator eigenvalues matching ζ zeros to 1% accuracy
-- IHS positivity verified numerically for p ≤ 31
-- Connes features improve rank classification over Hecke traces
+- N→∞ convergence law characterized: exponential or power-law?
+- Zeros 6–20 extracted to at least 10⁻⁶ accuracy
+- CvS × L-function generalization attempted and documented (even if negative)
 
-**Risk**: Mathematically complex — semilocal operators still require significant implementation effort
+**Risk**: Connes operator is specific to ζ(s) — generalization to L-functions is mathematically non-trivial
 
 ---
 
@@ -312,7 +318,7 @@
 ### Thread I: Paper Writing ⭐⭐ COMPLETED (v1.0)
 
 **Current state**: Comprehensive project paper written to `docs/2026-05-30-comprehensive-project-paper.md`.
-**Content**: 11 sections covering all experiments (1–15), trace-index GNN (R²=0.631), Sato-Tate moment analysis (Galois correlation ρ₂=-0.607, CM classifier F1=0.919), Friedli constant 1.1367, literature survey, and 9-thread roadmap.
+**Content**: 11 sections covering all experiments (1–15), trace-index GNN (R²=0.631), Sato-Tate moment analysis (Galois correlation ρ₂=-0.607, CM classifier F1=0.919), Friedli constant 1.1367, literature survey, and 19-thread roadmap (expanded May 31).
 
 **Findings synthesized**:
 1. Three eras of the project: Cayley GNN failures → Data-scaled LMFDB ML success → Statistical discovery
@@ -324,22 +330,356 @@
 
 ---
 
-## 3. Parallel Execution Plan
+### Thread J: Connes CvS Scaling Analysis ⭐⭐⭐ HIGHEST (NEW — DIRECTLY RUNNABLE)
+
+**Current state**: `connes_cvs` v0.2.2 installed and working. N=100 → 10⁻¹⁶ accuracy on first 5 zeros. N=50 → 10⁻¹¹.
+**Goal**: Characterize N→accuracy convergence, scale to extract more zeros, understand computational cost curve.
+
+**Why it's HIGHEST**: This is not a new implementation — the code already works. Every other thread requires new code. Thread J is pure analysis of an existing tool.
+
+**Specific steps**:
+1. **Convergence characterization**:
+   - Run N=10,20,40,60,80,100,120 (same c=30,T=400,dps=150)
+   - Measure error in γ₁–γ₅ as function of N
+   - Fit convergence law: exponential ∝ exp(-αN) or power-law ∝ N⁻ᵝ?
+   - Determine N₀ where further N ceases to improve accuracy (saturation)
+
+2. **Extract more zeros**:
+   - Current: n_zeros=5. Try n_zeros=10, 20 with N=100,200
+   - Is zero extraction accuracy uniform across k, or does it degrade?
+   - Compare to true zeros from lmfdb_zeros_ml.csv (63,844 entries with z1-z10)
+
+3. **Computational scaling**:
+   - Matrix is (2N+1)×(2N+1). Build time and solve time vs N.
+   - Is there a GPU-acceleratable bottleneck? (The python-flint library is CPU-only)
+   - Estimate cost for N=500 (zero extraction to γ₅₀?)
+
+4. **Cutoff sweep (sweep.py)**:
+   - Vary c from 5 to 100 (already has c=5,c=10,c=20,c=30 data)
+   - Study Q(c) ground state eigenvalue λ_min(c)
+   - Look for structural phase transitions in the eigenvector
+
+**Success criteria**:
+- Convergence law fitted with >0.99 R²
+- Zeros 6–10 extracted to <10⁻⁶ error
+- Scaling cost documented (hours? days? for N=200)
+- Machine-precision zeros for all 10 visible in LMFDB data
+
+**Risk**: Matrix solve becomes expensive beyond N=200; gains may saturate
+
+---
+
+### Thread K: FunSearch for Hecke Trace Identities ⭐⭐⭐ HIGH (NEW)
+
+**Current state**: `funsearch/` submodule is a fully functional LLM-based program search engine (forked from DeepMind's Nature 2023 FunSearch). Docker, wandb, multi-model support, sandboxed evaluation all configured. Currently dormant.
+
+**Goal**: Discover closed-form arithmetic relationships between Hecke trace sequences and L-function invariants.
+
+**Why it's HIGH**: The search infrastructure is already set up. The 63K LMFDB dataset is ideal for supervised program search. Even partial discoveries would significantly strengthen the project's mathematical depth.
+
+**Specific steps**:
+1. **Search for trace → z1 formula**:
+   - Define spec: given trace_1..trace_100, output a function f(traces) → z1
+   - Evaluation metric: mean absolute error vs true z1 from LMFDB
+   - Use 54,443 forms with complete z1-z10 data
+   - Sandbox: ExternalProcessSandbox (already configured)
+
+2. **Search for trace → rank formula**:
+   - Spec: function f(traces) → analytic_rank (0 or 1 or 2+)
+   - Metric: F1 score
+   - Focus on rank-2 (rare class, 1.3%) where ML struggles most
+
+3. **Search for CM detection**:
+   - Spec: function f(traces) → is_CM (boolean)
+   - Compare discovered formulas to the M₄/M₂ ratio heuristic (current F1=0.919)
+   - Can FunSearch discover a better rule?
+
+4. **Search for trace algebra identities**:
+   - Given two forms with related Hecke traces, is there a trace algebra?
+   - E.g.: trace_p(f × g) expressed in terms of trace_p(f) and trace_p(g)
+   - Could discover new Euler product relations
+
+**Success criteria**:
+- At least 1 spec runs end-to-end through funsearch pipeline
+- Discovered formula(s) have interpretable mathematical form
+- At least one formula beats the comparable sklearn model
+
+**Risk**: FunSearch requires LLM API keys and GPU for sandbox; program discovery is stochastic
+
+---
+
+### Thread L: GUE / Zero Statistics at Scale ⭐⭐⭐ HIGH (NEW)
+
+**Current state**: 63,844 LMFDB entries with z1-z10 zeros (54,443 with complete z1-z10). Current scripts (`train_lmfdb_zeros.py`, `generate_multigen.py`) only mention RMT in docstrings — no systematic GUE comparison exists.
+
+**Goal**: Test the Montgomery-Odlyzko law on the largest LMFDB L-function zero dataset assembled in this project.
+
+**Why it matters**: The GUE hypothesis predicts that non-trivial zeros of L-functions have the same spacing statistics as eigenvalues of random Hermitian matrices. Our 63K dataset enables per-level and per-dimension statistical tests at unprecedented scale for this project.
+
+**Specific steps**:
+1. **Level-spacing distribution**:
+   - Compute normalized spacing s_k = (γ_{k+1} - γ_k) × mean_density for each form
+   - Compare to Wigner surmise p(s) = (πs/2) exp(-πs²/4) for GUE
+   - Kolmogorov-Smirnov test per level/dim stratum
+   - Visualize with histogram overlays
+
+2. **Number variance**:
+   - Compute Σ²(L) = variance of zero count in intervals of length L
+   - Compare to GUE prediction Σ²(L) ≈ (2/π²) log L + 0.440...
+   - Test for deviations at small L (oscillatory component)
+
+3. **Trace → spacing connection**:
+   - Train models to predict spacing statistics from trace sequences
+   - Is there trace structure in the spacings beyond what pure RMT predicts?
+   - Correlation between Hecke eigenvalues and spacing deviations
+
+4. **Level-density analysis**:
+   - Compute mean density of zeros per form, per level
+   - Check for arithmetic effects (level-dependence) beyond the mean density
+   - Relate to conductor via Langlands correspondence
+
+**Success criteria**:
+- GUE spacing distribution validated at >95% confidence for at least one stratum
+- Deviations from GUE quantified (if any)
+- Trace → spacing model achieves R² > 0 for spacing statistics
+
+**Risk**: The L-function zeros may be too few (z1-z10 only) for robust statistics beyond level-spacing of adjacent zeros
+
+---
+
+### Thread M: Modern GNN Architectures for Trace-Index Graphs ⭐⭐ MEDIUM-HIGH (NEW)
+
+**Current state**: Only ChebConv (K=5) has been tried on trace-index graphs (R²=0.631 for z1). No attention-based or transformer architectures explored.
+**Goal**: Leverage the trace-index graph's natural structure (index distance metric) with modern GNN designs.
+
+**Specific steps**:
+1. **Graph Transformer / GPS**:
+   - The trace-index graph has a natural distance metric: index distance |i-j| between newforms
+   - GraphGPS with Laplacian positional encodings
+   - Compare spectral gap vs distance-based positional encodings
+
+2. **SAN / EXPHormer**:
+   - SAN learns edge- and node-level attention with structural encodings
+   - EXPHormer uses expander graphs for global attention
+   - Both are designed to handle the long-range dependencies present in trace-index graphs
+
+3. **GraphSAGE with JK-Net**:
+   - Deeper aggregation (JK connections) for better differentiation of rare classes
+   - Target: rank-2 forms (1.3% of dataset)
+
+4. **Ablation**:
+   - Edge features (trace-index magnitude)
+   - Directed vs undirected edges
+   - Multi-scale: k-NN edges at different thresholds
+
+**Success criteria**:
+- z1 R² > 0.700 (from 0.631)
+- Rank F1 > 0.950 (from 0.892)
+- Rank-2 recall > 0.800
+
+**Risk**: GNN literature moves fast — some architectures may not be available in PyG 2.x
+
+---
+
+### Thread N: Multi-Task Zero Prediction ⭐⭐ MEDIUM (NEW)
+
+**Current state**: Models predict z1, z2, z3 independently. The zeros are physically correlated — a multi-task model should exploit this.
+**Goal**: Jointly predict all available zeros (z1-z10) and auxiliary statistics, using their shared structure as a regularizer.
+
+**Specific steps**:
+1. **Multi-task MLP**:
+   - Shared hidden layers with 10 output heads (z1..z10) + aux tasks
+   - Loss: weighted sum of MAE for each zero + MSE for spacings
+   - Compare to 10 separate single-zero models
+
+2. **Multi-task GNN**:
+   - Same architecture, but on trace-index graphs
+   - Graph backbone shared across all tasks
+   - Can graph structure propagate information between zero prediction tasks?
+
+3. **Physics-informed regularization**:
+   - Penalty term if predicted zeros violate monotonicity (z_k < z_{k+1})
+   - Soft constraint: predicted zeros should satisfy mean spacing bounds
+   - Uses known bounds from L-function theory
+
+**Success criteria**:
+- Multi-task MAE for z1..z10 < single-task MAE for at least 8/10 zeros
+- Monotonicity constraint yields zero violations on test set
+
+**Risk**: Correlated outputs may not improve over independent predictions given sufficient data
+
+---
+
+### Thread O: Connes CvS × L-Functions of Modular Forms ⭐⭐⭐ HIGH (SPECULATIVE)
+
+**Current state**: Connes CvS works for ζ(s). Connecting to L-functions of modular forms is mathematically non-trivial but would unify the project's two most successful threads.
+
+**Goal**: Generalize the CvS Galerkin construction from ζ(s) to L(f,s) for weight-2 newforms.
+
+**Why it matters**: If possible, this would enable direct spectral computation of L-function zeros for modular forms — replacing statistical prediction (GNN R²=0.631) with direct numerical computation (potentially exponential convergence).
+
+**Specific steps**:
+1. **Theoretical analysis** (consult literature):
+   - The CvS operator Q(c) is built from the Euler product of ζ(s)
+   - For L(f,s) with Euler product ∏(1 - a_p p⁻ˢ + χ(p)p²ᵏ⁻¹⁻²ˢ)⁻¹, can we construct an analogous operator?
+   - This requires understanding the arithmetic structure of the CvS construction in detail
+
+2. **If theoretically feasible**:
+   - Implement generalized Q_f(c) for a single newform
+   - Test on forms with known zeros from lmfdb_zeros_ml.csv
+   - Compare to true zeros (currently 54,443 forms with z1-z10)
+
+3. **If not feasible**:
+   - Document the mathematical obstruction
+   - Propose alternative: use CvS ζ zeros as priors for L-function zeros via universal structures
+
+**Success criteria**:
+- Mathematical feasibility documented (even if negative)
+- If positive: zeros extracted for at least 1 form with <1% error
+
+**Risk**: The CvS construction may be specific to ζ(s) — generalization requires deep understanding of both Connes' noncommutative geometry program AND modular form L-functions
+
+---
+
+### Thread P: Individual Hecke Eigenvalue Extraction for d>1 ⭐⭐ MEDIUM (NEW)
+
+**Current state**: The Sato-Tate analysis and all LMFDB models use Hecke *traces* (sum of eigenvalues). For dim>1 forms, individual eigenvalues carry more information than their sum.
+**Goal**: Extract individual Hecke eigenvalues from LMFDB and use them to improve CM detection and Galois correlation analysis.
+
+**Specific steps**:
+1. **Extract eigenvalues**:
+   - LMFDB SQL mirror stores individual Fourier coefficients a_p^{(1)}, ..., a_p^{(d)} for each prime
+   - Modify `collect_lmfdb_sql.py` to include individual eigenvalues alongside traces
+   - Expected: 100 primes × dim eigenvalues per form
+
+2. **Refine CM classifier**:
+   - Current: F1=0.919 using traces + moment features
+   - With individual eigenvalues: the U(1) vs SU(2) distributional difference should be clearer
+   - Target: F1 > 0.950
+
+3. **Refine Galois correlation analysis**:
+   - Current: ρ₂ = -0.607 from traces
+   - With individual eigenvalues: can we measure the Galois action directly?
+   - Compare: is ρ₂ uniform across Galois orbits, or does it depend on the orbit structure?
+
+**Success criteria**:
+- Individual eigenvalue extraction pipeline working (10+ forms validated)
+- CM classifier F1 > 0.950
+- Galois correlation refined with narrower confidence interval
+
+**Risk**: LMFDB SQL may not expose individual eigenvalues for all forms; requires schema exploration
+
+---
+
+### Thread Q: Pizer Data Quality Autopsy ⭐ LOW (NEW)
+
+**Current state**: Exp 7 (Pizer/Brandt matrix GNN) produced R² = -49 — the worst result in the project. The failure was never diagnosed.
+**Goal**: Determine whether this failure is fundamental (Pizer graphs do not encode L-function invariants) or data-quality (bug in the collection/construction pipeline).
+
+**Specific steps**:
+1. **Data quality audit**:
+   - Examine the 13 Pizer graph samples: what sizes, which primes, what invariants
+   - Check for label leakage, missing values, normalization errors
+   - Validate the Brandt matrix → graph construction against known Pizer theory
+
+2. **Minimal reproduction**:
+   - Implement a simple linear model on Pizer graph features (bypass GNN entirely)
+   - If linear model fails too: the issue is in the features, not the architecture
+   - If linear model succeeds: the issue is in GNN architecture/hyperparameters
+
+3. **Documentation**:
+   - Write up the autopsy results in EXPERIMENT_LOG.md
+   - If salvageable: propose a fix
+   - If not: note the failure as fundamental and why
+
+**Success criteria**:
+- Root cause of R²=-49 identified
+- Clear documentation of findings
+
+**Risk**: The failure may be purely data-size (13 samples) — no deeper lesson
+
+---
+
+### Thread R: GUE/Zero Hypothesis Testing — Level Density and Pair Correlation ⭐⭐ MEDIUM (NEW)
+
+**Current state**: The LMFDB zeros dataset (63,844 entries) enables unprecedented statistical testing of the Montgomery-Odlylovy law for modular form L-functions.
+**Goal**: Test RMT predictions beyond level-spacing — pair correlation, number variance, and spectral rigidity.
+
+**Specific steps**:
+1. **Pair correlation**:
+   - Compute R₂(s) = fraction of zero pairs with spacing < s
+   - Compare to GUE prediction R₂(s) = 1 - (sin(πs)/(πs))²
+   - Stratify by level, dim, analytic rank
+
+2. **Spectral rigidity Δ₃**:
+   - Compute Dyson-Mehta Δ₃ statistic for each form
+   - Compare to GUE prediction Δ₃(L) ≈ (1/π²) log L + 0.058
+   - Detect arithmetic correlations (lower rigidity) in specific families
+
+3. **Correlation with Hecke eigenvalues**:
+   - For each form, compute deviation from GUE at the individual zero level
+   - Train model: do Hecke traces predict which zeros deviate from RMT?
+   - Connection to the trace-index GNN (Thread B): graph structure may encode RMT-deviating correlations
+
+**Success criteria**:
+- Pair correlation GUE prediction validated at >95% confidence for full dataset
+- Statistically significant Hecke trace → deviation correlation found
+- Connection between GNN performance and RMT deviation quantified
+
+**Risk**: With only z1-z10 per form, pair correlation is limited to nearest-neighbor spacing
+
+---
+
+### Thread S: LLM-Aided Automated Conjecture Generation ⭐⭐ MEDIUM (NEW)
+
+**Current state**: Empirical discoveries (ρ₂ correlation, dilution law d^{-1.29}, CM classification rules, Friedli constant) are documented — none have been formalized into conjectures.
+**Goal**: Use LLM assistance + the FunSearch infrastructure to generate precise mathematical conjectures from data.
+
+**Why it matters**: The MIT LMFDB + Lean4 grant signals that formalization of data-driven number theory is strategically important. Our empirical findings are natural candidates.
+
+**Specific steps**:
+1. **Formalize the dilution law**:
+   - Current: ρ_d ∼ d^{-1.29} observed from data
+   - Can we conjecture: ρ_d = c·d^{-α} with specific c, α?
+   - Test against analytic continuation of the expected Sato-Tate group
+
+2. **Formalize CM detection**:
+   - Current: M₄/M₂ ratio is best feature
+   - Can we conjecture: M₄/M₂ > threshold ≡ CM?
+   - Compute optimal threshold and confidence interval
+
+3. **Connect to MIT LMFDB + Lean4 effort**:
+   - Package the formalized conjectures in a format compatible with Lean4
+   - Position our empirical results as test cases for automated theorem proving
+
+**Success criteria**:
+- At least 1 conjecture formalized with mathematical precision
+- Optimal thresholds computed with confidence intervals
+- Connection to Lean4 formalism outlined
+
+**Risk**: Formalization requires category-theoretic/mathematical precision; LLM-assisted generation may produce "slop" conjectures
 
 ### Phase 1 (Now — 2 weeks)
+- **Thread J**: Connes CvS scaling analysis (N→accuracy law, zero extraction 6-10+) ⬆️ HIGHEST
+- **Thread L**: GUE zero statistics at scale (level spacing, pair correlation, spectral rigidity)
 - **Thread A**: Extend LMFDB collection to 200K+ newforms
 - **Thread B**: Architecture search on trace-index graphs (3 parallel agents)
-- **Thread F**: Fix Sato-Tate normalization
+- **Thread P**: Individual eigenvalue extraction for d>1 (refines Thread F)
 
 ### Phase 2 (Weeks 3-4)
-- **Thread C**: Connes spectral triple implementation (if background research confirms feasibility)
+- **Thread C (revised)**: CvS × L-function generalization (theoretical feasibility)
 - **Thread D**: Full-spectra Friedli extension for p=17, 19, 23
+- **Thread K**: FunSearch Hecke trace identities (first spec run)
 - **Thread E**: Run baseline GNN on Farey graphs
+- **Thread N**: Multi-task zero prediction (share backbone across z1-z10)
 
 ### Phase 3 (Weeks 5-6)
+- **Thread M**: Modern GNN architectures (GraphGPS, SAN, EXPHormer)
+- **Thread O**: CvS × L-functions (implementation if feasibility confirmed)
 - **Thread G**: Hybrid approach with enriched features
+- **Thread S**: LLM-aided conjecture generation
 - **Thread H**: KG integration with experimental results
-- **Thread I**: Begin paper outline if results warrant
+- **Thread Q**: Pizer data quality autopsy (low priority, one-shot)
 
 ---
 
@@ -349,11 +689,19 @@
 
 2. **What does the Friedli constant 1.1367 mean?** Is it related to the spectral density of SL(2,F_p)? Can we derive it analytically?
 
-3. **Is Connes' approach computationally feasible?** The semilocal operators (arXiv:2310.18423) give finite-dimensional approximations. The arXiv:2511.22755 paper already reports numerical results matching ζ zeros. Can we reproduce and extend these on SL(2,F_p)?
+3. **How does the Connes CvS operator converge?** The N=100 → 10⁻¹⁶ results are astonishing. Is it exponential convergence? What's the saturation point? Can we reach γ₂₀?
 
-4. **Does scaling to 500K+ newforms break the current bottleneck?** Or do we hit diminishing returns after 200K?
+4. **Can the Connes CvS construction be generalized from ζ(s) to L-functions of modular forms?** If yes, this would be the most transformative result — direct spectral computation of L-function zeros.
 
-5. **Are there other graph constructions beyond trace-index?** The trace-index paradigm connects newforms via shared Chef eigenvectors. Are there other natural graph structures?
+5. **Does scaling to 500K+ newforms break the current bottleneck?** Or do we hit diminishing returns after 200K?
+
+6. **Can FunSearch discover closed-form mathematical relationships from LMFDB data?** The submodule is ready — what can LLM-based program search tell us about Hecke traces vs zeros?
+
+7. **Are there other graph constructions beyond trace-index?** The trace-index paradigm connects newforms via shared Chef eigenvectors. Are there other natural graph structures?
+
+8. **Do L-function zeros satisfy GUE statistics in our 63K dataset?** Systematic testing of Montgomery-Odlyzko law at scale.
+
+9. **Can we formalize our empirical discoveries into precise mathematical conjectures?** Galois correlation ρ₂ = -0.607, dilution law d^{-1.29}, M₄/M₂ CM detection — are these provable?
 
 ---
 
@@ -365,7 +713,11 @@
 | Rank classification F1 | 0.970 | 0.985 | 4 weeks |
 | L-function zero R² | 0.631 | 0.750 | 4 weeks |
 | Friedli constant precision | 4 digits | 6 digits | 3 weeks |
-| Connes IHS verification | None | p ≤ 31 | 6 weeks |
+| Connes CvS zero extraction | γ₁-γ₅ @ 10⁻¹⁶ (N=100) | γ₁-γ₁₀ @ 10⁻¹⁰ (N=200) | 1 week |
+| Connes CvS N→accuracy law | Unknown | Characterized with >0.99 R² fit | 1 week |
+| GUE spacing test | None | >95% CI for full dataset | 2 weeks |
+| FunSearch spec running | Dormant | ≥1 spec end-to-end | 3 weeks |
+| CM classifier F1 | 0.919 (trace features) | 0.950 (individual eigenvalues) | 4 weeks |
 
 ---
 
@@ -441,3 +793,13 @@ From codebase review agent (May 2026):
 | `scripts/_sato_tate_analysis.py` | Sato-Tate moments | Needs normalization fix |
 | `scripts/generate_farey.py` | Farey graph generation | Working |
 | `scripts/train_farey_gnn.py` | Farey GNN training | Untested |
+| `scripts/test_connes_cvs.py` | Connes CvS N=100 zero extraction | Working — 10⁻¹⁶ accuracy |
+| `scripts/_connes_n100.py` | Connes CvS c=30,N=100 production run | Working |
+| `scripts/_connes_n50.py` | Connes CvS c=30,N=50 production run | Working |
+| `scripts/_connes_n40.py` | Connes CvS c=30,N=40 summary | Working |
+| `scripts/_connes_fixed.py` | Connes CvS with fix | Working |
+| `scripts/_connes_quick.py` | Connes CvS quick test | Working |
+| `scripts/_check_connes_api.py` | Connes CvS API validation | Working |
+| `data/connes_cvs/*.json` | CvS zero extraction results | 8 result files, c=5..30, N=20..100 |
+| `funsearch/` submodule | LLM-based program search engine | Dormant — Docker configured |
+| `data/lmfdb/lmfdb_zeros_ml.csv` | 63,844 forms with Hecke traces + z1-z10 | Working — 121 columns |
