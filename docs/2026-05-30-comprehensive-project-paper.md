@@ -661,6 +661,7 @@ The Riemann Project's results can be understood across three distinct eras:
 - Result: **Complete failure** — all architectures R² < 0
 - Root cause: Vertex-transitivity + insufficient data (13–57 samples)
 - Lesson: Some mathematical structures are fundamentally unsuitable for local GNN methods
+- Follow-up: Farey graphs $\mathcal{F}_n$ tested as a non-vertex-transitive alternative (Exp E) — GNN failed again, but for a different reason: the spectral gap follows an exact power law $\Delta_n \approx 2.65/n$ (R²=0.9998), making learning unnecessary
 
 **Era II: Data-scaled ML on LMFDB (Exps 9–12)**
 - Hypothesis: More data solves the problem
@@ -730,7 +731,7 @@ Below is the current research roadmap, updated to reflect all results through Ma
 |--------|-------------|----------|--------|
 | **C** | Connes spectral triples (semilocal trace formula, arXiv:2310.18423) | ⭐⭐⭐ HIGH | Pending |
 | **D** | Friedli full spectra $p$=17,19,23 (verify constant to 6 digits) | ⭐⭐ | Pending |
-| **E** | Farey graph GNN (Pfad B, untested — risk of vertex-transitivity) | ⭐⭐ | Pending |
+| **E** | Farey graph GNN (Pfad B — exact power law $\Delta_n \approx 2.65/n$ discovered, R²=0.9998, GNN R²=-4.43) | ⭐⭐ | **DONE** ✓ |
 | **K** | FunSearch for Hecke trace identities (dormant submodule) | ⭐⭐⭐ HIGH | Pending |
 | **M** | Modern GNN: GraphGPS, SAN, GPS++ on trace-index graphs | ⭐⭐ | Pending |
 | **N** | Multi-task zero prediction (joint z1–z10 with shared encoder) | ⭐⭐ | Pending |

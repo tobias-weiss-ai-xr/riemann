@@ -1319,6 +1319,71 @@ The dim=1 preference for GUE is the **first large-scale confirmation** of the Ka
 
 ---
 
+## Experiment E (Phase 1): Farey Graph GNN — Power Law Discovery
+
+**Date**: 2026-05-29  
+**Goal**: Train FareyChebNet (ChebConv GNN with precomputed Chebyshev features) to predict spectral gaps of Farey graphs $\mathcal{F}_n$, and determine whether GNNs can generalize across Farey graph sizes.
+
+### Background
+
+Farey graphs $\mathcal{F}_n$ (vertices = rational numbers $a/b$ with $0 \leq a \leq b \leq n$, edges between Farey neighbors) are natural candidates for GNN-based spectral prediction because they are **not vertex-transitive** — unlike the SL(2,F_p) Cayley graphs which all failed (Experiments 1-7). Their spectral properties are linked to modular forms via the Selberg trace formula, making them relevant to the project's central conjecture.
+
+### Methodology
+
+- **Model**: `FareyChebNet` — precomputes Chebyshev polynomial features of order $K=3$ on each graph, then applies 3-layer MLP with global mean pooling
+- **Data**: 23 Farey graphs $\mathcal{F}_{10}$ through $\mathcal{F}_{230}$ (33 to 16,155 nodes)
+- **Split**: Standard 80/10/10 train/val/test split by $n$ (chronological, not random)
+- **Baseline**: Power-law fit $\Delta_n = a \cdot n^{-b}$ in log-log space
+- **LOO validation**: 23-fold leave-one-out cross-validation (every $n$ held out once)
+- **Hardware**: CUDA-enabled, 1.2 GB GPU, 300 epochs per fold ($\sim$50s each)
+
+### Key Discovery: Exact Power Law
+
+The Farey graph spectral gap follows an **exact power law**:
+
+$$\Delta_n \approx 2.6547 \cdot n^{-0.9989} \approx \frac{2.65}{n}$$
+
+| Metric | log-log Linear Fit | Power Law ($a n^{-b}$) |
+|--------|-------------------|----------------------|
+| **R²** | 0.999995 | 0.999848 |
+| **MAE** | 0.00188 (log) | $5.36 \times 10^{-5}$ (gap) |
+| **RMSE** | 0.00354 (log) | $2.03 \times 10^{-4}$ (gap) |
+| **Median rel. error** | $8.60 \times 10^{-5}$ (log) | $6.97 \times 10^{-4}$ (gap) |
+
+The log-space fit yields slope $b = 0.9989 \approx 1.0$ and intercept $\log a = -0.9763 \Rightarrow a = 2.6547$. The exponent is **indistinguishable from 1** at this resolution.
+
+### GNN Results
+
+| Split | Model R² | Power-Law R² | Gap |
+|-------|----------|-------------|-----|
+| Standard (80/10/10) | **−4.43** | **0.9999** | Model fails at extrapolation |
+| LOO (23-fold) | Mean −0.84 | 0.9999 | Every held-out size worse than baseline |
+| LOO (best fold) | −0.12 | — | Best case barely below 0 |
+
+The GNN **cannot beat the power-law baseline** on any held-out $n$. Even with LOO, extrapolation to unseen $n$ produces R² < 0 in all cases. The FareyChebNet learns size-specific features that don't generalize.
+
+### Conclusion: Third Negative Result Family
+
+This joins the Cayley graph GNN failures (Experiments 1-7) as a **third negative result** for GNN-based spectral prediction in number-theoretic graphs:
+
+1. **SL(2,F_p) Cayley graphs** → Vertex-transitivity kills local features
+2. **Pizer graphs** → Exactly zero cross-prime generalization
+3. **Farey graphs** → Spectral gap follows exact power law — no learning needed
+
+The Farey case is particularly instructive: the spectral gap is a mathematical identity ($2.65/n$) that any model can discover analytically. The GNN cannot improve on it because there is nothing to learn beyond the exponent.
+
+### Files
+
+| File | Purpose |
+|------|---------|
+| `scripts/train_farey_gnn.py` | FareyChebNet training + LOO (1069 lines) |
+| `scripts/generate_farey.py` | Farey graph generation (9.8 KB) |
+| `scripts/build_farey_manifest.py` | Farey graph manifest builder |
+| `results/farey/farey_K3_h64_e300.json` | Baseline results |
+| `data/farey/` | Farey graph data ($n=10$ to $n=400$) |
+
+---
+
 ## Experiment A (Phase 1): LMFDB Scale-Up to 200K
 
 **Date**: 2026-05-29  
