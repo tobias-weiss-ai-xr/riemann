@@ -108,7 +108,9 @@ Alain Connes' program connecting the Riemann Hypothesis to noncommutative geomet
 
 5. **The Riemann Hypothesis survey** (Connes, Feb 2026, arXiv:2602.04022): Comprehensive overview connecting the Weil quadratic form, prolate operator, and the full program — serving as the best entry point.
 
-**Relevance to this work**: The semilocal operators (arXiv:2310.18423) may be implementable using finite adele approximations on our existing $\operatorname{SL}(2,\mathbb{F}_p)$ framework. We rank this as Thread C (high priority, theoretical) in our roadmap.
+**Connes CvS package**: The Characteristic Values of the Schwarzian (CvS) formulation — Connes–van Suijlekom's Galerkin matrix $Q(c)$ of size $(2N+1)\times(2N+1)$ from arXiv:2511.23257 — has been published as the `connes-cvs` Python package (v0.2.2, PyPI, April 2026) and is already deployed in this project. At $c=30,N=100,T=400,\\text{dps}=150$, it extracts the first five Riemann zeta zeros with **machine precision** (errors $3.6\times 10^{-16}$ to $8.3\times 10^{-16}$). Even $N=50$ achieves $10^{-11}$ accuracy. This transforms Thread C from theoretical to computational: the Galerkin matrix is a drop-in tool for zero extraction, and scaling analysis (Thread J) is already in progress.
+
+**Relevance to this work**: The semilocal operators (arXiv:2310.18423) may be implementable using finite adele approximations on our existing $\operatorname{SL}(2,\mathbb{F}_p)$ framework. We rank the full spectral triple pathway as Thread C (high priority, Phase 2).
 
 ### 2.4 Friedli Spectral Zeta and the $\operatorname{SL}(2,\mathbb{F}_p)$ Constant
 
@@ -702,68 +704,43 @@ Whether this constant relates to more familiar invariants (the spectral gap, the
 
 ---
 
-## 6. Roadmap (9 Priority-Ranked Threads)
+## 6. Roadmap (19 Priority-Ranked Threads A–S)
 
-Below is the current research roadmap, updated to reflect results through May 2026. Detailed implementation plans exist for Threads A, B, and F.
+Below is the current research roadmap, updated to reflect all results through May 2026. Threads marked ✓ are complete. A detailed research roadmap document is at `docs/superpowers/specs/2026-05-29-research-roadmap.md`.
 
-### Phase 1 (Immediate)
+### Phase 1 (Weeks 1–2) — Computational Discovery
 
-**Thread L: GUE Zero Statistics** ⭐⭐⭐ DONE ✓
-- **Status**: 63,844 forms, 568,708 spacings analyzed with dimension-resolved KS tests
-- **Discovery**: Two-population structure — $d=1$ forms prefer GUE (consistent with Katz-Sarnak), $d\ge 2$ forms uniformly favor GOE
-- **Data**: Published in results Section 4.8, raw data in `data/lmfdb/gue_analysis/`
-- **Open question**: Can the dimension-conditional symmetry breaking be predicted from Hecke trace data?
+| Thread | Description | Priority | Status |
+|--------|-------------|----------|--------|
+| **A** | Scale LMFDB to 200K+ forms (levels 5001–50000, parallel psycopg2) | ⭐⭐⭐ HIGHEST | Pending |
+| **B** | GNN architecture search (GraphSAGE+JK, SIGN, GAT+edge, transformers) | ⭐⭐⭐ HIGH | Pending |
+| **F** | Sato-Tate moment fix + CM classifier (F1=0.919) | ⭐⭐ | **DONE** ✓ |
+| **I** | Paper writing (v1.0, this document) | ⭐⭐ | **DONE** ✓ |
+| **J** | Connes CvS scaling analysis (N=40/60/80 → fill scaling law) | ⭐⭐⭐ **HIGHEST** | **In progress** |
+| **L** | GUE zero statistics (63K forms, two-population discovery) | ⭐⭐⭐ | **DONE** ✓ |
+| **P** | Individual Hecke eigenvalue extraction for $d>1$ forms | ⭐⭐ | Pending |
 
-**Thread A: Scale LMFDB to 200K+ Forms** ⭐⭐⭐ HIGHEST
-- **Status**: Data pipeline exists (53,779 forms, levels 11–5000)
-- **Action**: Extend collection to levels 5001–50000 (estimated 500K+ newforms)
-- **Pipeline enhancements**: Parallel psycopg2 COPY, 500 traces per form
-- **Expected impact**: All metrics improve with data (proven: 1K → 53K)
-- **Target**: Rank F1 > 0.985, conductor R² > 0.700
+### Phase 2 (Weeks 3–4) — Model & Theory
 
-**Thread B: GNN Architecture Search** ⭐⭐⭐ HIGH
-- **Status**: ChebConv K=5 baseline, R²=0.631 for z1
-- **Action**: Test GraphSAGE+JK, SIGN+MLP, GAT+edge, heterogeneous transformers
-- **Target**: z1 R² > 0.700, rank F1 > 0.950
+| Thread | Description | Priority | Status |
+|--------|-------------|----------|--------|
+| **C** | Connes spectral triples (semilocal trace formula, arXiv:2310.18423) | ⭐⭐⭐ HIGH | Pending |
+| **D** | Friedli full spectra $p$=17,19,23 (verify constant to 6 digits) | ⭐⭐ | Pending |
+| **E** | Farey graph GNN (Pfad B, untested — risk of vertex-transitivity) | ⭐⭐ | Pending |
+| **K** | FunSearch for Hecke trace identities (dormant submodule) | ⭐⭐⭐ HIGH | Pending |
+| **M** | Modern GNN: GraphGPS, SAN, GPS++ on trace-index graphs | ⭐⭐ | Pending |
+| **N** | Multi-task zero prediction (joint z1–z10 with shared encoder) | ⭐⭐ | Pending |
+| **R** | Pair correlation / spectral rigidity (GUE two-level tests) | ⭐⭐ | Pending |
 
-**Thread F: Sato-Tate Paper** ⭐⭐ DONE ✓
-- **Status**: Published to `docs/2026-05-29-sato-tate-moment-artifact.md`
-- **Findings**: $\rho_2=-0.607$, CM classifier F1=0.919, dimensional scaling law
-- **Done**: Bug fixed, discoveries documented, experiment log updated
+### Phase 3 (Weeks 5–6) — Synthesis & Theoretical
 
-**Thread I: Paper Publication (v1.0)** ⭐ DONE ✓
-- **Status**: Comprehensive paper written (this document, ~900 lines, 11 sections)
-- **Coverage**: All 15+ experiments, literature synthesis, 19-thread roadmap
-- **Next**: Target venues for publication after Phase 1 results
-
-### Phase 2 (Weeks 3–4)
-
-**Thread C: Connes Spectral Triples** ⭐⭐⭐ HIGH (theoretical)
-- **Entry point**: Semilocal operators (arXiv:2310.18423) on finite adele approximations
-- **Infrastructure**: $\operatorname{SL}(2,\mathbb{F}_p)$ framework already exists
-- **Target**: Reproduce $\zeta$ zero matching from arXiv:2511.22755
-
-**Thread D: Friedli Full Spectra Extension** ⭐⭐ MEDIUM-HIGH
-- **Target**: Compute full spectra for $p=17, 19, 23$ (4,896–12,096 nodes)
-- **Target**: Verify Friedli constant to 4+ decimal places
-
-**Thread E: Farey Graph GNN** ⭐⭐ MEDIUM
-- **Status**: Graphs generated, training script untested
-- **Risk**: May also be vertex-transitive (repeat the Cayley failure)
-
-### Phase 3 (Weeks 5–6)
-
-**Thread G: Hybrid GNN + Number Theory Features** ⭐⭐ MEDIUM
-- **Idea**: Enrich trace-index graph nodes with Sato-Tate moments, class numbers, Rankin-Selberg values
-- **Target**: Combined R² > 0.700 for z1, F1 > 0.960 for rank
-
-**Thread H: Knowledge Graph Integration** ⭐ LOW-MEDIUM
-- **Status**: Neo4j KG (194 nodes, 161 relationships)
-- **Action**: Add all 15+ experiments, query for patterns
-
-**Thread I: Paper Publication** ⭐ LOW (deferred)
-- This document serves as the comprehensive project paper
-- Target venues: NeurIPS workshop 2026, ICLR 2027, or number theory journals
+| Thread | Description | Priority | Status |
+|--------|-------------|----------|--------|
+| **G** | Hybrid GNN + number theory features (Sato-Tate moments, class numbers) | ⭐⭐ | Pending |
+| **H** | Knowledge graph integration (Neo4j, 194 nodes, query for patterns) | ⭐ | Pending |
+| **O** | Connes CvS × L-functions of modular forms (zero prediction via CvS) | ⭐⭐⭐ HIGH | Speculative |
+| **Q** | Pizer data quality autopsy | ⭐ | Pending |
+| **S** | LLM-aided automated conjecture generation | ⭐⭐ | Pending |
 
 ### Updated Success Metrics
 
@@ -771,12 +748,12 @@ Below is the current research roadmap, updated to reflect results through May 20
 |--------|---------|--------|----------|
 | LMFDB newforms | 53,779 | 200,000+ | Phase 1 |
 | Rank F1 (macro) | 0.970 | 0.985 | Phase 1 |
-| z1 R² | 0.631 | 0.750 | Phase 1–2 |
-| Connes spectra | N=50/100 (10⁻¹¹/10⁻¹⁶ error) | p ≤ 31 | Phase 2 |
-| Friedli constant | 4 digits | 6 digits | Phase 2 |
+| z1 R² (ChebConv) | 0.631 | 0.750 | Phase 1–2 |
+| Connes CvS errors | N=50: 10⁻¹¹, N=100: 10⁻¹⁶ | Filled N=40/60/80 | Phase 1 (in progress) |
+| Friedli constant | 1.1367 (4 digits) | 6 digits | Phase 2 |
 | CM classifier F1 | 0.919 | 0.950 | Phase 1 (done) |
-| GUE zero statistics | 63K forms (two-population) | Dim-resolved prediction | Phase 2 |
-| LMFDB connectivity | ✅ (1M+ forms available) | N/A | Phase 1 (done) |
+| GUE zero statistics | 63K forms, two-population | Dim-resolved theory | Phase 2 |
+| LMFDB connectivity | 1M+ newforms (218K with traces) | Full trace collection | Phase 1 |
 
 ---
 
