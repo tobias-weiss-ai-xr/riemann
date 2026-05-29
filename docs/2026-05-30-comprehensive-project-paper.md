@@ -712,7 +712,7 @@ Below is the current research roadmap, updated to reflect all results through Ma
 
 | Thread | Description | Priority | Status |
 |--------|-------------|----------|--------|
-| **A** | Scale LMFDB to 200K+ forms (levels 5001–50000, parallel psycopg2) | ⭐⭐⭐ HIGHEST | Pending |
+| **A** | Scale LMFDB to 200K+ forms (incremental collector, batch 500, checkpointed) | ⭐⭐⭐ HIGHEST | **In progress** (11K+ collected) |
 | **B** | GNN architecture search (GraphSAGE+JK, SIGN, GAT+edge, transformers) | ⭐⭐⭐ HIGH | Pending |
 | **F** | Sato-Tate moment fix + CM classifier (F1=0.919) | ⭐⭐ | **DONE** ✓ |
 | **I** | Paper writing (v1.0, this document) | ⭐⭐ | **DONE** ✓ |
@@ -753,7 +753,7 @@ Below is the current research roadmap, updated to reflect all results through Ma
 | Friedli constant | 1.1367 (4 digits) | 6 digits | Phase 2 |
 | CM classifier F1 | 0.919 | 0.950 | Phase 1 (done) |
 | GUE zero statistics | 63K forms, two-population | Dim-resolved theory | Phase 2 |
-| LMFDB connectivity | 1M+ newforms (218K with traces) | Full trace collection | Phase 1 |
+| LMFDB connectivity | 1M+ newforms (218K with traces) | Full trace collection | Phase 1 (in progress) |
 
 ---
 
