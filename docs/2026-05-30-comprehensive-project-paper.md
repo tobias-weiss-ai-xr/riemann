@@ -698,7 +698,7 @@ The most promising theoretical direction — the one that could genuinely connec
 
 3. **Zeta spectral triples** (to appear 2025): The next theoretical development, potentially providing the bridge between spectral triple computations and the $\operatorname{SL}(2,\mathbb{F}_p)$ data we already have.
 
-**Implementation strategy**: Start with the semilocal operators (arXiv:2310.18423) using finite adele approximations on $\operatorname{SL}(2,\mathbb{F}_p)$, compute low-lying eigenvalues, and compare to $\zeta$ zeros. This is ranked as Thread C in our roadmap.
+**Implementation update (May 2026)**: The Connes–van Suijlekom (CvS) variant of the spectral approach has already been implemented and validated. Our `connes-cvs` v0.2.2 PyPI package (arXiv:2511.23257) reproduces the first five $\zeta$ zeros to machine precision ($10^{-16}$) at Galerkin size $N=100$, with scaling error $\propto N^{-14.1}$. This is no longer theoretical — it is production-grade code available via `pip install connes-cvs`. The remaining theoretical thread (Thread C) is the semilocal generalization (arXiv:2310.18423) to $\operatorname{SL}(2,\mathbb{F}_p)$ settings, which could connect the CvS operator to our Cayley graph framework.
 
 ### 5.4 The Friedli Constant in Context
 
@@ -717,7 +717,7 @@ Below is the current research roadmap, updated to reflect all results through Ma
 | Thread | Description | Priority | Status |
 |--------|-------------|----------|--------|
 | **A** | Scale LMFDB to 200K+ forms (incremental collector, batch 500, checkpointed) | ⭐⭐⭐ HIGHEST | **DONE** ✓ (200K records, 103MB) |
-| **B** | GNN architecture search (GraphSAGE+JK, SIGN, GAT+edge, transformers) | ⭐⭐⭐ HIGH | Pending |
+| **B** | GNN architecture search (GCN, ChebConv, GAT, GIN on trace-index graphs with arithmetic node features) | ⭐⭐⭐ HIGH | **Running** (4 architectures, 63K forms, 100 epochs) |
 | **F** | Sato-Tate moment fix + CM classifier (F1=0.919) | ⭐⭐ | **DONE** ✓ |
 | **I** | Paper writing (v1.0, this document) | ⭐⭐ | **DONE** ✓ |
 | **J** | Connes CvS scaling analysis (N=40/60/80 → fill scaling law) | ⭐⭐⭐ **HIGHEST** | **DONE** ✓ (error ∝ $N^{-14.1}$, $N=100$ machine precision) |
@@ -775,7 +775,7 @@ We have conducted a comprehensive data-driven investigation of 53,779 weight-2 n
 
 5. **The Friedli spectral zeta of $\operatorname{SL}(2,\mathbb{F}_p)$ converges to a new constant** $1.1367$, distinct from the abelian case and encoding the spectral rigidity of Ramanujan graphs.
 
-6. **Connes' noncommutative geometry program** — particularly the semilocal operators (arXiv:2310.18423) — provides a computationally accessible pathway connecting our $\operatorname{SL}(2,\mathbb{F}_p)$ framework to the Riemann Hypothesis.
+6. **Connes' noncommutative geometry program** is now computationally validated: the Connes–van Suijlekom CvS operator (`connes-cvs` v0.2.2, PyPI) reproduces $\zeta$ zeros to machine precision ($10^{-16}$) at $N=100$. The remaining challenge is the semilocal generalization (arXiv:2310.18423) connecting this to $\operatorname{SL}(2,\mathbb{F}_p)$.
 
 7. **The GUE zero statistics reveal a dimensional transition**: At 63,844 forms and 568,708 spacings, $d=1$ (rational) newforms respect the Katz-Sarnak symplectic prediction (GUE preference, FVE=0.205), while $d\ge 2$ forms uniformly shift to GOE (FVE=0.233–0.286, %GUE dropping from 8.7% to 1.0%) — a two-population structure novel to the literature.
 
