@@ -716,7 +716,7 @@ Below is the current research roadmap, updated to reflect all results through Ma
 
 | Thread | Description | Priority | Status |
 |--------|-------------|----------|--------|
-| **A** | Scale LMFDB to 200K+ forms (incremental collector, batch 500, checkpointed) | ⭐⭐⭐ HIGHEST | **In progress** (100K+ collected) |
+| **A** | Scale LMFDB to 200K+ forms (incremental collector, batch 500, checkpointed) | ⭐⭐⭐ HIGHEST | **DONE** ✓ (200K records, 103MB) |
 | **B** | GNN architecture search (GraphSAGE+JK, SIGN, GAT+edge, transformers) | ⭐⭐⭐ HIGH | Pending |
 | **F** | Sato-Tate moment fix + CM classifier (F1=0.919) | ⭐⭐ | **DONE** ✓ |
 | **I** | Paper writing (v1.0, this document) | ⭐⭐ | **DONE** ✓ |
@@ -750,14 +750,14 @@ Below is the current research roadmap, updated to reflect all results through Ma
 
 | Metric | Current | Target | Timeline |
 |--------|---------|--------|----------|
-| LMFDB newforms | 53,779 | 200,000+ | Phase 1 |
+| LMFDB newforms | 53,779 | **200,000** ✓ | Phase 1 (done) |
 | Rank F1 (macro) | 0.970 | 0.985 | Phase 1 |
 | z1 R² (ChebConv) | 0.631 | 0.750 | Phase 1–2 |
 | Connes CvS errors | N=50: 10⁻¹¹, N=100: 10⁻¹⁶ | Scaling law $\propto N^{-14.1}$ | Phase 1 (done) ✓ |
 | Friedli constant | 1.1367 (4 digits) | 6 digits | Phase 2 |
 | CM classifier F1 | 0.919 | 0.950 | Phase 1 (done) |
 | GUE zero statistics | 63K forms, two-population | Dim-resolved theory | Phase 2 |
-| LMFDB connectivity | 1M+ newforms (218K with traces) | Full trace collection | Phase 1 (collecting, 46%) |
+| LMFDB connectivity | 1M+ newforms (218K with traces) | 200K traces collected | Phase 1 (done) ✓ |
 
 ---
 

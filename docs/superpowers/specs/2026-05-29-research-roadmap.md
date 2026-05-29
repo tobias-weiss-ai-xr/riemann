@@ -39,27 +39,22 @@
 
 ## 2. Open Threads (Priority-Ranked)
 
-### Thread A: Scale LMFDB Data Collection to Full Dataset ⭐⭐⭐ HIGHEST
+### Thread A: Scale LMFDB Data Collection to Full Dataset ⭐⭐⭐ HIGHEST ✅ DONE
 
-**Current state**: 53,779 newforms (levels 11-5000)
+**Current state**: ~~53,779 newforms~~ → **200,000 newforms** (200K records, 103MB CSV, collected May 29 2026)
+**Method**: Incremental collector (`collect_lmfdb_incremental.py`) using `mf_newforms.traces[]` ARRAY with 100 pre-computed Hecke traces per form. Batch size 500, checkpointed, memory 107MB RSS. No zero data (lfunc_lfunctions queries timed out during collection).
+**Dim distribution**: dim=0 (rational): 133,806 (66.9%), dim=1: 63,758 (31.9%), dim=2: 2,435 (1.2%), dim=3: 1
 **Available**: ~1.1M+ newforms in LMFDB SQL mirror (850K modular forms total, 24M L-functions, 3TB data)
 **External developments**: MIT team received AI for Math grant to connect LMFDB with **Lean4** formal proof system — LMFDB as AI training data is strategically important beyond our project
-**Expected impact**: Every metric improves with data (proven: 1k → 53k improved rank F1 0.839 → 0.970)
 
-**Specific steps**:
-1. Extend `scripts/collect_lmfdb_sql.py` to levels 5001-50000 (estimated 500K+ newforms)
-2. Add parallel collection with `psycopg2` COPY protocol (bulk insert)
-3. Feature engineering: compute 500 Hecke traces per form (currently 100)
-4. Track analytic rank 3+ forms (currently rank 2 is 1.3% of dataset)
-5. Validate data quality: check for duplicate labels, missing traces, inconsistent ranks
+**Next steps** (post-Phase 1):
+1. Convert 200K CSV to mmap format for GNN training
+2. Merge with existing zeros data (63K forms have z1–z10)
+3. Re-run GNN on 200K dataset (expected: rank F1 > 0.980, z1 R² > 0.700)
+4. Extend to 500 traces per form (traces[] ARRAY contains 1000 values)
+5. Collect zero data for remaining 137K forms (lfunc_lfunctions join)
 
-**Success criteria**:
-- 200K+ newforms with 100+ Hecke traces
-- Rank classification F1 > 0.980 (currently 0.970)
-- Rank-3 detection with F1 > 0.800 (currently unknown)
-- Conductor R² > 0.700 (currently 0.526)
-
-**Risk**: Network access to LMFDB SQL mirror, disk space (~50GB for 500K forms)
+**Success criteria**: 200K ✅ | Rank F1 > 0.980 ⏳ | Rank-3 F1 > 0.800 ⏳ | Conductor R² > 0.700 ⏳
 
 ---
 
