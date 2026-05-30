@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-05-30 19:00:30",
+  "timestamp": "2026-05-30 20:05:50",
   "(4) competition": {
     "method": "PCA(50)+LDA",
     "n": 200000,
@@ -16,7 +16,7 @@
       "1": 0.2699,
       "2": 0.0
     },
-    "elapsed_s": 74.2
+    "elapsed_s": 12.3
   },
   "(5) engineered": {
     "results": {
@@ -273,6 +273,6 @@
         ]
       }
     },
-    "elapsed_s": 36.1
+    "elapsed_s": 16.9
   }
 }
