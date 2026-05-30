@@ -79,6 +79,8 @@
 
 ### Thread C: Connes CvS — Characteristic Values of the Schwarzian ⭐⭐⭐ HIGH (REVISED: ALREADY WORKING)
 
+> **Note**: This section describes the `connes_cvs` package for the Riemann ζ(s) CvS operator (which already exists on PyPI). This is the **background/context** for Thread J (scaling analysis, done) and Thread O (L-function generalization, tested negative). Do not confuse with Phase 2 Thread C (L-function generalization attempt, same as Thread O).
+
 **⚠️ CRITICAL UPDATE (May 2026)**: This is NOT a theoretical thread. The `connes_cvs` package (v0.2.2) is **already implemented, published to PyPI, and producing ζ zeros to machine precision**. See `scripts/test_connes_cvs.py` and `scripts/_connes_n100.py`.
 
 **Implementation status**:
@@ -590,10 +592,10 @@ Per-zero R² (multi-task): z1–z9 consistent (0.70–0.75), z10 collapses (0.34
 - **Thread B**: Architecture search on trace-index graphs ✅ DONE | GAT R²=0.731 (+15.9% over ChebConv, +38.9% over sklearn)
 - **Thread P**: Individual eigenvalue extraction for d>1 ⏸️ Deferred | No concrete use case, schema understood (`mf_hecke_nf.an` JSONB cyclotomic)
 
-### Phase 2 (Weeks 3-4)
-- **Thread C (revised)**: CvS × L-function generalization (theoretical feasibility)
-- **Thread D**: Full-spectra Friedli extension for p=17, 19, 23
-- **Thread K**: FunSearch Hecke trace identities (first spec run)
+### Phase 2 (Weeks 3-4) ✅ COMPLETED
+- **Thread C**: CvS × L-function generalization ✅ **DONE (negative result)** — Direct $Q_f(c)$ built for form 11.2.a.a; $F_{\text{even}}(\tau)$ does NOT vanish at known L-function zeros. CvS operator structurally specific to $\zeta(s)$ (positive von Mangoldt weights, $s\to 1-s$ functional equation, trivial zeros). See Phase 3 Thread O for cross-reference.
+- **Thread D**: Full-spectra Friedli extension for p=17, 19, 23 ⏸️ (compute-bound, $O(n^3)$ bottleneck)
+- **Thread K**: FunSearch Hecke trace identities ✅ **RUNNING** — Spec 1 (CM detection) best 0.936; Spec 2 (Sato-Tate moments) best 0.984
 - **Thread N**: Multi-task zero prediction ✅ DONE (no improvement: 0.714→0.704)
 - **Thread R**: Spectral rigidity (P(r), Σ²(L), k-th neighbor) ✅ DONE (two-population validated; dim≥2 deviates from both GUE/GOE in P(r))
 
@@ -635,14 +637,16 @@ Per-zero R² (multi-task): z1–z9 consistent (0.70–0.75), z10 collapses (0.34
 |--------|---------|--------|----------|--------|
 | LMFDB newforms collected | **200,000** ✅ | 200,000+ | Phase 1 | **DONE** |
 | Rank classification F1 | 0.970 | 0.985 | Phase 1–2 | Pending |
-| L-function zero R² | 0.631 | 0.750 | Phase 1–2 | Pending |
+| z1 R² (ChebConv, tabular baseline) | 0.631 (0.526) | 0.750 | Phase 1–2 | Pending |
+| z1 R² (GAT, best) | **0.731** ✅ | 0.750 | Phase 1–2 | **ACHIEVED** |
 | Friedli constant precision | 4 digits | 6 digits | Phase 2 | Pending |
 | Connes CvS zero extraction | γ₁-γ₅ @ 10⁻¹⁶ (N=100) | γ₁-γ₁₀ @ 10⁻¹⁰ (N=200) | Phase 2 | Pending |
 | Connes CvS N→accuracy law | **N^{-14.1}** ✅ | Characterized | Phase 1 | **DONE** |
-| GUE spacing test | **Two-population** ✅ | >95% CI for full dataset | Phase 1 | **DONE** |
-| FunSearch spec running | Dormant | ≥1 spec end-to-end | Phase 2 | Pending |
+| GUE spacing test | **Two-population** ✅ (d=8.808, z=101.6σ) | Dim-resolved theory | Phase 1 | **DONE** |
+| FunSearch spec running | **Both specs running** (CM: 0.936, ST: 0.984) | ≥1 spec end-to-end | Phase 2 | **RUNNING** |
 | CM classifier F1 | **0.919** ✅ | 0.950 | Phase 1 | **DONE** |
-| Galois correlation ρ₂ | **-0.607** ✅ | Characterized | Phase 1 | **DONE** |
+| Galois correlation ρ₂ | **-0.607 ± 0.012** ✅ | Characterized | Phase 1 | **DONE** |
+| External benchmark (PCA+LDA) | Acc=0.686 F1=0.622 | Match arXiv:2502.10360 (~0.81 F1) | Phase 2 | Pending (class imbalance) |
 
 ---
 
