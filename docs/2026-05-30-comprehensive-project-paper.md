@@ -827,7 +827,7 @@ Below is the current research roadmap, updated to reflect all results through Ma
 | **C** | Connes CvS × L-function generalization — direct $Q_f(c)$ built for form 11.2.a.a, $F_{\text{even}}(\tau)$ does NOT vanish at known zeros (see §10.2) | ⭐⭐⭐ HIGH | **DONE ✓ (negative result)** |
 | **D** | Friedli full spectra $p$=17,19,23 (verify constant to 6 digits) | ⭐⭐ | Pending |
 | **E** | Farey graph GNN (Pfad B — exact power law $\Delta_n \approx 2.65/n$ discovered, R²=0.9998, GNN R²=-4.43) | ⭐⭐ | **DONE** ✓ |
-| **K** | FunSearch for Hecke trace identities (dormant submodule) | ⭐⭐⭐ HIGH | **RUNNING** (Spec 1: CM detection, best 0.936; Spec 2: Sato-Tate moments, best 0.984; both via deepseek-v4-flash) |
+| **K** | FunSearch for Hecke trace identities — LLM-based program search via `funsearch/` submodule | ⭐⭐⭐ HIGH | **DONE** ✓ Spec 1 (CM detection, 389 dim-1 forms): best formula `M4/M2² + 2·zero_count − 2·|skew|` achieves 0.941 balanced accuracy (vs 0.936 baseline). Spec 2 (Sato-Tate moments, 2000 forms): ALL 5 islands converged to `M4/M2` (not `M4/M2²`) at 0.984 — validating $M_4/M_2$ as the stablest moment ratio. Spec 3 (Mertens bound): perfect 1.0 score. |
 | **M** | Modern GNN: GPS (too slow, O(n²)), TransformerConv (R²=0.448 vs GAT 0.731) — GAT remains best | ⭐⭐ | **DONE** ✓ |
 | **N** | Multi-task zero prediction — shared backbone **degraded** z1 (0.714→0.704, -1.5%); each zero needs specialized head | ⭐⭐ | **DONE** ✓ |
 | **R** | Spectral rigidity — P(r), Σ²(L), k-th neighbor: all confirm two-population; dim≥2 deviates from both classical ensembles in P(r) (<r>=0.391) | ⭐⭐ | **DONE** ✓ |

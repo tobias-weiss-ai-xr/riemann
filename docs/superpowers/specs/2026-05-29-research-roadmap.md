@@ -595,7 +595,7 @@ Per-zero R² (multi-task): z1–z9 consistent (0.70–0.75), z10 collapses (0.34
 ### Phase 2 (Weeks 3-4) ✅ COMPLETED
 - **Thread C**: CvS × L-function generalization ✅ **DONE (negative result)** — Direct $Q_f(c)$ built for form 11.2.a.a; $F_{\text{even}}(\tau)$ does NOT vanish at known L-function zeros. CvS operator structurally specific to $\zeta(s)$ (positive von Mangoldt weights, $s\to 1-s$ functional equation, trivial zeros). See Phase 3 Thread O for cross-reference.
 - **Thread D**: Full-spectra Friedli extension for p=17, 19, 23 ⏸️ (compute-bound, $O(n^3)$ bottleneck)
-- **Thread K**: FunSearch Hecke trace identities ✅ **RUNNING** — Spec 1 (CM detection) best 0.936; Spec 2 (Sato-Tate moments) best 0.984
+- **Thread K**: FunSearch Hecke trace identities ✅ **DONE** — Spec 1 (CM detection): best formula `M4/M2² + 2·zero_count − 2·|skew|` at 0.941 (389 dim-1 forms). Spec 2 (Sato-Tate moments): all 5 islands converged to `M4/M2` (pure) at 0.984. Spec 3 (Mertens bound): perfect 1.0. FunSearch fully operational.
 - **Thread N**: Multi-task zero prediction ✅ DONE (no improvement: 0.714→0.704)
 - **Thread R**: Spectral rigidity (P(r), Σ²(L), k-th neighbor) ✅ DONE (two-population validated; dim≥2 deviates from both GUE/GOE in P(r))
 
@@ -643,7 +643,7 @@ Per-zero R² (multi-task): z1–z9 consistent (0.70–0.75), z10 collapses (0.34
 | Connes CvS zero extraction | γ₁-γ₅ @ 10⁻¹⁶ (N=100) | γ₁-γ₁₀ @ 10⁻¹⁰ (N=200) | Phase 2 | Pending |
 | Connes CvS N→accuracy law | **N^{-14.1}** ✅ | Characterized | Phase 1 | **DONE** |
 | GUE spacing test | **Two-population** ✅ (d=8.808, z=101.6σ) | Dim-resolved theory | Phase 1 | **DONE** |
-| FunSearch spec running | **Both specs running** (CM: 0.936, ST: 0.984) | ≥1 spec end-to-end | Phase 2 | **RUNNING** |
+| FunSearch program discovery | **DONE** (CM: 0.941, ST: 0.984, Mertens: 1.0) | ≥1 spec end-to-end | Phase 2 | **DONE** ✓ |
 | CM classifier F1 | **0.919** ✅ | 0.950 | Phase 1 | **DONE** |
 | Galois correlation ρ₂ | **-0.607 ± 0.012** ✅ | Characterized | Phase 1 | **DONE** |
 | External benchmark (PCA+LDA) | Acc=0.686 F1=0.622 | Match arXiv:2502.10360 (~0.81 F1) | Phase 2 | Pending (class imbalance) |
