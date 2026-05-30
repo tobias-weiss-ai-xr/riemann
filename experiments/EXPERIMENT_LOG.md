@@ -1469,3 +1469,54 @@ Training: 100 epochs, AdamW (lr=1e-3, weight_decay=1e-5), CosineAnnealingLR, ear
 
 ---
 
+## Experiment N (Phase 2): Multi-Task Zero Prediction
+
+**Date**: 2026-05-31  
+**Goal**: Compare single-task MLP (z1 only) vs multi-task MLP (shared backbone, z1-z10) to determine whether joint prediction improves z1 R².
+
+### Methodology
+
+- **Data**: 63,844 weight-2 newforms, 100 Hecke traces + z1-z10 targets
+- **Architecture**: 3-layer MLP (256 hidden, BatchNorm, ReLU, Dropout=0.2)
+  - Single-task: 1 output head (z1)
+  - Multi-task: shared backbone + 10 output heads (z1-z10), targets standardized per zero
+- **Training**: AdamW (lr=1e-3), CosineAnnealingLR, early stopping (patience=30), 200 epochs
+- **Split**: 70/15/15 train/val/test
+
+### Results
+
+| Configuration | Test z1 R² | Training Time |
+|---|---|---|
+| Single-task (z1 only) | **0.714** | 4.4s |
+| Multi-task (z1-z10) | 0.704 | 3.0s |
+
+**Multi-task vs single-task Δ**: -1.5% — multi-task does NOT improve z1 prediction.
+
+### Per-Zero R² (multi-task)
+
+| Zero | R² | Zero | R² |
+|------|-----|------|-----|
+| z1 | 0.704 | z6 | 0.745 |
+| z2 | 0.709 | z7 | 0.744 |
+| z3 | 0.724 | z8 | **0.749** |
+| z4 | 0.735 | z9 | 0.710 |
+| z5 | 0.741 | z10 | **0.340** |
+
+### Key Insights
+
+1. **Pure MLP on 100 traces achieves z1 R²=0.714** — matching GAT's 0.731 without any graph structure. The trace signal itself carries most of the information.
+2. **Multi-task training degrades z1 prediction** (-1.5%). Sharing a backbone hurts specialization.
+3. **Consistent z1–z9 performance** (0.70-0.75) suggests the backbone learns general L-function zero features.
+4. **z10 is fundamentally harder** (R²=0.34) — higher zeros have more noise/variability.
+5. **Each zero benefits from a specialized head** rather than shared representation.
+
+### Files
+
+| File | Purpose |
+|---|---|
+| `scripts/train_multi_task_zeros.py` | Multi-task comparison script |
+| `data/multi_task/multi_task_results.json` | Full results |
+| `data/multi_task/single_task_mlp.pt` | Single-task checkpoint |
+| `data/multi_task/multi_task_mlp.pt` | Multi-task checkpoint |
+
+---

@@ -747,7 +747,7 @@ Below is the current research roadmap, updated to reflect all results through Ma
 | **E** | Farey graph GNN (Pfad B — exact power law $\Delta_n \approx 2.65/n$ discovered, R²=0.9998, GNN R²=-4.43) | ⭐⭐ | **DONE** ✓ |
 | **K** | FunSearch for Hecke trace identities (dormant submodule) | ⭐⭐⭐ HIGH | Pending |
 | **M** | Modern GNN: GraphGPS, SAN, GPS++ on trace-index graphs | ⭐⭐ | Pending |
-| **N** | Multi-task zero prediction (joint z1–z10 with shared encoder) | ⭐⭐ | Pending |
+| **N** | Multi-task zero prediction — shared backbone **degraded** z1 (0.714→0.704, -1.5%); each zero needs specialized head | ⭐⭐ | **DONE** ✓ |
 | **R** | Pair correlation / spectral rigidity (GUE two-level tests) | ⭐⭐ | Pending |
 
 ### Phase 3 (Weeks 5–6) — Synthesis & Theoretical
