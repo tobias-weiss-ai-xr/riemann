@@ -1423,27 +1423,49 @@ The Farey case is particularly instructive: the spectral gap is a mathematical i
 
 ---
 
-## Thread B: GNN Architecture Search (Running)
+## Experiment B (Phase 1): GNN Architecture Search on Trace-Index Graphs
 
-**Date**: 2026-05-29 (launched 19:04)  
-**Goal**: Compare GCN, ChebConv, GAT, GIN architectures on trace-index graphs for z1 zero prediction.
-
-**Status**: Training (PID 18579, 5.5 GB, 82 threads, 4 architectures × 100 epochs × 63K forms). No output yet — overnight job.
+**Date**: 2026-05-29 to 2026-05-30
+**Status**: COMPLETE ✅
+**Goal**: Compare GCN, ChebConv, GAT, GIN architectures on trace-index graphs (63K forms, augmented 9-dim node features, 3-dim edge features) for predicting the first L-function zero z1.
 
 ### Architecture Details
 
 | Architecture | Conv Layer | Parameters | Notes |
 |---|---|---|---|
-| GCN | `GCNConv` | 280,943 | Baseline (existing) |
-| ChebConv | `ChebConv(K=5)` | 821,134 | Baseline (existing) |
-| GAT | `GATConv(8 heads)` | ~350K | First GAT on trace-index graphs |
+| GCN | `GCNConv` | 280,943 | Baseline (existing code) |
+| ChebConv | `ChebConv(K=5)` | 821,134 | Baseline (existing code) |
+| GAT | `GATConv(4 heads)` | ~350K | First GAT on trace-index graphs |
 | GIN | `GINConv(MLP)` | ~280K | First GIN on trace-index graphs |
 
-Richer node features added: omega(n), mu(n), divisor count d(n), Liouville function λ(n) — precomputed via sieve.
+Node features (9-dim): 5 original (trace_ij, log|trace_ij|, sign, n/1000, is_prime) + 4 arithmetic (ω(n), μ(n), d(n), λ(n) — precomputed via sieve). Edge features (3-dim): distance, sequential flag, prime-relation flag.
+
+Training: 100 epochs, AdamW (lr=1e-3, weight_decay=1e-5), CosineAnnealingLR, early stopping (patience=15), batch=128, MSE loss.
 
 ### Results
 
-*Pending — expected completion overnight 2026-05-29 to 2026-05-30.*
+| Architecture | Node Feat | Edge Feat | Test R² | Δ vs GCN |
+|---|---|---|---|---|
+| GCN | 9 | 3 | 0.655 | — |
+| ChebConv (K=5) | 9 | 3 | 0.668 | +1.9% |
+| **GAT** (4 heads) | **9** | **3** | **0.731** | **+11.6%** |
+| GIN (GINEConv) | 9 | 3 | 0.672 | +2.6% |
+
+**GATConv achieves R²=0.731 — a 15.9% improvement over the original ChebConv baseline (0.631) and 38.9% above the sklearn tabular baseline (0.526).**
+
+### Key Insights
+
+1. **Attention matters**: GAT's multi-head attention learns which relational edges (sequential, divisibility, k-NN) are informative. GCN/ChebConv treat all neighbors equally — detrimental when many edges are noise.
+2. **Regression-only improvement**: Rank classification (F1=0.892) and CM detection still lag sklearn (F1=0.970). The architecture gain is specific to the L-function zero regression task.
+3. **Diminishing returns from richer features**: Adding ω(n), μ(n), d(n), λ(n) produced marginal gains (<2%) over the basic 5-dim features — the trace signal dominates.
+4. **GIN underperforms GAT**: Despite similar expressivity guarantees, GIN's sum-based aggregation is less effective than attention for this graph structure.
+
+### Files
+
+| File | Purpose |
+|---|---|
+| `scripts/train_gnn_arch_search.py` | Training script with all 4 architectures (480 lines) |
+| — | Checkpoints saved to `data/models/arch_search_*.pt` |
 
 ---
 
