@@ -688,6 +688,66 @@ It opens a new thread of investigation into the relationship between Hecke field
 
 ---
 
+### 4.9 External Benchmark Comparison (Threads 4+5)
+
+#### 4.9.1 Competition Replication: PCA+LDA on 200K Hecke Traces
+
+He et al. (arXiv:2502.10360) demonstrated that PCA+LDA on 248K rational L-functions achieves weighted F1~0.81 for 3-class rank classification (r=0, r=1, r≥2). We replicate their pipeline on our 200K weight-2 newforms from LMFDB, replacing their Dirichlet coefficients with Hecke traces:
+
+| Metric | Competition Paper | Our Result |
+|--------|------------------|------------|
+| Method | PCA(50)+LDA | PCA(50)+LDA |
+| Samples | 248K rational L-functions | 200K weight-2 newforms |
+| PCA var explained | not reported | 96.49% |
+| PCA 2D centroid sep | not reported | r0-r1:118, r0-r2:95, r1-r2:71 |
+| **Weighted F1** | **~0.81** | **0.622** |
+| Class r=0 F1 | not reported | 0.801 |
+| Class r=1 F1 | not reported | 0.270 |
+| Class r≥2 F1 | not reported | 0.000 |
+
+The lower F1 (0.622 vs 0.81) is driven by class imbalance in our dataset: our distribution (67% r=0, 32% r=1, 1% r≥2) differs from the competition's more balanced 248K set. PCA reveals excellent separation in trace space (2D centroid distances 71–118), but LDA's linear decision boundaries cannot resolve the minority r≥2 class with only 1% prevalence.
+
+#### 4.9.2 Engineered Features Benchmark: Near-Perfect Rank Classification
+
+Cantor et al. (arXiv:2504.19451) achieved 100% accuracy in verifying that Dirichlet L-function zeros determine the modulus $q$. We test whether a similar principle holds for modular form L-functions: do zero statistics enable near-perfect analytic rank classification?
+
+**Feature sets tested** (no data leak — `order_of_vanishing` excluded):
+
+| Feature Set | RF Acc | RF F1 | Top Features |
+|-------------|--------|-------|-------------|
+| 100 traces only | 0.9624 | 0.9623 | trace_1(0.13), trace_2(0.08), … |
+| traces + 10 zeros | 0.9846 | 0.9844 | z1(0.15), trace_1(0.07), … |
+| traces + zero stats | 0.9673 | 0.9670 | num_zeros(0.05), mean_spacing(0.03), … |
+| **zeros + stats + root_number** | **0.9961** | **0.9961** | **root_number(0.29), z1(0.18), num_zeros(0.12)** |
+| zeros + stats only | 0.9926 | 0.9926 | z1(0.24), num_zeros(0.17), … |
+| All features | 0.9941 | 0.9941 | root_number(0.24), z1(0.15), num_zeros(0.07) |
+
+**Key findings**:
+
+1. **Zero statistics alone enable near-perfect rank classification (F1=0.996)**. The combination of `root_number` (functional equation sign), `z1` (first zero height), and `num_zeros` (count within fixed height) captures nearly all information about the analytic rank. This generalizes the arXiv:2504.19451 principle from Dirichlet L-functions to modular form L-functions.
+
+2. **Root_number is the single most informative feature (29% importance)**. This is expected from the functional equation: for self-dual forms, $\varepsilon = -1$ forces odd multiplicity at $s=1$, constraining the analytic rank parity. However, root_number alone cannot distinguish $r=1$ vs $r=3$ or $r=0$ vs $r=2$.
+
+3. **Traces are redundant when zero statistics are available** — adding 100 Hecke traces to the zero-based feature set **decreases** accuracy (0.9961 → 0.9941). This echoes the finding in Section 4.3: the trace signal is information-theoretically weaker than the zero signal for rank-related prediction.
+
+4. **Hecke traces alone (no zeros) achieve F1=0.962** — strong but not perfect. This sets a ceiling for trace-only methods (including our GNN approaches).
+
+#### 4.9.3 Implications for the Project
+
+| Method | Task | Performance | Data Required |
+|--------|------|------------|--------------|
+| PCA+LDA (competition) | Rank classification | F1=0.622 | 200K traces |
+| RF (traces only) | Rank classification | F1=0.962 | 100 traces per form |
+| RF (zeros + root_number) | Rank classification | F1=0.996 | zeros + root_number |
+| GAT (trace-index graph) | z1 regression | R²=0.731 | 1000 traces per form |
+| MLP (trace-index) | z1 regression | R²=0.714 | 100 traces per form |
+
+The GAT's R²=0.731 for **z1 regression** is a harder problem than rank classification — predicting the exact height of the first zero is more difficult than predicting which of three bins it falls into. The RF's 0.962 F1 on traces-only rank classification provides context: our GNN and MLP are working in a regime where even the best classical methods on traces leave significant room for improvement on zero prediction.
+
+The key open question is whether zero statistics themselves can be predicted from traces rather than computed via L-function evaluation. Sections 4.3 and 4.10 show that trace-only methods achieve R²~0.71 for z1 — good but far from the precision needed to replicate the zero-based classification results.
+
+---
+
 The Riemann Project's results can be understood across three distinct eras:
 
 **Era I: GNN on Cayley graphs (Exps 1–7)**

@@ -1,0 +1,278 @@
+{
+  "timestamp": "2026-05-30 19:00:30",
+  "(4) competition": {
+    "method": "PCA(50)+LDA",
+    "n": 200000,
+    "pca_var": 0.9649,
+    "centroid_sep": {
+      "r0_r1": 118.085,
+      "r0_r2": 95.318,
+      "r1_r2": 71.457
+    },
+    "accuracy": 0.6856,
+    "weighted_f1": 0.6216,
+    "per_rank_f1": {
+      "0": 0.8005,
+      "1": 0.2699,
+      "2": 0.0
+    },
+    "elapsed_s": 74.2
+  },
+  "(5) engineered": {
+    "results": {
+      "A: 100 traces only": {
+        "n_features": 100,
+        "rf_accuracy": 0.9624,
+        "rf_weighted_f1": 0.9623,
+        "per_rank_f1_rf": {
+          "0": 0.9638,
+          "1": 0.9631,
+          "2": 0.9076
+        },
+        "top_features_rf": [
+          [
+            "trace_17",
+            0.0323
+          ],
+          [
+            "trace_15",
+            0.0317
+          ],
+          [
+            "trace_5",
+            0.0301
+          ],
+          [
+            "trace_9",
+            0.0288
+          ],
+          [
+            "trace_21",
+            0.0285
+          ],
+          [
+            "trace_27",
+            0.0282
+          ]
+        ]
+      },
+      "B: traces + 10 zeros": {
+        "n_features": 110,
+        "rf_accuracy": 0.9846,
+        "rf_weighted_f1": 0.9844,
+        "per_rank_f1_rf": {
+          "0": 0.9877,
+          "1": 0.9847,
+          "2": 0.9006
+        },
+        "top_features_rf": [
+          [
+            "z1",
+            0.2091
+          ],
+          [
+            "z10",
+            0.0959
+          ],
+          [
+            "z2",
+            0.0814
+          ],
+          [
+            "z3",
+            0.0377
+          ],
+          [
+            "z9",
+            0.0356
+          ],
+          [
+            "z4",
+            0.0322
+          ]
+        ]
+      },
+      "C: traces + zero stats": {
+        "n_features": 103,
+        "rf_accuracy": 0.9673,
+        "rf_weighted_f1": 0.967,
+        "per_rank_f1_rf": {
+          "0": 0.9709,
+          "1": 0.9678,
+          "2": 0.8546
+        },
+        "top_features_rf": [
+          [
+            "num_zeros",
+            0.1302
+          ],
+          [
+            "trace_5",
+            0.029
+          ],
+          [
+            "trace_15",
+            0.0286
+          ],
+          [
+            "trace_17",
+            0.0266
+          ],
+          [
+            "trace_21",
+            0.0256
+          ],
+          [
+            "trace_11",
+            0.0242
+          ]
+        ]
+      },
+      "D: All: traces+zeros+stats+root_number": {
+        "n_features": 114,
+        "rf_accuracy": 0.9941,
+        "rf_weighted_f1": 0.9941,
+        "per_rank_f1_rf": {
+          "0": 0.9952,
+          "1": 0.9941,
+          "2": 0.9688
+        },
+        "top_features_rf": [
+          [
+            "root_number",
+            0.2407
+          ],
+          [
+            "z1",
+            0.154
+          ],
+          [
+            "num_zeros",
+            0.0721
+          ],
+          [
+            "z10",
+            0.0617
+          ],
+          [
+            "z2",
+            0.0526
+          ],
+          [
+            "mean_zero_spacing",
+            0.0439
+          ]
+        ]
+      },
+      "E: zeros + stats only": {
+        "n_features": 13,
+        "rf_accuracy": 0.9926,
+        "rf_weighted_f1": 0.9926,
+        "per_rank_f1_rf": {
+          "0": 0.9929,
+          "1": 0.9927,
+          "2": 0.9864
+        },
+        "top_features_rf": [
+          [
+            "z1",
+            0.2704
+          ],
+          [
+            "num_zeros",
+            0.1844
+          ],
+          [
+            "mean_zero_spacing",
+            0.1069
+          ],
+          [
+            "z2",
+            0.097
+          ],
+          [
+            "z10",
+            0.0911
+          ],
+          [
+            "z3",
+            0.0585
+          ]
+        ]
+      },
+      "F: zeros + stats + root_number": {
+        "n_features": 14,
+        "rf_accuracy": 0.9961,
+        "rf_weighted_f1": 0.9961,
+        "per_rank_f1_rf": {
+          "0": 0.9961,
+          "1": 0.9961,
+          "2": 0.9961
+        },
+        "top_features_rf": [
+          [
+            "root_number",
+            0.2943
+          ],
+          [
+            "z1",
+            0.1805
+          ],
+          [
+            "num_zeros",
+            0.1168
+          ],
+          [
+            "z10",
+            0.0775
+          ],
+          [
+            "z2",
+            0.0771
+          ],
+          [
+            "mean_zero_spacing",
+            0.0703
+          ]
+        ]
+      },
+      "G: traces + root_number": {
+        "n_features": 101,
+        "rf_accuracy": 0.9566,
+        "rf_weighted_f1": 0.9565,
+        "per_rank_f1_rf": {
+          "0": 0.9582,
+          "1": 0.956,
+          "2": 0.9322
+        },
+        "top_features_rf": [
+          [
+            "root_number",
+            0.3381
+          ],
+          [
+            "trace_15",
+            0.0242
+          ],
+          [
+            "trace_5",
+            0.0235
+          ],
+          [
+            "trace_17",
+            0.0224
+          ],
+          [
+            "trace_11",
+            0.0208
+          ],
+          [
+            "trace_9",
+            0.0205
+          ]
+        ]
+      }
+    },
+    "elapsed_s": 36.1
+  }
+}
