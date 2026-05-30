@@ -792,7 +792,9 @@ We have conducted a comprehensive data-driven investigation of 53,779 weight-2 n
 
 6. **Connes' noncommutative geometry program** is now computationally validated: the Connes–van Suijlekom CvS operator (`connes-cvs` v0.2.2, PyPI) reproduces $\zeta$ zeros to machine precision ($10^{-16}$) at $N=100$. The remaining challenge is the semilocal generalization (arXiv:2310.18423) connecting this to $\operatorname{SL}(2,\mathbb{F}_p)$.
 
-7. **The GUE zero statistics reveal a dimensional transition**: At 63,844 forms and 568,708 spacings, $d=1$ (rational) newforms respect the Katz-Sarnak symplectic prediction (GUE preference, FVE=0.205), while $d\ge 2$ forms uniformly shift to GOE (FVE=0.233–0.286, %GUE dropping from 8.7% to 1.0%) — a two-population structure novel to the literature. Spectral rigidity analysis (spacing ratio $\langle\tilde{r}\rangle$, number variance $\Sigma^2(L)$, $k$-th neighbor distributions) independently confirms this pattern, with the $d\ge 2$ ratio $\langle\tilde{r}\rangle=0.391$ deviating from both classical GUE (0.599) and GOE (0.530) predictions — hinting at a new effective universality class.
+7. **The GUE zero statistics reveal a dimensional transition**: At 63,844 forms and 568,708 spacings, $d=1$ (rational) newforms respect the Katz-Sarnak symplectic prediction (GUE preference, FVE=0.205), while $d\ge 2$ forms uniformly shift to GOE (FVE=0.233–0.286, %GUE dropping from 8.7% to 1.0%) — a two-population structure novel to the literature. Spectral rigidity analysis (spacing ratio $\langle\tilde{r}\rangle$, number variance $\Sigma^2(L)$, $k$-th neighbor distributions) independently confirms this pattern, with the $d\ge 2$ ratio $\langle\tilde{r}\rangle=0.391$ deviating from both classical GUE (0.599) and GOE (0.530)$^\dagger$ predictions. Cross-validation across 4 independent diagnostic families (P(s), P(r), $\Sigma^2(L)$, $k$-th neighbor) confirms the anomaly is not a statistical artifact — but its interpretation as a new universality class remains provisional pending (i) independent replication using Connes CvS zeros (see Thread O below) and (ii) theoretical derivation from the symmetry of the $L$-function family's moment matrix.
+
+$^\dagger$The true GOE $\langle r \rangle$ for $3\times 3$ matrices is $4-\sqrt{3} \approx 2.268$, which after normalization gives $\langle \tilde{r} \rangle = \langle r \rangle / (\langle r \rangle + 1) \approx 0.530$. The $d\ge 2$ value 0.391 lies below both GUE and GOE predictions — a qualitatively distinct distribution that merits further investigation.
 
 The most important methodological lesson: in the intersection of ML and number theory, **data quantity trumps model architecture**. The 53× scale-up from 1K to 53K forms transformed every metric. Scaling to 200K+ forms is the single highest-impact action we can take.
 
@@ -870,13 +872,50 @@ All code and data are available in the `riemann` repository:
 
 ---
 
-## 10. Acknowledgments
+## 10. Open Questions and Caveats
+
+We identify the following open questions and caveats to guide future work and prevent over-interpretation of results.
+
+### 10.1 The $d\ge 2$ P(r) Anomaly
+
+The most striking open question is the $d\ge 2$ spacing ratio $\langle\tilde{r}\rangle = 0.391$, which deviates from both GUE ($0.599$) and GOE ($0.530$) predictions. Cross-validation confirms this is not a statistical artifact (KS $d=1$ vs $d\ge 2$ = 0.398, $p = 0.00$, consistent across 4 diagnostic families). However, its interpretation remains unsettled:
+
+- **Data artifact risk**: Both Thread L (P(s)) and Thread R (P(r), $\Sigma^2(L)$, $k$-th neighbor) use the same LMFDB dataset. A shared selection bias (e.g., preferential inclusion of forms with low zeros, or database completeness thresholds) could explain the observed deviation. Independent replication with Connes CvS zeros (Thread O) is the fastest path to confirmation.
+- **New universality class?**: If validated, the $d\ge 2$ distribution may represent a new effective symmetry type — possibly a crossover regime where higher-dimensional $L$-function families interpolate between symplectic and orthogonal statistics.
+- **What would falsify this claim**: A single $d\ge 2$ form whose spacing distribution reproduces the theoretical GUE curve (KS $< 0.05$) would weaken the population-level claim.
+
+### 10.2 CvS × L-function Generalization (Thread O)
+
+The Connes–van Suijlekom CvS operator produces machine-precision $\zeta$ zeros at $N=100$ (Thread J), but its generalization to $L$-function zeros is **not yet implemented**. Thread O was incorrectly deferred — the computational primitive exists (`connes-cvs` v0.2.2, the Galerkin matrix $Q(c)$ with prime/pole/archimedean pieces). The gap is the semilocal adaptation (arXiv:2310.18423) incorporating the $L$-function's Euler factors. This thread is now elevated to **Active — Phase 2** priority.
+
+### 10.3 GNN Attention as Hypothesis Generator
+
+GAT's $R^2 = 0.731$ (Thread B) is the best-performing GNN on trace-index graphs, and its multi-head attention weights encode which relational edges (sequential chain, divisibility, $k$-NN in trace space) are most informative for zero prediction. These attention maps have **not yet been analyzed for algebraic structure** — e.g., correlation with Hecke operator norm bounds ($|a_p| \le 2\sqrt{p}$), or identification of trace-index graph motifs that concentrate attention. This analysis could elevate the GNN from a black-box regressor to a hypothesis-generating tool.
+
+### 10.4 Farey GNN's Information-Theoretic Bound
+
+The Farey GNN's failure (Exp E) follows from an exact power-law spectral gap $\Delta_n \approx 2.65/n$ ($R^2 = 1.0000$ in log-space) — meaning the GNN's task is predicting a deterministic function of $n$ that a simple $1/n$ baseline captures perfectly. This is fundamentally different from the Cayley graph obstruction (vertex-transitivity). The negative result is **correct** but the claim that it is "information-theoretic" requires formal quantification: the Farey spectral gap's Shannon entropy relative to $n$ is zero (completely determined by the Farey index), which bounds any learning algorithm's prediction error from below at exactly the baseline MSE.
+
+### 10.5 Multi-Task Zero Prediction
+
+Thread N found that a shared backbone degrades z1 prediction ($0.714 \to 0.704$, $-1.5\%$), but this result uses uniform weighting across all 10 zeros. A **weighted loss** prioritizing $z_1$-$z_5$ (where $R^2 > 0.7$) over $z_{10}$ (where $R^2 \approx 0.34$) may reveal a different trade-off. The open question is whether the shared backbone learns transferable spectral features that the uniform-weighted experiment failed to incentivize.
+
+### 10.6 Summary of Caveats
+
+- Thread L/R's two-population discovery uses a **single LMFDB snapshot** — replication on an independent sample (e.g., LMFDB's weight-1 forms, or a different database snapshot) is necessary.
+- The GNN architecture improvements (GAT $R^2 = 0.731$) are on **63K forms** — the recent 200K collection (Thread A) may change the ranking.
+- All spectral comparisons use **theoretical RMT ensembles** (GUE, GOE, GSE). Small-$N$ corrections ($N_{\text{eff}}$ finite) could shift the expected KS values, especially for $d\ge 2$ forms where the effective sample size per form is smaller.
+- The Friedli constant $1.1367$ (Exp 15) comes from the Karlsson–Friedli full-spectra analysis for $p=5,7,11,13$ — stability at larger $p$ values has not been verified.
+
+---
+
+## 11. Acknowledgments
 
 The LMFDB Collaboration for maintaining the L-functions and Modular Forms Database. The developers of PyTorch Geometric, scikit-learn, and CayleyPy. Alain Connes, Caterina Consani, and Henri Moscovici for the spectral triple program (arXiv:2412.06605, arXiv:2310.18423). Karlsson and Friedli for the spectral zeta theorem.
 
 ---
 
-## 11. References
+## 12. References
 
 1. Deligne, P. *La conjecture de Weil: I, II*. Publ. Math. IHÉS (1974, 1980).
 2. Harris, M., Shepherd-Barron, N., Taylor, R. *A family of Calabi-Yau varieties and potential automorphy*. Ann. Math. (2010).
