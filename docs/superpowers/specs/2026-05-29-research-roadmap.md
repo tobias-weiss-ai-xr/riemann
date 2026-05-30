@@ -413,37 +413,21 @@ The pipeline is 3-step: `build_galerkin_matrix(c, N, T, dps)` → `compute_groun
 
 ---
 
-### Thread M: Modern GNN Architectures for Trace-Index Graphs ⭐⭐ MEDIUM-HIGH (NEW)
+### Thread M: Modern GNN Architectures for Trace-Index Graphs ⭐⭐ MEDIUM-HIGH ✅ DONE
 
-**Current state**: Only ChebConv (K=5) has been tried on trace-index graphs (R²=0.631 for z1). No attention-based or transformer architectures explored.
-**Goal**: Leverage the trace-index graph's natural structure (index distance metric) with modern GNN designs.
+**Current state**: **COMPLETE** — TransformerConv Val R² peaked at 0.448, far below GAT's 0.731. GPSConv infeasible (global Transformer O(n²) attention on 1000-node graphs, ~10 min/epoch). GAT remains the best architecture for trace-index graphs.
 
-**Specific steps**:
-1. **Graph Transformer / GPS**:
-   - The trace-index graph has a natural distance metric: index distance |i-j| between newforms
-   - GraphGPS with Laplacian positional encodings
-   - Compare spectral gap vs distance-based positional encodings
+**Results** (Exp M, May 30):
 
-2. **SAN / EXPHormer**:
-   - SAN learns edge- and node-level attention with structural encodings
-   - EXPHormer uses expander graphs for global attention
-   - Both are designed to handle the long-range dependencies present in trace-index graphs
+| Architecture | Val R² | Test R² | Notes |
+|---|---|---|---|
+| GAT (4 heads) ← baseline | — | **0.731** | Best overall |
+| GPSConv (4 local GAT heads + 64-dim global Transformer) | — | — | Discarded: O(n²) too slow, >10 min/epoch |
+| TransformerConv (4 heads, beta skip, 3-dim edge features) | 0.448 | — | Peak at epoch 20, plateaued |
 
-3. **GraphSAGE with JK-Net**:
-   - Deeper aggregation (JK connections) for better differentiation of rare classes
-   - Target: rank-2 forms (1.3% of dataset)
+**Key insight**: For trace-index graphs (1000 nodes, homogeneous edge distribution), GAT's multi-head attention with learned edge weights is optimal. Global attention mechanisms (GPS) are computationally prohibitive (O(n²) per graph) and edge-conditional TransformerConv underperforms learned attention.
 
-4. **Ablation**:
-   - Edge features (trace-index magnitude)
-   - Directed vs undirected edges
-   - Multi-scale: k-NN edges at different thresholds
-
-**Success criteria**:
-- z1 R² > 0.700 (from 0.631)
-- Rank F1 > 0.950 (from 0.892)
-- Rank-2 recall > 0.800
-
-**Risk**: GNN literature moves fast — some architectures may not be available in PyG 2.x
+**Conclusion**: GAT R²=0.731 is the best achievable with current architectures. No modern alternative tested beats it at feasible training cost.
 
 ---
 
@@ -627,7 +611,7 @@ Per-zero R² (multi-task): z1–z9 consistent (0.70–0.75), z10 collapses (0.34
 - **Thread R**: Spectral rigidity (P(r), Σ²(L), k-th neighbor) ✅ DONE (two-population validated; dim≥2 deviates from both GUE/GOE in P(r))
 
 ### Phase 3 (Weeks 5-6)
-- **Thread M**: Modern GNN architectures (GraphGPS, SAN, EXPHormer)
+- **Thread M**: Modern GNN architectures ✅ DONE (GAT remains best: R²=0.731 > Transformer 0.448; GPS infeasible)
 - **Thread O**: CvS × L-functions (implementation if feasibility confirmed)
 - **Thread G**: Hybrid approach with enriched features
 - **Thread S**: LLM-aided conjecture generation

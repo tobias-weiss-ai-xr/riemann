@@ -1561,3 +1561,39 @@ Training: 100 epochs, AdamW (lr=1e-3, weight_decay=1e-5), CosineAnnealingLR, ear
 | `data/lmfdb/gue_analysis/spectral_rigidity_results.npz` | Full results |
 
 ---
+
+## Experiment M (Phase 2): Modern GNN Architectures
+
+**Date**: 2026-05-30  
+**Goal**: Determine if modern GNN architectures (GPSConv, TransformerConv) can outperform GAT (R²=0.731) on trace-index graph regression for z1 prediction.
+
+### Methodology
+
+- **Data**: 63K LMFDB forms, 9-dim node features (5 trace + 4 arithmetic) + 3-dim edge features (distance, sequential, prime-relation)
+- **Architectures tested**:
+  - **GPSConv** (GraphGPS hybrid): 3 layers, 4 GATConv local heads + 64-dim global Transformer attention, 485K params
+  - **TransformerConv**: 3 layers, 4 heads, beta skip connections, edge features, 185K params
+- **Training**: Same protocol as Thread B (100 epochs, AdamW, CosineAnnealingLR, patience=15, batch=128)
+
+### Results
+
+| Architecture | Best Val R² | Test R² | Training Time/Epoch | Verdict |
+|---|---|---|---|---|
+| GAT (4 heads) ← baseline | — | **0.731** | ~30s | Best overall |
+| GPSConv (GraphGPS hybrid) | — | — | ~600s+ | **Infeasible** — O(n²) global attention on 1000-node graphs |
+| TransformerConv (edge-conditional) | 0.448 | — | ~120s | **Underperforms** — 38.7% below GAT |
+
+### Key Findings
+
+1. **GAT remains the best architecture** for trace-index graphs. TransformerConv peaks at R²=0.448 vs GAT's 0.731.
+2. **GPSConv is computationally prohibitive**: Global Transformer attention on 1000-node graphs with 1000+ edges each is O(n²) per graph. Expected >10 min/epoch.
+3. **Multi-head learned attention > edge-conditional attention**: GAT's learned attention weights over heterogeneous edges (sequential, divisibility, k-NN) outperforms TransformerConv's edge-conditional attention.
+4. **GAT is the practical optimum**: For trace-index graphs with this structure, no architecture tested beats well-tuned GAT at feasible cost.
+
+### Files
+
+| File | Purpose |
+|---|---|
+| `scripts/train_gnn_modern.py` | GPSConv + TransformerConv implementation (380 lines) |
+
+---

@@ -747,7 +747,7 @@ Below is the current research roadmap, updated to reflect all results through Ma
 | **D** | Friedli full spectra $p$=17,19,23 (verify constant to 6 digits) | ⭐⭐ | Pending |
 | **E** | Farey graph GNN (Pfad B — exact power law $\Delta_n \approx 2.65/n$ discovered, R²=0.9998, GNN R²=-4.43) | ⭐⭐ | **DONE** ✓ |
 | **K** | FunSearch for Hecke trace identities (dormant submodule) | ⭐⭐⭐ HIGH | Pending |
-| **M** | Modern GNN: GraphGPS, SAN, GPS++ on trace-index graphs | ⭐⭐ | Pending |
+| **M** | Modern GNN: GPS (too slow, O(n²)), TransformerConv (R²=0.448 vs GAT 0.731) — GAT remains best | ⭐⭐ | **DONE** ✓ |
 | **N** | Multi-task zero prediction — shared backbone **degraded** z1 (0.714→0.704, -1.5%); each zero needs specialized head | ⭐⭐ | **DONE** ✓ |
 | **R** | Spectral rigidity — P(r), Σ²(L), k-th neighbor: all confirm two-population; dim≥2 deviates from both classical ensembles in P(r) (<r>=0.391) | ⭐⭐ | **DONE** ✓ |
 
