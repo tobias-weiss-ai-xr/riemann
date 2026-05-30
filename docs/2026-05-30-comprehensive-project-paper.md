@@ -745,6 +745,8 @@ Cantor et al. (arXiv:2504.19451) achieved 100% accuracy in verifying that Dirich
 
 4. **Hecke traces alone (no zeros) achieve F1=0.962** — strong but not perfect. This sets a ceiling for trace-only methods (including our GNN approaches).
 
+
+
 #### 4.9.3 Implications for the Project
 
 | Method | Task | Performance | Data Required |
@@ -760,6 +762,51 @@ The GAT's R²=0.731 for **z1 regression** is a harder problem than rank classifi
 The key open question is whether zero statistics themselves can be predicted from traces rather than computed via L-function evaluation. Sections 4.3 and 4.10 show that trace-only methods achieve R²~0.71 for z1 — good but far from the precision needed to replicate the zero-based classification results.
 
 ---
+
+### 4.10 GNN Attention Interpretability (Oracle Suggestion)
+
+Does the GAT architecture learn interpretable patterns related to number theory, or does it function as a black-box regressor? We analyze the trained TraceIndexGAT (best architecture, 45K parameters, R²=0.731) by extracting per-edge attention coefficients from all three GATConv layers on 2,000 held-out test graphs (126s on CPU).
+
+**Method**: We hook into `GATConv.message(x_j, alpha)` via `register_message_forward_hook` to capture the raw attention coefficient $\alpha_{ij}$ (before softmax normalization within each node's neighborhood). Per-edge attention is averaged across all 4 attention heads, then aggregated by source node type (prime-indexed vs composite-indexed trace nodes). Node $i$ corresponds to trace coefficient $a_i$, where $i$ is the trace index.
+
+#### 4.10.1 Global Statistics
+
+| Metric | Prime-Indexed Nodes | Composite-Indexed Nodes | Ratio |
+|--------|-------------------:|-----------------------:|------:|
+| Mean attention | 0.1026 | 0.0967 | 1.061 |
+| Std attention | 0.0820 | 0.0805 | 1.019 |
+| Median attention | 0.0814 | 0.0756 | 1.077 |
+| Min | 0.0001 | 0.0001 | — |
+| Max | 0.8549 | 0.8549 | — |
+| Total edges | 13,003,820 | 43,464,594 | — |
+
+**Key finding**: Prime-indexed trace nodes receive **6.1% higher attention** on average than composite-indexed nodes. Cohen's d = 0.0347 (tiny effect), but the t-statistic is $t=111.5$ ($p\approx 0$) driven by the enormous sample size (56M+ edge-level observations across 2,000 graphs).
+
+#### 4.10.2 Layer-Wise Structure
+
+The three GATConv layers exhibit dramatically different attention patterns:
+
+| Layer | Mean Attn | Entropy | Sparsity ($\alpha<0.01$) |
+|-------|----------:|--------:|-------------------------:|
+| 0 (input) | 0.0937 | 1,458 | 0.008 |
+| 1 (hidden) | 0.0921 | 1,472 | 0.007 |
+| 2 (output) | 0.1198 | 715 | 0.622 |
+
+**Layer 0 and 1** diffuse attention nearly uniformly across all edges (entropy ~1,460, sparsity < 0.01). The output **Layer 2** concentrates attention: entropy drops by half to 715, and 62.2% of edges receive attention below 0.01. This is consistent with a final-layer readout that focuses on the most informative trace nodes for the regression target.
+
+#### 4.10.3 Does the GAT Learn the Ramanujan-Petersson Bound?
+
+The RP bound $|a_p| \leq 2\sqrt{p}$ is the most fundamental constraint on Hecke eigenvalues. If the GAT had learned this bound, we would expect:
+1. **Higher attention** at prime-indexed nodes near the $2\sqrt{p}$ boundary
+2. **Lower attention** for composite-indexed nodes (which are products of prime contributions)
+3. **Layer 2 attention** correlating with $|a_p|/\sqrt{p}$ ratios
+
+The data show **none of these patterns**:
+- The 6% prime-node bias is uniform across all 168 prime indices, not concentrated near the RP boundary.
+- Layer 2's sparse attention distributes across both prime and composite nodes proportionally (ratio 1.04, essentially unchanged from mean ratio 1.06).
+- Within prime nodes, attention does not correlate with $p$ or $|a_p|/\sqrt{p}$ (Pearson $r < 0.05$).
+
+**Conclusion**: The GAT's attention mechanism functions as a learnable feature selector that slightly favors prime-indexed nodes, but this bias is practically negligible (d=0.035) and does not encode the Ramanujan-Petersson bound or other arithmetic structure. The model's predictive power on z1 regression (R²=0.731) derives primarily from the graph topology and node feature encoding rather than interpretable mathematical pattern discovery. A similar conclusion was reached in the Cayley graph GNN experiments (Section 4.1), where attention was irrelevant due to vertex-transitivity, but here it persists as a black-box limitation at a different scale.
 
 The Riemann Project's results can be understood across three distinct eras:
 
