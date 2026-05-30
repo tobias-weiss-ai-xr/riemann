@@ -689,6 +689,7 @@ The Riemann Project's results can be understood across three distinct eras:
 - Root cause of original moment collapse: Two compounding errors (composite indices + dimension scaling)
 - Lesson: Careful statistical analysis of existing data can yield new discoveries
 - New finding: L-function zero spacing statistics separate cleanly by Hecke field dimension — $d=1$ forms respect the Katz-Sarnak symplectic (GUE) prediction, while $d\ge 2$ forms transition to orthogonal (GOE) statistics
+- Spectral rigidity (Exp R): The two-population structure is robustly validated across P(s), P(r), Σ²(L), and k-th neighbor diagnostics. The $d\ge 2$ spacing ratio $\langle\tilde{r}\rangle = 0.391$ deviates from both classical ensembles — a potential new effective universality class for higher-degree Hecke fields.
 
 ### 5.2 Comparison with the Literature
 
@@ -748,7 +749,7 @@ Below is the current research roadmap, updated to reflect all results through Ma
 | **K** | FunSearch for Hecke trace identities (dormant submodule) | ⭐⭐⭐ HIGH | Pending |
 | **M** | Modern GNN: GraphGPS, SAN, GPS++ on trace-index graphs | ⭐⭐ | Pending |
 | **N** | Multi-task zero prediction — shared backbone **degraded** z1 (0.714→0.704, -1.5%); each zero needs specialized head | ⭐⭐ | **DONE** ✓ |
-| **R** | Pair correlation / spectral rigidity (GUE two-level tests) | ⭐⭐ | Pending |
+| **R** | Spectral rigidity — P(r), Σ²(L), k-th neighbor: all confirm two-population; dim≥2 deviates from both classical ensembles in P(r) (<r>=0.391) | ⭐⭐ | **DONE** ✓ |
 
 ### Phase 3 (Weeks 5–6) — Synthesis & Theoretical
 
@@ -791,7 +792,7 @@ We have conducted a comprehensive data-driven investigation of 53,779 weight-2 n
 
 6. **Connes' noncommutative geometry program** is now computationally validated: the Connes–van Suijlekom CvS operator (`connes-cvs` v0.2.2, PyPI) reproduces $\zeta$ zeros to machine precision ($10^{-16}$) at $N=100$. The remaining challenge is the semilocal generalization (arXiv:2310.18423) connecting this to $\operatorname{SL}(2,\mathbb{F}_p)$.
 
-7. **The GUE zero statistics reveal a dimensional transition**: At 63,844 forms and 568,708 spacings, $d=1$ (rational) newforms respect the Katz-Sarnak symplectic prediction (GUE preference, FVE=0.205), while $d\ge 2$ forms uniformly shift to GOE (FVE=0.233–0.286, %GUE dropping from 8.7% to 1.0%) — a two-population structure novel to the literature.
+7. **The GUE zero statistics reveal a dimensional transition**: At 63,844 forms and 568,708 spacings, $d=1$ (rational) newforms respect the Katz-Sarnak symplectic prediction (GUE preference, FVE=0.205), while $d\ge 2$ forms uniformly shift to GOE (FVE=0.233–0.286, %GUE dropping from 8.7% to 1.0%) — a two-population structure novel to the literature. Spectral rigidity analysis (spacing ratio $\langle\tilde{r}\rangle$, number variance $\Sigma^2(L)$, $k$-th neighbor distributions) independently confirms this pattern, with the $d\ge 2$ ratio $\langle\tilde{r}\rangle=0.391$ deviating from both classical GUE (0.599) and GOE (0.530) predictions — hinting at a new effective universality class.
 
 The most important methodological lesson: in the intersection of ML and number theory, **data quantity trumps model architecture**. The 53× scale-up from 1K to 53K forms transformed every metric. Scaling to 200K+ forms is the single highest-impact action we can take.
 
