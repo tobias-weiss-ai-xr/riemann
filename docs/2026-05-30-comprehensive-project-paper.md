@@ -81,7 +81,10 @@ The application of ML to number-theoretic data has accelerated rapidly since 202
 | This work (Exp 12, ChebConv GNN) | ChebConv K=5 | 46,347 newforms (graphs) | L-function zero z1 | R² = 0.631 |
 | Cantor et al. (2025, arXiv:2504.19451) | ML classification | 30K+ Dirichlet L-functions | Modulus q from zeros | **100%** accuracy (engineered features) |
 | Bober–Booker–Lee–Lowry–Duda (2026) | Statistical murmurations | Weight aspect $k=2,4,6,8$ | Murmuration curves | Match Katz-Sarnak predictions |
-| Bujanović–Kazalicki–Novak (2026) | CNN on elliptic curve data | Rank prediction | Elliptic curve rank | State-of-the-art rank prediction |
+| Kundu–Mueller (2026) | Murmurations | $p$-power coefficients | Modular forms | $p$-adic murmurations |
+| Bieri–Butbaia–Costa–Deines–Lee–Lowry-Duda–Oliver–Qi–Veenstra (2026, arXiv:2603.17681) | 1D CNN+saliency | Conductor 0–100K | Elliptic curve rank | Murmurations vs Mestre-Nagao interplay |
+| Bujanović–Kazalicki–Novak (2026) | CNN | Elliptic curves | Rank prediction | State-of-the-art rank prediction |
+| Lee–Oliver–Pozdnyakov–Sutherland (2026, in prep.) | Murmurations in L-functions | General families | Murmuration densities | Conceptual framework |
 
 **Key insight**: Our LMFDB results at 53K scale are competitive with or exceed the published literature. The arXiv:2502.10360 study uses simpler methods (PCA + LDA) on a larger dataset (248K L-functions). Our use of Hecke traces directly — rather than L-function values — provides a complementary approach with stronger per-form granularity. The arXiv:2504.19451 result on Dirichlet L-functions demonstrates that engineered features (as opposed to raw coefficients) can achieve perfect classification — a strategy we adopt in our CM classifier with moment features. The murmurations literature has now expanded to the weight aspect (Bober et al., 2026), confirming that Katz-Sarnak predictions for murmuration curves hold across multiple weights — directly relevant to our own murmuration-style dimension-resolved analysis.
 
@@ -111,6 +114,12 @@ Alain Connes' program connecting the Riemann Hypothesis to noncommutative geomet
 
 5. **The Riemann Hypothesis survey** (Connes, Feb 2026, arXiv:2602.04022): Comprehensive overview connecting the Weil quadratic form, prolate operator, and the full program — serving as the best entry point.
 
+6. **The Riemann Hypothesis: Past, Present and a Letter Through Time** (Connes, April 2026, J. Open Math. Probl. 2(1)): The published survey containing the "Letter to Riemann" — a construction using only 17th–19th century mathematics that, by extremizing a quadratic form using only primes $\le 13$, obtains the first 50 zeta zeros with errors from $2.6\times 10^{-55}$ (first zero) to $\sim 10^{-3}$ (fiftieth). All approximating values are *proven* to lie on the critical line.
+
+7. **Independent CvS confirmation** (Groskin, May 2026, arXiv:2605.20224): The first independent public implementation of the Connes–van Suijlekom Galerkin matrix at 16 cutoffs ($c=13$ through $67$, plus $c=100$, $N=250$). Reports first-zero absolute error shrinking monotonically from $\sim 2\times 10^{-55}$ at $c=13$ to $\sim 1.5\times 10^{-168}$ at $c=67$, and the smallest-positive even eigenvalue reaching $\sim 10^{-334}$ at $c=100,N=250$. This independent multi-$c$ survey validates and vastly extends our own two-point scaling law ($N^{-14.1}$): the true convergence is in the prime cutoff $c$, not just the matrix size $N$, with error decaying super-exponentially as $c$ increases.
+
+8. **Error analysis of $D_{\log}$ operators** (2026, arXiv:2601.12133): An independent analysis proves that the mean absolute error of the Connes–Consani–Moscovici $D_{\log}^{(\lambda,N)}$ operator satisfies $\epsilon(\lambda,N) \ge 1/(\log\lambda)$, establishing an inverse logarithmic lower bound. This provides rigorous theoretical grounding for the convergence rates we observe numerically, and suggests that the error bottleneck lies in the prime information content — not the Galerkin discretization.
+
 **Connes CvS package**: The Characteristic Values of the Schwarzian (CvS) formulation — Connes–van Suijlekom's Galerkin matrix $Q(c)$ of size $(2N+1)\times(2N+1)$ from arXiv:2511.23257 — has been published as the `connes-cvs` Python package (v0.2.2, PyPI, April 2026) and is already deployed in this project. At $c=30,N=100,T=400,\\text{dps}=150$, it extracts the first five Riemann zeta zeros with **machine precision** (errors $3.6\times 10^{-16}$ to $8.3\times 10^{-16}$). Even $N=50$ achieves $10^{-11}$ accuracy. This transforms Thread C from theoretical to computational: the Galerkin matrix is a drop-in tool for zero extraction.
 
 A two-point scaling analysis (Thread J) using $N=50$ ($10^{-11}$ error) and $N=100$ ($10^{-16}$ error, machine precision) reveals the accuracy follows a steep power law:
@@ -128,6 +137,10 @@ The connection between L-function zero statistics and random matrix theory — p
 2. **Pair correlation of Dirichlet L-function zeros** (Math. Annalen, 2026): Establishing that the pair correlation conjecture for Dirichlet $L$-functions implies the Elliott–Halberstam conjecture — one of the deepest conjectures in analytic number theory — demonstrating that zero statistics encode deep arithmetic information.
 
 3. **Resonance-correlation $\zeta$ small gaps** (arXiv:2604.05733, 2026): A new resonance-correlation method achieves $\mu < 0.50895$, setting a new record for the proportion of $\zeta$ zeros on the critical line. This independent methodological advance in zero analysis complements our statistical approach.
+
+4. **Gap ratio convergence to GUE** (Alarcon, 2026, Zenodo): The first precision measurement of the rate at which the gap ratio $\langle r\rangle$ of Riemann zeros converges to the GUE prediction. Using zeros up to $T\sim 3\times 10^{10}$, finds $\langle r\rangle(T) = 0.59891(13) + 1.245(40)/\log^2 T$, with the asymptotic value $R_\infty = 0.59891$ lying $6.1\sigma$ below the GUE limit $R_\text{GUE} = 0.59971$. The mechanism is identified: Riemann zeros have a narrower spacing distribution than GUE (std deviation smaller) and stronger nearest-neighbor anti-correlation, both converging as $1/\log^2 T$. This provides a critical benchmark for our own gap ratio analysis of L-function zeros in Thread L: the convergence rate $O(1/\log^2 T)$ for $\zeta$ zeros suggests our 63K-form LMFDB analysis (finite conductor) may similarly exhibit systematic $\sim 1/\log^2 N$ deviations from the limiting ensemble.
+
+5. **Low-lying zeros and central values** (2026, arXiv:2605.12688): Establishes an explicit conditional connection between the one-level density of low-lying zeros and the distribution of central $L$-values in families. Shows that the same symmetry-type-dependent densities control both phenomena — directly relevant to interpreting our two-population GUE/GOE discovery as a symmetry signature rather than a noise artifact.
 
 ### 2.5 Friedli Spectral Zeta and the $\operatorname{SL}(2,\mathbb{F}_p)$ Constant
 
@@ -161,23 +174,23 @@ The primary data source is the LMFDB PostgreSQL mirror at `devmirror.lmfdb.xyz:5
 
 | Property | Value |
 |----------|-------|
-| Total newforms | 53,779 |
+| Total newforms (original) | 53,779 (via `mf_hecke_nf.an_field_embedding` join) |
+| Total newforms (Thread A, expanded) | **200,000** (via `mf_newforms.traces[]` ARRAY, batch-500 checkpointed collector) |
 | Level range | 11–5000 |
-| Dimension ($d$) range | 1–250 |
+| Dimension ($d$) range | 1–676 |
 | Hecke traces per form | 100 ($a_1,\dots,a_{100}$) |
+| Pre-computed traces available | 1,000 per form for all 987K weight-2 newforms (`mf_newforms.traces[]`) |
 | Database | LMFDB SQL mirror (3TB, 24M L-functions, 850K modular forms) |
-| Collection method | psycopg2 server-side cursor, bulk export to CSV |
+| Collection method | `psycopg2` server-side cursor, incremental collector (`scripts/collect_lmfdb_incremental.py`) |
 
 #### Dataset Statistics
 
-| Property | Count | % |
-|----------|-------|---|
-| Analytic rank 0 | 26,929 | 50.1% |
-| Analytic rank 1 | 26,138 | 48.6% |
-| Analytic rank 2 | 712 | 1.3% |
-| CM forms | 213 | 0.4% |
-| Non-CM forms | 53,566 | 99.6% |
-| Self-dual | 53,779 | 100% |
+| Property | Original (53K) | Expanded (200K) |
+|----------|---------------|-----------------|
+| Analytic rank 0 | 26,929 (50.1%) | 133,806 (66.9%) |
+| Analytic rank 1 | 26,138 (48.6%) | 63,758 (31.9%) |
+| Analytic rank ≥ 2 | 712 (1.3%) | 2,436 (1.2%) |
+| Self-dual | 53,779 (100%) | 200,000 (100%) |
 
 #### $\operatorname{SL}(2,\mathbb{F}_p)$ Cayley Graphs
 
