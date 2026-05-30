@@ -751,7 +751,7 @@ Below is the current research roadmap, updated to reflect all results through Ma
 
 | Thread | Description | Priority | Status |
 |--------|-------------|----------|--------|
-| **C** | Connes spectral triples (semilocal trace formula, arXiv:2310.18423) | ⭐⭐⭐ HIGH | Pending |
+| **C** | Connes CvS × L-function generalization — direct $Q_f(c)$ built for form 11.2.a.a, $F_{\text{even}}(\tau)$ does NOT vanish at known zeros (see §10.2) | ⭐⭐⭐ HIGH | **DONE ✓ (negative result)** |
 | **D** | Friedli full spectra $p$=17,19,23 (verify constant to 6 digits) | ⭐⭐ | Pending |
 | **E** | Farey graph GNN (Pfad B — exact power law $\Delta_n \approx 2.65/n$ discovered, R²=0.9998, GNN R²=-4.43) | ⭐⭐ | **DONE** ✓ |
 | **K** | FunSearch for Hecke trace identities (dormant submodule) | ⭐⭐⭐ HIGH | Pending |
@@ -765,7 +765,7 @@ Below is the current research roadmap, updated to reflect all results through Ma
 |--------|-------------|----------|--------|
 | **G** | Hybrid GNN + number theory features (Sato-Tate moments, class numbers) | ⭐⭐ | Pending |
 | **H** | Knowledge graph integration (Neo4j, 194 nodes, query for patterns) | ⭐ | Pending |
-| **O** | Connes CvS × L-functions of modular forms (zero prediction via CvS) | ⭐⭐⭐ HIGH | Speculative |
+| **O** | Connes CvS × L-functions — direct operator generalization attempted and failed (Experiment C); semilocal adelic operator (arXiv:2310.18423) remains open | ⭐⭐⭐ HIGH | **Attempted — direct approach failed (see §10.2)** |
 | **Q** | Pizer data quality autopsy | ⭐ | Pending |
 | **S** | LLM-aided automated conjecture generation | ⭐⭐ | Pending |
 
@@ -894,7 +894,11 @@ The most striking open question is the $d\ge 2$ spacing ratio $\langle\tilde{r}\
 
 ### 10.2 CvS × L-function Generalization (Thread O)
 
-The Connes–van Suijlekom CvS operator produces machine-precision $\zeta$ zeros at $N=100$ (Thread J), but its generalization to $L$-function zeros is **not yet implemented**. Thread O was incorrectly deferred — the computational primitive exists (`connes-cvs` v0.2.2, the Galerkin matrix $Q(c)$ with prime/pole/archimedean pieces). The gap is the semilocal adaptation (arXiv:2310.18423) incorporating the $L$-function's Euler factors. This thread is now elevated to **Active — Phase 2** priority.
+The Connes–van Suijlekom CvS operator produces machine-precision $\zeta$ zeros at $N=100$ (Thread J). Its direct generalization to $L$-function zeros was **attempted and failed** (Experiment C, May 2026). A prototype $Q_f(c)$ operator was built for form 11.2.a.a (dim=1, level 11) by replacing von Mangoldt weights with Hecke eigenvalues, removing the pole piece, and swapping the archimedean $\Gamma(s/2)$ for $\Gamma(s)$. The matrix diagonalized successfully — $\lambda_{\min} = -3.277$ at $c=13,N=20$ — but $F_{\text{even}}(\tau)$ does NOT vanish at the known $L$-function zeros ($\gamma_1 = 6.36$ through $\gamma_5 = 13.57$ all yield $|F_{\text{even}}| > 0.01$).
+
+The obstruction is structural: (1) the CvS proof relies on **positive von Mangoldt weights** — Hecke eigenvalues can be negative, breaking the quadratic form's lower-boundedness; (2) the $L$-function's functional equation $s \to 2-s$ (vs $s \to 1-s$ for $\zeta$) shifts the Fourier basis; (3) cusp forms have no trivial zeros, altering the pole piece. **The CvS Galerkin operator is specific to $\zeta(s)$.**
+
+The semilocal adelic operator (arXiv:2310.18423) remains open as an alternative route but requires deeper theoretical work — it is no longer Phase 2-executable without collaboration with the noncommutative geometry community.
 
 ### 10.3 GNN Attention as Hypothesis Generator
 

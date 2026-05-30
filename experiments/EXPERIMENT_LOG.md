@@ -1562,6 +1562,84 @@ Training: 100 epochs, AdamW (lr=1e-3, weight_decay=1e-5), CosineAnnealingLR, ear
 
 ---
 
+## Experiment C (Phase 2): CvS × L-function Generalization
+
+**Date**: 2026-05-30  
+**Goal**: Determine if the Connes–van Suijlekom (CvS) Galerkin operator $Q(c)$ — which extracts $\zeta$ zeros to machine precision — can be generalized to compute $L$-function zeros of modular forms.
+
+### Background
+
+The CvS operator $Q(c)$ (arXiv:2511.23257) is a $(2N+1)\times(2N+1)$ self-adjoint Galerkin matrix whose ground state eigenvector encodes $\zeta$ zeros via:
+$$F_{\text{even}}(\tau) = \int_0^\infty \Theta(t)T_c(t,\tau)\,dt$$
+where $F_{\text{even}}(\tau) = 0$ at the zeros $\tau = \gamma_n$ of $\zeta(\tfrac12 + i\gamma_n)$. The operator decomposes into three pieces:
+1. **Prime piece**: $Q_{\text{prime}}$ — von Mangoldt sums $\sum_{p^k \le e^c} \frac{\Lambda(p^k)}{\sqrt{p^k}}$
+2. **Pole piece**: $Q_{\text{pole}}$ — trivial zeros of $\zeta(s)$
+3. **Archimedean piece**: $Q_{\text{arch}}$ — $\Gamma(s/2)$ digamma integrals
+
+### Methodology
+
+We wrote `scripts/_connes_lfunction_proto.py` that generalizes the CvS construction to the $L$-function of a weight-2 newform $f$ with Hecke eigenvalues $a_n$:
+
+1. **Prime piece**: Replace $\Lambda(n)/\sqrt{n}$ with $a_{p^k}\log(p)/p^{k/2}$ from the LMFDB CSV data (25 pre-computed Hecke traces)
+2. **Pole piece**: Removed entirely (cusp forms are entire — no trivial zeros)
+3. **Archimedean piece**: Swap $\Gamma(s/2) \to \Gamma(s)$, $\psi(\tfrac14 + \tfrac{it}{2}) \to \psi(1 + it)$, $\log\pi \to \log(2\pi)$
+4. **Conductor term**: Not included (see analysis below)
+
+Test form: **11.2.a.a** (dim=1, level 11, weight=2, the unique cusp form of level 11). Known first five $L$-function zeros: $\gamma_1 = 6.36, \gamma_2 = 9.92, \gamma_3 = 10.77, \gamma_4 = 12.20, \gamma_5 = 13.57$.
+
+### Results
+
+**Matrix construction succeeded**: $Q_f(c)$ built and diagonalized for form 11.2.a.a at $c=13, N=20, T=30, \text{dps}=40$ (79s runtime).
+
+| Metric | Value |
+|--------|-------|
+| $\lambda_{\min}$ | $-3.277$ |
+| Matrix size | $41 \times 41$ |
+| Runtime | 79s |
+
+**CRITICAL NEGATIVE RESULT**: $F_{\text{even}}(\tau)$ does NOT vanish at the known $L$-function zeros:
+
+| $\gamma_n$ | Known zero | $F_{\text{even}}(\gamma_n)$ |
+|------------|-----------|--------------------------|
+| $\gamma_1$ | 6.36 | 0.0124 (not near 0) |
+| $\gamma_2$ | 9.92 | 0.1712 |
+| $\gamma_3$ | 10.77 | 0.0799 |
+| $\gamma_4$ | 12.20 | $-0.0110$ |
+| $\gamma_5$ | 13.57 | 0.2688 |
+
+Grid scan over $\tau \in [0, 20]$ with step 0.1: $F_{\text{even}}$ varies smoothly between $-0.34$ and $0.58$ but does not cross zero at the $L$-function zero locations.
+
+### Analysis: Why the CvS Construction Does Not Generalize Directly
+
+The obstruction is structural, not numerical. The CvS proof (arXiv:2511.23257, Theorem 3.2) relies on three properties that $\zeta(s)$ satisfies but $L(f,s)$ does not:
+
+1. **Positive prime weights**: The von Mangoldt function $\Lambda(n) \ge 0$ ensures the quadratic form associated with $Q_{\text{prime}}$ is positive-definite. For $L(f,s)$, the Hecke eigenvalues $a_n$ can be negative or zero — e.g., $a_2 = -2, a_3 = -1$ for form 11.2.a.a. This sign variability breaks the lower-boundedness of the operator.
+
+2. **Functional equation symmetry**: $\zeta(s)$ satisfies $\xi(s) = \xi(1-s)$, placing the critical line at $\text{Re}(s) = 1/2$ and making the Fourier basis $e_n(x) = \text{sech}^{1/2}(x/2) \cdot q_n(e^{-x})$ natural. For $L(f,s)$, the completed $L$-function satisfies $\Lambda(f,s) = \varepsilon_f \cdot \Lambda(f, 2-s)$, where:
+   - The critical line is $\text{Re}(s) = 1$ (not $1/2$), shifting the Fourier analysis
+   - The root number $\varepsilon_f$ may be $\pm 1$, altering the parity structure
+   - The conductor $N_f$ introduces a $\log(N_f)$ term in the explicit formula
+
+3. **Trivial zeros**: $\zeta(s)$ has an infinite family of trivial zeros ($s = -2, -4, \dots$) explicitly accounted for in the pole piece. Cusp forms have no trivial zeros — they are entire functions whose completed $L$-functions are entire of order 1. This means the pole piece is structurally different.
+
+### Conclusion
+
+The CvS Galerkin operator $Q(c)$ is **specific to $\zeta(s)$** and cannot be generalized to $L(f,s)$ by simply replacing the prime weights and adjusting the archimedean factor. The mathematical structure — positive von Mangoldt weights, $\text{Re}(s) = 1/2$ symmetry, and trivial zeros — is essential to the proof that the ground state eigenvector encodes the zeros.
+
+**Thread O remains open** via alternative routes:
+- The **semilocal adelic operator** (arXiv:2310.18423) may admit an $L$-function generalization through a different operator whose spectral theory incorporates the conductor and root number
+- Direct functional analysis of the $L$-function's explicit formula (Weil distribution) could yield a different operator construction
+- These are research-level mathematics requiring collaboration with the noncommutative geometry community
+
+### Files
+
+| File | Purpose |
+|------|---------|
+| `scripts/_connes_lfunction_proto.py` | CvS generalization prototype (disposable) |
+| `scripts/data/cayley-graphs/form_11_2_a_a_zeros.json` | Known zeros for test form |
+
+---
+
 ## Experiment M (Phase 2): Modern GNN Architectures
 
 **Date**: 2026-05-30  

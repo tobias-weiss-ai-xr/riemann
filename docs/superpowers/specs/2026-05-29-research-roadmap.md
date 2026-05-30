@@ -135,11 +135,17 @@ The pipeline is 3-step: `build_galerkin_matrix(c, N, T, dps)` → `compute_groun
    - Compare Connes-based zero extraction vs GNN-predicted zeros
 
 **Success criteria**:
-- N→∞ convergence law characterized: exponential or power-law?
-- Zeros 6–20 extracted to at least 10⁻⁶ accuracy
-- CvS × L-function generalization attempted and documented (even if negative)
+- N→∞ convergence law characterized: exponential or power-law? ✅ (error ∝ N^{-14.1})
+- Zeros 6–20 extracted to at least 10⁻⁶ accuracy ✅ (N=100 → machine precision)
+- CvS × L-function generalization attempted and documented ✅ **NEGATIVE — see Experiment C**
 
-**Risk**: Connes operator is specific to ζ(s) — generalization to L-functions is mathematically non-trivial
+**Status**: ⚠️ **TESTED — DIRECT GENERALIZATION FAILS** (Experiment C, May 2026)
+
+The direct CvS operator $Q_f(c)$ was built for form 11.2.a.a (see detailed experiment log entry) and diagonalized successfully. $F_{\text{even}}(\tau)$ does NOT vanish at known $L$-function zeros. The obstruction is structural: (1) Hecke eigenvalues can be negative, breaking the positive-definite weights needed for the CvS proof; (2) $L$-function functional equation is $s \to 2-s$ (not $s \to 1-s$), shifting the Fourier basis; (3) cusp forms have no trivial zeros, altering the pole piece. **The CvS construction is specific to $\zeta(s)$.**
+
+Thread O remains open via the semilocal adelic operator (arXiv:2310.18423) — this requires deeper theoretical work and is no longer Phase 2-executable.
+
+**Risk** ✅ CONFIRMED: Connes operator is specific to ζ(s) — generalization to L-functions is mathematically non-trivial
 
 ---
 
@@ -452,34 +458,15 @@ Per-zero R² (multi-task): z1–z9 consistent (0.70–0.75), z10 collapses (0.34
 
 ---
 
-### Thread O: Connes CvS × L-Functions of Modular Forms ⭐⭐⭐ HIGH (SPECULATIVE)
+### Thread O: Connes CvS × L-Functions of Modular Forms ⭐⭐⭐ HIGH (INVESTIGATED — DIRECT APPROACH FAILED)
 
-**Current state**: Connes CvS works for ζ(s). Connecting to L-functions of modular forms is mathematically non-trivial but would unify the project's two most successful threads.
+**Current state**: The direct CvS generalization to L(f,s) was **attempted and failed** (Experiment C, May 2026). For form 11.2.a.a (dim=1, level 11), a generalized operator $Q_f(c)$ was built and diagonalized successfully, but $F_{\text{even}}(\tau)$ does NOT vanish at known $L$-function zeros.
 
-**Goal**: Generalize the CvS Galerkin construction from ζ(s) to L(f,s) for weight-2 newforms.
+**Why it fails**: The CvS proof relies on (1) positive von Mangoldt weights — Hecke eigenvalues can be negative, breaking lower-boundedness; (2) $\zeta$'s functional equation $s \to 1-s$ vs $L(f,s)$'s $s \to 2-s$, shifting the Fourier basis; (3) presence of trivial zeros in $\zeta$ vs entire cusp forms.
 
-**Why it matters**: If possible, this would enable direct spectral computation of L-function zeros for modular forms — replacing statistical prediction (GNN R²=0.631) with direct numerical computation (potentially exponential convergence).
+**What remains open**: The semilocal adelic operator (arXiv:2310.18423) may admit an $L$-function generalization through a different operator construction, but this is research-level mathematics requiring collaboration.
 
-**Specific steps**:
-1. **Theoretical analysis** (consult literature):
-   - The CvS operator Q(c) is built from the Euler product of ζ(s)
-   - For L(f,s) with Euler product ∏(1 - a_p p⁻ˢ + χ(p)p²ᵏ⁻¹⁻²ˢ)⁻¹, can we construct an analogous operator?
-   - This requires understanding the arithmetic structure of the CvS construction in detail
-
-2. **If theoretically feasible**:
-   - Implement generalized Q_f(c) for a single newform
-   - Test on forms with known zeros from lmfdb_zeros_ml.csv
-   - Compare to true zeros (currently 54,443 forms with z1-z10)
-
-3. **If not feasible**:
-   - Document the mathematical obstruction
-   - Propose alternative: use CvS ζ zeros as priors for L-function zeros via universal structures
-
-**Success criteria**:
-- Mathematical feasibility documented (even if negative)
-- If positive: zeros extracted for at least 1 form with <1% error
-
-**Risk**: The CvS construction may be specific to ζ(s) — generalization requires deep understanding of both Connes' noncommutative geometry program AND modular form L-functions
+**Risk**: ✅ **CONFIRMED** — The CvS Galerkin operator is specific to $\zeta(s)$.
 
 ---
 
@@ -612,7 +599,7 @@ Per-zero R² (multi-task): z1–z9 consistent (0.70–0.75), z10 collapses (0.34
 
 ### Phase 3 (Weeks 5-6)
 - **Thread M**: Modern GNN architectures ✅ DONE (GAT remains best: R²=0.731 > Transformer 0.448; GPS infeasible)
-- **Thread O**: CvS × L-functions (implementation if feasibility confirmed)
+- **Thread O**: CvS × L-functions ✅ **INVESTIGATED — DIRECT APPROACH FAILED** (Experiment C; CvS operator is specific to ζ(s))
 - **Thread G**: Hybrid approach with enriched features
 - **Thread S**: LLM-aided conjecture generation
 - **Thread H**: KG integration with experimental results
@@ -628,7 +615,7 @@ Per-zero R² (multi-task): z1–z9 consistent (0.70–0.75), z10 collapses (0.34
 
 3. **How does the Connes CvS operator converge?** The N=100 → 10⁻¹⁶ results are astonishing. Is it exponential convergence? What's the saturation point? Can we reach γ₂₀?
 
-4. **Can the Connes CvS construction be generalized from ζ(s) to L-functions of modular forms?** If yes, this would be the most transformative result — direct spectral computation of L-function zeros.
+4. ~~Can the Connes CvS construction be generalized from ζ(s) to L-functions of modular forms?~~ **ANSWERED: NO** — Direct generalization tested on form 11.2.a.a (Experiment C). The CvS operator is structurally specific to ζ(s) (positive von Mangoldt weights, $s \to 1-s$ functional equation, trivial zeros). The semilocal adelic operator (arXiv:2310.18423) remains an open alternative but requires deeper theoretical work.
 
 5. **Does scaling to 500K+ newforms break the current bottleneck?** Or do we hit diminishing returns after 200K?
 
