@@ -1,10 +1,6 @@
 # Machine Learning for Modular Forms: Hecke Traces, L-Function Zeros, and the Sato-Tate Distribution
 
-> **Date**: 2026-05-30  
-> **Project**: Riemann (GNN × Number Theory)  
-> **Authors**: Tobias Weiss (Neo4j Research / GraphWiz AI)  
-> **Status**: Comprehensive Project Paper (v1.0)  
-> **Related**: `docs/2026-05-29-sato-tate-moment-artifact.md` (focused Sato-Tate deep-dive)
+Tobias Weiss (tobias@tobias-weiss.org)
 
 ---
 
@@ -196,7 +192,7 @@ The primary data source is the LMFDB PostgreSQL mirror at `devmirror.lmfdb.xyz:5
 
 Generated via CayleyPy `MatrixGroups.special_linear_fundamental_roots(2,p)` for primes $p=2,\dots,101$:
 
-| p | \|\operatorname{SL}(2,\mathbb{F}_p)\| | Ramanujan? |
+| p | $\|\operatorname{SL}(2,\mathbb{F}_p)\|$ | Ramanujan? |
 |---|--------------------------------------|------------|
 | 2 | 6 | No |
 | 3 | 24 | **Yes** |

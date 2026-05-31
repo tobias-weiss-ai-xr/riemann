@@ -61,14 +61,31 @@ tensorboard: ## Start TensorBoard
 	$(DOCKER_COMPOSE) exec $(RESEARCH_CONTAINER) tensorboard --logdir data/models/wandb --bind_all --port 6006
 
 # ── Paper ────────────────────────────────────────────────────────
-paper: ## Build paper from markdown
-	$(DOCKER_COMPOSE) exec $(RESEARCH_CONTAINER) python /workspace/scripts/build_paper.py
+PAPER_SRC  := /workspace/docs/2026-05-30-comprehensive-project-paper.md
+PAPER_DIR  := /workspace/paper
+PAPER_TEX  := $(PAPER_DIR)/paper.tex
+PAPER_OUT  := $(PAPER_DIR)/machine-learning-modular-forms-comprehensive.pdf
 
-paper-pdf: ## Build paper as PDF
-	$(DOCKER_COMPOSE) exec $(RESEARCH_CONTAINER) pandoc /workspace/paper/gnn-zahlentheorie-riemann.md \
-		-o /workspace/paper/gnn-zahlentheorie-riemann.pdf \
-		--pdf-engine=xelatex \
-		--resource-path=/workspace/paper
+paper: ## Build paper from markdown (three-pass: pandoc→.tex → fix_tables → xelatex×2)
+	@echo "=== Step 1/4: pandoc → .tex ==="
+	$(DOCKER_COMPOSE) exec $(RESEARCH_CONTAINER) pandoc $(PAPER_SRC) \
+		-t latex -s -o $(PAPER_TEX) \
+		--lua-filter=/workspace/paper/booktabs.lua \
+		--resource-path=/workspace/docs
+	@echo "=== Step 2/4: Post-process tables (row colors) ==="
+	$(DOCKER_COMPOSE) exec $(RESEARCH_CONTAINER) python /workspace/scripts/fix_tables.py $(PAPER_TEX) --inplace
+	@echo "=== Step 3/4: xelatex (first pass) ==="
+	$(DOCKER_COMPOSE) exec $(RESEARCH_CONTAINER) bash -c \
+		"cd $(PAPER_DIR) && xelatex -interaction=nonstopmode paper.tex 2>&1 | tail -10"
+	@echo "=== Step 4/4: xelatex (second pass — cross-refs) ==="
+	$(DOCKER_COMPOSE) exec $(RESEARCH_CONTAINER) bash -c \
+		"cd $(PAPER_DIR) && xelatex -interaction=nonstopmode paper.tex 2>&1 | tail -10"
+	@echo "=== Renaming output ==="
+	$(DOCKER_COMPOSE) exec $(RESEARCH_CONTAINER) bash -c \
+		"cp $(PAPER_DIR)/paper.pdf $(PAPER_OUT)"
+	@echo "=== PDF built: $(PAPER_OUT) ==="
+
+paper-pdf: paper ## Build paper as PDF (alias)
 
 # ── Utilities ────────────────────────────────────────────────────
 logs: ## Tail all service logs
