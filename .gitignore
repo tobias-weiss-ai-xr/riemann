@@ -103,6 +103,10 @@ wandb/
 %TEMP%/
 funsearch/
 
+# ── Git worktrees ───────────────────────────────────────────────
+.worktrees/
+worktrees/
+
 # ── Generated model outputs (not committed) ──────────────────
 data/connes_cvs/
 data/sato_tate/
