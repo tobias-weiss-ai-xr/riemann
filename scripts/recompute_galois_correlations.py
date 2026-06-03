@@ -98,8 +98,8 @@ def load_and_sample_forms(
     df = pd.read_csv(csv_path)
     dim_d = df[df.dim == target_dim].head(sample_size)
 
-    # Get trace columns
-    trace_cols = [c for c in dim_d.columns if c.startswith('trace_')]
+    # Get trace columns (only numbered ones, skip trace_mean, trace_std, trace_max_abs)
+    trace_cols = [c for c in dim_d.columns if c.startswith('trace_') and c[6:].isdigit()]
     trace_cols = sorted(trace_cols, key=lambda x: int(x.split('_')[1]))
     trace_cols = trace_cols[:50]  # Use first 50 primes
 
