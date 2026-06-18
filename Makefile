@@ -87,6 +87,30 @@ paper: ## Build paper from markdown (three-pass: pandoc→.tex → fix_tables �
 
 paper-pdf: paper ## Build paper as PDF (alias)
 
+# ── Lean 4 Formalization ─────────────────────────────────────────
+LEAN_DIR := lean
+
+lean-setup: ## Update mathlib dependency (first time: ~30 min)
+	cd $(LEAN_DIR) && lake update
+
+lean-build: ## Compile all Lean files (zero errors expected)
+	cd $(LEAN_DIR) && lake build
+
+lean-clean: ## Clean Lean build artifacts
+	cd $(LEAN_DIR) && lake clean
+
+lean-eigenvalues: ## Export Python eigenvalue data → Lean certificates
+	python $(LEAN_DIR)/scripts/extract_lean_data.py --primes 2-79
+
+lean-eigenvalues-all: ## Export all primes including uncomputed ones
+	python $(LEAN_DIR)/scripts/extract_lean_data.py
+
+lean-test: ## Run Lean verification (#eval statements)
+	cd $(LEAN_DIR) && lake build && echo "=== Test: verifying known spectral gaps ===" && \
+		python scripts/extract_lean_data.py --verify
+
+lean-ci: lean-build lean-test ## Full Lean CI pipeline
+
 # ── Utilities ────────────────────────────────────────────────────
 logs: ## Tail all service logs
 	$(DOCKER_COMPOSE) logs -f
