@@ -1675,3 +1675,97 @@ The CvS Galerkin operator $Q(c)$ is **specific to $\zeta(s)$** and cannot be gen
 | `scripts/train_gnn_modern.py` | GPSConv + TransformerConv implementation (380 lines) |
 
 ---
+
+## Experiment 16 (Planned): Spectral Gap × Hecke Trace Correlation — Goldbach-RH Bridge
+
+**Date**: 2026-06-18  
+**Status**: Script written (`scripts/spectral_gap_hecke_correlation.py`) — requires Docker + LMFDB data to execute  
+**Goal**: Test whether Cayley graph spectral gaps of SL(2,F_p) correlate with Hecke trace statistics of newforms at level p, providing empirical support for the Brandt matrix connection (Pizer's theorem) and the averaged-Goldbach ↔ RH bridge (Granville's theorem).
+
+### Theoretical Chain
+
+```
+SL(2,F_p) Cayley spectral gap
+  → Brandt matrix eigenvalue (Pizer's theorem)
+  → Hecke eigenvalue T_ℓ on S₂(Γ₀(p))
+  → Fourier coefficient a_ℓ(f) of modular form f
+  → L-function L(f,s) analytic properties
+  → Explicit formula (Weil distribution)
+  → Averaged Goldbach sum Σ (G(2N) - J(2N))
+  → Granville's theorem: RH ⇔ averaged Goldbach bound
+```
+
+### Background: Granville's Equivalence
+
+Granville (2007) proved that the Riemann Hypothesis is equivalent to:
+$$\sum_{2N \leq x} (G(2N) - J(2N)) \ll x^{3/2 + o(1)}$$
+
+where:
+- $G(2N) = \sum_{p+q=2N} \log p \cdot \log q$ is the weighted Goldbach count
+- $J(2N) = 2N \cdot \prod_{p \mid 2N} \frac{p-1}{p-2} \cdot \prod_{p>2} \left(1 - \frac{1}{(p-1)^2}\right)$ is the Hardy–Littlewood singular series prediction
+
+This is an *averaged* statement — exactly the kind of structure our spectral work operates in (Friedli constant 1.1367 is also an averaged quantity from the spectral zeta functional equation).
+
+### Connection to Our Discoveries
+
+| Our Finding | Goldbach Connection |
+|---|---|
+| **Friedli constant ≈ 1.1367** (Exp 15b) | Spectral zeta averaged derivative — same averaging structure as Granville's Goldbach average |
+| **Pizer's theorem**: Brandt eigenvalues = Hecke eigenvalues | Links Cayley graph spectra directly to modular form coefficients, which shape L-functions controlling explicit formula error terms |
+| **GNN fails at pointwise prediction, ML succeeds at statistical** (Exps 1-7, 9-10) | Deep patterns in number theory reveal themselves through averages, not pointwise values — consistent with Granville's averaged Goldbach |
+| **Hecke traces predict L-function zeros** (Exp 12: GAT R²=0.731) | Validates the modular form → L-function → zero statistics chain |
+| **GUE/GOE zero statistics by dimension** (Exp L, R) | Random matrix structure in L-function zeros — relevant to explicit formula error terms |
+
+### Three Concrete Research Directions
+
+#### Direction A: Friedli Constant for Cyclic Groups (Control Experiment)
+
+Compute the Friedli derivative $\frac{d}{d\sigma} \log R_{Z/nZ}(\sigma)$ at $\sigma=0.5$ for cyclic Cayley graphs $Z/nZ$. Since Friedli's theorem shows the spectral zeta of $Z/nZ$ converges to $\zeta_Z(s) + \zeta(2s) \cdot n^{-2s}$ which has a functional equation at $s=1/2$, the derivative should **vanish** in the limit $n \to \infty$.
+
+**Prediction**: $d(\log R)/d\sigma \to 0$ for $Z/nZ$, confirming 1.1367 is a non-abelian invariant specific to SL(2,F_p).
+
+**Script**: `scripts/compute_friedli_cyclic.py` (pending implementation)
+
+#### Direction B: Spectral Gap × Hecke Trace Correlation (PRIMARY)
+
+Test whether SL(2,F_p) Cayley spectral gaps correlate with Hecke trace statistics of newforms at level p. Uses Pizer's theorem as theoretical anchor.
+
+**Method**:
+1. Hardcode spectral gaps for p=2..79 (from experiment log) + Friedli slopes for p=2,3,5,7,11,13
+2. Load LMFDB 53k newforms CSV, aggregate by level p → compute mean a₂ trace, mean rank, mean a₂/2√p (Deligne-normalized)
+3. Compute Pearson r between spectral gap and each Hecke aggregate
+4. Generate 4 diagnostic plots
+5. Produce JSON summary for documentation
+
+**Script**: `scripts/spectral_gap_hecke_correlation.py` (written, ~150 lines)
+**Status**: Blocked on Docker build + LMFDB data collection
+
+#### Direction C: Granville's Theorem Formalization in Lean
+
+Formalize the statement "RH ⇔ averaged Goldbach bound" in `lean/Riemann/RiemannHypothesis.lean` or a new `lean/Riemann/GoldbachBridge.lean`.
+
+Requires: Lean formalization of Goldbach count functions, Hardy–Littlewood singular series, and the asymptotic bound. This is a research-level formalization task — the Granville proof uses analytic number theory (explicit formula, contour integration) not yet in mathlib.
+
+**Ideal approach**: Decompose as:
+1. Define $G(2N)$ and $J(2N)$ as Lean functions
+2. Connect to $\zeta(s)$ via the explicit formula (Fujii formula)
+3. Formalize Granville's equivalence using mathlib's `RiemannHypothesis`  
+4. Add as `Theorem BridgeC` in `RiemannHypothesis.lean`
+
+### Files
+
+| File | Purpose | Status |
+|---|---|---|
+| `scripts/spectral_gap_hecke_correlation.py` | Direction B: correlation analysis (spectral gaps × Hecke traces) | ✅ Written |
+| `scripts/compute_friedli_cyclic.py` | Direction A: cyclic Friedli constant | 📝 Pending |
+| `lean/Riemann/RiemannHypothesis.lean` | Direction C target: Granville formalization | 📝 Pending |
+
+### Next Steps
+
+1. `docker compose build research && docker compose up -d` — build Docker
+2. `docker compose exec research python scripts/collect_lmfdb_sql.py --max-level 1000` — collect LMFDB data
+3. `docker compose exec research python scripts/spectral_gap_hecke_correlation.py` — run Exp 16
+4. Document results in this log; decide whether Direction A or C is more impactful
+
+---
+

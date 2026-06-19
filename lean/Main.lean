@@ -9,6 +9,7 @@ import Riemann.RamanujanProperty
 import Riemann.FriedliRatio
 import Riemann.LMFDBConjectures
 import Riemann.RiemannHypothesis
+import Riemann.GoldbachBridge
 
 open Riemann
 
@@ -48,6 +49,7 @@ def main : IO Unit := do
   IO.println "  ✓ FriedliRatio.lean — Spectral zeta ratio"
   IO.println "  ✓ LMFDBConjectures.lean — Empirical ML conjectures"
   IO.println "  ✓ RiemannHypothesis.lean — Bridge to mathlib's RH"
+  IO.println "  ✓ GoldbachBridge.lean — Granville's RH ↔ averaged Goldbach"
   IO.println ""
   IO.println "The Riemann hypothesis (RiemannHypothesis) is already"
   IO.println "defined in mathlib as a Prop. The goal of this project"

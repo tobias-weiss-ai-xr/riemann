@@ -525,14 +525,259 @@ theorem isConnected : (cayleyGraph p).Connected := by
     (Subgroup.closure_le (k := generators p) (K := reachableFromOneSubgroup p)).mpr
       h_gens_in_reachable
   have h_full : Subgroup.closure (generators p : Set (SL2Fp p)) = ⊤ := by
-    -- S = [[0,-1],[1,0]] and R = [[1,1],[0,1]] generate SL(2,F_p).
-    -- This is a standard group theory fact: they generate the elementary
-    -- matrices [[1,k],[0,1]] and [[1,0],[k,1]], which generate SL(2,F_p)
-    -- via Gauss-Jordan elimination. The proof is deferred as it requires
-    -- a constructive reduction algorithm for 2×2 matrices over Z/pZ.
-    -- See e.g. Serre, "Trees" (SL(2,Z) generation) or Dieudonné,
-    -- "The Classical Groups" (elementary matrices generate SL(n,F)).
-    sorry
+    let H := Subgroup.closure (generators p : Set (SL2Fp p))
+    have hS : generatorS p ∈ H :=
+      Subgroup.subset_closure (by simp [generators])
+    have hR : generatorR p ∈ H :=
+      Subgroup.subset_closure (by simp [generators])
+    have hSinv : (generatorS p)⁻¹ ∈ H := H.inv_mem hS
+    have hRpow (k : ℕ) : (generatorR p) ^ k ∈ H := H.pow_mem hR k
+    -- Matrix entries of R^k
+    have hRpow_val (k : ℕ) : ((generatorR p) ^ k).val = !![1, (k : ZMod p); 0, 1] := by
+      induction k with
+      | zero =>
+        simp [generatorR, coe_one, Matrix.one_fin_two]
+      | succ k ih =>
+        have hstep : ((generatorR p) ^ (k+1)).val = !![1, (↑(k+1) : ZMod p); 0, 1] := by
+          calc
+            ((generatorR p) ^ (k+1)).val = (((generatorR p) ^ k) * (generatorR p)).val := by
+              rw [pow_succ]
+            _ = ((generatorR p) ^ k).val * (generatorR p).val := by simp
+            _ = !![1, (k : ZMod p); 0, 1] * !![1, 1; 0, 1] := by rw [ih, generatorR]
+            _ = !![1, (↑k + 1 : ZMod p); 0, 1] := by
+              rw [Matrix.mul_fin_two]; simp [add_comm]
+            _ = !![1, (↑(k+1) : ZMod p); 0, 1] := by simp
+        exact hstep
+    -- Lemma: (t.val : ZMod p) = t
+    have h_val_cast (t : ZMod p) : (t.val : ZMod p) = t := by
+      simpa using ZMod.nat_cast_zmod_val t
+    -- Inverse of generatorS
+    have hSinv_val : ((generatorS p)⁻¹).val = !![0, 1; -1, 0] := by
+      have := SL2_inv_expl (generatorS p)
+      simpa [generatorS] using congrArg Subtype.val this
+    -- Diagonal matrices diag(t, t⁻¹) are in H
+    have h_diag (t : ZMod p) (ht : t ≠ 0) :
+        (⟨!![t, 0; 0, t⁻¹], by
+          rw [det_fin_two_of]; have h_mul : t * t⁻¹ = 1 := mul_inv_cancel₀ ht; simp [h_mul]⟩ : SL2Fp p) ∈ H := by
+      set n := t.val with hn_def
+      set m := (t⁻¹).val with hm_def
+      have hn_val : (n : ZMod p) = t := by
+        rw [hn_def, h_val_cast]
+      have hm_val : (m : ZMod p) = t⁻¹ := by
+        rw [hm_def, h_val_cast]
+      have h_prod : (generatorS p)⁻¹ * (generatorR p) ^ m * (generatorS p) *
+          (generatorR p) ^ n * (generatorS p) * (generatorR p) ^ m ∈ H := by
+        repeat' apply H.mul_mem
+        · exact hSinv
+        · exact hRpow m
+        · exact hS
+        · exact hRpow n
+        · exact hS
+        · exact hRpow m
+      -- Show this product equals the diagonal matrix
+      have h_eq_val : ((generatorS p)⁻¹ * (generatorR p) ^ m * (generatorS p) *
+          (generatorR p) ^ n * (generatorS p) * (generatorR p) ^ m).val = !![t, 0; 0, t⁻¹] := by
+        calc
+          ((generatorS p)⁻¹ * (generatorR p) ^ m * (generatorS p) *
+            (generatorR p) ^ n * (generatorS p) * (generatorR p) ^ m).val
+              = ((generatorS p)⁻¹).val * ((generatorR p) ^ m).val * (generatorS p).val *
+                ((generatorR p) ^ n).val * (generatorS p).val * ((generatorR p) ^ m).val := by
+            simp [coe_mul]
+          _ = !![0, 1; -1, 0] * !![1, (m : ZMod p); 0, 1] * !![0, -1; 1, 0] *
+              !![1, (n : ZMod p); 0, 1] * !![0, -1; 1, 0] * !![1, (m : ZMod p); 0, 1] := by
+            simp [generatorS, hRpow_val, hSinv_val]
+          _ = !![0, 1; -1, 0] * !![1, t⁻¹; 0, 1] * !![0, -1; 1, 0] *
+              !![1, t; 0, 1] * !![0, -1; 1, 0] * !![1, t⁻¹; 0, 1] := by
+            simp [hn_val, hm_val]
+          _ = !![t, 0; 0, t⁻¹] := by
+            calc
+              !![0, 1; -1, 0] * !![1, t⁻¹; 0, 1] * !![0, -1; 1, 0] *
+                !![1, t; 0, 1] * !![0, -1; 1, 0] * !![1, t⁻¹; 0, 1]
+                  = ((!![0, 1; -1, 0] * !![1, t⁻¹; 0, 1]) * !![0, -1; 1, 0]) *
+                    !![1, t; 0, 1] * !![0, -1; 1, 0] * !![1, t⁻¹; 0, 1] := by ring
+              _ = (!![0, 1; -1, -t⁻¹] * !![0, -1; 1, 0]) *
+                    !![1, t; 0, 1] * !![0, -1; 1, 0] * !![1, t⁻¹; 0, 1] := by
+                rw [Matrix.mul_fin_two]; simp
+              _ = !![1, 0; -t⁻¹, 1] *
+                    !![1, t; 0, 1] * !![0, -1; 1, 0] * !![1, t⁻¹; 0, 1] := by
+                rw [Matrix.mul_fin_two]; simp
+              _ = (!![1, 0; -t⁻¹, 1] * !![1, t; 0, 1]) * !![0, -1; 1, 0] * !![1, t⁻¹; 0, 1] := by ring
+              _ = !![1, t; -t⁻¹, -t⁻¹*t + 1] * !![0, -1; 1, 0] * !![1, t⁻¹; 0, 1] := by
+                rw [Matrix.mul_fin_two]; simp
+              _ = (!![1, t; -t⁻¹, -t⁻¹*t + 1] * !![0, -1; 1, 0]) * !![1, t⁻¹; 0, 1] := by ring
+              _ = !![t, -1; -t⁻¹*t + 1, t⁻¹] * !![1, t⁻¹; 0, 1] := by
+                rw [Matrix.mul_fin_two]; simp
+              _ = !![t, t*t⁻¹ - 1; -t⁻¹*t + 1, (-t⁻¹*t + 1)*t⁻¹ + t⁻¹] := by
+                rw [Matrix.mul_fin_two]
+                simp [mul_comm, add_comm, sub_eq_add_neg]
+              _ = !![t, 0; 0, t⁻¹] := by
+                have h_mul : t * t⁻¹ = 1 := mul_inv_cancel₀ ht
+                have h_mul' : t⁻¹ * t = 1 := by rw [mul_comm, h_mul]
+                ext <;> simp [h_mul, h_mul', mul_comm, add_comm]
+      have h_eq : ((generatorS p)⁻¹ * (generatorR p) ^ m * (generatorS p) *
+          (generatorR p) ^ n * (generatorS p) * (generatorR p) ^ m : SL2Fp p) =
+          (⟨!![t, 0; 0, t⁻¹], by
+            rw [det_fin_two_of]; have h_mul : t * t⁻¹ = 1 := mul_inv_cancel₀ ht; simp [h_mul]⟩ : SL2Fp p) :=
+        Subtype.ext h_eq_val
+      rw [h_eq] at h_prod
+      exact h_prod
+    -- Now show every SL(2,F_p) matrix is in H via Gauss-Jordan reduction
+    apply (Subgroup.eq_top_iff' (H := H)).mpr
+    intro g
+    induction g using Matrix.SpecialLinearGroup.fin_two_induction with
+    | h a b c d hdet =>
+      have had : a * d - b * c = 1 := hdet
+      by_cases hc : c = 0
+      · -- Case c = 0: then ad = 1, so d = a⁻¹ and a ≠ 0
+        have ha0 : a ≠ 0 := by
+          intro ha0
+          have : a * d = 0 := by simp [ha0]
+          have hzero : a * d - b * c = 0 := by simp [hc, this]
+          rw [hzero] at had
+          exact zero_ne_one had
+        have ha_mul_ad : a * d = 1 := by
+          calc
+            a * d = a * d - b * c := by simp [hc]
+            _ = 1 := had
+        have ha_inv_mul : a⁻¹ * a = 1 := by
+          calc
+            a⁻¹ * a = a * a⁻¹ := mul_comm _ _
+            _ = 1 := mul_inv_cancel₀ ha0
+        have hd : d = a⁻¹ := by
+          calc
+            d = 1 * d := by simp
+            _ = (a⁻¹ * a) * d := by simp [ha_inv_mul]
+            _ = a⁻¹ * (a * d) := by ring
+            _ = a⁻¹ * 1 := by rw [ha_mul_ad]
+            _ = a⁻¹ := by simp
+        -- A = [[a, b], [0, a⁻¹]]. Right-multiply by R^(-b*a⁻¹) to get diag(a, a⁻¹)
+        let A_diag : SL2Fp p := ⟨!![a, 0; 0, a⁻¹], by
+          rw [det_fin_two_of]; have ha_mul : a * a⁻¹ = 1 := mul_inv_cancel₀ ha0; simp [ha_mul]⟩
+        have hA_eq_val : (⟨!![a, b; 0, a⁻¹], by
+            rw [det_fin_two_of]; have ha_mul : a * a⁻¹ = 1 := mul_inv_cancel₀ ha0; simp [ha_mul]⟩ : SL2Fp p).val =
+            (A_diag * (generatorR p) ^ ((b * a⁻¹).val : ℕ)).val := by
+          calc
+            (⟨!![a, b; 0, a⁻¹], by
+                rw [det_fin_two_of]; have ha_mul : a * a⁻¹ = 1 := mul_inv_cancel₀ ha0; simp [ha_mul]⟩ : SL2Fp p).val
+                = !![a, b; 0, a⁻¹] := rfl
+            _ = A_diag.val * ((generatorR p) ^ ((b * a⁻¹).val : ℕ)).val := by
+              calc
+                !![a, b; 0, a⁻¹] = !![a, 0; 0, a⁻¹] * !![1, b*a⁻¹; 0, 1] := by
+                  rw [Matrix.mul_fin_two]
+                  have ha_mul' : a * a⁻¹ = 1 := mul_inv_cancel₀ ha0
+                  have h_eq : a * (b * a⁻¹) = b := by
+                    calc
+                      a * (b * a⁻¹) = (a * b) * a⁻¹ := by simp [mul_assoc]
+                      _ = (b * a) * a⁻¹ := by rw [mul_comm a b]
+                      _ = b * (a * a⁻¹) := by simp [mul_assoc]
+                      _ = b * 1 := by rw [ha_mul']
+                      _ = b := by simp
+                  simp [ha_mul', h_eq]
+                _ = A_diag.val * ((generatorR p) ^ ((b * a⁻¹).val : ℕ)).val := by
+                  simp [A_diag, hRpow_val ((b * a⁻¹).val), h_val_cast (b * a⁻¹)]
+            _ = (A_diag * (generatorR p) ^ ((b * a⁻¹).val : ℕ)).val := by simp
+        have hA_eq : (⟨!![a, b; 0, a⁻¹], by
+            rw [det_fin_two_of]; have ha_mul : a * a⁻¹ = 1 := mul_inv_cancel₀ ha0; simp [ha_mul]⟩ : SL2Fp p) =
+            A_diag * (generatorR p) ^ ((b * a⁻¹).val : ℕ) :=
+          Subtype.ext hA_eq_val
+        have hA_target : (⟨!![a, b; c, d], by rwa [det_fin_two_of]⟩ : SL2Fp p) =
+            (⟨!![a, b; 0, a⁻¹], by
+              rw [det_fin_two_of]; have ha_mul : a * a⁻¹ = 1 := mul_inv_cancel₀ ha0; simp [ha_mul]⟩ : SL2Fp p) := by
+          ext; simp [hc, hd]
+        rw [hA_target, hA_eq]
+        exact H.mul_mem (h_diag a ha0) (hRpow ((b * a⁻¹).val : ℕ))
+      · -- Case c ≠ 0: use Bruhat decomposition R^x * D * S * R^y = A
+        have hc0 : c ≠ 0 := hc
+        have hc_inv : c⁻¹ ≠ 0 := inv_ne_zero hc0
+        -- Set x = a*c⁻¹, y = d*c⁻¹, D = diag(c⁻¹, c)
+        set x := a * c⁻¹ with hx_def
+        set y := d * c⁻¹ with hy_def
+        have h_c_inv_mul : c⁻¹ * c = 1 := by
+          calc
+            c⁻¹ * c = c * c⁻¹ := mul_comm _ _
+            _ = 1 := mul_inv_cancel₀ hc0
+        have hD_det : det !![c⁻¹, 0; 0, c] = 1 := by
+          rw [det_fin_two_of]
+          simp [h_c_inv_mul]
+        let D : SL2Fp p := ⟨!![c⁻¹, 0; 0, c], hD_det⟩
+        have hA_expr : (⟨!![a, b; c, d], by rwa [det_fin_two_of]⟩ : SL2Fp p) =
+            (generatorR p) ^ (x.val : ℕ) * D * (generatorS p) * (generatorR p) ^ (y.val : ℕ) := by
+          apply Subtype.ext
+          calc
+            (⟨!![a, b; c, d], by rwa [det_fin_two_of]⟩ : SL2Fp p).val = !![a, b; c, d] := rfl
+            _ = !![1, a * c⁻¹; 0, 1] * !![c⁻¹, 0; 0, c] * !![0, -1; 1, 0] * !![1, d * c⁻¹; 0, 1] :=
+              (calc
+                !![1, a * c⁻¹; 0, 1] * !![c⁻¹, 0; 0, c] * !![0, -1; 1, 0] * !![1, d * c⁻¹; 0, 1]
+                    = ((!![1, a*c⁻¹; 0, 1] * !![c⁻¹, 0; 0, c]) * !![0, -1; 1, 0]) *
+                      !![1, d*c⁻¹; 0, 1] := by ring
+                _ = (!![c⁻¹, a*c⁻¹*c; 0, c] * !![0, -1; 1, 0]) *
+                      !![1, d*c⁻¹; 0, 1] := by
+                  rw [Matrix.mul_fin_two]; simp
+                _ = !![a*c⁻¹*c, -c⁻¹; c, 0] * !![1, d*c⁻¹; 0, 1] := by
+                  rw [Matrix.mul_fin_two]; simp
+                _ = !![a*c⁻¹*c, a*c⁻¹*c*d*c⁻¹ - c⁻¹; c, c*d*c⁻¹] := by
+                  rw [Matrix.mul_fin_two]; simp [mul_assoc, h_c_inv_mul, sub_eq_add_neg]
+                _ = !![a, b; c, d] := by
+                  ext i j <;> fin_cases i <;> fin_cases j
+                  · -- (0,0): a*c⁻¹*c = a
+                    calc
+                      a*c⁻¹*c = a*(c⁻¹*c) := by simp [mul_assoc]
+                      _ = a*1 := by rw [h_c_inv_mul]
+                      _ = a := by simp
+                  · -- (0,1): a*c⁻¹*c*d*c⁻¹ - c⁻¹ = b
+                    calc
+                      a*c⁻¹*c*d*c⁻¹ - c⁻¹ = (a*(c⁻¹*c))*d*c⁻¹ - c⁻¹ := by simp [mul_assoc]
+                      _ = (a*1)*d*c⁻¹ - c⁻¹ := by rw [h_c_inv_mul]
+                      _ = a*d*c⁻¹ - c⁻¹ := by simp
+                      _ = (a*d)*c⁻¹ - 1*c⁻¹ := by simp
+                      _ = (a*d - 1)*c⁻¹ := by rw [sub_mul]
+                      _ = (b*c)*c⁻¹ := by
+                        have had_eq : a*d - 1 = b*c := by
+                          calc
+                            a*d - 1 = (a*d - b*c) + b*c - 1 := by ring
+                            _ = 1 + b*c - 1 := by rw [had]
+                            _ = b*c := by ring
+                        rw [had_eq]
+                      _ = b*(c*c⁻¹) := by simp [mul_assoc]
+                      _ = b*1 := by rw [mul_inv_cancel₀ hc0]
+                      _ = b := by simp
+                  · -- (1,0): c = c
+                    rfl
+                  · -- (1,1): c*d*c⁻¹ = d
+                    calc
+                      c*d*c⁻¹ = d*c*c⁻¹ := by rw [mul_comm c d]
+                      _ = d*(c*c⁻¹) := by simp [mul_assoc]
+                      _ = d*1 := by rw [mul_inv_cancel₀ hc0]
+                      _ = d := by simp
+              ).symm
+            _ = !![1, (x.val : ZMod p); 0, 1] * !![c⁻¹, 0; 0, c] *
+                !![0, -1; 1, 0] * !![1, (y.val : ZMod p); 0, 1] := by
+              simp [hx_def, hy_def, h_val_cast]
+            _ = ((generatorR p) ^ (x.val : ℕ)).val * D.val * (generatorS p).val *
+                ((generatorR p) ^ (y.val : ℕ)).val := by
+              rw [hRpow_val (x.val), hRpow_val (y.val)]
+              simp [D, generatorS]
+            _ = ((generatorR p) ^ (x.val : ℕ) * D * (generatorS p) * (generatorR p) ^ (y.val : ℕ)).val := by
+              simp [coe_mul]
+        rw [hA_expr]
+        repeat' apply Subgroup.mul_mem
+        · exact hRpow (x.val)
+        · have hD_mem : D ∈ H := by
+            have h_diag' := h_diag c⁻¹ hc_inv
+            have h_eq : D = (⟨!![c⁻¹, 0; 0, (c⁻¹)⁻¹], by
+              calc
+                det !![c⁻¹, 0; 0, (c⁻¹)⁻¹] = c⁻¹ * (c⁻¹)⁻¹ - 0 * 0 := by
+                  rw [det_fin_two_of]
+                _ = c⁻¹ * c := by simp [inv_inv]
+                _ = 1 := h_c_inv_mul
+              ⟩ : SL2Fp p) := by
+              apply Subtype.ext
+              simp [D, inv_inv]
+            rw [h_eq]
+            exact h_diag'
+          exact hD_mem
+        · exact hS
+        · exact hRpow (y.val)
   have h_all_reachable : ∀ g : SL2Fp p, (cayleyGraph p).Reachable (1 : SL2Fp p) g := by
     intro g
     have hg_top : g ∈ (⊤ : Subgroup (SL2Fp p)) := Subgroup.mem_top g

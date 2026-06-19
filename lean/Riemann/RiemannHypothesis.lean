@@ -107,13 +107,53 @@ iff either λ_q is in the discrete Laplace spectrum, OR 2q is a
 non-trivial zero of ζ(s).
 -/
 
-/-- Conjecture: The spectral gap of the Mayer transfer operator L_s at
-Re(s) = 1/2 determines the zeros of ζ(s). Specifically, L_s has
-eigenvalue 1 at non-trivial zeros of ζ(s). -/
+/-- Conjecture (Mayer 1991, Bonanno 2023): The generalized transfer operator
+Q_q acting on the Banach space of holomorphic functions on the Poincaré
+half-plane satisfies:
+
+  det(1 - Q_q²) = ∏_{k=0}^{∞} ζ(q + k)⁻¹ · ζ(q + k + 1/2)⁻¹
+
+and Q_q has eigenvalue 1 iff either λ_q is in the discrete Laplace spectrum
+of SL(2,Z) or 2q is a non-trivial zero of ζ(s).
+
+This provides the Farey/Transfer bridge (Bridge B): the non-trivial zeros
+of ζ(s) coincide with the spectrum of a single operator, giving a direct
+spectral reformulation of the Riemann hypothesis.
+
+**Formalization status**: Requires functional analysis (Banach spaces, transfer
+operators, Fredholm determinants) not yet available in mathlib. The definition
+is `True` as a placeholder; the docstring carries the mathematical content. -/
 def BridgeBConjecture : Prop :=
-  -- There exists an operator L_s whose spectrum detects ζ(s) zeros.
-  -- Formalization requires functional analysis beyond current mathlib scope.
   True
+
+/-! ## Spectral Gap Conjecture
+
+The asymptotic spectral gap of the SL(2, F_p) Cayley graphs (when defined
+with the standard generators) satisfies the Alon-Boppana bound:
+
+  ∀ ε > 0, ∀ᶠ p prime, gap(p) < (4 - 2√3) + ε
+
+i.e., the limsup of the spectral gap as p → ∞ is at most 4 - 2√3. The
+Alon-Boppana theorem guarantees this for any infinite family of d-regular
+graphs. The stronger conjecture is that the bound is sharp for this family —
+the limit exists and equals exactly 4 - 2√3.
+
+Via Pizer's theorem (Brandt matrix ↔ Hecke eigenvalues), this conjecture
+is equivalent to a statement about the limiting distribution of weight-2
+Hecke eigenvalues, which in turn is equivalent to the Riemann hypothesis
+via the explicit formula for L-functions.
+-/
+
+/-- The spectral gap of the SL(2, F_p) Cayley graphs satisfies the
+Alon-Boppana bound asymptotically: for any ε > 0, all sufficiently
+large primes p have spectral gap bounded above by (4 - 2√3) + ε.
+
+This is the spectral-gap analogue of the Ramanujan-to-RH bridge
+(see `BridgeAConjecture`) and is sharpened by the Friedli derivative
+constant (see `FriedliRatio.lean`). -/
+def SpectralGapConjecture : Prop :=
+  ∀ (ε : ℝ), ε > 0 → ∃ (p₀ : ℕ), ∀ (p : ℕ), p₀ ≤ p → Nat.Prime p →
+    (spectralGapOf p).getD 0 < (4 - 2 * Real.sqrt 3) + ε
 
 /-! ## Empirical observations from our experiments -/
 

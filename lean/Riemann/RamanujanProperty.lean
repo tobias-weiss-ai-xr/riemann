@@ -4,7 +4,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Riemann Project Contributors
 -/
 import Mathlib.Data.Real.Basic
-import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Topology.Basic
 import Riemann.CayleyGraphs
 import Riemann.SpectralGaps
