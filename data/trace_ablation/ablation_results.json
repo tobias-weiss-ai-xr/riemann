@@ -1,0 +1,13 @@
+{
+  "n_runs": 3,
+  "n_samples": 63844,
+  "mlp_r2_mean": 0.3557357488460699,
+  "mlp_r2_std": 0.0036346215996261024,
+  "noisy_r2_mean": 0.3340114671059892,
+  "noisy_r2_std": 0.0020841539272282235,
+  "colshuf_r2_mean": 0.35540663853608684,
+  "colshuf_r2_std": 0.004814003683479485,
+  "gat_reference_r2": 0.731,
+  "mlp_reference_r2": 0.714,
+  "noise_std": 0.1
+}

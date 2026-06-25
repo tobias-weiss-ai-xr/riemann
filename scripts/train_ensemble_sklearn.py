@@ -4,10 +4,12 @@ Fast training focused on best models from Exp 10/11.
 
 Usage:
     python scripts/train_ensemble_sklearn.py
+    python scripts/train_ensemble_sklearn.py --data data/lmfdb/lmfdb_incremental_ml.csv
 """
 
 from __future__ import annotations
 
+import argparse
 import sys
 from pathlib import Path
 from typing import Dict, Any
@@ -40,6 +42,19 @@ from extract_sklearn_predictions import (
 DATA_DIR = Path(__file__).parent.parent / "data"
 MODEL_DIR = DATA_DIR / "models"
 L2_CSV_PATH = DATA_DIR / "lmfdb" / "lmfdb_sql_weight2_ml.csv"
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Train sklearn ensemble (ExtraTrees for z1, XGBoost for rank/cm)",
+    )
+    parser.add_argument(
+        "--data",
+        type=str,
+        default=str(L2_CSV_PATH),
+        help=f"Path to LMFDB ML dataset CSV (default: {L2_CSV_PATH})",
+    )
+    return parser.parse_args()
 
 
 def load_and_prepare_data(df: pd.DataFrame) -> tuple:
@@ -149,7 +164,7 @@ def train_cm_model(X_train, y_train, X_test, y_test, scaler) -> Dict[str, Any]:
     }
 
 
-def main():
+def main(data_path: str | Path = L2_CSV_PATH):
     logger.remove()
     logger.add(
         sys.stderr,
@@ -158,11 +173,12 @@ def main():
     )
 
     logger.info("Ensemble sklearn model training")
-    logger.info("="*60)
+    logger.info("=" * 60)
 
     # Load data
-    logger.info(f"Loading data from {L2_CSV_PATH}")
-    df = pd.read_csv(L2_CSV_PATH)
+    data_path = Path(data_path)
+    logger.info(f"Loading data from {data_path}")
+    df = pd.read_csv(data_path)
     logger.info(f"  Loaded {len(df)} samples")
 
     # Get target columns (z1 is NOT in CSV - GNN-only target)
@@ -219,4 +235,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    args = parse_args()
+    main(data_path=args.data)

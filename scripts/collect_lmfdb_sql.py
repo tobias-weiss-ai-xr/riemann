@@ -198,7 +198,7 @@ def _safe_bool(val, default=False) -> bool:
 # ---------------------------------------------------------------------------
 
 
-def count_newforms(conn, min_level: int, max_level: int, char_order: int) -> int:
+def count_newforms(conn, min_level: int, max_level: int, char_order: int, min_dim: int = 1, max_dim: int = float("inf")) -> int:
     """Count weight-2 newforms matching the filters."""
     if char_order == 0:
         where = "weight = 2"
@@ -212,15 +212,21 @@ def count_newforms(conn, min_level: int, max_level: int, char_order: int) -> int
     else:
         level_filter = ""
 
-    query = f"SELECT count(*) FROM mf_newforms WHERE {where}{level_filter}"
-    print(f"\nCounting: {where}{level_filter}")
+    dimension_filter = ""
+    if min_dim > 1 or max_dim < float("inf"):
+        dimension_filter = f" AND dim >= {min_dim} AND dim <= {max_dim}"
+
+    query = f"SELECT count(*) FROM mf_newforms WHERE {where}{level_filter}{dimension_filter}"
+    print(f"\nCounting: {where}{level_filter}{dimension_filter}")
 
     try:
         with conn.cursor() as cur:
             cur.execute(query)
             count = cur.fetchone()[0]
+
+        dim_label = f"dim {min_dim}..{max_dim}" if (min_dim > 1 or max_dim < float("inf")) else "all dimensions"
         print(
-            f"  Found {count:,} weight-2 newforms ({label}, levels {min_level}..{max_level})"
+            f"  Found {count:,} weight-2 newforms ({label}, levels {min_level}..{max_level}, {dim_label})"
         )
         return count
     except psycopg2.Error as e:
@@ -246,6 +252,8 @@ def fetch_newforms(
     min_level: int,
     max_level: int,
     char_order: int,
+    min_dim: int = 1,
+    max_dim: int = float("inf"),
     limit: int = 0,
 ) -> list[dict]:
     """Fetch weight-2 newforms using a server-side WITH HOLD cursor.
@@ -262,6 +270,10 @@ def fetch_newforms(
         conditions.append(f"level >= {min_level}")
     if max_level < float("inf"):
         conditions.append(f"level <= {max_level}")
+    if min_dim > 1:
+        conditions.append(f"dim >= {min_dim}")
+    if max_dim < float("inf"):
+        conditions.append(f"dim <= {max_dim}")
 
     where_clause = " AND ".join(conditions)
 
@@ -462,6 +474,103 @@ def fetch_hecke_traces(
     return result
 
 
+def fetch_individual_eigenvalues(
+    conn,
+    orbit_codes: list[int],
+) -> dict[int, dict[int, list[float]]]:
+    """Fetch individual eigenvalues per embedding from mf_hecke_nf table.
+
+    The mf_hecke_nf table stores eigenvalues in the `an` column as a 2D array
+    where an[n] = [[a1, b1], [a2, b2], ...] representing number field embeddings.
+    Instead of just the trace, we want to preserve individual eigenvalues per embedding.
+
+    Args:
+        conn: Database connection.
+        orbit_codes: List of hecke_orbit_code values.
+
+    Returns:
+        Dict mapping hecke_orbit_code -> {n: [e1, e2, ..., ed], ...}
+        where n is the coefficient index (1, 2, 3, ...) and [e1, e2, ..., ed] are
+        the individual eigenvalues for each embedding.
+    """
+    if not orbit_codes:
+        return {}
+
+    result: dict[int, dict[int, list[float]]] = {}
+    total_orbits = 0
+    t0 = time.time()
+
+    # Process in batches
+    n_batches = (len(orbit_codes) + HECKE_BATCH - 1) // HECKE_BATCH
+
+    for batch_idx in range(n_batches):
+        start = batch_idx * HECKE_BATCH
+        end = min(start + HECKE_BATCH, len(orbit_codes))
+        batch_codes = orbit_codes[start:end]
+
+        # Query: get an column (array of eigenvalue vectors)
+        query = """
+            SELECT hecke_orbit_code, an
+            FROM mf_hecke_nf
+            WHERE hecke_orbit_code = ANY(%s)
+        """
+
+        try:
+            with conn.cursor() as cur:
+                cur.execute(query, (batch_codes,))
+                rows = cur.fetchall()
+
+            for row in rows:
+                code = row[0]
+                an_array = row[1]
+
+                if code not in result:
+                    result[code] = {}
+
+                if an_array is None or not isinstance(an_array, list):
+                    continue
+
+                # an_array[n] gives eigenvalues for coefficient a_n
+                for n_idx, eigenvalues in enumerate(an_array):
+                    if eigenvalues is None:
+                        result[code][n_idx] = [0.0]  # Default single eigenvalue
+                        continue
+
+                    eigenvalue_list = []
+                    if isinstance(eigenvalues, (int, float)):
+                        # Simple scalar eigenvalue (dim=1 forms)
+                        eigenvalue_list.append(float(eigenvalues))
+                    elif isinstance(eigenvalues, list) and eigenvalues:
+                        # Number field representation: extract first component per embedding
+                        for emb in eigenvalues:
+                            if isinstance(emb, (int, float)):
+                                eigenvalue_list.append(float(emb))
+                            elif isinstance(emb, list) and len(emb) >= 1:
+                                eigenvalue_list.append(float(emb[0]))
+                            elif isinstance(emb, Decimal):
+                                eigenvalue_list.append(float(emb))
+
+                    result[code][n_idx] = eigenvalue_list
+
+                total_orbits += 1
+
+        except psycopg2.Error as e:
+            print(f"  ERROR fetching individual eigenvalues batch {batch_idx + 1}/{n_batches}: {e}")
+            conn.rollback()
+            continue
+
+        if (batch_idx + 1) % 5 == 0 or batch_idx == n_batches - 1:
+            elapsed = time.time() - t0
+            print(
+                f"  Individual eigenvalues batch {batch_idx + 1}/{n_batches}: "
+                f"{total_orbits:,} orbits processed ({elapsed:.1f}s)"
+            )
+
+    elapsed = time.time() - t0
+    print(f"  Individual eigenvalues: {len(result):,} orbits processed in {elapsed:.1f}s")
+    return result
+
+
 def build_trace_vectors(
     records: list[dict],
     hecke_traces: dict[int, dict[int, float]],
@@ -541,11 +650,24 @@ def build_json(records: list[dict]) -> Path:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     json_path = OUTPUT_DIR / "lmfdb_sql_weight2.json"
 
-    # Strip internal fields before saving
+    # Strip internal fields before saving (but keep individual_eigenvalues if present)
     clean_records = []
+    individual_eigenvalues_records = []
+
     for rec in records:
         clean = {k: v for k, v in rec.items() if k != "trace_vector"}
         clean_records.append(clean)
+
+        # Also collect records with individual eigenvalues for separate export
+        if "individual_eigenvalues" in clean and clean["individual_eigenvalues"]:
+            individual_eigenvalues_records.append({
+                "label": clean.get("label"),
+                "level": clean.get("level"),
+                "dim": clean.get("dim"),
+                "hecke_orbit_code": clean.get("hecke_orbit_code"),
+                "individual_eigenvalues": clean.get("individual_eigenvalues"),
+                "eigenvalue_dimension": clean.get("eigenvalue_dimension"),
+            })
 
     print(f"\nSaving JSON ({len(clean_records):,} records)...")
     t0 = time.time()
@@ -554,6 +676,16 @@ def build_json(records: list[dict]) -> Path:
     elapsed = time.time() - t0
     size_mb = json_path.stat().st_size / (1024 * 1024)
     print(f"  JSON saved: {json_path} ({size_mb:.1f} MB, {elapsed:.1f}s)")
+
+    # Save individual eigenvalues separately if present
+    if individual_eigenvalues_records:
+        eigenvalues_path = OUTPUT_DIR / "lmfdb_individual_eigenvalues.json"
+        print(f"\nSaving individual eigenvalues ({len(individual_eigenvalues_records):,} records)...")
+        with open(eigenvalues_path, "w", encoding="utf-8") as f:
+            json.dump(individual_eigenvalues_records, f, cls=_DecimalEncoder)
+        size_mb_eigenvalues = eigenvalues_path.stat().st_size / (1024 * 1024)
+        print(f"  Individual eigenvalues saved: {eigenvalues_path} ({size_mb_eigenvalues:.1f} MB)")
+
     return json_path
 
 
@@ -843,6 +975,18 @@ def main() -> None:
         help="Character order filter (default: 1 for trivial; 0 for ALL)",
     )
     parser.add_argument(
+        "--min-dim",
+        type=int,
+        default=1,
+        help="Minimum dimension to include (default: 1)",
+    )
+    parser.add_argument(
+        "--max-dim",
+        type=int,
+        default=float("inf"),
+        help="Maximum dimension to include (default: no limit)",
+    )
+    parser.add_argument(
         "--limit",
         type=int,
         default=0,
@@ -852,6 +996,11 @@ def main() -> None:
         "--no-traces-matrix",
         action="store_true",
         help="Skip building the large traces_matrix.npy file",
+    )
+    parser.add_argument(
+        "--individual-eigenvalues",
+        action="store_true",
+        help="Collect individual eigenvalues per embedding (for ρ₂ analysis)",
     )
     parser.add_argument(
         "--test",
@@ -869,7 +1018,14 @@ def main() -> None:
     conn = connect_db(test=args.test)
 
     # Step 2: Count (always, even in --test mode)
-    count = count_newforms(conn, args.min_level, args.max_level, args.char_order)
+    count = count_newforms(
+        conn,
+        args.min_level,
+        args.max_level,
+        args.char_order,
+        args.min_dim,
+        args.max_dim,
+    )
     hecke_count = count_hecke(conn)
 
     if args.test:
@@ -888,6 +1044,8 @@ def main() -> None:
         min_level=args.min_level,
         max_level=args.max_level,
         char_order=args.char_order,
+        min_dim=args.min_dim,
+        max_dim=args.max_dim,
         limit=args.limit,
     )
 
@@ -913,8 +1071,31 @@ def main() -> None:
 
     hecke_traces = fetch_hecke_traces(conn, orbit_codes)
 
-    # Step 5: Build trace vectors
+    # Step 5a: Collect individual eigenvalues per embedding (if requested)
+    individual_eigenvalues = {}
+    if args.individual_eigenvalues:
+        print("\nCollecting individual eigenvalues per embedding...")
+        individual_eigenvalues = fetch_individual_eigenvalues(conn, orbit_codes)
+        print(f"  Collected individual eigenvalues for {len(individual_eigenvalues):,} orbits")
+
+    # Step 5b: Build trace vectors
     records = build_trace_vectors(records, hecke_traces)
+
+    # Step 5c: Attach individual eigenvalues to records (if collected)
+    if individual_eigenvalues:
+        print("\nAttaching individual eigenvalues to records...")
+        for record in records:
+            orbit_code = _safe_int(record.get("hecke_orbit_code"))
+            if orbit_code in individual_eigenvalues:
+                record["individual_eigenvalues"] = individual_eigenvalues[orbit_code]
+                # Determine dimension from first coefficient (if available)
+                if record["individual_eigenvalues"]:
+                    first_coeff = record["individual_eigenvalues"].get(1, [])
+                    record["eigenvalue_dimension"] = len(first_coeff)
+            else:
+                record["individual_eigenvalues"] = {}
+                record["eigenvalue_dimension"] = 0
+        print("  Individual eigenvalues attached to all records")
 
     # Close DB connection
     conn.close()

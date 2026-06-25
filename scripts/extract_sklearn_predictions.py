@@ -9,6 +9,7 @@ Usage:
     python scripts/extract_sklearn_predictions.py --target rank
     python scripts/extract_sklearn_predictions.py --target cm
     python scripts/extract_sklearn_predictions.py --all
+    python scripts/extract_sklearn_predictions.py --all --data-path data/lmfdb/lmfdb_incremental_ml.csv
 """
 
 from __future__ import annotations

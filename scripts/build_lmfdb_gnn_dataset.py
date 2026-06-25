@@ -9,11 +9,12 @@ Produces two paradigms:
 Each output directory contains: train.pt, val.pt, test.pt, metadata.json
 
 Usage:
-    python scripts/build_lmfdb_gnn_dataset.py                          # Both paradigms
-    python scripts/build_lmfdb_gnn_dataset.py --paradigm trace_index   # Paradigm A only
-    python scripts/build_lmfdb_gnn_dataset.py --paradigm multiplicative  # Paradigm C only
-    python scripts/build_lmfdb_gnn_dataset.py --num-traces 100         # Subset for debug
-    python scripts/build_lmfdb_gnn_dataset.py --debug                  # Verbose + small subset
+    python scripts/build_lmfdb_gnn_dataset.py                                # Both paradigms (46K)
+    python scripts/build_lmfdb_gnn_dataset.py --csv data/lmfdb/lmfdb_incremental_ml.csv  # Use 200K
+    python scripts/build_lmfdb_gnn_dataset.py --paradigm trace_index         # Paradigm A only
+    python scripts/build_lmfdb_gnn_dataset.py --paradigm multiplicative      # Paradigm C only
+    python scripts/build_lmfdb_gnn_dataset.py --num-traces 100               # Subset for debug
+    python scripts/build_lmfdb_gnn_dataset.py --debug                        # Verbose + small subset
 """
 
 from __future__ import annotations
@@ -115,6 +116,7 @@ def compute_omega(limit: int) -> np.ndarray:
 
 def load_and_join_data(
     num_traces: int | None = None,
+    weight2_ml_path: Path = WEIGHT2_ML_PATH,
 ) -> tuple[np.ndarray, list[str], pd.DataFrame]:
     """
     Load traces matrix, labels, and join with weight2_ml + zeros_ml.
@@ -132,8 +134,8 @@ def load_and_join_data(
         labels_full: list[str] = json.load(f)
     logger.info(f"  labels.json: {len(labels_full)} entries")
 
-    logger.info("Loading weight2_ml CSV...")
-    df_ml = pd.read_csv(WEIGHT2_ML_PATH, usecols=["label", "analytic_rank", "is_cm", "dim", "level"])
+    logger.info(f"Loading weight2_ml CSV from {weight2_ml_path}...")
+    df_ml = pd.read_csv(weight2_ml_path, usecols=["label", "analytic_rank", "is_cm", "dim", "level"])
     logger.info(f"  weight2_ml: {len(df_ml)} rows")
 
     logger.info("Loading zeros_ml CSV (deduplicating)...")
@@ -769,6 +771,12 @@ def main() -> None:
         default=None,
         help="Suffix for output directory (e.g. 'cross_level')",
     )
+    parser.add_argument(
+        "--csv",
+        type=str,
+        default=None,
+        help=f"Path to LMFDB ML dataset CSV (default: {WEIGHT2_ML_PATH})",
+    )
     args = parser.parse_args()
 
     if args.debug:
@@ -788,7 +796,11 @@ def main() -> None:
     logger.info("=" * 60)
 
     # Load and join data
-    traces, labels, meta_df = load_and_join_data(num_traces=args.num_traces)
+    weight2_ml_csv = Path(args.csv) if args.csv else WEIGHT2_ML_PATH
+    traces, labels, meta_df = load_and_join_data(
+        num_traces=args.num_traces,
+        weight2_ml_path=weight2_ml_csv,
+    )
     ranks = meta_df["analytic_rank"].values
 
     # Stratified split
