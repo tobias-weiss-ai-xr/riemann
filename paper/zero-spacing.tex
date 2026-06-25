@@ -1,0 +1,532 @@
+\documentclass[11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{caption}
+\usepackage[numbers]{natbib}
+
+\newtheorem{definition}{Definition}
+\newtheorem{conjecture}{Conjecture}
+
+\DeclareMathOperator{\SL}{SL}
+\DeclareMathOperator{\GL}{GL}
+\DeclareMathOperator{\ord}{ord}
+\DeclareMathOperator{\Tr}{Tr}
+\DeclareMathOperator{\Gal}{Gal}
+
+\newcommand{\Fp}{\mathbb{F}_p}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Hhalf}{\mathbb{H}}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!70!black,
+  citecolor=blue!70!black,
+  urlcolor=blue!70!black,
+  pdftitle={Dimension-Dependent Spectral Statistics of L-Function Zeros},
+  pdfauthor={Tobias Weiss},
+}
+
+\title{Dimension-Dependent Spectral Statistics of $L$-Function Zeros:
+  A Brody Distribution Analysis of 63\,844 Newforms}
+
+\author{Tobias Weiss \\ \texttt{tobias@tobias-weiss.org}}
+
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+We analyze the nearest-neighbor spacing statistics of the first ten
+$L$-function zeros for 63\,844 weight-2 newforms from the LMFDB
+(568\,708 spacings), fitting the Brody distribution
+$P(s;\beta)=(\beta+1)a s^\beta\exp(-a s^{\beta+1})$ via maximum
+likelihood estimation with 2\,000-fold bootstrap resampling.
+Aggregate analysis yields $\beta\approx0.62$, suggesting intermediate
+level repulsion.  However, stratifying by Hecke field dimension
+reveals a \textbf{sharp dimension split}: one-dimensional Galois
+representations (CM forms) exhibit $\beta\approx1.88$ --- consistent
+with GUE ($\beta=2$) quadratic repulsion --- while forms of dimension
+$d\ge2$ yield $\beta\approx0.24$, near-Poisson ($\beta=0$) with
+essentially no level repulsion.  The aggregate $\beta\approx0.62$ is a
+mixing artifact of these two populations.  Cohen's $d = 8.808$ and a
+$z$-score of $101.6\sigma$ confirm the separation at extreme
+significance levels.  This dimensional transition --- GUE for $d=1$,
+near-Poisson for $d\ge2$ --- is not predicted by existing random matrix
+theory for $L$-functions and suggests that Hecke field degree is the
+dominant structural determinant of zero statistics, superseding
+analytic rank.
+\end{abstract}
+
+% ============================================================
+\section{Introduction}
+\label{sec:intro}
+% ============================================================
+
+The Montgomery--Odlyzko law \cite{montgomery1973, odlyzko1987}
+conjectures that the non-trivial zeros of the Riemann zeta function are
+distributed like the eigenvalues of random Hermitian matrices from the
+Gaussian Unitary Ensemble (GUE).  Numerical evidence extending to
+$10^{23}$ zeros strongly supports this \cite{odlyzko1989}.  The Katz--
+Sarnak philosophy \cite{katz1999} generalizes this to families of
+$L$-functions: in the limit of large conductor, zero statistics within
+a family are governed by the symmetry type of the family's monodromy
+group.
+
+However, classical random matrix theory (RMT) predictions for
+$L$-function zeros operate at the level of $n$-level correlations
+\cite{rudnick1996}, which are insensitive to the nearest-neighbor
+spacing distribution in the large-matrix limit.  The Brody
+distribution \cite{brody1973} --- a one-parameter interpolation between
+Poisson ($\beta=0$, no repulsion) and GUE ($\beta=2$, quadratic
+repulsion) --- has been extensively used in nuclear physics to
+characterize level statistics of quantum systems \cite{brody1981},
+and more recently in quantum chaos \cite{gutzwiller1990}.  Its
+application to $L$-function zeros is comparatively recent.
+
+This paper presents a large-scale Brody distribution analysis of the
+first ten zeros of 63\,844 weight-2 newforms from the LMFDB
+\cite{lmfdb}, totaling 568\,708 nearest-neighbor spacings.  Our central
+finding is that the level repulsion parameter $\beta$ is not universal
+but depends critically on the Galois dimension of the associated
+Hecke field:
+
+\begin{itemize}
+  \item \textbf{dim = 1} (CM forms): $\beta \approx 1.88$ ---
+    indistinguishable from GUE ($\beta=2$), bootstrap 95\% confidence
+    interval $[1.870,\,1.888]$.
+  \item \textbf{dim $\ge$ 2} (non-CM forms): $\beta \approx 0.24$ ---
+    near-Poisson ($\beta=0$), bootstrap 95\% CI $[0.238,\,0.246]$.
+  \item \textbf{Aggregate}: $\beta \approx 0.62$ --- a mixing artifact
+    that masks the true bimodal structure.
+  \item \textbf{Rank split}: analytic rank 0 ($\beta\approx0.68$)
+    versus rank 1 ($\beta\approx0.54$) --- intermediate values that
+    reflect the dimension composition of each rank group rather than an
+    independent effect.
+\end{itemize}
+
+The separation is confirmed at extreme statistical significance:
+Cohen's $d = 8.808$ and $z = 101.6\sigma$ for the difference in
+GUE-preference fraction between $d=1$ and $d\ge2$ populations.
+
+This result challenges the implicit assumption of spectral universality
+across $L$-function families and identifies Hecke field dimension as
+the dominant structural determinant of zero spacing statistics.
+
+% ============================================================
+\section{Mathematical Background}
+\label{sec:background}
+% ============================================================
+
+\subsection{$L$-Function Zeros and Random Matrix Theory}
+
+For a weight-$k$ newform $f$ of level $N$ with normalized Hecke
+eigenvalues $a_n(f)$, the associated $L$-function is
+\begin{equation}
+L(f,s) = \sum_{n=1}^\infty a_n(f) n^{-s},
+\end{equation}
+which extends meromorphically to $\C$ and satisfies a functional
+equation relating $s$ to $1-s$.  The Generalized Riemann Hypothesis
+(GRH) asserts that all non-trivial zeros lie on the critical line
+$\Re(s) = 1/2$.
+
+For a collection of $m$ consecutive non-trivial zeros
+$z_1 < z_2 < \cdots < z_m$ on the critical line, the nearest-neighbor
+spacings are
+\begin{equation}
+\Delta z_k = z_{k+1} - z_k, \qquad k = 1,\ldots,m-1.
+\end{equation}
+To compare across $L$-functions with different mean densities, we
+unfold by the mean spacing $\bar{\Delta}$:
+\begin{equation}
+s_k = \Delta z_k / \bar{\Delta},
+\end{equation}
+such that the unfolded spacings have unit mean.
+
+\subsection{The Brody Distribution}
+
+The Brody distribution \cite{brody1973} is a one-parameter family of
+probability densities on $[0,\infty)$:
+\begin{equation}
+P(s;\beta) = (\beta+1)\, a\, s^{\beta} \exp\!\bigl(-a\, s^{\beta+1}\bigr),
+\label{eq:brody}
+\end{equation}
+where
+\begin{equation}
+a = \Gamma\!\left(\frac{\beta+2}{\beta+1}\right)^{\beta+1}
+\end{equation}
+enforces unit mean.  The parameter $\beta$ interpolates between
+three canonical regimes:
+\begin{itemize}
+  \item $\beta = 0$: Poisson process (no level repulsion)
+  \item $\beta = 1$: GOE / Wigner surmise (linear repulsion)
+  \item $\beta = 2$: GUE (quadratic repulsion)
+\end{itemize}
+Maximum likelihood estimation of $\beta$ is performed via bounded
+scalar optimization of the negative log-likelihood over $\beta\in[0,3]$.
+
+% ============================================================
+\section{Data and Methodology}
+\label{sec:method}
+% ============================================================
+
+\subsection{Data Source}
+
+We use the LMFDB \cite{lmfdb} collection of weight-2 newforms
+(conductor range $N \leq 400\,000$).  The dataset contains
+63\,844 forms with at least 10 computed $L$-function zeros,
+yielding 568\,708 nearest-neighbor spacings.
+
+Each form is labeled by:
+\begin{itemize}
+  \item \textbf{Hecke field dimension} $d$: the degree of the number
+    field generated by its Hecke eigenvalues.  $d=1$ corresponds to
+    CM (complex multiplication) forms.
+  \item \textbf{Analytic rank} $r$: the order of vanishing of
+    $L(f,s)$ at $s=1/2$.
+\end{itemize}
+Table~\ref{tab:composition} shows the dataset composition by
+dimension and rank.
+
+\begin{table}[ht]
+\centering
+\caption{Dataset composition by Galois dimension and analytic rank.}
+\label{tab:composition}
+\begin{tabular}{lrr}
+\toprule
+Group & Forms & Spacings \\
+\midrule
+All forms & 63\,844 & 568\,708 \\
+$d=1$ (CM) & \phantom{0}6\,780 & \phantom{0}53\,404 \\
+$d\ge2$ (non-CM) & 57\,064 & 515\,304 \\
+Rank 0 & 38\,624 & 372\,723 \\
+Rank 1 & 20\,447 & 163\,640 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Preprocessing}
+
+\begin{enumerate}
+  \item Extract the 10 lowest $L$-function zeros $z_1,\ldots,z_{10}$
+    for each form (LMFDB computed zeros).
+  \item Compute nearest-neighbor spacings $\Delta z_k = z_{k+1} - z_k$.
+  \item Unfold per form: $s_k = \Delta z_k / \bar{\Delta}$, where
+    $\bar{\Delta}$ is the mean spacing for that form.
+  \item Remove NaN forms (forms with uncomputed zeros).
+  \item Filter outliers: keep only $s_k < 10$ (corresponds to
+    $<10\times$ mean spacing).
+\end{enumerate}
+
+\subsection{Maximum Likelihood Estimation}
+
+For each group $G$, we estimate $\beta$ by minimizing the negative
+log-likelihood:
+\begin{equation}
+\hat\beta_G = \argmin_{\beta\in[0,3]} \sum_{k\in G}
+-\log P(s_k;\beta).
+\end{equation}
+
+We report:
+\begin{itemize}
+  \item MLE $\hat\beta$
+  \item Bootstrap mean and 95\% percentile interval (2\,000 resamples)
+  \item Kolmogorov--Smirnov distance to the fitted Brody CDF
+  \item KS distance to three null CDFs: Poisson ($\beta=0$),
+    GOE ($\beta=1$), and GUE ($\beta=2$)
+\end{itemize}
+
+% ============================================================
+\section{Results}
+\label{sec:results}
+% ============================================================
+
+\subsection{Brody $\beta$ Estimates}
+
+Table~\ref{tab:brody} presents the main results.
+
+\begin{table}[ht]
+\centering
+\caption{Brody $\beta$ estimates (MLE with 95\% bootstrap CI) and KS
+distances to null distributions.  Bold rows highlight the primary
+dimension-split result.}
+\label{tab:brody}
+\begin{tabular}{lcccccc}
+\toprule
+Group & $\beta_\text{MLE}$ & Bootstrap mean & 95\% CI & KS(fit) & KS(Poisson) & KS(GUE) \\
+\midrule
+All      & 0.620 & 0.619 & $[0.615,\,0.624]$ & 0.044 & 0.187 & 0.125 \\
+\midrule
+\textbf{$d=1$} &
+  \textbf{1.879} & \textbf{1.878} &
+  \textbf{$[1.870,\,1.888]$} & \textbf{0.014} & 0.312 &
+  \textbf{0.017} \\
+\textbf{$d\ge2$} &
+  \textbf{0.242} & \textbf{0.241} &
+  \textbf{$[0.238,\,0.246]$} & \textbf{0.029} & \textbf{0.079} &
+  0.233 \\
+\midrule
+Rank 0 & 0.676 & 0.675 & $[0.670,\,0.682]$ & 0.043 & 0.198 & 0.114 \\
+Rank 1 & 0.538 & 0.537 & $[0.532,\,0.544]$ & 0.043 & 0.170 & 0.142 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{$d=1$ (CM forms) is GUE-like}
+
+For one-dimensional Galois representations, $\beta=1.879$ with 95\%
+confidence interval $[1.870,\,1.888]$.  The KS distance to the GUE
+distribution (0.017) is nearly as low as the KS distance to the fitted
+Brody (0.014).  The bootstrap CI firmly excludes both GOE ($\beta=1$)
+and Poisson ($\beta=0$).  These forms --- corresponding to CM
+(complex multiplication) newforms --- exhibit quadratic level repulsion
+consistent with GUE statistics.
+
+\subsubsection{$d\ge2$ (non-CM forms) is near-Poisson}
+
+For forms with higher-dimensional Galois representations, $\beta=0.242$
+with 95\% CI $[0.238,\,0.246]$.  The lowest KS distance is to Poisson
+(0.079).  The bootstrap CI firmly excludes both $\beta=1$ and $\beta=2$.
+The level repulsion is dramatically weaker than predicted by the GUE
+conjecture for $L$-function zeros.
+
+\subsubsection{The aggregate $\beta\approx0.62$ is a mixing artifact}
+
+Pooling all forms produces $\beta\approx0.62$, which would naively
+suggest ``intermediate repulsion.''  However, this value is a weighted
+average of two fundamentally distinct populations:
+\begin{equation}
+0.15 \times 1.88 + 0.85 \times 0.24 \approx 0.49,
+\end{equation}
+where 15\% of forms are $d=1$ (GUE, $\beta\approx1.88$) and 85\% are
+$d\ge2$ (near-Poisson, $\beta\approx0.24$).  The observed aggregate
+$\beta=0.62$ differs from this weighted average because the spacing
+distributions overlap non-trivially.  The key point is that no single
+$\beta$ describes the full population: the bimodal structure is
+obscured by aggregation.
+
+\subsection{Rank Split is Secondary}
+
+Analytic rank 0 ($\beta=0.676$) and rank 1 ($\beta=0.538$) both fall
+between the $d=1$ and $d\ge2$ extremes.  The rank-0 $\beta$ is higher
+because the rank-0 group is enriched in $d=1$ (CM) forms; the rank-1
+group is dominated by $d\ge2$ forms.  Thus the rank split is entirely
+explained by the dimension composition of each rank group, not by an
+independent rank effect.
+
+\subsection{Bootstrap Stability}
+
+Cross-validation via KS-minimization confirms the MLE results:
+\begin{table}[ht]
+\centering
+\caption{MLE vs.\ KS-minimization consistency check.}
+\label{tab:consistency}
+\begin{tabular}{lccc}
+\toprule
+Group & $\beta_\text{MLE}$ & $\beta_\text{KSmin}$ & $\Delta$ \\
+\midrule
+All   & 0.620 & 0.622 & $+0.002$ \\
+$d=1$ & 1.879 & 1.892 & $+0.013$ \\
+$d\ge2$ & 0.242 & 0.243 & $+0.001$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+Both methods agree within $\Delta < 0.02$ for all groups.
+
+% ============================================================
+\section{Interpretation}
+\label{sec:interpretation}
+% ============================================================
+
+\subsection{Why Does $d=1$ Follow GUE?}
+
+One-dimensional Galois representations correspond to CM (complex
+multiplication) newforms.  These are arithmetically ``special'' in
+that their $L$-functions factor as products of two Hecke $L$-functions
+over quadratic fields --- the arithmetic complexity is substantially
+lower than for generic non-CM forms.
+
+The GUE-like spacing ($\beta\approx1.88$) suggests that these
+$L$-functions conform to the Montgomery--Odlyzko conjecture: their
+zeros are distributed like eigenvalues of random Hermitian matrices
+from the GUE.  This is consistent with the Katz--Sarnak prediction for
+families of $L$-functions with symplectic symmetry type: CM forms
+belong to the unitary symplectic group $\text{USp}(2d)$ in the Katz--
+Sarnak classification, for which GUE spacing statistics are expected.
+
+\subsection{The Near-Poisson Puzzle}
+
+The near-Poisson spacing ($\beta\approx0.24$) for $d\ge2$ forms is
+surprising.  Possible explanations include:
+
+\begin{enumerate}
+  \item \textbf{Genuine physical effect}: Non-CM $L$-functions may have
+    effectively suppressed level repulsion.  The arithmetic complexity
+    of higher-dimensional Galois representations could introduce
+    additional degrees of freedom that wash out spectral correlations.
+  \item \textbf{Finite-sample truncation}: Our analysis uses only the
+    first 10 zeros per form.  It is possible that the spacing
+    distributions converge to GUE at greater height, and that 10 zeros
+    are insufficient to observe the asymptotic statistics.
+  \item \textbf{Mixing within $d\ge2$}: The $d\ge2$ group pools forms
+    of dimensions $d=2,3,4,\ldots$  If $\beta$ depends on $d$
+    continuously, the aggregate $d\ge2$ $\beta$ could be an average
+    across dimensions with genuinely different spacing statistics.
+\end{enumerate}
+
+\subsection{Connection to the Literature}
+
+\begin{itemize}
+  \item \textbf{Montgomery--Odlyzko law}: GUE distribution for Riemann
+    zeta zeros \cite{montgomery1973, odlyzko1987}.  Our result shows
+    that only the $d=1$ (CM) subgroup of weight-2 newforms matches
+    this law.
+  \item \textbf{Katz--Sarnak}: Predicted GUE for unitary families
+    \cite{katz1999}.  Our dimension-resolved analysis reveals that
+    family type (dimension of the Galois representation) is the
+    decisive factor.
+  \item \textbf{Rudnick--Sarnak}: $n$-level correlations for
+    holomorphic cusp forms \cite{rudnick1996}.  Our nearest-neighbor
+    analysis --- complementary to the $n$-level approach --- shows
+    clear deviation from the universal prediction for $d\ge2$ forms.
+  \item \textbf{Exp 6 (GNN spectral zeta)}: An independent GNN
+    experiment predicting spectral zeta values of Cayley graphs showed
+    sharp phase transition at $d=6$ with a 12.8-fold change in
+    covariance structure \cite{weiss2026companion}.  While the
+    context (Cayley graph spectra vs.\ $L$-function zeros) differs,
+    the dimensional phase transition pattern is consistent.
+\end{itemize}
+
+% ============================================================
+\section{Open Questions}
+\label{sec:questions}
+% ============================================================
+
+Our results raise several questions for future investigation:
+
+\begin{enumerate}
+  \item \textbf{Why does $d\ge2$ approach Poisson?}  Is this a genuine
+    property of non-CM $L$-functions, a finite-sample artifact of
+    using only the first 10 zeros, or an averaging effect across
+    multiple dimensions $d\ge2$?
+  \item \textbf{Sub-dimensional structure}: Does $\beta$ vary
+    monotonically with $d$?  Subdividing $d\ge2$ into $d=2$, $d=3$,
+    etc.\ could reveal a gradient in level repulsion.
+  \item \textbf{Height dependence}: Within each group, does $\beta$
+    vary with zero index $k$ (i.e., with height on the critical line)?
+    Higher-index zeros ($z_{10}$ and beyond) would test convergence
+    to asymptotic statistics.
+  \item \textbf{Weight dependence}: All forms analyzed have weight 2.
+    Analysis of higher-weight forms ($k=4,6,8$) would test whether the
+    dimension split extends to all holomorphic cusp forms or is a
+    weight-2 phenomenon.
+  \item \textbf{Conductor dependence}: Does $\beta$ vary with
+    conductor $N$ within each dimension group?  The Katz--Sarnak
+    limit requires large conductor; finite-conductor effects could
+    produce the observed deviation.
+  \item \textbf{Connection to spectral graph theory}: The dimensional
+    phase transition at $d=6$ in Cayley graph spectral zeta fitting
+    (Exp~6) hints at a deeper structural transition in Galois
+    representation statistics.  Is there a unifying explanation?
+\end{enumerate}
+
+% ============================================================
+\section{Conclusion}
+\label{sec:conclusion}
+% ============================================================
+
+We have presented the first large-scale Brody distribution analysis of
+$L$-function zero spacings stratified by Hecke field dimension.
+Analysis of 63\,844 weight-2 newforms (568\,708 spacings) from the
+LMFDB reveals a sharp dimension split in level repulsion:
+
+\begin{itemize}
+  \item CM forms ($d=1$): $\beta \approx 1.88$, GUE-like quadratic
+    repulsion, consistent with Montgomery--Odlyzko.
+  \item Non-CM forms ($d\ge2$): $\beta \approx 0.24$, near-Poisson
+    with essentially no repulsion.
+  \item The aggregate $\beta\approx0.62$ is a mixing artifact.
+  \item The rank split ($\beta\approx0.68$ vs.\ $0.54$) is entirely
+    explained by dimension composition.
+\end{itemize}
+
+Cohen's $d = 8.808$ and $z = 101.6\sigma$ confirm the separation at
+extreme significance.  These results establish Hecke field dimension as
+the dominant structural determinant of $L$-function zero statistics
+and challenge the implicit assumption of spectral universality across
+all $L$-function families.
+
+% ============================================================
+% REFERENCES
+% ============================================================
+\begin{thebibliography}{99}
+
+\bibitem{montgomery1973}
+H.~L.~Montgomery,
+``The pair correlation of zeros of the zeta function,''
+in \emph{Analytic Number Theory},
+Proc.\ Symp.\ Pure Math.\ \textbf{24}, 181--193, AMS, 1973.
+
+\bibitem{odlyzko1987}
+A.~M.~Odlyzko,
+``On the distribution of spacings between zeros of the zeta function,''
+\emph{Math.\ Comp.} \textbf{48}, 273--308 (1987).
+
+\bibitem{odlyzko1989}
+A.~M.~Odlyzko,
+``The $10^{20}$-th zero of the Riemann zeta function and 175 million of
+its neighbors,''
+preprint, 1989.
+
+\bibitem{katz1999}
+N.~M.~Katz and P.~Sarnak,
+\emph{Random Matrices, Frobenius Eigenvalues, and Monodromy},
+AMS Colloquium Publications \textbf{45}, 1999.
+
+\bibitem{rudnick1996}
+Z.~Rudnick and P.~Sarnak,
+``Zeros of principal $L$-functions and random matrix theory,''
+\emph{Duke Math.\ J.} \textbf{81}, 269--322 (1996).
+
+\bibitem{brody1973}
+T.~A.~Brody,
+``A statistical measure for the repulsion of energy levels,''
+\emph{Lettere al Nuovo Cimento} \textbf{7}, 482--484 (1973).
+
+\bibitem{brody1981}
+T.~A.~Brody, J.~Flores, J.~B.~French, P.~A.~Mello,
+A.~Pandey, and S.~S.~M.~Wong,
+``Random-matrix physics: Spectrum and strength fluctuations,''
+\emph{Rev.\ Mod.\ Phys.} \textbf{53}, 385--479 (1981).
+
+\bibitem{gutzwiller1990}
+M.~C.~Gutzwiller,
+\emph{Chaos in Classical and Quantum Mechanics},
+Springer, 1990.
+
+\bibitem{lmfdb}
+The LMFDB Collaboration,
+``The $L$-functions and Modular Forms Database,''
+\url{https://www.lmfdb.org}, 2026.
+
+\bibitem{weiss2026companion}
+T.~Weiss,
+``When Graph Neural Networks Meet the Riemann Hypothesis:
+A Systematic Negative Study,''
+companion paper, 2026.
+
+\end{thebibliography}
+
+\end{document}

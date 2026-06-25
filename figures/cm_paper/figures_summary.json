@@ -1,0 +1,10 @@
+{
+  "figures_generated": 4,
+  "output_directory": "figures/cm_paper",
+  "figures": [
+    "fig1_model_performance.pdf/png",
+    "fig2_feature_importance.pdf/png",
+    "fig3_key_findings.pdf/png",
+    "fig4_discriminative_feature.pdf/png"
+  ]
+}

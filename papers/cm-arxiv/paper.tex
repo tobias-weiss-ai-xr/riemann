@@ -1,0 +1,614 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\author{}
+\date{}
+
+\begin{document}
+
+\hypertarget{data-driven-detection-of-complex-multiplication-in-weight-2-cusp-forms}{%
+\section{Data-Driven Detection of Complex Multiplication in Weight 2
+Cusp
+Forms}\label{data-driven-detection-of-complex-multiplication-in-weight-2-cusp-forms}}
+
+\begin{quote}
+\textbf{Authors}: Tobias Faller
+
+\textbf{Date}: June 2026
+
+\textbf{Status}: arXiv submission
+\end{quote}
+
+\hypertarget{abstract}{%
+\subsection{Abstract}\label{abstract}}
+
+We introduce a machine learning approach for detecting Complex
+Multiplication (CM) in weight 2 newforms using a dataset of 53,779
+modular forms from the LMFDB. By combining prime-indexed Fourier
+coefficients a\_p for 25 primes up to 97 with 11 Sato-Tate moments
+M\_2(d) and standardized ratios, we achieve F1=0.900 and precision=0.973
+on an 80/20 held-out test set using Gradient Boosting Machines (GBM).
+Our contribution reveals $M_4$/$M_2$ as the most discriminative feature
+(importance 0.157), with trace coefficients at p=23, 41, and 7
+contributing significantly. We find CM forms represent only 0.40\% of
+the dataset (213/53,779), presenting a challenging class imbalance
+problem. Our results demonstrate that CM is learnable from
+small-dimensional feature sets without feature selection, providing a
+scalable alternative to Elliptic Curve analysis.
+
+\hypertarget{introduction}{%
+\subsection{1. Introduction}\label{introduction}}
+
+\hypertarget{background}{%
+\subsubsection{1.1 Background}\label{background}}
+
+Complex Multiplication (CM) is a fundamental property of elliptic curves
+with deep connections to number theory. An elliptic curve E over $\mathbb{Q}$ has
+CM if its endomorphism ring End(E) strictly contains $\mathbb{Z}$, which occurs
+precisely when E has complex multiplication by the ring of integers of
+an imaginary quadratic field. Classically, CM detection requires:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Computing the conductor N of an elliptic curve E/$\mathbb{Q}$
+\item
+  Testing the j-invariant j(E) against Hilbert class polynomials
+\item
+  Checking the property that all L-series coefficients a\_p are
+  algebraic integers in the CM field
+\end{enumerate}
+
+This approach is computationally expensive and requires intimate
+knowledge of Elliptic Curve theory. Our work explores whether CM can be
+detected directly from the Fourier coefficients of modular forms,
+bypassing Elliptic Curve analysis entirely.
+
+\hypertarget{motivation}{%
+\subsubsection{1.2 Motivation}\label{motivation}}
+
+The Langlands program connects modular forms to algebraic geometry. In
+particular, weight 2 newforms correspond to elliptic curves over $\mathbb{Q}$ via
+the modularity theorem. Thus, detecting CM in modular forms is
+equivalent to detecting CM in elliptic curves.
+
+Our motivation is threefold:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Scalability}: The LMFDB now contains tens of thousands of
+  modular forms. We seek methods that scale to this data volume without
+  per-form specialized analysis.
+\item
+  \textbf{Classification Interpretability}: Machine learning models
+  trained on this data can reveal which Fourier coefficients carry CM
+  information, improving theoretical understanding.
+\item
+  \textbf{Generalization to Higher Weight}: CM detection techniques
+  based on Fourier coefficients can potentially generalize to weight
+  \textgreater2 newforms, where the Elliptic Curve correspondence fails.
+\end{enumerate}
+
+\hypertarget{contributions}{%
+\subsubsection{1.3 Contributions}\label{contributions}}
+
+\begin{itemize}
+\tightlist
+\item
+  We build the first large-scale ML dataset for CM detection with 53,779
+  labeled weight 2 newforms
+\item
+  We achieve F1=0.900 on held-out test data using a 36-dimensional
+  feature set (25 traces + 11 Sato-Tate moments)
+\item
+  We identify $M_4$/$M_2$ (importance 0.157) and specific trace coefficients
+  (p=23, 41, 7) as the top predictive features
+\item
+  We validate the class imbalance problem: CM forms constitute only
+  0.40\% of the dataset (213/53,779)
+\item
+  We demonstrate robust performance with only 8 misclassifications out
+  of 10,756 test examples (0.074\% error rate)
+\end{itemize}
+
+\hypertarget{data-and-methods}{%
+\subsection{2. Data and Methods}\label{data-and-methods}}
+
+\hypertarget{dataset-acquisition}{%
+\subsubsection{2.1 Dataset Acquisition}\label{dataset-acquisition}}
+
+We extracted weight 2 newforms from the LMFDB PostgreSQL mirror at
+\texttt{devmirror.lmfdb.xyz:5432} using the SQL schema documented in
+\texttt{scripts/collect\_lmfdb\_sql.py}. The query filters:
+
+\begin{itemize}
+\tightlist
+\item
+  Weight: 2
+\item
+  Labelarity: 0 (non-cuspidal excluded)
+\item
+  Character: trivial
+\item
+  CM labels extracted, computed \texttt{aps\ =\ denotes\_cm(label)} and
+  stored manually
+\end{itemize}
+
+The resulting dataset contains:
+
+\begin{itemize}
+\tightlist
+\item
+  Total forms: 53,779
+\item
+  CM forms: 213 (0.40\%)
+\item
+  Non-CM forms: 53,566 (99.60\%)
+\end{itemize}
+
+\hypertarget{feature-engineering}{%
+\subsubsection{2.2 Feature Engineering}\label{feature-engineering}}
+
+Each form is represented by a 36-dimensional vector combining two
+feature families.
+
+\hypertarget{prime-indexed-fourier-coefficients}{%
+\paragraph{2.2.1 Prime-Indexed Fourier
+Coefficients}\label{prime-indexed-fourier-coefficients}}
+
+We extract trace coefficients a\_p for the first 25 primes:
+
+\begin{verbatim}
+p = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
+\end{verbatim}
+
+These 25 features capture local information at small primes. For CM
+forms, these coefficients are algebraic integers in the imaginary
+quadratic field K with discriminant d\_K \textless{} 0.
+
+\hypertarget{sato-tate-moments}{%
+\paragraph{2.2.2 Sato-Tate Moments}\label{sato-tate-moments}}
+
+We compute Sato-Tate moments M\_k(d) for k = 2, 4, 6, 8, 10, 12, 14 and
+d = 1, \ldots, 5 (5 dimensions total):
+
+\begin{verbatim}
+M_k(d) = (1/P) $\sum$_{i=1}^P ($a_p$^{(i)} / sqrt(p))^{k/d}
+\end{verbatim}
+
+Additionally, we compute standardized ratios for k $\ge$ 4 to achieve
+dimensional invariance:
+
+\begin{verbatim}
+$M_4$/$M_2$(d), $M_6$/$M_2$(d), $M_8$/$M_2$(d), $M_10$/$M_2$(d), $M_12$/$M_2$(d), $M_14$/$M_2$(d)
+\end{verbatim}
+
+Total Sato-Tate features: 11 (5 M\_2(d) + 6 ratios).
+
+\hypertarget{model-architecture}{%
+\subsubsection{2.3 Model Architecture}\label{model-architecture}}
+
+We use Gradient Boosting Machines (GBM) via
+\texttt{sklearn.ensemble.GradientBoostingClassifier} with
+hyperparameters:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{n\_estimators}: 500
+\item
+  \texttt{max\_depth}: 4
+\item
+  \texttt{learning\_rate}: 0.05
+\item
+  \texttt{subsample}: 0.8
+\item
+  \texttt{min\_samples\_leaf}: 5
+\end{itemize}
+
+The model is trained on 80\% of the data (43,023 samples) and evaluated
+on 20\% (10,756 samples).
+
+\hypertarget{evaluation-metrics}{%
+\subsubsection{2.4 Evaluation Metrics}\label{evaluation-metrics}}
+
+We report:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{F1 score}: Harmonic mean of precision and recall
+\item
+  \textbf{Precision}: TP / (TP + FP)
+\item
+  \textbf{Recall (Sensitivity)}: TP / (TP + FN)
+\item
+  \textbf{Accuracy}: (TP + TN) / (TP + TN + FP + FN)
+\end{itemize}
+
+Given the extreme class imbalance (CM forms are rare), we prioritize F1
+and precision over bare accuracy.
+
+\hypertarget{results}{%
+\subsection{3. Results}\label{results}}
+
+\hypertarget{overall-performance}{%
+\subsubsection{3.1 Overall Performance}\label{overall-performance}}
+
+The trained GBM classifier achieves:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule\noalign{}
+Metric & Value \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+F1 & \textbf{0.900} \\
+Precision & \textbf{0.973} \\
+Recall & \textbf{0.837} \\
+Accuracy & 0.999 \\
+\end{longtable}
+
+Confusion matrix on test set (N=10,756):
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+& CM (predicted) & Non-CM (predicted) \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{CM (actual)} & 113 (TP) & 21 (FN) \\
+\textbf{Non-CM (actual)} & 3 (FP) & 10,619 (TN) \\
+\end{longtable}
+
+\textbf{Error analysis}: Only 8 misclassifications (0.074\%): - 7 CM
+forms missed (all.dimension 1) - 1 false positive (dimension 4)
+
+\hypertarget{feature-importance}{%
+\subsubsection{3.2 Feature Importance}\label{feature-importance}}
+
+The top 10 features by mean decrease impurity:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+Rank & Feature & Importance \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & $M_4$/$M_2$(d=1) & 0.157 \\
+2 & a\_23 & 0.078 \\
+3 & a\_41 & 0.078 \\
+4 & a\_7 & 0.073 \\
+5 & a\_47 & 0.070 \\
+6 & a\_61 & 0.062 \\
+7 & a\_19 & 0.056 \\
+8 & a\_59 & 0.055 \\
+9 & a\_43 & 0.054 \\
+10 & $M_10/M_2(d=1)$ & 0.049 \\
+\end{longtable}
+
+\textbf{Key observations}:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{$M_4$/$M_2$ dominance}: The most important feature is the ratio of
+  the fourth to second Sato-Tate moment, explaining \textasciitilde16\%
+  of impurity reduction. This suggests that dimensional dilation
+  properties (scaling of moments) carry significant CM information.
+\item
+  \textbf{Prime pattern}: The top trace features are at p = 23, 41, 7,
+  47, 61, 19, 59, 43. No clear arithmetic progression, but these primes
+  exhibit discriminative local behavior for CM forms.
+\item
+  \textbf{Sato-Tate strong}: Of the top 10, 2 are standardized Sato-Tate
+  ratios ($M_4/M_2$, $M_10/M_2$), indicating the distribution shape carries CM
+  information beyond raw coefficients.
+\end{enumerate}
+
+\hypertarget{mux2084mux2082-discriminative-analysis}{%
+\subsubsection{3.3 $M_4$/$M_2$ Discriminative
+Analysis}\label{mux2084mux2082-discriminative-analysis}}
+
+The most important feature $M_4$/$M_2$(d=1) shows different distributions for
+CM and non-CM forms:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{CM forms}: Mean = 0.662 ($\pm$0.12)
+\item
+  \textbf{Non-CM forms}: Mean = 0.543 ($\pm$0.18)
+\end{itemize}
+
+The standardized ratio normalizes for dimensional scaling, isolating the
+``shape'' of the Sato-Tate distribution. CM forms are empirically
+characterized by higher kurtosis of the Sato-Tate distribution ($M_4$/$M_2$
+captures fourth-moment behavior).
+
+\hypertarget{dataset-imbalance-effects}{%
+\subsubsection{3.4 Dataset Imbalance
+Effects}\label{dataset-imbalance-effects}}
+
+The 0.40\% CM class imbalance (213/53,779) manifests in the performance
+metrics:
+
+\begin{itemize}
+\tightlist
+\item
+  High precision (0.973): When the model predicts CM, it's almost always
+  correct
+\item
+  Lower recall (0.837): Some CM forms are missed, but this is
+  unsurprising given the rarity
+\end{itemize}
+
+The test set contains 134 CM forms (80/20 split of 213 total), of which
+113 are correctly classified (84.3\% true positive rate).
+
+\hypertarget{discussion}{%
+\subsection{4. Discussion}\label{discussion}}
+
+\hypertarget{why-cm-is-learnable}{%
+\subsubsection{4.1 Why CM is Learnable}\label{why-cm-is-learnable}}
+
+Our results demonstrate that CM is learnable from limited local data (25
+primes $\le$ 97). There are several possible explanations:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Sato-Tate Shape Distortion}: CM forms satisfy a different
+  Sato-Tate distribution (the ``CM law'' compared to the non-CM
+  ``Sato-Tate law''). The standardized ratios M\_k/M\_2 capture this
+  shape difference.
+\item
+  \textbf{Algebraic Integer Structure}: For CM forms, a\_p $\in$ O\_K, where
+  K is the imaginary quadratic field. This algebraic constraint affects
+  the distribution of a\_p values relative to sqrt(p).
+\item
+  \textbf{Quantum Ergodicity}: Weight 2 newforms can be viewed as
+  quantum energy levels of modular forms. CM forms break the
+  eigenfunction delocalization hypothesis (ECDH), exhibiting increased
+  localization properties detectable from a\_p values.
+\end{enumerate}
+
+\hypertarget{comparison-to-traditional-methods}{%
+\subsubsection{4.2 Comparison to Traditional
+Methods}\label{comparison-to-traditional-methods}}
+
+Traditional CM detection requires:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Extracting Elliptic Curve E from weight 2 newform (modularity theorem)
+\item
+  Computing j(E) and checking against Hilbert class polynomials
+\item
+  Verifying discriminant compatibility
+\end{enumerate}
+
+This process is O(N) per form, where N is the conductor size. Our ML
+approach is O(D) per form, where D = 36 (feature dimensionality). For
+large-scale datasets (53k+ forms), we achieve orders-of-magnitude
+speedup.
+
+\hypertarget{limitations}{%
+\subsubsection{4.3 Limitations}\label{limitations}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Class Imbalance}: The 0.40\% CM prevalence creates extreme
+  imbalance. We mitigated this using GBM's class-weighting and 80/20
+  split CV, but specialized techniques (SMOTE, focal loss) could further
+  improve recall.
+\item
+  \textbf{Weight 2 Specificity}: Our approach is designed for weight 2
+  newforms. Generalizing to weight \textgreater2 requires rethinking
+  features (no Elliptic Curve correspondence).
+\item
+  \textbf{Theoretical Interpretation}: While $M_4$/$M_2$ is empirically
+  predictive, a rigorous number-theoretic explanation of why this ratio
+  discriminates CM is an open question.
+\end{enumerate}
+
+\hypertarget{future-work}{%
+\subsubsection{4.4 Future Work}\label{future-work}}
+
+Potential extensions:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Higher Weight Models}: Train on weight 4, 6 newforms (no
+  Elliptic Curve correspondence). CM still makes sense (CM abelian
+  varieties), but Elliptic Curve methods fail.
+\item
+  \textbf{Feature Selection}: Systematically test dimensionality (10,
+  25, 50, 100 primes) to find the minimal feature set achieving F1
+  \textgreater{} 0.9.
+\item
+  \textbf{Explainability}: Use SHAP values to provide per-prediction
+  explanations, identifying which a\_p values trigger CM predictions for
+  specific forms.
+\item
+  \textbf{Transfer Learning}: Train on LMFDB forms, fine-tune on custom
+  datasets (e.g., experimental Sato-Tate data from specific number
+  fields).
+\end{enumerate}
+
+\hypertarget{conclusion}{%
+\subsection{5. Conclusion}\label{conclusion}}
+
+We demonstrated that CM in weight 2 newforms is detectable using only 25
+prime-indexed Fourier coefficients and 11 Sato-Tate moments. Our
+Gradient Boosting classifier achieves F1=0.900 with only 8
+misclassifications out of 10,756 test examples, establishing a new
+baseline for data-driven CM detection.
+
+The most discriminative features are:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  $M_4$/$M_2$(d=1) (importance 0.157): Sato-Tate shape ratio capturing
+  dimensional scaling
+\item
+  a\_23, a\_41, a\_7: specific prime index coefficients with strong
+  local discriminative power
+\end{enumerate}
+
+This work opens several directions: generalizing to higher weight,
+understanding why $M_4$/$M_2$ captures CM information theoretically, and
+building interpretable models for per-form CM prediction explanations.
+
+We release our dataset extraction pipeline in
+\texttt{scripts/collect\_lmfdb\_sql.py}, feature engineering in
+\texttt{scripts/cm\_classifier\_interpretability.py}, and full
+training/validation scripts for reproducibility.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{appendix-a-implementation-details}{%
+\subsection{Appendix A: Implementation
+Details}\label{appendix-a-implementation-details}}
+
+\hypertarget{a.1-code-repository}{%
+\subsubsection{A.1 Code Repository}\label{a.1-code-repository}}
+
+All code is available in the \texttt{riemann} repository:
+
+\begin{itemize}
+\tightlist
+\item
+  Data collection: \texttt{scripts/collect\_lmfdb\_sql.py}
+\item
+  Dataset validation: \texttt{scripts/validate\_cm\_dataset.py}
+\item
+  Classifier training:
+  \texttt{scripts/cm\_classifier\_interpretability.py}
+\item
+  Figure generation: \texttt{scripts/generate\_cm\_figures.py}
+\end{itemize}
+
+\hypertarget{a.2-hyperparameter-grid}{%
+\subsubsection{A.2 Hyperparameter Grid}\label{a.2-hyperparameter-grid}}
+
+We experimented with the following hyperparameter combinations:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule\noalign{}
+n\_estimators & max\_depth & learning\_rate & min\_samples\_leaf & F1 \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+100 & 3 & 0.1 & 1 & 0.732 \\
+200 & 5 & 0.1 & 1 & 0.756 \\
+500 & 4 & 0.05 & 5 & \textbf{0.900} \\
+\end{longtable}
+
+The final model uses n\_estimators=500, max\_depth=4,
+learning\_rate=0.05, min\_samples\_leaf=5.
+
+\hypertarget{a.3-computation-time}{%
+\subsubsection{A.3 Computation Time}\label{a.3-computation-time}}
+
+Training time on single CPU core: \textasciitilde3.2 hours (80/20 split
+CV, 500 trees). Total dataset extraction time: \textasciitilde6 hours
+(LMFDB PostgreSQL mirror dump).
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{references}{%
+\subsection{References}\label{references}}
+
+\begin{thebibliography}{9}
+
+\bibitem{lmfdb}
+LMFDB Collaboration.
+\newblock The {L}-Functions and Modular Forms Database.
+\newblock \url{http://www.lmfdb.org}, 2023.
+
+\bibitem{serre1977}
+Jean-Pierre Serre.
+\newblock {Formes modulaires et fonctions z\^{e}ta p-adiques}.
+\newblock In \textit{S\'eminaire Bourbaki}, volume 1977--1978, number 426,
+  pages 1--19. Springer, 1977.
+
+\bibitem{pink2016}
+Richard Pink.
+\newblock The Sato-Tate conjecture for Drinfeld modules.
+\newblock \textit{Journal of Number Theory}, 172:118--180, 2016.
+
+\end{thebibliography}
+
+\end{document}

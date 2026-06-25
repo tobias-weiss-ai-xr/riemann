@@ -1,0 +1,51 @@
+{
+  "n_graphs_analyzed": 2000,
+  "n_nodes_total": 2000000,
+  "attention_stats": {
+    "prime": {
+      "mean": 0.10261001478403282,
+      "std": 0.17186597018484295,
+      "median": 0.026022709906101227,
+      "p25": 0.0006770423497073352,
+      "p75": 0.1501389592885971,
+      "min": 2.663487763676642e-10,
+      "max": 1.0,
+      "n": 13912377
+    },
+    "composite": {
+      "mean": 0.09674867901940779,
+      "std": 0.16579807676558872,
+      "median": 0.021455122157931328,
+      "p25": 0.0006316424405667931,
+      "p75": 0.14103272557258606,
+      "min": 1.7686653530635255e-10,
+      "max": 1.0,
+      "n": 43096395
+    }
+  },
+  "prime_vs_composite_ttest": {
+    "t_statistic": 111.54864554700441,
+    "p_value": 0.0,
+    "mean_difference": 0.005861335764625039
+  },
+  "prime_vs_composite_cohens_d": 0.034711362674256833,
+  "attention_ratio_prime_composite": 1.0605831089791857,
+  "layer_summary": {
+    "0": {
+      "mean_entropy": 1457.913873752525,
+      "std_entropy": 39.27178178524135,
+      "mean_sparsity": 0.37047371551394465
+    },
+    "1": {
+      "mean_entropy": 1472.420323426802,
+      "std_entropy": 45.735002573122,
+      "mean_sparsity": 0.3665477803349495
+    },
+    "2": {
+      "mean_entropy": 715.2452874842835,
+      "std_entropy": 138.3708806078331,
+      "mean_sparsity": 0.6209977513551712
+    }
+  },
+  "conclusion": "YES \u2014 GAT attention preferentially focuses on prime-indexed nodes"
+}

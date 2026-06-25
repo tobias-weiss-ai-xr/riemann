@@ -116,5 +116,25 @@ def main():
     else:
         logger.info("NO DIFFERENCE: No significant spectral mode differences found")
 
+    # Phase 6: Visualization
+    logger.info("=" * 60)
+    logger.info("Phase 6: Creating visualizations")
+    logger.info("=" * 60)
+
+    import sys
+    sys.path.insert(0, str(Path(__file__).parent.parent))
+    from covariance_analysis.visualization import (
+        plot_eigenvalue_scree,
+        plot_top_eigenvectors,
+        plot_spectral_metrics_comparison
+    )
+
+    plot_dir = Path("plots/covariance_analysis")
+    plot_dir.mkdir(parents=True, exist_ok=True)
+
+    plot_eigenvalue_scree(low_evals, high_evals, plot_dir / "eigenvalue_scree.png")
+    plot_top_eigenvectors(low_modes, high_modes, plot_dir / "top_k_eigenvectors.png", k=5)
+    plot_spectral_metrics_comparison(comparison, plot_dir / "spectral_metrics_comparison.png")
+
 if __name__ == "__main__":
     main()

@@ -1,0 +1,46 @@
+{
+  "21": {
+    "factors": [
+      3,
+      7
+    ],
+    "divisors": [
+      1,
+      3,
+      7,
+      21
+    ],
+    "phi": 12,
+    "squarefree": true,
+    "cyclotomic_field_degree": 12
+  },
+  "neighbors": {
+    "19": {
+      "factors": [
+        19
+      ],
+      "squarefree": true
+    },
+    "20": {
+      "factors": [
+        2,
+        2,
+        5
+      ],
+      "squarefree": false
+    },
+    "22": {
+      "factors": [
+        2,
+        11
+      ],
+      "squarefree": true
+    },
+    "23": {
+      "factors": [
+        23
+      ],
+      "squarefree": true
+    }
+  }
+}

@@ -1,0 +1,519 @@
+- generic [active] [ref=e1]:
+  - link "Skip to main" [ref=e2] [cursor=pointer]:
+    - /url: "#main"
+  - banner [ref=e4]:
+    - navigation [ref=e7]:
+      - link "Zenodo home" [ref=e9] [cursor=pointer]:
+        - /url: /
+        - img "Zenodo home" [ref=e10]
+      - button "Menu" [ref=e12] [cursor=pointer]
+      - text:   
+  - main [ref=e14]:
+    - generic [ref=e15]:
+      - generic [ref=e17]:
+        - heading "Featured communities" [level=2] [ref=e19]
+        - generic [ref=e20]:
+          - button "Previous slide" [ref=e22] [cursor=pointer]: 
+          - generic [ref=e450]:
+            - generic [ref=e451]:
+              - link "AAS Journals" [ref=e453] [cursor=pointer]:
+                - /url: https://zenodo.org/communities/aas/
+              - link "Browse AAS Journals" [ref=e455] [cursor=pointer]:
+                - /url: https://zenodo.org/communities/aas/
+                - text: Browse
+            - paragraph [ref=e456]: Collection of data and software for AAS Journal (ApJ, AJ, ApJL, ApJS, BAAS, PSJ, RNAAS) articles. Draft review & community submissions are welcome and will be curated by the AAS Data Editors. More information at https://journals.aas.org/data-guide/
+          - button "Next slide" [ref=e35] [cursor=pointer]: 
+      - generic [ref=e36]:
+        - generic [ref=e38]:
+          - heading "Recent uploads" [level=2] [ref=e39]
+          - list [ref=e41]:
+            - listitem [ref=e42]:
+              - generic [ref=e43]:
+                - generic [ref=e44]:
+                  - generic [ref=e45]: May 31, 2026 (v4)
+                  - generic [ref=e46]: Dataset
+                  - generic [ref=e47]:
+                    - generic [ref=e48]: 
+                    - text: Open
+                - link "ESA CLIM4cities - Land Surface Temperature Downscaled from Sentinel-3 SLSTR Level-2 LST products - Copenhagen, Aarhus, Aalborg and Odense, 2020-2023" [ref=e50] [cursor=pointer]:
+                  - /url: /records/20480524
+                - generic [ref=e51]:
+                  - generic [ref=e52]:
+                    - link "Pereira, Élio" [ref=e53] [cursor=pointer]:
+                      - /url: /search?q=metadata.creators.person_or_org.name:Pereira, Élio
+                    - 'link "Pereira, Élio: ORCID profile" [ref=e54] [cursor=pointer]':
+                      - /url: https://orcid.org/0009-0004-4267-8028
+                    - text: ;
+                  - generic [ref=e55]:
+                    - link "Khudynian, Manvel" [ref=e56] [cursor=pointer]:
+                      - /url: /search?q=metadata.creators.person_or_org.name:Khudynian, Manvel
+                    - 'link "Khudynian, Manvel: ORCID profile" [ref=e57] [cursor=pointer]':
+                      - /url: https://orcid.org/0000-0001-9774-3190
+                    - text: ;
+                  - generic [ref=e58]:
+                    - link "Girão, Inês" [ref=e59] [cursor=pointer]:
+                      - /url: /search?q=metadata.creators.person_or_org.name:Girão, Inês
+                    - 'link "Girão, Inês: ORCID profile" [ref=e60] [cursor=pointer]':
+                      - /url: https://orcid.org/0000-0001-7201-0548
+                - paragraph [ref=e61]: "The present dataset provides land surface temperatures (LST) of 300 m resolution for the Danish functional urban areas of Copenhagen, Aarhus, Aalborg, and Odense between 2020 and 2023 (including) as well as other items. There are six main items issued by the dataset: lst_sen3_downscaled.zip - zip folder with fine LST data obtained by..."
+                - generic [ref=e63]:
+                  - generic [ref=e64]:
+                    - paragraph [ref=e65]: Uploaded on May 31, 2026
+                    - paragraph [ref=e66]:
+                      - generic [ref=e68]:
+                        - text: Part of
+                        - link "CLIM4cities" [ref=e70] [cursor=pointer]:
+                          - /url: /communities/clim4cities
+                    - paragraph
+                    - paragraph [ref=e71]: 3 more versions exist for this record
+                  - generic [ref=e72]:
+                    - generic "Views" [ref=e73]:
+                      - generic [ref=e74]: 
+                      - text: "199"
+                    - generic "Downloads" [ref=e75]:
+                      - generic [ref=e76]: 
+                      - text: "108"
+            - listitem [ref=e77]:
+              - generic [ref=e78]:
+                - generic [ref=e79]:
+                  - generic [ref=e80]: May 28, 2026 (v1)
+                  - generic [ref=e81]: Dataset
+                  - generic [ref=e82]:
+                    - generic [ref=e83]: 
+                    - text: Open
+                - link "Supplementary data for the Publication - \"A New Record Census of Dwarf AGN and a Bimodal MBH - M* Scaling Relation with DESI DR1\"" [ref=e85] [cursor=pointer]:
+                  - /url: /records/20433635
+                - generic [ref=e87]:
+                  - link "Pucha, Ragadeepika" [ref=e88] [cursor=pointer]:
+                    - /url: /search?q=metadata.creators.person_or_org.name:Pucha, Ragadeepika
+                  - 'link "Pucha, Ragadeepika: ORCID profile" [ref=e89] [cursor=pointer]':
+                    - /url: https://orcid.org/0000-0002-4940-3009
+                - paragraph [ref=e90]: Supplementary data for DESI publication - "A New Record Census of Dwarf AGN and a Bimodal MBH - M* Scaling Relation with DESI DR1" - to comply with the data management file. Data for all figures in the paper are included. Additionally, the catalogs of all BPT-identified AGN and broad-line AGN (BL-AGN) candidates from the paper are provided separately.
+                - generic [ref=e92]:
+                  - generic [ref=e93]:
+                    - paragraph [ref=e94]: Uploaded on May 31, 2026
+                    - paragraph [ref=e95]:
+                      - generic [ref=e97]:
+                        - text: Part of
+                        - link "Dark Energy Spectroscopic Instrument (DESI)" [ref=e99] [cursor=pointer]:
+                          - /url: /communities/desi-pub
+                    - paragraph
+                  - generic [ref=e100]:
+                    - generic "Views" [ref=e101]:
+                      - generic [ref=e102]: 
+                      - text: "0"
+                    - generic "Downloads" [ref=e103]:
+                      - generic [ref=e104]: 
+                      - text: "0"
+            - listitem [ref=e105]:
+              - generic [ref=e106]:
+                - generic [ref=e107]:
+                  - generic [ref=e108]: May 31, 2026 (1.0)
+                  - generic [ref=e109]: Presentation
+                  - generic [ref=e110]:
+                    - generic [ref=e111]: 
+                    - text: Open
+                - link "Dirección y tutorización de tesis doctorales" [ref=e113] [cursor=pointer]:
+                  - /url: /records/20480408
+                - generic [ref=e115]:
+                  - link "García-Peñalvo, Francisco José" [ref=e116] [cursor=pointer]:
+                    - /url: /search?q=metadata.creators.person_or_org.name:García-Peñalvo, Francisco José
+                  - 'link "García-Peñalvo, Francisco José: ORCID profile" [ref=e117] [cursor=pointer]':
+                    - /url: https://orcid.org/0000-0001-9987-5584
+                - paragraph [ref=e118]: Curso impartido en el ICE de la Universidad Politécnica de Madrid (ETSI Caminos) el día 2 de junio de 2026, dentro del Plan de Formación del Profesorado del Curso 2025-2026, con una duración de 2 horas. En este seminario se plantea la dirección doctoral como una práctica de gobierno académico que combina supervisión científica, cumplimiento...
+                - generic [ref=e120]:
+                  - generic [ref=e121]:
+                    - paragraph [ref=e122]: Uploaded on May 31, 2026
+                    - paragraph [ref=e123]:
+                      - generic [ref=e125]:
+                        - text: Part of
+                        - link "GIR GRIAL - University of Salamanca" [ref=e127] [cursor=pointer]:
+                          - /url: /communities/uic-grial
+                    - paragraph
+                  - generic [ref=e128]:
+                    - generic "Views" [ref=e129]:
+                      - generic [ref=e130]: 
+                      - text: "0"
+                    - generic "Downloads" [ref=e131]:
+                      - generic [ref=e132]: 
+                      - text: "0"
+            - listitem [ref=e133]:
+              - generic [ref=e134]:
+                - generic [ref=e135]:
+                  - generic [ref=e136]: May 31, 2026 (v1)
+                  - generic [ref=e137]: Poster
+                  - generic [ref=e138]:
+                    - generic [ref=e139]: 
+                    - text: Open
+                - link "When Human Rights Are Used to Justify Restrictive Law" [ref=e141] [cursor=pointer]:
+                  - /url: /records/20479382
+                - link "Mohamed Osman, Wasan" [ref=e144] [cursor=pointer]:
+                  - /url: /search?q=metadata.creators.person_or_org.name:Mohamed Osman, Wasan
+                - paragraph
+                - generic [ref=e146]:
+                  - generic [ref=e147]:
+                    - paragraph [ref=e148]: Uploaded on May 31, 2026
+                    - paragraph [ref=e149]:
+                      - generic [ref=e151]:
+                        - text: Part of
+                        - generic [ref=e152]:
+                          - 'link "States'' Practice of Human Rights Justification: a study in civil society engagement and human rights through the lens of gender and intersectionality" [ref=e153] [cursor=pointer]':
+                            - /url: /communities/hrjust
+                          - text: ","
+                        - link "EU Open Research Repository" [ref=e155] [cursor=pointer]:
+                          - /url: /communities/eu
+                    - paragraph
+                  - generic [ref=e156]:
+                    - generic "Views" [ref=e157]:
+                      - generic [ref=e158]: 
+                      - text: "0"
+                    - generic "Downloads" [ref=e159]:
+                      - generic [ref=e160]: 
+                      - text: "0"
+            - listitem [ref=e161]:
+              - generic [ref=e162]:
+                - generic [ref=e163]:
+                  - generic [ref=e164]: May 31, 2026 (v1)
+                  - generic [ref=e165]: Poster
+                  - generic [ref=e166]:
+                    - generic [ref=e167]: 
+                    - text: Open
+                - link "3 Patterns in Human Rights Justification Arguments" [ref=e169] [cursor=pointer]:
+                  - /url: /records/20479262
+                - link "Mohamed Osman, Wasan" [ref=e172] [cursor=pointer]:
+                  - /url: /search?q=metadata.creators.person_or_org.name:Mohamed Osman, Wasan
+                - paragraph
+                - generic [ref=e174]:
+                  - generic [ref=e175]:
+                    - paragraph [ref=e176]: Uploaded on May 31, 2026
+                    - paragraph [ref=e177]:
+                      - generic [ref=e179]:
+                        - text: Part of
+                        - generic [ref=e180]:
+                          - 'link "States'' Practice of Human Rights Justification: a study in civil society engagement and human rights through the lens of gender and intersectionality" [ref=e181] [cursor=pointer]':
+                            - /url: /communities/hrjust
+                          - text: ","
+                        - link "EU Open Research Repository" [ref=e183] [cursor=pointer]:
+                          - /url: /communities/eu
+                    - paragraph
+                  - generic [ref=e184]:
+                    - generic "Views" [ref=e185]:
+                      - generic [ref=e186]: 
+                      - text: "0"
+                    - generic "Downloads" [ref=e187]:
+                      - generic [ref=e188]: 
+                      - text: "0"
+            - listitem [ref=e189]:
+              - generic [ref=e190]:
+                - generic [ref=e191]:
+                  - generic [ref=e192]: May 21, 2026 (1)
+                  - generic [ref=e193]: Dataset
+                  - generic [ref=e194]:
+                    - generic [ref=e195]: 
+                    - text: Open
+                - link "Adriatic Sound World Dataset" [ref=e197] [cursor=pointer]:
+                  - /url: /records/19815546
+                - generic [ref=e199]:
+                  - link "Cugelj, Tin" [ref=e200] [cursor=pointer]:
+                    - /url: /search?q=metadata.creators.person_or_org.name:Cugelj, Tin
+                  - 'link "Cugelj, Tin: ORCID profile" [ref=e201] [cursor=pointer]':
+                    - /url: https://orcid.org/0000-0002-5967-1437
+                - paragraph [ref=e202]: "This dataset was prepared as a bibliographic publication companion to the article “The Adriatic Sound World: Listening to the Sea (1300–1650)”, published in Senses and Society. Its purpose is to make the article’s source base more transparent, not to publish a full passage-level or annotation-level reproduction of the interpretive process. The..."
+                - generic [ref=e204]:
+                  - generic [ref=e205]:
+                    - paragraph [ref=e206]: Uploaded on May 31, 2026
+                    - paragraph [ref=e207]:
+                      - generic [ref=e209]:
+                        - text: Part of
+                        - 'link "Resounding Ships: Sound and Music of Sacred Sea Travel between Venice and Jerusalem (c. 1450-1650)" [ref=e211] [cursor=pointer]':
+                          - /url: /communities/soundship
+                    - paragraph
+                  - generic [ref=e212]:
+                    - generic "Views" [ref=e213]:
+                      - generic [ref=e214]: 
+                      - text: "0"
+                    - generic "Downloads" [ref=e215]:
+                      - generic [ref=e216]: 
+                      - text: "0"
+            - listitem [ref=e217]:
+              - generic [ref=e218]:
+                - generic [ref=e219]:
+                  - generic [ref=e220]: May 31, 2026 (v1)
+                  - generic [ref=e221]: Poster
+                  - generic [ref=e222]:
+                    - generic [ref=e223]: 
+                    - text: Open
+                - 'link "Infographic: HRJust''s Pathway Towards Impact" [ref=e225] [cursor=pointer]':
+                  - /url: /records/20479164
+                - link "Mohamed Osman, Wasan" [ref=e228] [cursor=pointer]:
+                  - /url: /search?q=metadata.creators.person_or_org.name:Mohamed Osman, Wasan
+                - paragraph
+                - generic [ref=e230]:
+                  - generic [ref=e231]:
+                    - paragraph [ref=e232]: Uploaded on May 31, 2026
+                    - paragraph [ref=e233]:
+                      - generic [ref=e235]:
+                        - text: Part of
+                        - generic [ref=e236]:
+                          - 'link "States'' Practice of Human Rights Justification: a study in civil society engagement and human rights through the lens of gender and intersectionality" [ref=e237] [cursor=pointer]':
+                            - /url: /communities/hrjust
+                          - text: ","
+                        - link "EU Open Research Repository" [ref=e239] [cursor=pointer]:
+                          - /url: /communities/eu
+                    - paragraph
+                  - generic [ref=e240]:
+                    - generic "Views" [ref=e241]:
+                      - generic [ref=e242]: 
+                      - text: "0"
+                    - generic "Downloads" [ref=e243]:
+                      - generic [ref=e244]: 
+                      - text: "0"
+            - listitem [ref=e245]:
+              - generic [ref=e246]:
+                - generic [ref=e247]:
+                  - generic [ref=e248]: May 31, 2026 (v1)
+                  - generic [ref=e249]: Poster
+                  - generic [ref=e250]:
+                    - generic [ref=e251]: 
+                    - text: Open
+                - link "A Guide on How to Respond to Human Rights Justifications" [ref=e253] [cursor=pointer]:
+                  - /url: /records/20479049
+                - link "Mohamed Osman, Wasan" [ref=e256] [cursor=pointer]:
+                  - /url: /search?q=metadata.creators.person_or_org.name:Mohamed Osman, Wasan
+                - paragraph
+                - generic [ref=e258]:
+                  - generic [ref=e259]:
+                    - paragraph [ref=e260]: Uploaded on May 31, 2026
+                    - paragraph [ref=e261]:
+                      - generic [ref=e263]:
+                        - text: Part of
+                        - generic [ref=e264]:
+                          - 'link "States'' Practice of Human Rights Justification: a study in civil society engagement and human rights through the lens of gender and intersectionality" [ref=e265] [cursor=pointer]':
+                            - /url: /communities/hrjust
+                          - text: ","
+                        - link "EU Open Research Repository" [ref=e267] [cursor=pointer]:
+                          - /url: /communities/eu
+                    - paragraph
+                  - generic [ref=e268]:
+                    - generic "Views" [ref=e269]:
+                      - generic [ref=e270]: 
+                      - text: "0"
+                    - generic "Downloads" [ref=e271]:
+                      - generic [ref=e272]: 
+                      - text: "0"
+            - listitem [ref=e273]:
+              - generic [ref=e274]:
+                - generic [ref=e275]:
+                  - generic [ref=e276]: May 31, 2026 (v1)
+                  - generic [ref=e277]: Poster
+                  - generic [ref=e278]:
+                    - generic [ref=e279]: 
+                    - text: Open
+                - link "Why Human Rights Justifications Matter for Law and Policy Today" [ref=e281] [cursor=pointer]:
+                  - /url: /records/20478955
+                - link "Mohamed Osman, Wasan" [ref=e284] [cursor=pointer]:
+                  - /url: /search?q=metadata.creators.person_or_org.name:Mohamed Osman, Wasan
+                - paragraph
+                - generic [ref=e286]:
+                  - generic [ref=e287]:
+                    - paragraph [ref=e288]: Uploaded on May 31, 2026
+                    - paragraph [ref=e289]:
+                      - generic [ref=e291]:
+                        - text: Part of
+                        - generic [ref=e292]:
+                          - 'link "States'' Practice of Human Rights Justification: a study in civil society engagement and human rights through the lens of gender and intersectionality" [ref=e293] [cursor=pointer]':
+                            - /url: /communities/hrjust
+                          - text: ","
+                        - link "EU Open Research Repository" [ref=e295] [cursor=pointer]:
+                          - /url: /communities/eu
+                    - paragraph
+                  - generic [ref=e296]:
+                    - generic "Views" [ref=e297]:
+                      - generic [ref=e298]: 
+                      - text: "0"
+                    - generic "Downloads" [ref=e299]:
+                      - generic [ref=e300]: 
+                      - text: "0"
+            - listitem [ref=e301]:
+              - generic [ref=e302]:
+                - generic [ref=e303]:
+                  - generic [ref=e304]: May 31, 2026 (v3.0.1 beta)
+                  - generic [ref=e305]: Dataset
+                  - generic [ref=e306]:
+                    - generic [ref=e307]: 
+                    - text: Open
+                - link "HANZE database of historical flood impacts in Europe, 1870-2025" [ref=e309] [cursor=pointer]:
+                  - /url: /records/20478847
+                - generic [ref=e311]:
+                  - link "Dominik Paprotny" [ref=e312] [cursor=pointer]:
+                    - /url: /search?q=metadata.creators.person_or_org.name:Dominik Paprotny
+                  - 'link "Dominik Paprotny: ORCID profile" [ref=e313] [cursor=pointer]':
+                    - /url: https://orcid.org/0000-0001-5090-8402
+                - paragraph [ref=e314]: The HANZE dataset covers riverine, pluvial, coastal and compound floods that have occurred in 42 European countries between 1870 and 2025. The data was collected by extensive data-collection from more than 1000 sources ranging from news reports through government databases to scientific papers. The dataset includes 2724 events characterized by...
+                - generic [ref=e316]:
+                  - generic [ref=e317]:
+                    - paragraph [ref=e318]: Uploaded on May 31, 2026
+                    - paragraph [ref=e319]:
+                      - generic [ref=e321]:
+                        - text: Part of
+                        - link "Historical Analysis of Natural Hazards in Europe (HANZE)" [ref=e323] [cursor=pointer]:
+                          - /url: /communities/hanze
+                    - paragraph
+                    - paragraph [ref=e324]: 4 more versions exist for this record
+                  - generic [ref=e325]:
+                    - generic "Views" [ref=e326]:
+                      - generic [ref=e327]: 
+                      - text: "5033"
+                    - generic "Downloads" [ref=e328]:
+                      - generic [ref=e329]: 
+                      - text: "10388"
+          - link "See more records" [ref=e331] [cursor=pointer]:
+            - /url: /search
+            - text: More
+        - complementary [ref=e332]:
+          - generic [ref=e333]:
+            - heading "Why use Zenodo?" [level=2] [ref=e334]
+            - list [ref=e336]:
+              - listitem [ref=e337]:
+                - strong [ref=e338]: Safe
+                - text: — Your research is stored safely for the future in CERN’s Data Centre for as long as CERN exists
+              - listitem [ref=e339]:
+                - strong [ref=e340]: Trusted
+                - text: — Built and operated by CERN and OpenAIRE to ensure that everyone can join in Open Science
+              - listitem [ref=e341]:
+                - strong [ref=e342]: Citeable
+                - text: — Every upload is assigned a Digital Object Identifier (DOI), to make them citable and trackable
+              - listitem [ref=e343]:
+                - strong [ref=e344]: No waiting time
+                - text: — Uploads are made available online as soon as you hit publish, and your DOI is registered within seconds
+              - listitem [ref=e345]:
+                - strong [ref=e346]: Open or closed
+                - text: — Share e.g. anonymized clinical trial data with only medical professionals via our restricted access mode
+              - listitem [ref=e347]:
+                - strong [ref=e348]: Versioning
+                - text: — Easily update your dataset with our versioning feature
+              - listitem [ref=e349]:
+                - strong [ref=e350]: GitHub integration
+                - text: — Easily preserve your GitHub repository in Zenodo
+              - listitem [ref=e351]:
+                - strong [ref=e352]: Usage statistics
+                - text: — All uploads display standards compliant usage statistics
+          - generic [ref=e353]:
+            - heading "Newsletter" [level=2] [ref=e354]
+            - generic [ref=e355]:
+              - paragraph [ref=e356]: Receive updates on our latest developments, projects and upcoming webinars sent quarterly.
+              - generic [ref=e357]:
+                - generic [ref=e358]: E-mail *
+                - textbox "E-mail *" [ref=e360]:
+                  - /placeholder: your-email@example.com
+                - generic [ref=e361]: Name
+                - textbox "Name" [ref=e363]:
+                  - /placeholder: Your name
+                - button "Subscribe" [ref=e364] [cursor=pointer]
+  - contentinfo [ref=e365]:
+    - generic [ref=e368]:
+      - generic [ref=e369]:
+        - heading "About" [level=2] [ref=e370]
+        - list [ref=e371]:
+          - listitem [ref=e372]:
+            - link "About" [ref=e373] [cursor=pointer]:
+              - /url: https://about.zenodo.org
+          - listitem [ref=e374]:
+            - link "Policies" [ref=e375] [cursor=pointer]:
+              - /url: https://about.zenodo.org/policies
+          - listitem [ref=e376]:
+            - link "Infrastructure" [ref=e377] [cursor=pointer]:
+              - /url: https://about.zenodo.org/infrastructure
+          - listitem [ref=e378]:
+            - link "Principles" [ref=e379] [cursor=pointer]:
+              - /url: https://about.zenodo.org/principles
+          - listitem [ref=e380]:
+            - link "Projects" [ref=e381] [cursor=pointer]:
+              - /url: https://about.zenodo.org/projects/
+          - listitem [ref=e382]:
+            - link "Roadmap" [ref=e383] [cursor=pointer]:
+              - /url: https://about.zenodo.org/roadmap/
+          - listitem [ref=e384]:
+            - link "Contact" [ref=e385] [cursor=pointer]:
+              - /url: https://about.zenodo.org/contact
+      - generic [ref=e386]:
+        - heading "Blog" [level=2] [ref=e387]
+        - list [ref=e388]:
+          - listitem [ref=e389]:
+            - link "Blog" [ref=e390] [cursor=pointer]:
+              - /url: https://blog.zenodo.org
+      - generic [ref=e391]:
+        - heading "Support" [level=2] [ref=e392]
+        - list [ref=e393]:
+          - listitem [ref=e394]:
+            - link "Help" [ref=e395] [cursor=pointer]:
+              - /url: https://help.zenodo.org/
+          - listitem [ref=e396]:
+            - link "FAQ" [ref=e397] [cursor=pointer]:
+              - /url: https://support.zenodo.org/help/
+      - generic [ref=e398]:
+        - heading "Developers" [level=2] [ref=e399]
+        - list [ref=e400]:
+          - listitem [ref=e401]:
+            - link "REST API" [ref=e402] [cursor=pointer]:
+              - /url: https://developers.zenodo.org
+          - listitem [ref=e403]:
+            - link "OAI-PMH" [ref=e404] [cursor=pointer]:
+              - /url: https://developers.zenodo.org#oai-pmh
+      - generic [ref=e405]:
+        - heading "Contribute" [level=2] [ref=e406]
+        - list [ref=e407]:
+          - listitem [ref=e408]:
+            - link "GitHub" [ref=e409] [cursor=pointer]:
+              - /url: https://github.com/zenodo/zenodo-rdm
+              - generic [ref=e410]: 
+              - text: GitHub
+          - listitem [ref=e411]:
+            - link "Donate" [ref=e412] [cursor=pointer]:
+              - /url: /donate
+              - generic [ref=e413]: 
+              - text: Donate
+      - generic [ref=e414]:
+        - heading "Funded by" [level=2] [ref=e415]
+        - list [ref=e416]:
+          - listitem [ref=e417]:
+            - link "CERN" [ref=e418] [cursor=pointer]:
+              - /url: https://home.cern
+          - listitem [ref=e419]:
+            - link "OpenAIRE" [ref=e420] [cursor=pointer]:
+              - /url: https://www.openaire.eu
+          - listitem [ref=e421]:
+            - link "European Commission" [ref=e422] [cursor=pointer]:
+              - /url: https://commission.europa.eu/index_en
+    - generic [ref=e425]:
+      - paragraph [ref=e427]:
+        - text: Powered by
+        - link "CERN Data Centre" [ref=e428] [cursor=pointer]:
+          - /url: https://home.cern/science/computing/data-centre
+        - text: "&"
+        - link "InvenioRDM" [ref=e429] [cursor=pointer]:
+          - /url: https://inveniordm.docs.cern.ch/
+      - list [ref=e431]:
+        - listitem [ref=e432]:
+          - link "Status" [ref=e433] [cursor=pointer]:
+            - /url: https://stats.uptimerobot.com/vlYOVuWgM/
+        - listitem [ref=e434]:
+          - link "Privacy policy" [ref=e435] [cursor=pointer]:
+            - /url: https://about.zenodo.org/privacy-policy
+        - listitem [ref=e436]:
+          - link "Cookie policy" [ref=e437] [cursor=pointer]:
+            - /url: https://about.zenodo.org/cookie-policy
+        - listitem [ref=e438]:
+          - link "Terms of Use" [ref=e439] [cursor=pointer]:
+            - /url: https://about.zenodo.org/terms
+  - generic [ref=e440]:
+    - generic [ref=e441] [cursor=pointer]: 
+    - generic [ref=e442]:
+      - generic [ref=e443]: 
+      - paragraph [ref=e444]:
+        - text: This site uses cookies. Find out more on
+        - link "how we use cookies" [ref=e445] [cursor=pointer]:
+          - /url: https://about.zenodo.org/cookie-policy
+    - generic [ref=e446]:
+      - button "Accept all cookies" [ref=e447] [cursor=pointer]
+      - button "Accept only essential cookies" [ref=e448] [cursor=pointer]

@@ -1,0 +1,365 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand*\HyPL@Entry[1]{}
+\HyPL@Entry{0<</S/D>>}
+\@writefile{toc}{\contentsline {section}{Machine Learning for Modular Forms: Hecke Traces, L-Function Zeros, and the Sato-Tate Distribution}{1}{section*.1}\protected@file@percent }
+\newlabel{machine-learning-for-modular-forms-hecke-traces-l-function-zeros-and-the-sato-tate-distribution}{{}{1}{Machine Learning for Modular Forms: Hecke Traces, L-Function Zeros, and the Sato-Tate Distribution}{section*.1}{}}
+\@writefile{toc}{\contentsline {subsection}{Abstract}{1}{section*.2}\protected@file@percent }
+\newlabel{abstract}{{}{1}{Abstract}{section*.2}{}}
+\@writefile{toc}{\contentsline {subsection}{1. Introduction}{2}{section*.3}\protected@file@percent }
+\newlabel{introduction}{{}{2}{1. Introduction}{section*.3}{}}
+\@writefile{toc}{\contentsline {subsubsection}{1.1 Motivation}{2}{section*.4}\protected@file@percent }
+\newlabel{motivation}{{}{2}{1.1 Motivation}{section*.4}{}}
+\@writefile{toc}{\contentsline {subsubsection}{1.2 The Riemann Project}{2}{section*.5}\protected@file@percent }
+\newlabel{the-riemann-project}{{}{2}{1.2 The Riemann Project}{section*.5}{}}
+\@writefile{toc}{\contentsline {subsubsection}{1.3 Contributions}{2}{section*.6}\protected@file@percent }
+\newlabel{contributions}{{}{2}{1.3 Contributions}{section*.6}{}}
+\gdef \LT@i {\LT@entry 
+    {1}{55.25752pt}\LT@entry 
+    {1}{65.70749pt}\LT@entry 
+    {1}{58.25752pt}\LT@entry 
+    {1}{65.70749pt}\LT@entry 
+    {1}{100.04059pt}}
+\@writefile{toc}{\contentsline {subsection}{2. Related Work}{3}{section*.7}\protected@file@percent }
+\newlabel{related-work}{{}{3}{2. Related Work}{section*.7}{}}
+\@writefile{toc}{\contentsline {subsubsection}{2.1 Machine Learning for L-Functions and Modular Forms}{3}{section*.8}\protected@file@percent }
+\newlabel{machine-learning-for-l-functions-and-modular-forms}{{}{3}{2.1 Machine Learning for L-Functions and Modular Forms}{section*.8}{}}
+\@writefile{toc}{\contentsline {subsubsection}{2.2 Graph Neural Networks for Mathematics}{5}{section*.9}\protected@file@percent }
+\newlabel{graph-neural-networks-for-mathematics}{{}{5}{2.2 Graph Neural Networks for Mathematics}{section*.9}{}}
+\@writefile{toc}{\contentsline {subsubsection}{2.3 Connes' Noncommutative Geometry Program}{5}{section*.10}\protected@file@percent }
+\newlabel{connes-noncommutative-geometry-program}{{}{5}{2.3 Connes' Noncommutative Geometry Program}{section*.10}{}}
+\@writefile{toc}{\contentsline {subsubsection}{2.4 Random Matrix Theory and L-Function Zeros}{7}{section*.11}\protected@file@percent }
+\newlabel{random-matrix-theory-and-l-function-zeros}{{}{7}{2.4 Random Matrix Theory and L-Function Zeros}{section*.11}{}}
+\@writefile{toc}{\contentsline {subsubsection}{2.5 Friedli Spectral Zeta and the \(\operatorname  {SL}(2,\symbb {F}_p)\) Constant}{8}{section*.12}\protected@file@percent }
+\newlabel{friedli-spectral-zeta-and-the-operatornamesl2mathbbf_p-constant}{{}{8}{\texorpdfstring {2.5 Friedli Spectral Zeta and the \(\operatorname {SL}(2,\mathbb {F}_p)\) Constant}{2.5 Friedli Spectral Zeta and the \textbackslash operatorname\{SL\}(2,\textbackslash mathbb\{F\}\_p) Constant}}{section*.12}{}}
+\@writefile{toc}{\contentsline {subsection}{3. Data and Methods}{8}{section*.13}\protected@file@percent }
+\newlabel{data-and-methods}{{}{8}{3. Data and Methods}{section*.13}{}}
+\@writefile{toc}{\contentsline {subsubsection}{3.1 Data Sources}{8}{section*.14}\protected@file@percent }
+\newlabel{data-sources}{{}{8}{3.1 Data Sources}{section*.14}{}}
+\newlabel{lmfdb-sql-mirror}{{}{8}{LMFDB SQL Mirror}{section*.15}{}}
+\@writefile{toc}{\contentsline {paragraph}{LMFDB SQL Mirror}{8}{section*.15}\protected@file@percent }
+\gdef \LT@ii {\LT@entry 
+    {1}{202.39838pt}\LT@entry 
+    {1}{142.60162pt}}
+\gdef \LT@iii {\LT@entry 
+    {3}{76.59303pt}\LT@entry 
+    {3}{66.147pt}\LT@entry 
+    {1}{74.82pt}}
+\gdef \LT@iv {\LT@entry 
+    {3}{16.878pt}\LT@entry 
+    {1}{50.61829pt}\LT@entry 
+    {1}{53.733pt}}
+\newlabel{dataset-statistics}{{}{9}{Dataset Statistics}{section*.16}{}}
+\@writefile{toc}{\contentsline {paragraph}{Dataset Statistics}{9}{section*.16}\protected@file@percent }
+\newlabel{operatornamesl2mathbbf_p-cayley-graphs}{{}{9}{\texorpdfstring {\(\operatorname {SL}(2,\mathbb {F}_p)\) Cayley Graphs}{\textbackslash operatorname\{SL\}(2,\textbackslash mathbb\{F\}\_p) Cayley Graphs}}{section*.17}{}}
+\@writefile{toc}{\contentsline {paragraph}{\(\operatorname  {SL}(2,\symbb {F}_p)\) Cayley Graphs}{9}{section*.17}\protected@file@percent }
+\gdef \LT@v {\LT@entry 
+    {1}{78.19125pt}\LT@entry 
+    {1}{156.3825pt}\LT@entry 
+    {1}{110.42624pt}}
+\gdef \LT@vi {\LT@entry 
+    {3}{58.84502pt}\LT@entry 
+    {3}{180.48003pt}}
+\@writefile{toc}{\contentsline {subsubsection}{3.2 Machine Learning Methods}{10}{section*.18}\protected@file@percent }
+\newlabel{machine-learning-methods}{{}{10}{3.2 Machine Learning Methods}{section*.18}{}}
+\newlabel{sklearn-models-exps-910}{{}{10}{sklearn Models (Exps 9--10)}{section*.19}{}}
+\@writefile{toc}{\contentsline {paragraph}{sklearn Models (Exps 9--10)}{10}{section*.19}\protected@file@percent }
+\newlabel{chebconv-gnn-exp-12}{{}{10}{ChebConv GNN (Exp 12)}{section*.20}{}}
+\@writefile{toc}{\contentsline {paragraph}{ChebConv GNN (Exp 12)}{10}{section*.20}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{3.3 Sato-Tate Moment Analysis}{11}{section*.21}\protected@file@percent }
+\newlabel{sato-tate-moment-analysis}{{}{11}{3.3 Sato-Tate Moment Analysis}{section*.21}{}}
+\newlabel{the-normalization-bug}{{}{11}{The Normalization Bug}{section*.22}{}}
+\@writefile{toc}{\contentsline {paragraph}{The Normalization Bug}{11}{section*.22}\protected@file@percent }
+\newlabel{corrected-computation}{{}{11}{Corrected Computation}{section*.23}{}}
+\@writefile{toc}{\contentsline {paragraph}{Corrected Computation}{11}{section*.23}\protected@file@percent }
+\newlabel{galois-correlation}{{}{11}{Galois Correlation}{section*.24}{}}
+\@writefile{toc}{\contentsline {paragraph}{Galois Correlation}{11}{section*.24}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{3.4 Friedli Spectral Zeta Computation}{11}{section*.25}\protected@file@percent }
+\newlabel{friedli-spectral-zeta-computation}{{}{11}{3.4 Friedli Spectral Zeta Computation}{section*.25}{}}
+\gdef \LT@vii {\LT@entry 
+    {1}{50.169pt}\LT@entry 
+    {3}{147.73201pt}\LT@entry 
+    {1}{41.07301pt}\LT@entry 
+    {3}{99.43503pt}}
+\gdef \LT@viii {\LT@entry 
+    {1}{50.169pt}\LT@entry 
+    {3}{60.261pt}\LT@entry 
+    {1}{70.80002pt}\LT@entry 
+    {1}{78.48302pt}}
+\@writefile{toc}{\contentsline {subsection}{4. Results}{12}{section*.26}\protected@file@percent }
+\newlabel{results}{{}{12}{4. Results}{section*.26}{}}
+\@writefile{toc}{\contentsline {subsubsection}{4.1 Negative Results: Cayley Graph GNNs (Exps 1--7)}{12}{section*.27}\protected@file@percent }
+\newlabel{negative-results-cayley-graph-gnns-exps-17}{{}{12}{4.1 Negative Results: Cayley Graph GNNs (Exps 1--7)}{section*.27}{}}
+\newlabel{spectral-gap-prediction-exps-1-2-4}{{}{12}{4.1.1 Spectral Gap Prediction (Exps 1, 2, 4)}{section*.28}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.1.1 Spectral Gap Prediction (Exps 1, 2, 4)}{12}{section*.28}\protected@file@percent }
+\newlabel{hecke-gnn-exps-56}{{}{12}{4.1.2 Hecke GNN (Exps 5--6)}{section*.29}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.1.2 Hecke GNN (Exps 5--6)}{12}{section*.29}\protected@file@percent }
+\gdef \LT@ix {\LT@entry 
+    {3}{127.25401pt}\LT@entry 
+    {1}{52.12502pt}\LT@entry 
+    {1}{61.37701pt}\LT@entry 
+    {1}{66.003pt}\LT@entry 
+    {1}{89.90402pt}}
+\gdef \LT@x {\LT@entry 
+    {3}{58.42203pt}\LT@entry 
+    {1}{41.361pt}\LT@entry 
+    {1}{35.661pt}}
+\newlabel{pizerbrandt-matrix-gnn-exp-7}{{}{13}{4.1.3 Pizer/Brandt Matrix GNN (Exp 7)}{section*.30}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.1.3 Pizer/Brandt Matrix GNN (Exp 7)}{13}{section*.30}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{4.2 Data Scaling Success: LMFDB ML (Exps 9--10)}{13}{section*.31}\protected@file@percent }
+\newlabel{data-scaling-success-lmfdb-ml-exps-910}{{}{13}{4.2 Data Scaling Success: LMFDB ML (Exps 9--10)}{section*.31}{}}
+\newlabel{scaling-from-1k-to-53k-samples}{{}{13}{4.2.1 Scaling from 1K to 53K Samples}{section*.32}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.2.1 Scaling from 1K to 53K Samples}{13}{section*.32}\protected@file@percent }
+\newlabel{three-class-rank-classification-exp-10a}{{}{13}{4.2.2 Three-Class Rank Classification (Exp 10a)}{section*.33}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.2.2 Three-Class Rank Classification (Exp 10a)}{13}{section*.33}\protected@file@percent }
+\gdef \LT@xi {\LT@entry 
+    {3}{46.794pt}\LT@entry 
+    {1}{25.617pt}}
+\newlabel{cm-detection-exp-10d}{{}{14}{4.2.3 CM Detection (Exp 10d)}{section*.34}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.2.3 CM Detection (Exp 10d)}{14}{section*.34}\protected@file@percent }
+\newlabel{scaling-from-53k-to-200k-samples}{{}{14}{4.2.4 Scaling from 53K to 200K Samples}{section*.35}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.2.4 Scaling from 53K to 200K Samples}{14}{section*.35}\protected@file@percent }
+\gdef \LT@xii {\LT@entry 
+    {1}{29.496pt}\LT@entry 
+    {3}{30.273pt}\LT@entry 
+    {1}{111.44403pt}\LT@entry 
+    {1}{56.19pt}}
+\@writefile{toc}{\contentsline {subsubsection}{4.3 Trace-Index GNN (Exp 12)}{15}{section*.36}\protected@file@percent }
+\newlabel{trace-index-gnn-exp-12}{{}{15}{4.3 Trace-Index GNN (Exp 12)}{section*.36}{}}
+\newlabel{graph-construction}{{}{15}{4.3.1 Graph Construction}{section*.37}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.3.1 Graph Construction}{15}{section*.37}\protected@file@percent }
+\newlabel{l-function-zero-prediction-exp-12a}{{}{15}{4.3.2 L-Function Zero Prediction (Exp 12a)}{section*.38}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.3.2 L-Function Zero Prediction (Exp 12a)}{15}{section*.38}\protected@file@percent }
+\gdef \LT@xiii {\LT@entry 
+    {3}{75.72pt}\LT@entry 
+    {1}{68.19902pt}\LT@entry 
+    {1}{46.86002pt}\LT@entry 
+    {1}{36.474pt}\LT@entry 
+    {1}{46.281pt}}
+\gdef \LT@xiv {\LT@entry 
+    {3}{48.63899pt}\LT@entry 
+    {3}{34.782pt}\LT@entry 
+    {1}{69.51001pt}}
+\gdef \LT@xv {\LT@entry 
+    {3}{73.173pt}\LT@entry 
+    {1}{53.61902pt}\LT@entry 
+    {1}{44.457pt}\LT@entry 
+    {3}{34.347pt}}
+\newlabel{rank-classification-exp-12b}{{}{16}{4.3.3 Rank Classification (Exp 12b)}{section*.39}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.3.3 Rank Classification (Exp 12b)}{16}{section*.39}\protected@file@percent }
+\newlabel{ensemble-exp-13}{{}{16}{4.3.4 Ensemble (Exp 13)}{section*.40}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.3.4 Ensemble (Exp 13)}{16}{section*.40}\protected@file@percent }
+\gdef \LT@xvi {\LT@entry 
+    {1}{36.399pt}\LT@entry 
+    {1}{45.213pt}\LT@entry 
+    {1}{62.04301pt}\LT@entry 
+    {1}{25.23pt}}
+\gdef \LT@xvii {\LT@entry 
+    {3}{12.252pt}\LT@entry 
+    {3}{31.704pt}\LT@entry 
+    {3}{27.078pt}\LT@entry 
+    {1}{30.04236pt}\LT@entry 
+    {3}{27.16501pt}}
+\@writefile{toc}{\contentsline {subsubsection}{4.4 Corrected Sato-Tate Moment Analysis}{17}{section*.41}\protected@file@percent }
+\newlabel{corrected-sato-tate-moment-analysis}{{}{17}{4.4 Corrected Sato-Tate Moment Analysis}{section*.41}{}}
+\newlabel{prime-index-fix}{{}{17}{4.4.1 Prime-Index Fix}{section*.42}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.4.1 Prime-Index Fix}{17}{section*.42}\protected@file@percent }
+\newlabel{dimension-scaling}{{}{17}{4.4.2 Dimension Scaling}{section*.43}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.4.2 Dimension Scaling}{17}{section*.43}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{4.5 Galois Correlation Discovery}{17}{section*.44}\protected@file@percent }
+\newlabel{galois-correlation-discovery}{{}{17}{4.5 Galois Correlation Discovery}{section*.44}{}}
+\newlabel{the-rho_2--0.607-constant}{{}{17}{\texorpdfstring {4.5.1 The \(\rho _2 = -0.607\) Constant}{4.5.1 The \textbackslash rho\_2 = -0.607 Constant}}{section*.45}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.5.1 The \(\mitrho _2 = -0.607\) Constant}{17}{section*.45}\protected@file@percent }
+\newlabel{correlation-dilution-law}{{}{18}{4.5.2 Correlation Dilution Law}{section*.46}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.5.2 Correlation Dilution Law}{18}{section*.46}\protected@file@percent }
+\newlabel{connection-to-sato-tate-groups}{{}{18}{4.5.3 Connection to Sato-Tate Groups}{section*.47}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.5.3 Connection to Sato-Tate Groups}{18}{section*.47}\protected@file@percent }
+\gdef \LT@xviii {\LT@entry 
+    {3}{32.788pt}\LT@entry 
+    {1}{29.904pt}\LT@entry 
+    {3}{27.078pt}\LT@entry 
+    {1}{46.2pt}}
+\gdef \LT@xix {\LT@entry 
+    {3}{132.15002pt}\LT@entry 
+    {3}{30.273pt}\LT@entry 
+    {1}{50.52pt}}
+\gdef \LT@xx {\LT@entry 
+    {1}{24.447pt}\LT@entry 
+    {3}{57.919pt}\LT@entry 
+    {1}{52.278pt}\LT@entry 
+    {3}{150.13203pt}}
+\@writefile{toc}{\contentsline {subsubsection}{4.6 CM Classification with Moment Features}{19}{section*.48}\protected@file@percent }
+\newlabel{cm-classification-with-moment-features}{{}{19}{4.6 CM Classification with Moment Features}{section*.48}{}}
+\newlabel{theory}{{}{19}{4.6.1 Theory}{section*.49}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.6.1 Theory}{19}{section*.49}\protected@file@percent }
+\newlabel{classification-results}{{}{19}{4.6.2 Classification Results}{section*.50}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.6.2 Classification Results}{19}{section*.50}\protected@file@percent }
+\newlabel{feature-importance}{{}{19}{4.6.3 Feature Importance}{section*.51}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.6.3 Feature Importance}{19}{section*.51}\protected@file@percent }
+\newlabel{cross-validation}{{}{19}{4.6.4 Cross-Validation}{section*.52}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.6.4 Cross-Validation}{19}{section*.52}\protected@file@percent }
+\gdef \LT@xxi {\LT@entry 
+    {3}{25.356pt}\LT@entry 
+    {3}{27.078pt}\LT@entry 
+    {1}{42.69301pt}\LT@entry 
+    {1}{27.804pt}}
+\gdef \LT@xxii {\LT@entry 
+    {3}{12.252pt}\LT@entry 
+    {1}{30.723pt}\LT@entry 
+    {1}{95.27965pt}}
+\@writefile{toc}{\contentsline {subsubsection}{4.7 Friedli Spectral Zeta Constant}{20}{section*.53}\protected@file@percent }
+\newlabel{friedli-spectral-zeta-constant}{{}{20}{4.7 Friedli Spectral Zeta Constant}{section*.53}{}}
+\newlabel{friedli-slope-convergence}{{}{20}{4.7.1 Friedli Slope Convergence}{section*.54}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.7.1 Friedli Slope Convergence}{20}{section*.54}\protected@file@percent }
+\newlabel{interpretation}{{}{20}{4.7.2 Interpretation}{section*.55}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.7.2 Interpretation}{20}{section*.55}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{4.8 GUE Zero Statistics (Thread L)}{20}{section*.56}\protected@file@percent }
+\newlabel{gue-zero-statistics-thread-l}{{}{20}{4.8 GUE Zero Statistics (Thread L)}{section*.56}{}}
+\newlabel{motivation-1}{{}{20}{4.8.1 Motivation}{section*.57}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.8.1 Motivation}{20}{section*.57}\protected@file@percent }
+\gdef \LT@xxiii {\LT@entry 
+    {3}{130.92603pt}\LT@entry 
+    {3}{63.147pt}}
+\newlabel{method}{{}{21}{4.8.2 Method}{section*.58}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.8.2 Method}{21}{section*.58}\protected@file@percent }
+\newlabel{global-results}{{}{21}{4.8.3 Global Results}{section*.59}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.8.3 Global Results}{21}{section*.59}\protected@file@percent }
+\gdef \LT@xxiv {\LT@entry 
+    {3}{12.252pt}\LT@entry 
+    {3}{31.704pt}\LT@entry 
+    {1}{53.214pt}\LT@entry 
+    {1}{52.962pt}\LT@entry 
+    {1}{51.162pt}\LT@entry 
+    {1}{54.129pt}}
+\newlabel{the-two-population-discovery-dimension-resolved-analysis}{{}{22}{4.8.4 The Two-Population Discovery: Dimension-Resolved Analysis}{section*.60}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.8.4 The Two-Population Discovery: Dimension-Resolved Analysis}{22}{section*.60}\protected@file@percent }
+\newlabel{trend-across-dimensions}{{}{23}{4.8.5 Trend Across Dimensions}{section*.61}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.8.5 Trend Across Dimensions}{23}{section*.61}\protected@file@percent }
+\newlabel{comparison-with-synthetic-gue}{{}{23}{4.8.6 Comparison with Synthetic GUE}{section*.62}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.8.6 Comparison with Synthetic GUE}{23}{section*.62}\protected@file@percent }
+\newlabel{significance}{{}{23}{4.8.7 Significance}{section*.63}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.8.7 Significance}{23}{section*.63}\protected@file@percent }
+\gdef \LT@xxv {\LT@entry 
+    {3}{89.41801pt}\LT@entry 
+    {3}{110.292pt}\LT@entry 
+    {3}{113.15102pt}}
+\gdef \LT@xxvi {\LT@entry 
+    {1}{106.68938pt}\LT@entry 
+    {1}{69.79733pt}\LT@entry 
+    {1}{61.81892pt}\LT@entry 
+    {1}{106.68938pt}}
+\@writefile{toc}{\contentsline {subsubsection}{4.9 External Benchmark Comparison (Threads 4+5)}{24}{section*.64}\protected@file@percent }
+\newlabel{external-benchmark-comparison-threads-45}{{}{24}{4.9 External Benchmark Comparison (Threads 4+5)}{section*.64}{}}
+\newlabel{competition-replication-pcalda-on-200k-hecke-traces}{{}{24}{4.9.1 Competition Replication: PCA+LDA on 200K Hecke Traces}{section*.65}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.9.1 Competition Replication: PCA+LDA on 200K Hecke Traces}{24}{section*.65}\protected@file@percent }
+\newlabel{engineered-features-benchmark-near-perfect-rank-classification}{{}{24}{4.9.2 Engineered Features Benchmark: Near-Perfect Rank Classification}{section*.66}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.9.2 Engineered Features Benchmark: Near-Perfect Rank Classification}{24}{section*.66}\protected@file@percent }
+\gdef \LT@xxvii {\LT@entry 
+    {1}{68.399pt}\LT@entry 
+    {1}{55.048pt}\LT@entry 
+    {1}{104.101pt}\LT@entry 
+    {1}{117.452pt}}
+\newlabel{implications-for-the-project}{{}{25}{4.9.3 Implications for the Project}{section*.67}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.9.3 Implications for the Project}{25}{section*.67}\protected@file@percent }
+\gdef \LT@xxviii {\LT@entry 
+    {3}{72.912pt}\LT@entry 
+    {1}{93.05702pt}\LT@entry 
+    {1}{111.72302pt}\LT@entry 
+    {1}{25.23pt}}
+\@writefile{toc}{\contentsline {subsubsection}{4.10 GNN Attention Interpretability (Oracle Suggestion)}{26}{section*.68}\protected@file@percent }
+\newlabel{gnn-attention-interpretability-oracle-suggestion}{{}{26}{4.10 GNN Attention Interpretability (Oracle Suggestion)}{section*.68}{}}
+\newlabel{global-statistics}{{}{26}{4.10.1 Global Statistics}{section*.69}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.10.1 Global Statistics}{26}{section*.69}\protected@file@percent }
+\newlabel{layer-wise-structure}{{}{26}{4.10.2 Layer-Wise Structure}{section*.70}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.10.2 Layer-Wise Structure}{26}{section*.70}\protected@file@percent }
+\gdef \LT@xxix {\LT@entry 
+    {3}{45.15602pt}\LT@entry 
+    {1}{50.46pt}\LT@entry 
+    {1}{38.769pt}\LT@entry 
+    {1}{80.00948pt}}
+\newlabel{does-the-gat-learn-the-ramanujan-petersson-bound}{{}{27}{4.10.3 Does the GAT Learn the Ramanujan-Petersson Bound?}{section*.71}{}}
+\@writefile{toc}{\contentsline {paragraph}{4.10.3 Does the GAT Learn the Ramanujan-Petersson Bound?}{27}{section*.71}\protected@file@percent }
+\gdef \LT@xxx {\LT@entry 
+    {1}{95.9398pt}\LT@entry 
+    {1}{153.15088pt}\LT@entry 
+    {1}{95.9398pt}}
+\@writefile{toc}{\contentsline {subsubsection}{5.2 Comparison with the Literature}{28}{section*.72}\protected@file@percent }
+\newlabel{comparison-with-the-literature}{{}{28}{5.2 Comparison with the Literature}{section*.72}{}}
+\@writefile{toc}{\contentsline {subsubsection}{5.3 Computational Feasibility of the Connes Approach}{28}{section*.73}\protected@file@percent }
+\newlabel{computational-feasibility-of-the-connes-approach}{{}{28}{5.3 Computational Feasibility of the Connes Approach}{section*.73}{}}
+\@writefile{toc}{\contentsline {subsubsection}{5.4 The Friedli Constant in Context}{29}{section*.74}\protected@file@percent }
+\newlabel{the-friedli-constant-in-context}{{}{29}{5.4 The Friedli Constant in Context}{section*.74}{}}
+\@writefile{toc}{\contentsline {subsection}{6. Roadmap (19 Priority-Ranked Threads A--S)}{29}{section*.75}\protected@file@percent }
+\newlabel{roadmap-19-priority-ranked-threads-as}{{}{29}{6. Roadmap (19 Priority-Ranked Threads A--S)}{section*.75}{}}
+\gdef \LT@xxxi {\LT@entry 
+    {1}{70.06554pt}\LT@entry 
+    {1}{114.98836pt}\LT@entry 
+    {1}{89.84065pt}\LT@entry 
+    {1}{70.06554pt}}
+\gdef \LT@xxxii {\LT@entry 
+    {1}{70.06554pt}\LT@entry 
+    {1}{114.98836pt}\LT@entry 
+    {1}{89.84065pt}\LT@entry 
+    {1}{70.06554pt}}
+\@writefile{toc}{\contentsline {subsubsection}{Phase 1 (Weeks 1--2) --- Computational Discovery}{30}{section*.76}\protected@file@percent }
+\newlabel{phase-1-weeks-12-computational-discovery}{{}{30}{Phase 1 (Weeks 1--2) --- Computational Discovery}{section*.76}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Phase 2 (Weeks 3--4) --- Model \& Theory}{30}{section*.77}\protected@file@percent }
+\newlabel{phase-2-weeks-34-model-theory}{{}{30}{Phase 2 (Weeks 3--4) --- Model \& Theory}{section*.77}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Phase 3 (Weeks 5--6) --- Synthesis \& Theoretical}{31}{section*.78}\protected@file@percent }
+\newlabel{phase-3-weeks-56-synthesis-theoretical}{{}{31}{Phase 3 (Weeks 5--6) --- Synthesis \& Theoretical}{section*.78}{}}
+\gdef \LT@xxxiii {\LT@entry 
+    {1}{70.06554pt}\LT@entry 
+    {1}{114.98836pt}\LT@entry 
+    {1}{89.84065pt}\LT@entry 
+    {1}{70.06554pt}}
+\gdef \LT@xxxiv {\LT@entry 
+    {1}{62.70749pt}\LT@entry 
+    {1}{73.18684pt}\LT@entry 
+    {1}{65.70749pt}\LT@entry 
+    {1}{80.6662pt}\LT@entry 
+    {1}{62.70749pt}}
+\@writefile{toc}{\contentsline {subsubsection}{Updated Success Metrics}{32}{section*.79}\protected@file@percent }
+\newlabel{updated-success-metrics}{{}{32}{Updated Success Metrics}{section*.79}{}}
+\@writefile{toc}{\contentsline {subsection}{7. Conclusions}{33}{section*.80}\protected@file@percent }
+\newlabel{conclusions}{{}{33}{7. Conclusions}{section*.80}{}}
+\gdef \LT@xxxv {\LT@entry 
+    {1}{146.42944pt}\LT@entry 
+    {1}{198.57056pt}}
+\gdef \LT@xxxvi {\LT@entry 
+    {3}{74.46pt}\LT@entry 
+    {3}{85.119pt}\LT@entry 
+    {3}{165.76501pt}}
+\@writefile{toc}{\contentsline {subsection}{8. Methods}{34}{section*.81}\protected@file@percent }
+\newlabel{methods}{{}{34}{8. Methods}{section*.81}{}}
+\@writefile{toc}{\contentsline {subsubsection}{8.1 Data Collection}{34}{section*.82}\protected@file@percent }
+\newlabel{data-collection}{{}{34}{8.1 Data Collection}{section*.82}{}}
+\@writefile{toc}{\contentsline {subsubsection}{8.2 Models}{34}{section*.83}\protected@file@percent }
+\newlabel{models}{{}{34}{8.2 Models}{section*.83}{}}
+\gdef \LT@xxxvii {\LT@entry 
+    {1}{172.5pt}\LT@entry 
+    {1}{172.5pt}}
+\@writefile{toc}{\contentsline {subsubsection}{8.3 Sato-Tate Moment Computation}{35}{section*.84}\protected@file@percent }
+\newlabel{sato-tate-moment-computation}{{}{35}{8.3 Sato-Tate Moment Computation}{section*.84}{}}
+\@writefile{toc}{\contentsline {subsubsection}{8.4 Friedli Spectral Zeta}{35}{section*.85}\protected@file@percent }
+\newlabel{friedli-spectral-zeta}{{}{35}{8.4 Friedli Spectral Zeta}{section*.85}{}}
+\@writefile{toc}{\contentsline {subsection}{9. Reproducibility}{35}{section*.86}\protected@file@percent }
+\newlabel{reproducibility}{{}{35}{9. Reproducibility}{section*.86}{}}
+\@writefile{toc}{\contentsline {subsection}{10. Open Questions and Caveats}{36}{section*.87}\protected@file@percent }
+\newlabel{open-questions-and-caveats}{{}{36}{10. Open Questions and Caveats}{section*.87}{}}
+\@writefile{toc}{\contentsline {subsubsection}{10.1 The \(d\ge 2\) P(r) Anomaly}{36}{section*.88}\protected@file@percent }
+\newlabel{the-dge-2-pr-anomaly}{{}{36}{\texorpdfstring {10.1 The \(d\ge 2\) P(r) Anomaly}{10.1 The d\textbackslash ge 2 P(r) Anomaly}}{section*.88}{}}
+\@writefile{toc}{\contentsline {subsubsection}{10.2 CvS × L-function Generalization (Thread O)}{36}{section*.89}\protected@file@percent }
+\newlabel{cvs-l-function-generalization-thread-o}{{}{36}{10.2 CvS × L-function Generalization (Thread O)}{section*.89}{}}
+\@writefile{toc}{\contentsline {subsubsection}{10.3 GNN Attention as Hypothesis Generator}{37}{section*.90}\protected@file@percent }
+\newlabel{gnn-attention-as-hypothesis-generator}{{}{37}{10.3 GNN Attention as Hypothesis Generator}{section*.90}{}}
+\@writefile{toc}{\contentsline {subsubsection}{10.4 Farey GNN's Information-Theoretic Bound}{37}{section*.91}\protected@file@percent }
+\newlabel{farey-gnns-information-theoretic-bound}{{}{37}{10.4 Farey GNN's Information-Theoretic Bound}{section*.91}{}}
+\@writefile{toc}{\contentsline {subsubsection}{10.5 Multi-Task Zero Prediction}{37}{section*.92}\protected@file@percent }
+\newlabel{multi-task-zero-prediction}{{}{37}{10.5 Multi-Task Zero Prediction}{section*.92}{}}
+\@writefile{toc}{\contentsline {subsubsection}{10.6 Summary of Caveats}{38}{section*.93}\protected@file@percent }
+\newlabel{summary-of-caveats}{{}{38}{10.6 Summary of Caveats}{section*.93}{}}
+\@writefile{toc}{\contentsline {subsection}{11. Acknowledgments}{38}{section*.94}\protected@file@percent }
+\newlabel{acknowledgments}{{}{38}{11. Acknowledgments}{section*.94}{}}
+\@writefile{toc}{\contentsline {subsection}{12. References}{38}{section*.95}\protected@file@percent }
+\newlabel{references}{{}{38}{12. References}{section*.95}{}}
+\gdef \@abspage@last{40}

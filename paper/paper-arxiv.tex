@@ -35,7 +35,7 @@
 }{% if KOMA class
   \KOMAoptions{parskip=half}}
 \makeatother
-\usepackage[table]{xcolor}
+\usepackage{xcolor}
 \usepackage{color}
 \usepackage{fancyvrb}
 \newcommand{\VerbBar}{|}
@@ -88,6 +88,7 @@
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\PassOptionsToPackage{table}{xcolor}
 \ifLuaTeX
   \usepackage{selnolig}  % disable illegal ligatures
 \fi
@@ -95,13 +96,17 @@
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
 \urlstyle{same}
 \hypersetup{
+  pdftitle={Machine Learning for Modular Forms},
+  pdfauthor={Tobias Weiss},
   hidelinks,
   pdfcreator={LaTeX via pandoc}}
 
-\author{}
+\title{Machine Learning for Modular Forms}
+\author{Tobias Weiss}
 \date{}
 
 \begin{document}
+\maketitle
 
 \hypertarget{machine-learning-for-modular-forms-hecke-traces-l-function-zeros-and-the-sato-tate-distribution}{%
 \section{Machine Learning for Modular Forms: Hecke Traces, L-Function
@@ -282,7 +287,6 @@ since 2022:
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1860}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.3023}}@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 \begin{minipage}[b]{\linewidth}\raggedright
 Study
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -294,11 +298,10 @@ Target
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Best Result
 \end{minipage} \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 He et al.~(2025, arXiv:2502.10360) & PCA + LDA + FNN & \textbf{248,359}
 rational L-functions & Vanishing order & Strong correlation \\
 Naser et al.~(2024, arXiv:2403.14631) & FNN & \textasciitilde10K forms &
@@ -585,17 +588,15 @@ trivial character via \texttt{scripts/collect\_lmfdb\_sql.py}:
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5882}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4118}}@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 \begin{minipage}[b]{\linewidth}\raggedright
 Property
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Value
 \end{minipage} \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 Total newforms (original) & 53,779 (via
 \texttt{mf\_hecke\_nf.an\_field\_embedding} join) \\
 Total newforms (Thread A, expanded) & \textbf{200,000} (via
@@ -623,13 +624,11 @@ collector (\texttt{scripts/collect\_lmfdb\_incremental.py}) \\
 
 \begin{longtable}[]{@{}lll@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 Property & Original (53K) & Expanded (200K) \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 Analytic rank 0 & 26,929 (50.1\%) & 133,806 (66.9\%) \\
 Analytic rank 1 & 26,138 (48.6\%) & 63,758 (31.9\%) \\
 Analytic rank ≥ 2 & 712 (1.3\%) & 2,436 (1.2\%) \\
@@ -652,13 +651,11 @@ primes \(p=2,\dots,101\):
 
 \begin{longtable}[]{@{}lll@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 p & \(\|\operatorname{SL}(2,\mathbb{F}_p)\|\) & Ramanujan? \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 2 & 6 & No \\
 3 & 24 & \textbf{Yes} \\
 5 & 120 & \textbf{Yes} \\
@@ -710,7 +707,6 @@ Methods}\label{machine-learning-methods}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4516}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3226}}@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 \begin{minipage}[b]{\linewidth}\raggedright
 Model
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -718,11 +714,10 @@ Configuration
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Best For
 \end{minipage} \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 LogisticRegression & multinomial, L2 & Fast baseline \\
 RandomForest & 100 trees, max\_depth=None & Dimension regression
 (R²=0.990) \\
@@ -746,13 +741,11 @@ Features: 100 Hecke trace coefficients \(a_1,\dots,a_{100}\). Split:
 
 \begin{longtable}[]{@{}ll@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 Component & Configuration \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 Architecture & ChebConv K=5, hidden=128, 3 layers \\
 Graph & Trace-index, 1000 nodes/graph, k-NN edges \\
 Node features & 5-dim (level, dim, cond, \(a_1\), \(a_2\)) \\
@@ -849,13 +842,11 @@ spectral gap of \(\operatorname{SL}(2,\mathbb{F}_p)\) Cayley graphs.
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 Experiment & Model & Train R² & Test R² \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 1a & GAT, 6 train / 2 test & --- & -733 \\
 1b & GAT, 15 train / 3 test & --- & Timeout (O(N) scaling) \\
 2 & GAT + subgraph augment, 599/82 & 0.688 & -121.7 \\
@@ -889,13 +880,11 @@ predicted training-distribution means for test graphs.
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 Experiment & Target & GNN R² (LOO) & Linear Baseline R² \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 5 & deligne\_ratio & -0.361 & \textbf{0.070} \\
 6 & mean\_a\_p & -0.127 & \textbf{0.410} \\
 \end{longtable}
@@ -941,13 +930,11 @@ metric:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 Metric & Exp 9 (1K forms) & Exp 10 (53K forms) & Improvement \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 Rank classification F1 & 0.839 (binary) & 0.970 (3-class) & +15.6\% \\
 Dimension regression R² & 0.976 & 0.990 & +1.4\% \\
 Conductor regression R² & 0.142 & 0.526 & +270\% \\
@@ -956,111 +943,14 @@ Training samples & 1,000 & 53,779 & 53× \\
 
 }
 
-\\textbf{Data quantity, not model architecture, was the fundamental
+\textbf{Data quantity, not model architecture, was the fundamental
 bottleneck.} This finding --- trivially obvious in ML but often
 overlooked in mathematical applications --- is the single most important
 methodological lesson of this project.
 
-\\hypertarget{scaling-from-53k-to-200k-samples}{%
-\\paragraph{4.2.2 Further Scaling: 53K to 200K Samples}
-\\label{scaling-from-53k-to-200k-samples}}
-
-Expanding from 53,779 to 200,000 weight-2 newforms yielded additional
-gains, particularly for conductor regression where the logarithmic
-relationship enabled improved linear model capture:
-
-{\\small\\setlength{\\tabcolsep}{3pt}%
-\\renewcommand{\\arraystretch}{1.08}%
-\\LTleft=\\fill\\LTright=\\fill
-
-\\begin{longtable}[]{@{}llll@{}}
-\\toprule\\noalign{}
-\\rowcolor{gray!14}
-Metric & Exp 10 (53K) & Exp 11 (200K) & Improvement \\\\
-\\midrule
-\\endhead
-\\bottomrule
-\\endlastfoot
-\\rowcolors{2}{gray!5}{white}
-Rank accuracy (MLP 128→64) & -- & 94.4\\% & -- \\\\
-Rank F1 (macro, MLP) & -- & 0.905 & -- \\\\
-Dimension R² (StackingEnsemble) & 0.990& 0.999999 & +1\\% \\\\
-Dimension MAE (StackingEnsemble) & -- & 0.0083 & -- \\\\
-Dimension RMSE (StackingEnsemble)& -- & 0.061  & -- \\\\
-Conductor R² (log, MLP) & -- & 0.692 & -- \\\\
-Conductor MAE (log, MLP) & -- & 0.233 & -- \\\\
-Conductor RMSE (log, MLP)& -- & 0.395 & -- \\\\
-CM accuracy (XGBoost) & -- & 99.86\\% & -- \\\\
-CM F1 (macro, XGBoost) & -- & 0.805 & -- \\\\
-Training samples & 53,779 & 200,000 & 3.7× \\\\
-\\end{longtable}
-
-}
-
-\\textbf{Key insights}:
-\\begin{itemize}
-  \\item \textbf{Dimension}: StackingEnsemble achieves near-perfect
-    prediction at 200K scale, confirming that dimension is fundamentally
-    learnable from Hecke traces (R²=0.999999)
-  \\item \textbf{Conductor}: Logarithmic modeling improves dramatically
-    at larger scale (R²=0.692), suggesting non-linear patterns need
-    more data for accurate capture
-  \\item \textbf{CM detection}: XGBoost maintains 99.86\\% accuracy
-    despite extreme class imbalance, well-suited for rare class
-    identification
-\\end{itemize}
-
-\\textbf{Complete 200K model comparison} across all sklearn models:
-
-{\\small\\setlength{\\tabcolsep}{2pt}%
-\\renewcommand{\\arraystretch}{1.05}%
-\\LTleft=\\fill\\LTright=\\fill
-
-\\begin{longtable}[]{@{}lllll@{}}
-\\toprule\\noalign{}
-\\rowcolor{gray!14}
-Target & Model & Accuracy/F1 & R² & MAE/RMSE \\\\
-\\midrule
-\\endhead
-\\bottomrule
-\\endlastfoot
-\\rowcolors{2}{gray!5}{white}
-\\multirow{6}{*}{Rank (class)}
-LogisticRegression & 86.70\\%/0.778 & -- & -- \\\\
-RandomForest & 80.88\\%/0.658 & -- & -- \\\\
-GradientBoosting & 83.00\\%/0.754 & -- & -- \\\\
-\\textbf{MLP (128→64)} & \\textbf{94.38\\%/0.905} & -- & -- \\\\
-XGBoost & 85.45\\%/0.808 & -- & -- \\\\
-StackingEnsemble & 87.41\\%/0.798 & -- & -- \\\\\
-\\midrule
-\\multirow{5}{*}{Dim (regr)}
-RandomForest & -- & 0.999999 & 0.0023/0.065 \\\\
-GradientBoosting & -- & 0.999998 & 0.0142/0.087 \\\\
-MLP (128→64) & -- & 0.999958 & 0.2232/0.370 \\\\
-XGBoost & -- & 0.998322 & 0.3524/2.327 \\\\
-\\textbf{StackingEnsemble}& -- & \\textbf{0.999999} & \\textbf{0.0083/0.061} \\\\\
-\\midrule
-\\multirow{5}{*}{Floor(Log N)}
-RandomForest & -- & 0.249 & 0.455/0.618 \\\\
-GradientBoosting & -- & 0.208 & 0.474/0.634 \\\\
-\\textbf{MLP (128→64)} & -- & \\textbf{0.692} & \\textbf{0.233/0.395} \\\\
-XGBoost & -- & 0.273 & 0.443/0.608 \\\\
-StackingEnsemble & -- & 0.256 & 0.450/0.615 \\\\\
-\\midrule
-\\multirow{6}{*}{CM (class)}
-LogisticRegression & 75.25\\%/0.436 & -- & -- \\\\
-RandomForest & 99.84\\%/0.759 & -- & -- \\\\
-GradientBoosting & 99.83\\%/0.779 & -- & -- \\\\
-MLP (128→64) & 99.80\\%/0.499 & -- & -- \\\\
-\\textbf{XGBoost} & \\textbf{99.86\\%/0.805} & -- & -- \\\\
-StackingEnsemble & 99.39\\%/0.696 & -- & -- \\\\
-\\end{longtable}
-
-}
-
-\\hypertarget{three-class-rank-classification-exp-10a}{%
-\\paragraph{4.2.3 Three-Class Rank Classification (Exp
-10a)}\\label{three-class-rank-classification-exp-10a}}
+\hypertarget{three-class-rank-classification-exp-10a}{%
+\paragraph{4.2.2 Three-Class Rank Classification (Exp
+10a)}\label{three-class-rank-classification-exp-10a}}
 
 MLP (128→64, ReLU) achieves 97.9\% accuracy, F1(macro)=0.970:
 
@@ -1070,13 +960,11 @@ MLP (128→64, ReLU) achieves 97.9\% accuracy, F1(macro)=0.970:
 
 \begin{longtable}[]{@{}lll@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 Class & F1 Score & Support \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 Rank 0 & 0.979 & 5,386 \\
 Rank 1 & 0.979 & 5,228 \\
 Rank 2 (rare) & 0.953 & 142 \\
@@ -1101,13 +989,11 @@ GradientBoosting achieves F1=0.800 against extreme class imbalance
 
 \begin{longtable}[]{@{}ll@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 Metric & Value \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 Precision & 0.865 \\
 Recall & 0.744 \\
 F1 & 0.800 \\
@@ -1151,13 +1037,11 @@ ChebConv K=5 with 3 layers and 128 hidden dimensions:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 Metric & GNN & Sklearn Baseline (Exp 10) & Improvement \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 \textbf{R²} & \textbf{0.631} & 0.526 & \textbf{+20\%} \\
 \textbf{MAE} & \textbf{0.229} & 0.297 & \textbf{-23\%} \\
 \end{longtable}
@@ -1177,13 +1061,11 @@ epochs with early stopping (patience=15).
 
 \begin{longtable}[]{@{}lcccc@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 Architecture & Node Feat Dim & Edge Feat & Test R² & Δ vs GCN \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 GCN & 9 & 3 & 0.655 & --- \\
 ChebConv (K=5) & 9 & 3 & 0.668 & +1.9\% \\
 \textbf{GAT} (4 heads) & \textbf{9} & \textbf{3} & \textbf{0.731} &
@@ -1220,13 +1102,11 @@ connections carries spectral information.
 
 \begin{longtable}[]{@{}lll@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 Metric & GNN & Sklearn Baseline \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 Accuracy & 94.16\% & \textbf{97.9\%} \\
 F1 (macro) & 0.892 & \textbf{0.970} \\
 Rank-2 F1 & 0.789 & \textbf{0.953} \\
@@ -1248,13 +1128,11 @@ Stacking GNN embeddings + sklearn predictions:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 Target & GNN Alone & Ensemble & Delta \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 z1 R² & 0.631 & \textbf{0.656} & +2.6\% \\
 Rank F1 (macro) & 0.892 & 0.929 & --- \\
 Rank-2 F1 & 0.789 & \textbf{0.886} & +12.3\% \\
@@ -1286,13 +1164,11 @@ non-CM dimension-1 forms:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 Moment & Empirical & SU(2) Theory & Ratio \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 \(M_2\) & 0.177 & 0.250 & 0.708 \\
 \(M_4\) & 0.054 & 0.125 & 0.432 \\
 \(M_6\) & 0.023 & 0.078 & 0.296 \\
@@ -1325,13 +1201,11 @@ The second moment \(M_2\) scales as \(\sim 1/d^\alpha\) with
 
 \begin{longtable}[]{@{}lllll@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 \(d\) & \(N\) & \(M_2\) & \(M_2 \cdot d\) & \(\rho_d\) \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 1 & 17,198 & 0.177 & 0.177 & --- \\
 2 & 8,026 & 0.037 & 0.069 & -0.607 \\
 3 & 4,305 & 0.014 & 0.041 & -0.383 \\
@@ -1437,13 +1311,11 @@ The moment ratios discriminate:
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 Ratio & SU(2) & U(1) & Separation \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 \(M_4/M_2\) & 0.500 & 0.750 & \textbf{Maximal} \\
 \(M_6/M_2\) & 0.313 & 0.625 & Strong \\
 \(M_6/M_4\) & 0.625 & 0.833 & Moderate \\
@@ -1462,13 +1334,11 @@ GradientBoosting (150 trees, depth 3, lr=0.1) on two feature sets:
 
 \begin{longtable}[]{@{}lll@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 Feature Set & F1 & vs.~Baseline \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 100 traces (Exp 10 baseline) & 0.800 & --- \\
 25 prime traces only & 0.903 & \textbf{+12.9\%} \\
 25 traces + 11 moment features & \textbf{0.919} & \textbf{+14.9\%} \\
@@ -1490,13 +1360,11 @@ improvement, with most of the gain coming from the prime-index fix.
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 Rank & Feature & Importance & Interpretation \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 1 & \(M_4/M_2\) ratio & 0.176 & SU(2) vs U(1) separation (maximal) \\
 2 & \(a_{47}\) & 0.109 & Individual Hecke trace \\
 3 & \(M_4^s/M_2^s\) & 0.091 & Dimension-scaled moment ratio \\
@@ -1521,13 +1389,11 @@ beyond individual trace values.
 
 \begin{longtable}[]{@{}llll@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 Fold & F1 & Precision & Recall \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 Mean & 0.845 & 1.000 & 0.59 \\
 Std & 0.056 & 0.000 & 0.05 \\
 \end{longtable}
@@ -1555,13 +1421,11 @@ Full-spectra computation for \(p \le 13\):
 
 \begin{longtable}[]{@{}lll@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 p & Nodes & \(d(\log R)/d\sigma\) at \(\sigma=1/2\) \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 2 & 6 & 1.3208 \\
 3 & 24 & 1.2084 \\
 5 & 120 & 1.1574 \\
@@ -1650,13 +1514,11 @@ methodology.
 
 \begin{longtable}[]{@{}ll@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 Metric & Value \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 Forms analyzed & 63,844 \\
 Total nearest-neighbor spacings & 568,708 \\
 Best ensemble: GOE & 36,967 (57.9\%) \\
@@ -1686,13 +1548,11 @@ the Hecke field:
 
 \begin{longtable}[]{@{}llllll@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 \(d\) & Forms & FVE(GOE) & FVE(GUE) & FVE(GSE) & \% GUE best \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 1 & 34,628 & 0.2241 & \textbf{0.2048} & 0.2177 & 32.8\% \\
 2 & 8,263 & \textbf{0.2326} & 0.2680 & 0.3168 & 8.7\% \\
 3 & 4,319 & \textbf{0.2527} & 0.2934 & 0.3441 & 5.3\% \\
@@ -1824,13 +1684,11 @@ with Hecke traces:
 
 \begin{longtable}[]{@{}lll@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 Metric & Competition Paper & Our Result \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 Method & PCA(50)+LDA & PCA(50)+LDA \\
 Samples & 248K rational L-functions & 200K weight-2 newforms \\
 PCA var explained & not reported & 96.49\% \\
@@ -1872,7 +1730,6 @@ statistics enable near-perfect analytic rank classification?
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.1707}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3171}}@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 \begin{minipage}[b]{\linewidth}\raggedright
 Feature Set
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1882,11 +1739,10 @@ RF F1
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Top Features
 \end{minipage} \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 100 traces only & 0.9624 & 0.9623 & trace\_1(0.13), trace\_2(0.08),
 \ldots{} \\
 traces + 10 zeros & 0.9846 & 0.9844 & z1(0.15), trace\_1(0.07),
@@ -1948,7 +1804,6 @@ Project}\label{implications-for-the-project}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3000}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.3500}}@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 \begin{minipage}[b]{\linewidth}\raggedright
 Method
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -1958,11 +1813,10 @@ Performance
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Data Required
 \end{minipage} \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 PCA+LDA (competition) & Rank classification & F1=0.622 & 200K traces \\
 RF (traces only) & Rank classification & F1=0.962 & 100 traces per
 form \\
@@ -2018,13 +1872,11 @@ coefficient \(a_i\), where \(i\) is the trace index.
 
 \begin{longtable}[]{@{}lrrr@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 Metric & Prime-Indexed Nodes & Composite-Indexed Nodes & Ratio \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 Mean attention & 0.1026 & 0.0967 & 1.061 \\
 Std attention & 0.0820 & 0.0805 & 1.019 \\
 Median attention & 0.0814 & 0.0756 & 1.077 \\
@@ -2053,13 +1905,11 @@ patterns:
 
 \begin{longtable}[]{@{}lrrr@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 Layer & Mean Attn & Entropy & Sparsity (\(\alpha<0.01\)) \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 0 (input) & 0.0937 & 1,458 & 0.008 \\
 1 (hidden) & 0.0921 & 1,472 & 0.007 \\
 2 (output) & 0.1198 & 715 & 0.622 \\
@@ -2153,7 +2003,6 @@ Literature}\label{comparison-with-the-literature}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4419}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2791}}@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 \begin{minipage}[b]{\linewidth}\raggedright
 Our Result
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2161,11 +2010,10 @@ Closest Literature
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Comparison
 \end{minipage} \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 Rank F1=0.970 at 53K & arXiv:2502.10360 (248K L-functions) & Different
 approach (traces vs L-function values) \\
 Galois correlation \(\rho_2=-0.607\) & \textbf{No precedent} & New
@@ -2269,7 +2117,6 @@ Discovery}\label{phase-1-weeks-12-computational-discovery}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2564}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2051}}@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 \begin{minipage}[b]{\linewidth}\raggedright
 Thread
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2279,11 +2126,10 @@ Priority
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Status
 \end{minipage} \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 \textbf{A} & Scale LMFDB to 200K+ forms (incremental collector, batch
 500, checkpointed) & ⭐⭐⭐ HIGHEST & \textbf{DONE} ✓ (200K records,
 103MB) \\
@@ -2319,7 +2165,6 @@ Theory}\label{phase-2-weeks-34-model-theory}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2564}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2051}}@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 \begin{minipage}[b]{\linewidth}\raggedright
 Thread
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2329,11 +2174,10 @@ Priority
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Status
 \end{minipage} \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 \textbf{C} & Connes CvS × L-function generalization --- direct
 \(Q_f(c)\) built for form 11.2.a.a, \(F_{\text{even}}(\tau)\) does NOT
 vanish at known zeros (see §10.2) & ⭐⭐⭐ HIGH & \textbf{DONE ✓
@@ -2377,7 +2221,6 @@ Theoretical}\label{phase-3-weeks-56-synthesis-theoretical}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2564}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2051}}@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 \begin{minipage}[b]{\linewidth}\raggedright
 Thread
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2387,11 +2230,10 @@ Priority
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Status
 \end{minipage} \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 \textbf{G} & Hybrid GNN + number theory features (Sato-Tate moments,
 class numbers) & ⭐⭐ & Pending \\
 \textbf{H} & Knowledge graph integration (Neo4j, 194 nodes, query for
@@ -2423,7 +2265,6 @@ Pending \\
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2326}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1860}}@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 \begin{minipage}[b]{\linewidth}\raggedright
 Metric
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
@@ -2435,11 +2276,10 @@ Timeline
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Status
 \end{minipage} \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 LMFDB newforms & \textbf{200,000} ✅ & 200,000 & Phase 1 & ✅
 \textbf{DONE} \\
 Rank F1 (macro) & 0.970 & 0.985 & Phase 1--2 & Pending \\
@@ -2557,17 +2397,15 @@ forms is the single highest-impact action we can take.
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4231}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5769}}@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 \begin{minipage}[b]{\linewidth}\raggedright
 Component
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Implementation
 \end{minipage} \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 LMFDB SQL access & \texttt{psycopg2} server-side cursor,
 \texttt{mf\_hecke\_nf.an\_field\_embedding} table \\
 Output & \texttt{data/lmfdb/lmfdb\_sql\_weight2\_ml.csv} (100 trace
@@ -2590,13 +2428,11 @@ spectra (\(p \le 13\)) \\
 
 \begin{longtable}[]{@{}lll@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 Model & Framework & Configuration \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 GAT & PyTorch Geometric & 3 layers, hidden=64, global\_mean\_pool \\
 ChebConv & PyTorch Geometric & K=5, hidden=128, 3 layers \\
 MLP & sklearn & 128→64, ReLU, Adam, early stopping \\
@@ -2654,17 +2490,15 @@ All code and data are available in the \texttt{riemann} repository:
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5000}}@{}}
 \toprule\noalign{}
-\rowcolor{gray!14}
 \begin{minipage}[b]{\linewidth}\raggedright
 Resource
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Location
 \end{minipage} \\
-\midrule
+\midrule\noalign{}
 \endhead
-\bottomrule
+\bottomrule\noalign{}
 \endlastfoot
-\rowcolors{2}{gray!5}{white}
 LMFDB collection & \texttt{scripts/collect\_lmfdb\_sql.py} \\
 sklearn ML & \texttt{scripts/train\_lmfdb\_ml\_53k.py} \\
 Trace-index GNN & \texttt{scripts/train\_lmfdb\_gnn.py} \\
