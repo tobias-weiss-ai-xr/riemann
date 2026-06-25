@@ -1,0 +1,285 @@
+{
+  "per_spacing_full": {
+    "spacing_1": {
+      "spacing_index": 0,
+      "n_spacings": 54443,
+      "beta_mle": 0.6923,
+      "beta_bootstrap_mean": 0.6924,
+      "beta_95_ci_lower": 0.6798,
+      "beta_95_ci_upper": 0.7049,
+      "ks_vs_poisson_0": 0.2697,
+      "ks_vs_goe_1": 0.1547,
+      "ks_vs_gue_2": 0.1935
+    },
+    "spacing_2": {
+      "spacing_index": 1,
+      "n_spacings": 54443,
+      "beta_mle": 0.715,
+      "beta_bootstrap_mean": 0.715,
+      "beta_95_ci_lower": 0.7022,
+      "beta_95_ci_upper": 0.7284,
+      "ks_vs_poisson_0": 0.2673,
+      "ks_vs_goe_1": 0.127,
+      "ks_vs_gue_2": 0.1735
+    },
+    "spacing_3": {
+      "spacing_index": 2,
+      "n_spacings": 54443,
+      "beta_mle": 0.6504,
+      "beta_bootstrap_mean": 0.6505,
+      "beta_95_ci_lower": 0.6368,
+      "beta_95_ci_upper": 0.6638,
+      "ks_vs_poisson_0": 0.1948,
+      "ks_vs_goe_1": 0.0455,
+      "ks_vs_gue_2": 0.1185
+    },
+    "spacing_4": {
+      "spacing_index": 3,
+      "n_spacings": 54443,
+      "beta_mle": 0.6861,
+      "beta_bootstrap_mean": 0.6864,
+      "beta_95_ci_lower": 0.6737,
+      "beta_95_ci_upper": 0.6988,
+      "ks_vs_poisson_0": 0.2368,
+      "ks_vs_goe_1": 0.061,
+      "ks_vs_gue_2": 0.1147
+    },
+    "spacing_5": {
+      "spacing_index": 4,
+      "n_spacings": 54443,
+      "beta_mle": 0.4751,
+      "beta_bootstrap_mean": 0.4752,
+      "beta_95_ci_lower": 0.4621,
+      "beta_95_ci_upper": 0.487,
+      "ks_vs_poisson_0": 0.1293,
+      "ks_vs_goe_1": 0.1017,
+      "ks_vs_gue_2": 0.1957
+    },
+    "spacing_6": {
+      "spacing_index": 5,
+      "n_spacings": 54443,
+      "beta_mle": 0.6493,
+      "beta_bootstrap_mean": 0.6495,
+      "beta_95_ci_lower": 0.6368,
+      "beta_95_ci_upper": 0.6628,
+      "ks_vs_poisson_0": 0.2226,
+      "ks_vs_goe_1": 0.0329,
+      "ks_vs_gue_2": 0.1055
+    },
+    "spacing_7": {
+      "spacing_index": 6,
+      "n_spacings": 54443,
+      "beta_mle": 0.4904,
+      "beta_bootstrap_mean": 0.4905,
+      "beta_95_ci_lower": 0.4765,
+      "beta_95_ci_upper": 0.5047,
+      "ks_vs_poisson_0": 0.1402,
+      "ks_vs_goe_1": 0.1362,
+      "ks_vs_gue_2": 0.2207
+    },
+    "spacing_8": {
+      "spacing_index": 7,
+      "n_spacings": 54443,
+      "beta_mle": 0.6361,
+      "beta_bootstrap_mean": 0.6362,
+      "beta_95_ci_lower": 0.6227,
+      "beta_95_ci_upper": 0.6501,
+      "ks_vs_poisson_0": 0.1867,
+      "ks_vs_goe_1": 0.0438,
+      "ks_vs_gue_2": 0.1345
+    },
+    "spacing_9": {
+      "spacing_index": 8,
+      "n_spacings": 54443,
+      "beta_mle": 0.5482,
+      "beta_bootstrap_mean": 0.5482,
+      "beta_95_ci_lower": 0.5343,
+      "beta_95_ci_upper": 0.5617,
+      "ks_vs_poisson_0": 0.1345,
+      "ks_vs_goe_1": 0.1361,
+      "ks_vs_gue_2": 0.2089
+    }
+  },
+  "per_spacing_dim_split": {
+    "dim_1": {
+      "spacing_1": {
+        "n_spacings": 25227,
+        "beta_mle": 1.4272,
+        "beta_bootstrap_mean": 1.4273,
+        "beta_95_ci_lower": 1.4127,
+        "beta_95_ci_upper": 1.4428,
+        "ks_vs_poisson_0": 0.4684,
+        "ks_vs_goe_1": 0.344
+      },
+      "spacing_2": {
+        "n_spacings": 25227,
+        "beta_mle": 1.7916,
+        "beta_bootstrap_mean": 1.7914,
+        "beta_95_ci_lower": 1.7716,
+        "beta_95_ci_upper": 1.8112,
+        "ks_vs_poisson_0": 0.3887,
+        "ks_vs_goe_1": 0.2117
+      },
+      "spacing_3": {
+        "n_spacings": 25227,
+        "beta_mle": 2.0068,
+        "beta_bootstrap_mean": 2.0069,
+        "beta_95_ci_lower": 1.9813,
+        "beta_95_ci_upper": 2.0324,
+        "ks_vs_poisson_0": 0.344,
+        "ks_vs_goe_1": 0.1445
+      },
+      "spacing_4": {
+        "n_spacings": 25227,
+        "beta_mle": 2.1773,
+        "beta_bootstrap_mean": 2.1776,
+        "beta_95_ci_lower": 2.1498,
+        "beta_95_ci_upper": 2.207,
+        "ks_vs_poisson_0": 0.3333,
+        "ks_vs_goe_1": 0.1317
+      },
+      "spacing_5": {
+        "n_spacings": 25227,
+        "beta_mle": 2.1212,
+        "beta_bootstrap_mean": 2.121,
+        "beta_95_ci_lower": 2.0916,
+        "beta_95_ci_upper": 2.1505,
+        "ks_vs_poisson_0": 0.298,
+        "ks_vs_goe_1": 0.1213
+      },
+      "spacing_6": {
+        "n_spacings": 25227,
+        "beta_mle": 2.0506,
+        "beta_bootstrap_mean": 2.0507,
+        "beta_95_ci_lower": 2.0192,
+        "beta_95_ci_upper": 2.0817,
+        "ks_vs_poisson_0": 0.2835,
+        "ks_vs_goe_1": 0.1363
+      },
+      "spacing_7": {
+        "n_spacings": 25227,
+        "beta_mle": 2.1418,
+        "beta_bootstrap_mean": 2.142,
+        "beta_95_ci_lower": 2.1091,
+        "beta_95_ci_upper": 2.1729,
+        "ks_vs_poisson_0": 0.282,
+        "ks_vs_goe_1": 0.1474
+      },
+      "spacing_8": {
+        "n_spacings": 25227,
+        "beta_mle": 2.0137,
+        "beta_bootstrap_mean": 2.0138,
+        "beta_95_ci_lower": 1.9815,
+        "beta_95_ci_upper": 2.0448,
+        "ks_vs_poisson_0": 0.2696,
+        "ks_vs_goe_1": 0.1628
+      },
+      "spacing_9": {
+        "n_spacings": 25227,
+        "beta_mle": 2.1472,
+        "beta_bootstrap_mean": 2.1474,
+        "beta_95_ci_lower": 2.1124,
+        "beta_95_ci_upper": 2.1844,
+        "ks_vs_poisson_0": 0.2708,
+        "ks_vs_goe_1": 0.2115
+      }
+    },
+    "dim_ge2": {
+      "spacing_1": {
+        "n_spacings": 29216,
+        "beta_mle": 0.3155,
+        "beta_bootstrap_mean": 0.3154,
+        "beta_95_ci_lower": 0.3033,
+        "beta_95_ci_upper": 0.3269,
+        "ks_vs_poisson_0": 0.1103,
+        "ks_vs_goe_1": 0.1083
+      },
+      "spacing_2": {
+        "n_spacings": 29216,
+        "beta_mle": 0.3396,
+        "beta_bootstrap_mean": 0.3396,
+        "beta_95_ci_lower": 0.3283,
+        "beta_95_ci_upper": 0.3516,
+        "ks_vs_poisson_0": 0.1675,
+        "ks_vs_goe_1": 0.1505
+      },
+      "spacing_3": {
+        "n_spacings": 29216,
+        "beta_mle": 0.2367,
+        "beta_bootstrap_mean": 0.2366,
+        "beta_95_ci_lower": 0.2243,
+        "beta_95_ci_upper": 0.2484,
+        "ks_vs_poisson_0": 0.0671,
+        "ks_vs_goe_1": 0.1525
+      },
+      "spacing_4": {
+        "n_spacings": 29216,
+        "beta_mle": 0.3176,
+        "beta_bootstrap_mean": 0.3176,
+        "beta_95_ci_lower": 0.3061,
+        "beta_95_ci_upper": 0.3293,
+        "ks_vs_poisson_0": 0.1646,
+        "ks_vs_goe_1": 0.1403
+      },
+      "spacing_5": {
+        "n_spacings": 29216,
+        "beta_mle": 0.0775,
+        "beta_bootstrap_mean": 0.0773,
+        "beta_95_ci_lower": 0.0673,
+        "beta_95_ci_upper": 0.0874,
+        "ks_vs_poisson_0": 0.0757,
+        "ks_vs_goe_1": 0.2386
+      },
+      "spacing_6": {
+        "n_spacings": 29216,
+        "beta_mle": 0.3432,
+        "beta_bootstrap_mean": 0.3432,
+        "beta_95_ci_lower": 0.3318,
+        "beta_95_ci_upper": 0.355,
+        "ks_vs_poisson_0": 0.1944,
+        "ks_vs_goe_1": 0.1473
+      },
+      "spacing_7": {
+        "n_spacings": 29216,
+        "beta_mle": 0.0789,
+        "beta_bootstrap_mean": 0.0788,
+        "beta_95_ci_lower": 0.0683,
+        "beta_95_ci_upper": 0.0903,
+        "ks_vs_poisson_0": 0.1064,
+        "ks_vs_goe_1": 0.259
+      },
+      "spacing_8": {
+        "n_spacings": 29216,
+        "beta_mle": 0.3094,
+        "beta_bootstrap_mean": 0.3095,
+        "beta_95_ci_lower": 0.2973,
+        "beta_95_ci_upper": 0.3217,
+        "ks_vs_poisson_0": 0.1299,
+        "ks_vs_goe_1": 0.107
+      },
+      "spacing_9": {
+        "n_spacings": 29216,
+        "beta_mle": 0.165,
+        "beta_bootstrap_mean": 0.165,
+        "beta_95_ci_lower": 0.1531,
+        "beta_95_ci_upper": 0.1769,
+        "ks_vs_poisson_0": 0.063,
+        "ks_vs_goe_1": 0.2035
+      }
+    },
+    "dim_1_early_vs_late": {
+      "early_beta_mle": 1.6699,
+      "late_beta_mle": 2.0987,
+      "ks_early_vs_late": 0.3252,
+      "mannwhitney_u": 4138710202.0,
+      "mannwhitney_p": 0.0
+    },
+    "dim_ge2_early_vs_late": {
+      "early_beta_mle": 0.2976,
+      "late_beta_mle": 0.1828,
+      "ks_early_vs_late": 0.0943,
+      "mannwhitney_u": 4319832002.0,
+      "mannwhitney_p": 0.0
+    }
+  }
+}

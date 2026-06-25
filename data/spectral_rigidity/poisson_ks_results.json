@@ -1,0 +1,87 @@
+{
+  "all": {
+    "N": 564606,
+    "mean_spacing": 1.1584637761019556,
+    "poisson": {
+      "ks_stat": 0.24533277550418098,
+      "ks_pvalue": 0.0
+    },
+    "goe": {
+      "ks_stat": 0.08022325952130177,
+      "ks_pvalue": 0.0
+    },
+    "gue": {
+      "ks_stat": 0.11409947360319339,
+      "ks_pvalue": 0.0
+    },
+    "best_fit": "GOE"
+  },
+  "dim_1": {
+    "N": 301662,
+    "mean_spacing": 1.0903646739030783,
+    "poisson": {
+      "ks_stat": 0.3378723125495827,
+      "ks_pvalue": 0.0
+    },
+    "goe": {
+      "ks_stat": 0.14185974857759123,
+      "ks_pvalue": 0.0
+    },
+    "gue": {
+      "ks_stat": 0.09339667300452004,
+      "ks_pvalue": 0.0
+    },
+    "best_fit": "GUE"
+  },
+  "dim_ge2": {
+    "N": 262944,
+    "mean_spacing": 1.2365903405701224,
+    "poisson": {
+      "ks_stat": 0.14685349145456844,
+      "ks_pvalue": 0.0
+    },
+    "goe": {
+      "ks_stat": 0.16450590808687848,
+      "ks_pvalue": 0.0
+    },
+    "gue": {
+      "ks_stat": 0.20812029338760185,
+      "ks_pvalue": 0.0
+    },
+    "best_fit": "Poisson"
+  },
+  "rank_0": {
+    "N": 275741,
+    "mean_spacing": 1.1808209491690653,
+    "poisson": {
+      "ks_stat": 0.2440794653104754,
+      "ks_pvalue": 0.0
+    },
+    "goe": {
+      "ks_stat": 0.08578533360961704,
+      "ks_pvalue": 0.0
+    },
+    "gue": {
+      "ks_stat": 0.12723469563692813,
+      "ks_pvalue": 0.0
+    },
+    "best_fit": "GOE"
+  },
+  "rank_1": {
+    "N": 278334,
+    "mean_spacing": 1.13858145502124,
+    "poisson": {
+      "ks_stat": 0.24337697875859876,
+      "ks_pvalue": 0.0
+    },
+    "goe": {
+      "ks_stat": 0.07540651090948158,
+      "ks_pvalue": 0.0
+    },
+    "gue": {
+      "ks_stat": 0.10400261976746794,
+      "ks_pvalue": 0.0
+    },
+    "best_fit": "GOE"
+  }
+}
