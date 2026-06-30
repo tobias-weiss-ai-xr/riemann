@@ -2847,3 +2847,66 @@ Each dim group has a **broad unimodal** β distribution (single-peaked, not bimo
 - `scripts/task_2_nn_rank_prediction.py` — Experiment script (3 architectures × 2 formulations)
 - `data/results/task_2_nn_rank_prediction_results.json` — Full numerical results
 - `data/results/task_2_nn_rank_prediction.png` — Confusion matrices and training curves
+
+---
+
+## Task 3: L-function Zero Spacing Prediction from Hecke Traces
+
+**Date**: 2026-06-30
+**Motivation**: Prior experiments (Exp 11d, 15, 16) established that L-function zero spacing statistics encode deep number-theoretic structure — dim=1 forms show GUE statistics (Brody β≈1.88) while dim≥2 forms show near-Poisson (β≈0.24). Exp L showed that individual zero positions (z1) are highly predictable (R²=0.714). This experiment asks: can we predict the *spacing distribution* itself (std_zero_spacing) and individual spacings from Hecke traces?
+
+**Data**: 63,844 modular forms from `data/lmfdb/lmfdb_zeros_ml.csv`. 100 Hecke traces + 7 scalar features (level, dim, analytic_rank, root_number, order_of_vanishing, num_zeros, char_order). Targets: std_zero_spacing and 9 individual spacings (z_{i+1} - z_i for i=1..9).
+
+### Task 3A: Single-Task std_zero_spacing Regression
+
+| Model | R² | MAE | Time |
+|---|---|---|---|
+| **GradientBoosting** | **0.9063** | **0.0230** | 265.2s |
+| RandomForest | 0.8621 | 0.0274 | 12.8s |
+| MLP (128,64) | 0.8112 | 0.0338 | 106.8s |
+| Scalars-only GB | 0.7628 | 0.0351 | 5.1s |
+
+**Trace contribution**: Traces boost R² by +0.14 (0.76 → 0.91), confirming Hecke eigenvalues carry spacing information beyond scalar metadata.
+
+### Task 3B: Multi-Task Regression (9 spacings + std)
+
+| Target | R² | MAE |
+|---|---|---|
+| spacing_1 (z2-z1) | 0.9025 | 0.1304 |
+| spacing_2 (z3-z2) | 0.8261 | 0.1510 |
+| spacing_3 (z4-z3) | 0.8070 | 0.1495 |
+| spacing_4 | 0.7583 | 0.1561 |
+| spacing_5 | 0.7623 | 0.1520 |
+| spacing_6 | 0.6938 | 0.1597 |
+| spacing_7 | 0.7239 | 0.1549 |
+| spacing_8 | 0.9530 | 0.1574 |
+| **spacing_9 (z10-z9)** | **0.9964** | 0.1464 |
+| std_zero_spacing | 0.8699 | 0.0268 |
+| **Mean** | **0.8293** | — |
+
+### Per-Dimension std_zero_spacing (GradientBoosting)
+
+| Dim | N | R² | MAE |
+|---|---|---|---|
+| 1 | 34,628 | 0.7641 | 0.0267 |
+| 2 | 8,263 | 0.3681 | 0.0286 |
+| 3 | 4,319 | 0.2732 | 0.0221 |
+| 4 | 3,157 | 0.2663 | 0.0158 |
+| 5–6 | 3,910 | 0.32 | 0.012 |
+| 7 | 1,201 | 0.0076 | 0.0096 |
+| 8–20 | 6,046 | 0.30 | 0.004 |
+
+### Key Findings
+
+1. **std_zero_spacing is highly predictable** — R²=0.91 with GB, substantially above the Exp 11d mean_zero_spacing results (R²~0.6-0.8). Standard deviation of spacing is a more ML-friendly target than mean spacing.
+2. **Traces contribute +0.14 R²** over scalar features alone — Hecke eigenvalues genuinely encode spacing distribution information.
+3. **Later spacings are more predictable**: spacing_9 has R²=0.9964 (near-perfect!), spacing_8 has 0.9530. Early spacings (1-3) have R² 0.80-0.90. This gradient suggests the overall zero distribution constrains later spacings more tightly.
+4. **Dim=1 dominates the aggregate R²** — with 54% of samples, dim=1 drives the high overall score (R²=0.76 per-dim). Higher dimensions (dim≥3) have R² 0.2-0.47 with much smaller sample sizes.
+5. **Dim=7 is unlearnable** (R²=0.008, n=1201) — a striking outlier suggesting zero spacing in dim=7 forms has minimal correlation with Hecke traces.
+6. **Multi-task degrades vs single-task** — mean multi-task R²=0.83 vs single-task R²=0.91 for std_zero_spacing. The 9-spacing prediction task is harder than the aggregate statistic, as expected from the per-spacing R² spread (0.69–0.996).
+
+### Files
+
+- `scripts/task_3_zero_spacing_prediction.py` — Experiment script (single + multi-task, GB/RF/MLP)
+- `data/results/task_3_zero_spacing_prediction_results.json` — Full numerical results
+- `data/results/task_3_zero_spacing_prediction.png` — Summary plots (4 panels)
