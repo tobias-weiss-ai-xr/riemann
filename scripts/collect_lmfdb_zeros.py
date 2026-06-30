@@ -67,7 +67,7 @@ DB_PASS = "lmfdb"
 
 OUTPUT_DIR = Path("data/lmfdb")
 
-N_TRACE_CSV_COLS = 100
+MAX_ZEROS_PER_FORM = 100
 
 CONNECT_TIMEOUT = 30
 MAX_RETRIES = 3
@@ -507,7 +507,7 @@ def build_ml_csv(records: list[dict]) -> Path:
 
     meta_cols = ["label", "level", "dim", "analytic_rank", "char_order", "trace_hash"]
     trace_cols = [f"trace_{i}" for i in range(1, N_TRACE_CSV_COLS + 1)]
-    zero_cols = [f"z{i}" for i in range(1, 11)] + [
+    zero_cols = [f"z{i}" for i in range(1, args.max_zeros_per_form + 1)] + [
         "num_zeros",
         "mean_zero_spacing",
         "std_zero_spacing",
@@ -695,10 +695,10 @@ def main() -> None:
         description="Collect L-function zeros from LMFDB SQL mirror",
     )
     parser.add_argument(
-        "--max-level",
+        "--max-zeros-per-form",
         type=int,
-        default=5000,
-        help="Maximum level to include (default: 5000)",
+        default=10,
+        help="Maximum number of zeros to extract per form (default: 10)",
     )
     parser.add_argument(
         "--limit",

@@ -64,6 +64,7 @@ data/cayley-multigen*/
 data/cheb_*/
 data/farey-*/
 data/sign_precomputed/
+data/results/
 data/*.json
 
 # ── Output / temp files ────────────────────────────────────────
@@ -84,6 +85,9 @@ tea_debug.log
 
 # ── Temp scripts (root) ────────────────────────────────────────
 quick_test*.py
+quick_check*.py
+quick_list*.py
+quick_publish*.py
 run_collect*.py
 run_collect*.sh
 run_verify*.sh

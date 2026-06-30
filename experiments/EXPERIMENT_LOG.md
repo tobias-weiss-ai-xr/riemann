@@ -2732,3 +2732,67 @@ Each dim group has a **broad unimodal** β distribution (single-peaked, not bimo
 - `data/spectral_rigidity/item2_per_form_beta_results.json`
 - `data/spectral_rigidity/item2_raw_betas.json` (1.9 MB, per-form raw β values)
 - `data/spectral_rigidity/item3_height_dependence_results.json`
+
+---
+
+## Task 1B: Hecke Trace Learning Curve
+
+**Date:** 2026-06-30  
+**Goal:** Determine how many Hecke eigenvalue traces are needed to predict rank, dimension, and CM label — is data quantity a bottleneck?  
+**Status:** COMPLETED — dim and CM are trivially predictable; rank is not learnable from traces with sklearn.
+
+### Methodology
+
+- **Data**: 46,347 newforms from LMFDB, full 1000-trace Hecke eigenvalue matrix (46347 × 1000), 6 scalar features (dim, rank, level, weight, CM, char_order)
+- **Learning curve**: Trained models on N = [100, 200, 500, 1000] traces, measured accuracy/R² vs. N
+- **Targets**:
+  - **Rank classification**: GradientBoostingClassifier, multi-class (rank 0–6), stratified 80/20 split
+  - **Dimension regression**: GradientBoostingRegressor, MSE loss
+  - **CM classification**: LogisticRegression, binary
+
+### Results
+
+**Rank Classification (GradientBoostingClassifier):**
+
+| N Traces | Accuracy | F1 (macro) | Fit Time |
+|---|---|---|---|
+| 100 | 0.5192 | 0.3481 | 15.3s |
+| 200 | 0.5192 | 0.3481 | 28.1s |
+| 500 | 0.5192 | 0.3481 | 61.8s |
+| 1000 | 0.5192 | 0.3481 | 128.3s |
+
+→ **Flat curve** — adding more traces provides zero improvement. Accuracy barely above majority class.
+
+**Dimension Regression (GradientBoostingRegressor):**
+
+| N Traces | MAE | R² | Fit Time |
+|---|---|---|---|
+| 100 | 9.1e-05 | 1.0000 | 4.2s |
+| 200 | 9.1e-05 | 1.0000 | 8.5s |
+| 500 | 9.1e-05 | 1.0000 | 22.4s |
+| 1000 | 9.1e-05 | 1.0000 | 45.9s |
+
+→ **Perfect with 100 traces** — dimension is encoded in trace magnitudes (dim ≈ trace scale).
+
+**CM Classification (LogisticRegression):**
+
+| N Traces | Accuracy | F1 | Fit Time |
+|---|---|---|---|
+| 100 | 1.0000 | 1.0000 | 0.4s |
+| 200 | 1.0000 | 1.0000 | 1.0s |
+| 500 | 1.0000 | 1.0000 | 2.4s |
+| 1000 | 1.0000 | 1.0000 | 4.4s |
+
+→ **Perfect with 100 traces** — CM is determined by trace sign patterns (CM forms have integer traces with specific multiplicities).
+
+### Key Findings
+
+1. **Data quantity is NOT the bottleneck for rank** — even 10× more traces (100→1000) gives identical accuracy. The information about analytic rank is not present in the first N Hecke eigenvalues in a way that gradient boosting can extract.
+2. **Dimension and CM are trivially predictable** — these are algebraic properties directly reflected in the trace values (dim from scale, CM from integrality/sign patterns).
+3. **Rank is the only non-trivial ML target** among the three, and it resists sklearn approaches entirely. More sophisticated architectures (CNN/Transformer on trace sequences) or engineered features (Sato-Tate moments, trace statistics) may be needed.
+
+### Files
+
+- `scripts/task_1b_trace_learning_curve.py` — Learning curve experiment script
+- `data/results/task_1b_trace_learning_curve_results.json` — Numerical results
+- `data/results/task_1b_trace_learning_curve.png` — Learning curve plots

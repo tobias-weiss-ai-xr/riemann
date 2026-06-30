@@ -141,6 +141,11 @@ def load_spacings(df: pd.DataFrame) -> dict[str, np.ndarray]:
     result["dim_ge2"] = unfolded[d2][np.isfinite(unfolded[d2])]
     result["rank_0"] = unfolded[r0][np.isfinite(unfolded[r0])]
     result["rank_1"] = unfolded[r1][np.isfinite(unfolded[r1])]
+    result["dim_2"] = unfolded[dims == 2][np.isfinite(unfolded[dims == 2])]
+    result["dim_3"] = unfolded[dims == 3][np.isfinite(unfolded[dims == 3])]
+    result["dim_4"] = unfolded[dims == 4][np.isfinite(unfolded[dims == 4])]
+    result["dim_5"] = unfolded[dims == 5][np.isfinite(unfolded[dims == 5])]
+    result["dim_6plus"] = unfolded[dims >= 6][np.isfinite(unfolded[dims >= 6])]
 
     for name, s in result.items():
         s_clean = s[(~np.isnan(s)) & (s > 0) & (s < 10)]
