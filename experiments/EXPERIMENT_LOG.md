@@ -2796,3 +2796,54 @@ Each dim group has a **broad unimodal** β distribution (single-peaked, not bimo
 - `scripts/task_1b_trace_learning_curve.py` — Learning curve experiment script
 - `data/results/task_1b_trace_learning_curve_results.json` — Numerical results
 - `data/results/task_1b_trace_learning_curve.png` — Learning curve plots
+
+---
+
+## Task 2: Neural Network Rank Prediction from Hecke Traces
+
+**Date**: 2026-06-30
+**Motivation**: Task 1B showed rank is the only non-trivial ML target from Hecke traces. sklearn (GradientBoosting) achieved 0.5192 accuracy on 7-class rank prediction — barely above majority class. This experiment tests whether deep learning architectures (CNN, Transformer, Attention) can extract patterns that tree-based methods miss.
+
+**Architecture**: 3 model families × 2 formulations = 6 experiments
+
+| Architecture | Params | Structure |
+|---|---|---|
+| CNN1D | 61k | 3× Conv1d(64→128→256, k=5) + BN + ReLU + GlobalAvgPool + FC |
+| Transformer | 437k | Linear proj(64) + PosEnc + 2× TransformerEncoder(d=128, h=4) + GlobalAvgPool + FC |
+| CNN+Attention | 68k | 2× Conv1d(64→128, k=5) + BN + ReLU + AttentionPool(128→64) + FC |
+
+**Data**: 33,369 samples (after filtering), 1000 Hecke traces per sample, 6 scalar features (dim, level, CM, weight, Sato-Tate ratio, trace mean), 80/20 stratified split, 90/10 train/val.
+
+**Training**: Adam lr=1e-3, batch_size=256, 50 epochs max, early stopping patience=10, class-weighted CrossEntropyLoss.
+
+### Multi-class Results (Rank 0–6)
+
+| Architecture | Accuracy | F1(macro) | F1(weighted) | Train Time |
+|---|---|---|---|---|
+| **CNN+Attention** | **0.5216** | **0.3379** | 0.4999 | 59.7s |
+| CNN1D | 0.4969 | 0.2218 | 0.3304 | 28.8s |
+| Transformer | 0.3638 | 0.2872 | 0.3908 | 48.4s |
+| sklearn baseline | 0.5192 | 0.3481 | — | — |
+
+### Binary Results (Rank=0 vs Rank>0)
+
+| Architecture | Accuracy | F1(macro) | ROC-AUC | Train Time |
+|---|---|---|---|---|
+| **CNN+Attention** | **0.5400** | 0.5227 | **0.5532** | 148.0s |
+| Transformer | 0.5394 | 0.5235 | 0.5524 | 186.2s |
+| CNN1D | 0.5389 | 0.5237 | 0.5488 | 35.7s |
+
+### Key Findings
+
+1. **Neural nets do NOT significantly outperform sklearn** on rank prediction. CNN+Attention achieves 0.5216 vs sklearn's 0.5192 (Δ=+0.2%) — statistically indistinguishable.
+2. **Binary formulation is easier** (54% vs 52%) but still near-random — ROC-AUC of 0.553 indicates minimal discriminative power.
+3. **CNN+Attention is the best architecture**, suggesting that local convolutional patterns combined with global attention provide a slight edge, but the signal is simply too weak.
+4. **The Transformer overfits on multiclass** — val accuracy stays ~36% while achieving 99.8% recall on rank=2 (142 samples), essentially memorizing the minority class rather than learning generalizable features.
+5. **Rank information is not in the trace sequence structure** — both order-sensitive (CNN/Transformer) and order-agnostic (sklearn on flattened traces) models perform identically. This confirms that the analytic rank of a modular form cannot be predicted from its first 1000 Hecke eigenvalues alone, regardless of model architecture.
+6. **The fundamental bottleneck is signal, not model capacity** — 437k-param Transformer performs worse than 61k-param CNN. Adding capacity does not help when the target variable has no traceable signature in the input features.
+
+### Files
+
+- `scripts/task_2_nn_rank_prediction.py` — Experiment script (3 architectures × 2 formulations)
+- `data/results/task_2_nn_rank_prediction_results.json` — Full numerical results
+- `data/results/task_2_nn_rank_prediction.png` — Confusion matrices and training curves
