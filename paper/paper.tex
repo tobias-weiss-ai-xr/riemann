@@ -35,6 +35,7 @@
 }{% if KOMA class
   \KOMAoptions{parskip=half}}
 \makeatother
+\PassOptionsToPackage{table}{xcolor}
 \usepackage{xcolor}
 \usepackage{color}
 \usepackage{fancyvrb}
@@ -88,7 +89,6 @@
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \setcounter{secnumdepth}{-\maxdimen} % remove section numbering
-\PassOptionsToPackage{table}{xcolor}
 \ifLuaTeX
   \usepackage{selnolig}  % disable illegal ligatures
 \fi
@@ -102,6 +102,8 @@
 \author{}
 \date{}
 
+\usepackage{etoolbox}
+\AtBeginEnvironment{longtable}{\small\setlength{\tabcolsep}{4pt}}
 \begin{document}
 
 \hypertarget{machine-learning-for-modular-forms-hecke-traces-l-function-zeros-and-the-sato-tate-distribution}{%
@@ -110,6 +112,8 @@ Zeros, and the Sato-Tate
 Distribution}\label{machine-learning-for-modular-forms-hecke-traces-l-function-zeros-and-the-sato-tate-distribution}}
 
 Tobias Weiss (tobias@tobias-weiss.org)
+
+\textbf{Date:} July 2026 (v2 --- revised; v1: May 2026)
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
@@ -633,7 +637,7 @@ Property & Original (53K) & Expanded (200K) \\
 \rowcolors{2}{gray!5}{white}
 Analytic rank 0 & 26,929 (50.1\%) & 133,806 (66.9\%) \\
 Analytic rank 1 & 26,138 (48.6\%) & 63,758 (31.9\%) \\
-Analytic rank ≥ 2 & 712 (1.3\%) & 2,436 (1.2\%) \\
+Analytic rank \(\geq\) 2 & 712 (1.3\%) & 2,436 (1.2\%) \\
 Self-dual & 53,779 (100\%) & 200,000 (100\%) \\
 \end{longtable}
 
@@ -1071,9 +1075,9 @@ Metric & GNN & Sklearn Baseline (Exp 10) & Improvement \\
 \textbf{Architecture search} (Exp B, May 29): We extended the experiment
 to compare 4 architectures --- GCN, ChebConv, GAT, and GIN --- all with
 enhanced 9-dim node features (5 original trace features + 4 arithmetic
-features: ω(n), μ(n), d(n), λ(n)) and 3-dim edge features (distance,
-sequential flag, prime-relation flag). Training used 63K forms, 100
-epochs with early stopping (patience=15).
+features: \(\omega(n)\), \(\mu(n)\), \(d(n)\), \(\lambda(n)\)) and 3-dim
+edge features (distance, sequential flag, prime-relation flag). Training
+used 63K forms, 100 epochs with early stopping (patience=15).
 
 {\small\setlength{\tabcolsep}{3pt}%
 \renewcommand{\arraystretch}{1.08}%
@@ -1718,9 +1722,9 @@ Traces}\label{competition-replication-pcalda-on-200k-hecke-traces}}
 
 He et al.~(arXiv:2502.10360) demonstrated that PCA+LDA on 248K rational
 L-functions achieves weighted F1\textasciitilde0.81 for 3-class rank
-classification (r=0, r=1, r≥2). We replicate their pipeline on our 200K
-weight-2 newforms from LMFDB, replacing their Dirichlet coefficients
-with Hecke traces:
+classification (r=0, r=1, r\$\geq\$2). We replicate their pipeline on
+our 200K weight-2 newforms from LMFDB, replacing their Dirichlet
+coefficients with Hecke traces:
 
 {\small\setlength{\tabcolsep}{3pt}%
 \renewcommand{\arraystretch}{1.08}%
@@ -1742,17 +1746,15 @@ PCA 2D centroid sep & not reported & r0-r1:118, r0-r2:95, r1-r2:71 \\
 \textbf{Weighted F1} & \textbf{\textasciitilde0.81} & \textbf{0.622} \\
 Class r=0 F1 & not reported & 0.801 \\
 Class r=1 F1 & not reported & 0.270 \\
-Class r≥2 F1 & not reported & 0.000 \\
+Class r\$\geq\$2 F1 & not reported & 0.000 \\
 \end{longtable}
 
 }
 
 The lower F1 (0.622 vs 0.81) is driven by class imbalance in our
-dataset: our distribution (67\% r=0, 32\% r=1, 1\% r≥2) differs from the
-competition's more balanced 248K set. PCA reveals excellent separation
-in trace space (2D centroid distances 71--118), but LDA's linear
-decision boundaries cannot resolve the minority r≥2 class with only 1\%
-prevalence.
+dataset: our distribution (67\% r=0, 32\% r=1, 1\%
+r\$\geq\(2) differs from the competition's more balanced 248K set. PCA reveals excellent separation in trace space (2D centroid distances 71–118), but LDA's linear decision boundaries cannot resolve the minority r\)\geq\$2
+class with only 1\% prevalence.
 
 \hypertarget{engineered-features-benchmark-near-perfect-rank-classification}{%
 \paragraph{4.9.2 Engineered Features Benchmark: Near-Perfect Rank
@@ -2086,9 +2088,9 @@ order\_of\_vanishing) always included alongside the trace subset.
 
 \textbf{The learning curve is perfectly flat.} Adding 900 additional
 traces (a 10× increase) produces zero improvement. The 0.519 accuracy is
-barely above the majority class baseline (rank 1 prevalence ≈ 49\%),
-confirming that rank is fundamentally unpredictable from traces --- a
-signal problem, not a data problem.
+barely above the majority class baseline (rank 1 prevalence \(\approx\)
+49\%), confirming that rank is fundamentally unpredictable from traces
+--- a signal problem, not a data problem.
 
 \textbf{Dimension Regression} --- trivially easy:
 
@@ -2105,8 +2107,8 @@ signal problem, not a data problem.
 \bottomrule
 \endlastfoot
 \rowcolors{2}{gray!5}{white}
-100 & 1.0000 & 9.1×10⁻⁵ \\
-1000 & 1.0000 & 9.1×10⁻⁵ \\
+100 & 1.0000 & \(9.1 \times 10^{-5}\) \\
+1000 & 1.0000 & \(9.1 \times 10^{-5}\) \\
 \end{longtable}
 
 }
@@ -2411,12 +2413,13 @@ Dimension & Forms & R² \\
   while \(d\ge 2\) forms exhibit more chaotic (GOE-like) behavior.
 \item
   \textbf{Contrast with rank}: Zero spacing is learnable from traces
-  (R²=0.91) while rank is not (R²≈0). This differential learnability
-  confirms that traces encode spectral information about \(L\)-function
-  zeros, but this information does not propagate to the analytic rank
-  --- consistent with the Birch--Swinnerton-Dyer conjecture's prediction
-  that rank depends on the \emph{order} of vanishing (a discrete,
-  topological property) rather than the spacing distribution.
+  (R²=0.91) while rank is not (R²\$\approx\$0). This differential
+  learnability confirms that traces encode spectral information about
+  \(L\)-function zeros, but this information does not propagate to the
+  analytic rank --- consistent with the Birch--Swinnerton-Dyer
+  conjecture's prediction that rank depends on the \emph{order} of
+  vanishing (a discrete, topological property) rather than the spacing
+  distribution.
 \end{enumerate}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -2599,7 +2602,7 @@ finding: L-function zero spacing statistics separate cleanly by Hecke
 field dimension --- \(d=1\) forms respect the Katz-Sarnak symplectic
 (GUE) prediction, while \(d\ge 2\) forms transition to orthogonal (GOE)
 statistics - Spectral rigidity (Exp R): The two-population structure is
-robustly validated across P(s), P(r), Σ²(L), and k-th neighbor
+robustly validated across P(s), P(r), \(\Sigma^2(L)\), and k-th neighbor
 diagnostics. The \(d\ge 2\) spacing ratio
 \(\langle\tilde{r}\rangle = 0.391\) deviates from both classical
 ensembles --- a potential new effective universality class for
@@ -2821,9 +2824,9 @@ moment ratio. Spec 3 (Mertens bound): perfect 1.0 score. \\
 \textbf{N} & Multi-task zero prediction --- shared backbone
 \textbf{degraded} z1 (0.714→0.704, -1.5\%); each zero needs specialized
 head & ⭐⭐ & \textbf{DONE} ✓ \\
-\textbf{R} & Spectral rigidity --- P(r), Σ²(L), k-th neighbor: all
-confirm two-population; dim≥2 deviates from both classical ensembles in
-P(r) (=0.391) & ⭐⭐ & \textbf{DONE} ✓ \\
+\textbf{R} & Spectral rigidity --- P(r), \(\Sigma^2(L)\), k-th neighbor:
+all confirm two-population; dim\$\geq\$2 deviates from both classical
+ensembles in P(r) (=0.391) & ⭐⭐ & \textbf{DONE} ✓ \\
 \end{longtable}
 
 }
@@ -2919,8 +2922,8 @@ Friedli constant & 1.1367 (4 digits) & 6 digits & Phase 2 & Pending \\
 CM classifier F1 & 0.919 & 0.950 & Phase 1 & ✅ \textbf{DONE} \\
 Galois correlation \(\rho_2\) & −0.607 ± 0.012 & Characterized & Phase 1
 & ✅ \textbf{DONE} \\
-GUE zero statistics & Two-population (d=1→GUE, d≥2→GOE) & Dim-resolved
-theory & Phase 2 & ✅ \textbf{DONE} \\
+GUE zero statistics & Two-population (d=1→GUE, d\$\geq\$2→GOE) &
+Dim-resolved theory & Phase 2 & ✅ \textbf{DONE} \\
 External benchmark (PCA+LDA) & Acc=0.686 F1=0.622 & Match
 arXiv:2502.10360 (\textasciitilde0.81) & Phase 2 & Pending (class
 imbalance) \\

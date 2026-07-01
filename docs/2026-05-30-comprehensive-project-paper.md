@@ -2,6 +2,8 @@
 
 Tobias Weiss (tobias@tobias-weiss.org)
 
+**Date:** July 2026 (v2 — revised; v1: May 2026)
+
 ---
 
 ## Abstract
@@ -185,7 +187,7 @@ The primary data source is the LMFDB PostgreSQL mirror at `devmirror.lmfdb.xyz:5
 |----------|---------------|-----------------|
 | Analytic rank 0 | 26,929 (50.1%) | 133,806 (66.9%) |
 | Analytic rank 1 | 26,138 (48.6%) | 63,758 (31.9%) |
-| Analytic rank ≥ 2 | 712 (1.3%) | 2,436 (1.2%) |
+| Analytic rank $\geq$ 2 | 712 (1.3%) | 2,436 (1.2%) |
 | Self-dual | 53,779 (100%) | 200,000 (100%) |
 
 #### $\operatorname{SL}(2,\mathbb{F}_p)$ Cayley Graphs
@@ -391,7 +393,7 @@ ChebConv K=5 with 3 layers and 128 hidden dimensions:
 | **R²** | **0.631** | 0.526 | **+20%** |
 | **MAE** | **0.229** | 0.297 | **-23%** |
 
-**Architecture search** (Exp B, May 29): We extended the experiment to compare 4 architectures — GCN, ChebConv, GAT, and GIN — all with enhanced 9-dim node features (5 original trace features + 4 arithmetic features: ω(n), μ(n), d(n), λ(n)) and 3-dim edge features (distance, sequential flag, prime-relation flag). Training used 63K forms, 100 epochs with early stopping (patience=15).
+**Architecture search** (Exp B, May 29): We extended the experiment to compare 4 architectures — GCN, ChebConv, GAT, and GIN — all with enhanced 9-dim node features (5 original trace features + 4 arithmetic features: $\omega(n)$, $\mu(n)$, $d(n)$, $\lambda(n)$) and 3-dim edge features (distance, sequential flag, prime-relation flag). Training used 63K forms, 100 epochs with early stopping (patience=15).
 
 | Architecture | Node Feat Dim | Edge Feat | Test R² | Δ vs GCN |
 |-------------|:------------:|:--------:|:-------:|:--------:|
@@ -701,7 +703,7 @@ It opens a new thread of investigation into the relationship between Hecke field
 
 #### 4.9.1 Competition Replication: PCA+LDA on 200K Hecke Traces
 
-He et al. (arXiv:2502.10360) demonstrated that PCA+LDA on 248K rational L-functions achieves weighted F1~0.81 for 3-class rank classification (r=0, r=1, r≥2). We replicate their pipeline on our 200K weight-2 newforms from LMFDB, replacing their Dirichlet coefficients with Hecke traces:
+He et al. (arXiv:2502.10360) demonstrated that PCA+LDA on 248K rational L-functions achieves weighted F1~0.81 for 3-class rank classification (r=0, r=1, r$\geq$2). We replicate their pipeline on our 200K weight-2 newforms from LMFDB, replacing their Dirichlet coefficients with Hecke traces:
 
 | Metric | Competition Paper | Our Result |
 |--------|------------------|------------|
@@ -712,9 +714,9 @@ He et al. (arXiv:2502.10360) demonstrated that PCA+LDA on 248K rational L-functi
 | **Weighted F1** | **~0.81** | **0.622** |
 | Class r=0 F1 | not reported | 0.801 |
 | Class r=1 F1 | not reported | 0.270 |
-| Class r≥2 F1 | not reported | 0.000 |
+| Class r$\geq$2 F1 | not reported | 0.000 |
 
-The lower F1 (0.622 vs 0.81) is driven by class imbalance in our dataset: our distribution (67% r=0, 32% r=1, 1% r≥2) differs from the competition's more balanced 248K set. PCA reveals excellent separation in trace space (2D centroid distances 71–118), but LDA's linear decision boundaries cannot resolve the minority r≥2 class with only 1% prevalence.
+The lower F1 (0.622 vs 0.81) is driven by class imbalance in our dataset: our distribution (67% r=0, 32% r=1, 1% r$\geq$2) differs from the competition's more balanced 248K set. PCA reveals excellent separation in trace space (2D centroid distances 71–118), but LDA's linear decision boundaries cannot resolve the minority r$\geq$2 class with only 1% prevalence.
 
 #### 4.9.2 Engineered Features Benchmark: Near-Perfect Rank Classification
 
@@ -831,14 +833,14 @@ Each model uses an 80/20 stratified train/test split with 6 scalar features (lev
 | 500 | 0.5192 | 0.3481 | 61.8s |
 | 1000 | 0.5192 | 0.3481 | 128.3s |
 
-**The learning curve is perfectly flat.** Adding 900 additional traces (a 10× increase) produces zero improvement. The 0.519 accuracy is barely above the majority class baseline (rank 1 prevalence ≈ 49%), confirming that rank is fundamentally unpredictable from traces — a signal problem, not a data problem.
+**The learning curve is perfectly flat.** Adding 900 additional traces (a 10× increase) produces zero improvement. The 0.519 accuracy is barely above the majority class baseline (rank 1 prevalence $\approx$ 49%), confirming that rank is fundamentally unpredictable from traces — a signal problem, not a data problem.
 
 **Dimension Regression** — trivially easy:
 
 | $N$ Traces | R² | MAE |
 |:----------:|:---:|:----:|
-| 100 | 1.0000 | 9.1×10⁻⁵ |
-| 1000 | 1.0000 | 9.1×10⁻⁵ |
+| 100 | 1.0000 | $9.1 \times 10^{-5}$ |
+| 1000 | 1.0000 | $9.1 \times 10^{-5}$ |
 
 **CM Classification** — trivially easy:
 
@@ -959,7 +961,7 @@ Data: 63,844 weight-2 newforms, each with 100 Hecke traces, 7 scalar features (l
 
 3. **Dimension dependence**: Prediction quality drops sharply from $d=1$ (R²=0.76) to $d=2$ (R²=0.37), with $d=7$ essentially unlearnable (R²=0.008). This mirrors the two-population GUE structure (Section 4.8): $d=1$ forms have more regular (GUE-like) spacing, while $d\ge 2$ forms exhibit more chaotic (GOE-like) behavior.
 
-4. **Contrast with rank**: Zero spacing is learnable from traces (R²=0.91) while rank is not (R²≈0). This differential learnability confirms that traces encode spectral information about $L$-function zeros, but this information does not propagate to the analytic rank — consistent with the Birch–Swinnerton-Dyer conjecture's prediction that rank depends on the *order* of vanishing (a discrete, topological property) rather than the spacing distribution.
+4. **Contrast with rank**: Zero spacing is learnable from traces (R²=0.91) while rank is not (R²$\approx$0). This differential learnability confirms that traces encode spectral information about $L$-function zeros, but this information does not propagate to the analytic rank — consistent with the Birch–Swinnerton-Dyer conjecture's prediction that rank depends on the *order* of vanishing (a discrete, topological property) rather than the spacing distribution.
 
 ---
 
@@ -1039,7 +1041,7 @@ The Riemann Project's results can be understood across three distinct eras:
 - Root cause of original moment collapse: Two compounding errors (composite indices + dimension scaling)
 - Lesson: Careful statistical analysis of existing data can yield new discoveries
 - New finding: L-function zero spacing statistics separate cleanly by Hecke field dimension — $d=1$ forms respect the Katz-Sarnak symplectic (GUE) prediction, while $d\ge 2$ forms transition to orthogonal (GOE) statistics
-- Spectral rigidity (Exp R): The two-population structure is robustly validated across P(s), P(r), Σ²(L), and k-th neighbor diagnostics. The $d\ge 2$ spacing ratio $\langle\tilde{r}\rangle = 0.391$ deviates from both classical ensembles — a potential new effective universality class for higher-degree Hecke fields.
+- Spectral rigidity (Exp R): The two-population structure is robustly validated across P(s), P(r), $\Sigma^2(L)$, and k-th neighbor diagnostics. The $d\ge 2$ spacing ratio $\langle\tilde{r}\rangle = 0.391$ deviates from both classical ensembles — a potential new effective universality class for higher-degree Hecke fields.
 
 ### 5.2 Comparison with the Literature
 
@@ -1099,7 +1101,7 @@ Below is the current research roadmap, updated to reflect all results through Ma
 | **K** | FunSearch for Hecke trace identities — LLM-based program search via `funsearch/` submodule | ⭐⭐⭐ HIGH | **DONE** ✓ Spec 1 (CM detection, 389 dim-1 forms): best formula `M4/M2² + 2·zero_count − 2·|skew|` achieves 0.941 balanced accuracy (vs 0.936 baseline). Spec 2 (Sato-Tate moments, 2000 forms): ALL 5 islands converged to `M4/M2` (not `M4/M2²`) at 0.984 — validating $M_4/M_2$ as the stablest moment ratio. Spec 3 (Mertens bound): perfect 1.0 score. |
 | **M** | Modern GNN: GPS (too slow, O(n²)), TransformerConv (R²=0.448 vs GAT 0.731) — GAT remains best | ⭐⭐ | **DONE** ✓ |
 | **N** | Multi-task zero prediction — shared backbone **degraded** z1 (0.714→0.704, -1.5%); each zero needs specialized head | ⭐⭐ | **DONE** ✓ |
-| **R** | Spectral rigidity — P(r), Σ²(L), k-th neighbor: all confirm two-population; dim≥2 deviates from both classical ensembles in P(r) (<r>=0.391) | ⭐⭐ | **DONE** ✓ |
+| **R** | Spectral rigidity — P(r), $\Sigma^2(L)$, k-th neighbor: all confirm two-population; dim$\geq$2 deviates from both classical ensembles in P(r) (<r>=0.391) | ⭐⭐ | **DONE** ✓ |
 
 ### Phase 3 (Weeks 5–6) — Synthesis & Theoretical
 
@@ -1124,7 +1126,7 @@ Below is the current research roadmap, updated to reflect all results through Ma
 | Friedli constant | 1.1367 (4 digits) | 6 digits | Phase 2 | Pending |
 | CM classifier F1 | 0.919 | 0.950 | Phase 1 | ✅ **DONE** |
 | Galois correlation $\rho_2$ | −0.607 ± 0.012 | Characterized | Phase 1 | ✅ **DONE** |
-| GUE zero statistics | Two-population (d=1→GUE, d≥2→GOE) | Dim-resolved theory | Phase 2 | ✅ **DONE** |
+| GUE zero statistics | Two-population (d=1→GUE, d$\geq$2→GOE) | Dim-resolved theory | Phase 2 | ✅ **DONE** |
 | External benchmark (PCA+LDA) | Acc=0.686 F1=0.622 | Match arXiv:2502.10360 (~0.81) | Phase 2 | Pending (class imbalance) |
 
 ---
