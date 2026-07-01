@@ -21,6 +21,28 @@ import sys
 def fix_tables(tex: str) -> str:
     """Apply row-coloring improvements to all table environments in tex source."""
 
+    # --- 0. Ensure xcolor is loaded with 'table' option ---
+    # pandoc loads \usepackage{xcolor} without the 'table' option, so \rowcolor
+    # and \rowcolors are undefined. Pass the option BEFORE xcolor is loaded.
+    if "\\PassOptionsToPackage{table}{xcolor}" not in tex:
+        tex = tex.replace(
+            "\\usepackage{xcolor}",
+            "\\PassOptionsToPackage{table}{xcolor}\n\\usepackage{xcolor}",
+            1,
+        )
+
+    # --- 0b. Add etoolbox + AtBeginEnvironment for table font/spacing ---
+    # This applies \small and tighter column spacing to all longtables,
+    # preventing "Overfull hbox" on wider tables.
+    if "\\AtBeginEnvironment{longtable}" not in tex:
+        tex = tex.replace(
+            "\\begin{document}",
+            "\\usepackage{etoolbox}\n"
+            "\\AtBeginEnvironment{longtable}{\\small\\setlength{\\tabcolsep}{4pt}}\n"
+            "\\begin{document}",
+            1,
+        )
+
     # Work on longtable and tabular environments
     # Strategy: process each environment block individually
 
@@ -63,15 +85,8 @@ def fix_tables(tex: str) -> str:
         block = block.replace("\\bottomrule\\noalign{}", "\\bottomrule")
 
         # --- 4. Tighten spacing within tables ---
-        # Add \small if not already present
-        # (Our Lua filter handles this, so this is a fallback)
-        if "\\small" not in block and is_longtable:
-            # Inject \small before the first line of the environment
-            block = re.sub(
-                r"(\\\\begin\{longtable\})",
-                r"{\\small\n\1",
-                block,
-            )
+        # (Handled globally via \AtBeginEnvironment in the preamble, see below)
+        # Per-table injection was unreliable; we use etoolbox instead.
 
         return block
 

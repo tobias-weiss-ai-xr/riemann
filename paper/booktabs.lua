@@ -11,16 +11,6 @@
 -- The actual alternating row colors (\rowcolor, \rowcolors) are added
 -- by scripts/fix_tables.py during the two-pass build.
 
--- Inject \PassOptionsToPackage{table}{xcolor} before pandoc's \usepackage{xcolor}
-function Meta(meta)
-  if not meta['header-includes'] then
-    meta['header-includes'] = pandoc.MetaList({})
-  end
-  table.insert(meta['header-includes'],
-    pandoc.RawInline('latex', '\\PassOptionsToPackage{table}{xcolor}'))
-  return meta
-end
-
 function Table(tbl)
   local before = pandoc.RawBlock('latex',
     '{\\small\\setlength{\\tabcolsep}{3pt}%\n' ..
