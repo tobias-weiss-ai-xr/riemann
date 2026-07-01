@@ -157,9 +157,45 @@ def publish_deposit(deposit_id):
         print(f"  FAILED ({r.status_code}: {r.text[:300]})")
 
 
+def delete_all_files(deposit_id):
+    """Delete all existing files from a draft deposit (for new versions)."""
+    r = requests.get(f"{BASE_URL}/deposit/depositions/{deposit_id}", headers=HEADERS)
+    r.raise_for_status()
+    files = r.json().get("files", [])
+    if not files:
+        print("  No existing files to delete")
+        return
+    print(f"  Deleting {len(files)} old files...")
+    for f in files:
+        fid = f["id"]
+        r2 = requests.delete(
+            f"{BASE_URL}/deposit/depositions/{deposit_id}/files/{fid}",
+            headers=HEADERS,
+        )
+        if r2.status_code == 204:
+            print(f"    Deleted: {f['filename']}")
+        else:
+            print(f"    FAILED to delete {f['filename']}: {r2.status_code}")
+
+
+def new_version(existing_id):
+    """Create a new version of an existing deposit."""
+    print(f"Creating new version from deposit {existing_id}...")
+    r = requests.post(
+        f"{BASE_URL}/deposit/depositions/{existing_id}/actions/newversion",
+        headers=HEADERS,
+    )
+    r.raise_for_status()
+    deposit = r.json()
+    deposit_id = deposit["id"]
+    print(f"  New version deposit ID: {deposit_id}")
+    return deposit_id
+
+
 def main():
     parser = argparse.ArgumentParser(description="Upload comprehensive paper to Zenodo")
     parser.add_argument("--publish", metavar="ID", help="Publish an existing deposit by ID")
+    parser.add_argument("--new-version", metavar="ID", help="Create new version of existing deposit")
     parser.add_argument("--create-only", action="store_true", help="Create deposit and upload, but skip metadata")
     parser.add_argument("--skip-upload", action="store_true", help="Only set metadata on existing deposit")
     args = parser.parse_args()
@@ -174,7 +210,11 @@ def main():
         print("Run 'make paper-pdf' first.")
         return
 
-    deposit_id = create_deposit()
+    if args.new_version:
+        deposit_id = new_version(args.new_version)
+        delete_all_files(deposit_id)
+    else:
+        deposit_id = create_deposit()
 
     if not args.skip_upload:
         upload_files(deposit_id)
