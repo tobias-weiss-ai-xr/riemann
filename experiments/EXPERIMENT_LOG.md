@@ -2960,3 +2960,58 @@ Class distribution: {0: 30,638, 1: 33,206} (balanced).
 - `scripts/task_4_binary_prediction.py` — Experiment script (3 targets, classification + regression)
 - `data/results/task_4_binary_prediction_results.json` — Full numerical results
 - `data/results/task_4_binary_prediction.png` — Summary plots (4 panels)
+
+---
+
+## Thread G: Hybrid GNN with Enriched Number-Theoretic Features
+
+**Date:** 2026-07-08  
+**Motivation:** Prior work (Thread B/Exp 12) showed GAT with 9-dim node features achieves R²=0.731 for z1 prediction on stratified splits. This experiment tests whether enriching node features with number-theoretic functions (divisor sums, Euler totient, von Mangoldt, Ramanujan sums) and adding form-level global features (conductor, dim, root number, Sato-Tate moments) improves z1 prediction beyond the baseline.
+
+**Status:** COMPLETED — Enriched features do NOT help; baseline GAT with 9-dim features is optimal.
+
+### Methodology
+
+**Architecture:** GATConv (3 layers, 4 heads, hidden=128, edge_dim=3) with global mean+max pooling readout. Three ablation configurations:
+
+| Config | Node Dim | Global Dim | Description |
+|--------|----------|------------|-------------|
+| baseline | 9 | 0 | 5 base + 4 arithmetic (omega, mu, d, liouville) |
+| enriched | 17 | 0 | 9 + 8 new NT features (σ₁, σ₂, φ, Λ, c₂, c₃, c₅, c₇) |
+| global | 17 | 8 | enriched nodes + form-level features at readout |
+
+**New index-level features (for n=1..1000):**
+- σ₁(n) = sum of divisors  
+- σ₂(n) = sum of squares of divisors  
+- φ(n) = Euler's totient  
+- Λ(n) = von Mangoldt function (log p if n = p^k, else 0)  
+- c_q(n) = Ramanujan sums for q ∈ {2, 3, 5, 7}
+
+**New global features (per form):**
+- log(conductor), dim/8, root_number (±1), log(num_zeros)  
+- Sato-Tate moments: mean(a²_p), skew(a³_p), kurtosis(a⁴_p) from first 100 traces  
+- spectral_ratio = num_zeros / log(level)
+
+**Data:** Cross-level split (train ≤ N3000, val N3001–4000, test > N4000) on 46,347 forms. 25,026 train / 10,556 val / 10,765 test, 1000 nodes per graph, shared edge_index (~9,500 edges/graph). Target: z1 (first L-function zero). Training: AdamW lr=1e-3, CosineAnnealing, batch_size=64, patience=10, max 50 epochs.
+
+### Results (z1 Regression, Test Set)
+
+| Config | Node Dim | Global | Params | R² | MAE | Best Epoch | Time |
+|--------|----------|--------|--------|------|------|------------|------|
+| **baseline** | 9 | 0 | 53,441 | **0.5298** | 0.229 | 17 | 80.3m |
+| enriched | 17 | 0 | 54,465 | 0.4978 | 0.239 | 3 | 43.1m |
+| global | 17 | 8 | 55,489 | 0.5009 | 0.242 | 13 | 36.6m |
+
+### Key Findings
+
+1. **Enriched features WORsEN performance** — both enriched (17-dim) and global (17+8-dim) configurations achieve lower R² than the 9-dim baseline. The new number-theoretic features are pure noise for z1 prediction.
+2. **The enriched config collapsed rapidly** — best epoch was 3, with no val loss improvement for the next 10 epochs. The 8 additional features interfere with gradient signal rather than adding useful information.
+3. **Global features show marginal recovery** over enriched alone (R²=0.501 vs 0.498) but still below baseline. The form-level features (conductor, Sato-Tate moments) do contribute a weak signal but not enough to overcome the enriched node feature noise.
+4. **Cross-level split is harder** than stratified split — baseline R²=0.530 on cross-level vs R²=0.731 on stratified (Exp 12/Thread B). Generalizing to higher conductors is genuinely more difficult.
+5. **z1 is predicted from Hecke traces themselves, not from index-level geometry** — consistent with Exp Y (column shuffle: traces are bag-of-features, per-prime identity is irrelevant). The graph structure (message passing with index-level features) helps moderately over MLP (GAT 0.731 vs MLP 0.714 on stratified), but enriching node features with number theory doesn't improve it further.
+6. **Sato-Tate moments as global features do not help** — despite being theoretically motivated (Sato-Tate measures the eigenvalue distribution), they contribute no predictive signal for z1 beyond what's already in the node features.
+
+### Files
+
+- `scripts/train_gnn_enriched_features.py` — Experiment script (3 ablation configs, GAT backbone)
+- `data/results/thread_g_enriched_features_results.json` — Full numerical results
