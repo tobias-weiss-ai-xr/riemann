@@ -87,6 +87,31 @@ paper: ## Build paper from markdown (three-pass: pandoc→.tex → fix_tables �
 
 paper-pdf: paper ## Build paper as PDF (alias)
 
+# ── Transfer Operator Paper ──────────────────────────────────────
+TRANSFER_PAPER_DIR := paper
+TRANSFER_PAPER_TEX := $(TRANSFER_PAPER_DIR)/transfer-operator-rh.tex
+TRANSFER_PAPER_OUT := $(TRANSFER_PAPER_DIR)/transfer-operator-rh.pdf
+
+paper-transfer: ## Build transfer operator paper (pdflatex → bibtex → pdflatex×2)
+	@echo "=== Building transfer operator paper ==="
+	$(DOCKER_COMPOSE) exec $(RESEARCH_CONTAINER) bash -c \
+		"cd $(TRANSFER_PAPER_DIR) && pdflatex -interaction=nonstopmode transfer-operator-rh.tex 2>&1 | tail -5"
+	@echo "=== Running bibtex ==="
+	$(DOCKER_COMPOSE) exec $(RESEARCH_CONTAINER) bash -c \
+		"cd $(TRANSFER_PAPER_DIR) && bibtex transfer-operator-rh.aux 2>&1 | tail -5"
+	@echo "=== First pdflatex pass (after bibtex) ==="
+	$(DOCKER_COMPOSE) exec $(RESEARCH_CONTAINER) bash -c \
+		"cd $(TRANSFER_PAPER_DIR) && pdflatex -interaction=nonstopmode transfer-operator-rh.tex 2>&1 | tail -5"
+	@echo "=== Second pdflatex pass (cross-refs) ==="
+	$(DOCKER_COMPOSE) exec $(RESEARCH_CONTAINER) bash -c \
+		"cd $(TRANSFER_PAPER_DIR) && pdflatex -interaction=nonstopmode transfer-operator-rh.tex 2>&1 | tail -5"
+	@echo "=== PDF built: $(TRANSFER_PAPER_OUT) ==="
+
+paper-transferfast: ## Build transfer operator paper (single pass, no bibtex)
+	@echo "=== Building transfer operator paper (fast) ==="
+	$(DOCKER_COMPOSE) exec $(RESEARCH_CONTAINER) bash -c \
+		"cd $(TRANSFER_PAPER_DIR) && pdflatex -interaction=nonstopmode transfer-operator-rh.tex 2>&1 | tail -5"
+
 # ── Lean 4 Formalization ─────────────────────────────────────────
 LEAN_DIR := lean
 
