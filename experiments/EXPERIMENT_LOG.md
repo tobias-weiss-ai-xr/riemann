@@ -3113,3 +3113,47 @@ Requires: Lean formalization of Goldbach count functions, Hardy–Littlewood sin
 ---
 
 
+
+---
+
+## Experiment 18: CM Forms Analysis — Do CM Forms Explain GUE Outliers?
+
+**Date:** 2026-08-17
+**Status:** COMPLETED
+**Script:** `scripts/analyze_cm_forms.py`
+
+### Goal
+
+Test whether the 1,748 GUE outliers in dim≥2 are predominantly CM (complex multiplication) forms. CM forms are arithmetically closest to elliptic curves (dim=1, all GUE), so the hypothesis is that CM status explains the GUE outliers.
+
+### Method
+
+1. Merge `is_cm` from `lmfdb_sql_weight2_ml.csv` into `lmfdb_zeros_ml.csv` (63,844 forms)
+2. Recompute GUE/GOE preference via KS test
+3. Chi-square test, Fisher's exact test, Cramér's V
+
+### Results
+
+|  | GUE | GOE | Total |
+|---|---|---|---|
+| non-CM | 1,729 | 27,384 | 29,113 |
+| CM | 19 | 84 | 103 |
+| **Total** | **1,748** | **27,468** | **29,216** |
+
+- CM forms preferring GUE: 18.4% (19/103)
+- non-CM forms preferring GUE: 5.9% (1,729/29,113)
+- **Enrichment: 3.58×** (chi²=26.36, p=2.8×10⁻⁷, Fisher p=1.0×10⁻⁵)
+- CM fraction of GUE outliers: **1.1%** (19/1,748)
+- Cramér's V: 0.030 (small effect size)
+
+### Verdict
+
+**PARTIALLY CONFIRMED.** CM forms are 3.6× enriched in GUE outliers (statistically significant, p=10⁻⁵), but account for only 1.1% of outliers due to their rarity (0.4% of dim≥2). The 98.9% of GUE outliers are non-CM, driven by low dimension and small level (as identified in the paper). CM is a minor contributing factor, not the primary explanation.
+
+### Files
+
+- `scripts/analyze_cm_forms.py` — analysis script
+- `data/results/cm_forms_analysis.json` — summary statistics
+- `data/results/cm_merged_dim2.csv` — merged dataset
+- `papers/cm_forms_analysis.png` — figure
+- `experiments/CM_FORMS_ANALYSIS.md` — full report
