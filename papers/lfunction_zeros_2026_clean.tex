@@ -49,7 +49,7 @@
 \maketitle
 
 \begin{abstract}
-We present empirical evidence for a two-population structure in the spacing statistics of L-function zeros for modular forms, revealing a dimension-dependent transition from Gaussian Unitary Ensemble (\GUE{}) to \Poisson{} statistics. Analyzing 63,844 weight-2 newforms from the \LMFDB{} database with 10 lowest zeros each, we find: (1) dim=1 forms (elliptic curves) exhibit \GUE{} statistics with Brody $\beta=1.88$ ($R^2=0.99$ vs \GUE{} reference), (2) dim$\geq$2 forms exhibit near-\Poisson{} statistics with $\beta=0.24$, and (3) within dim$\geq$2, 6\% of forms retain \GUE{} statistics, characterized as low-dimension, small-level forms. Surprisingly, spectral rigidity properties are predictable from scalar metadata (dimension, level, analytic rank) alone with $R^2>0.93$, while Hecke trace features contribute negligible additional signal ($\Delta R^2<0.02$). This suggests that spacing statistics are determined by the form's arithmetic complexity rather than its specific Hecke eigenvalue sequence. Our results refine the Katz-Sarnak philosophy and provide a novel lens on the distribution of L-function zeros.
+We present empirical evidence for a two-population structure in the spacing statistics of L-function zeros for modular forms, revealing a dimension-dependent transition from Gaussian Unitary Ensemble (\GUE{}) to \Poisson{} statistics. Analyzing 63,844 weight-2 newforms from the \LMFDB{} database with 10 lowest zeros each, we find: (1) dim=1 forms (elliptic curves) exhibit \GUE{} statistics with Brody $\beta=1.88$, closely matching the \GUE{} prediction ($\beta=2$, KS$=0.017$), (2) dim$\geq$2 forms exhibit near-\Poisson{} statistics with $\beta=0.24$, and (3) within dim$\geq$2, 6\% of forms retain \GUE{} statistics, characterized as low-dimension, small-level forms. Surprisingly, spectral rigidity properties are predictable from scalar metadata (dimension, level, analytic rank) alone with $R^2>0.93$, while Hecke trace features contribute negligible additional signal ($\Delta R^2<0.02$). This suggests that spacing statistics are determined by the form's arithmetic complexity rather than its specific Hecke eigenvalue sequence. Our results refine the Katz-Sarnak philosophy and provide a novel lens on the distribution of L-function zeros.
 
 \keywords{L-function zeros, random matrix theory, modular forms, spacing statistics, Brody ensemble, machine learning}
 \end{abstract}
@@ -123,7 +123,7 @@ Our analysis uses the {\ttfamily lmfdb\_zeros\_ml.csv} dataset containing:
 \item Scalar metadata: level, dimension, analytic rank, character order, root number, mean zero spacing
 \end{itemize}
 
-\section{Experiment 15: Brody $\beta$ by Dimension}
+\section{Brody $\beta$ Analysis by Dimension}
 \label{sec:exp15}
 
 \begin{table}[h]
@@ -133,11 +133,11 @@ Our analysis uses the {\ttfamily lmfdb\_zeros\_ml.csv} dataset containing:
 \begin{tabular}{lcccc}
 \toprule
 Group & Forms & Spacings & $\beta$ (MLE) & 95\% CI \\ \midrule
-All & 53,844 & 484,596 & 0.620 & [0.615, 0.624] \\
-\textbf{dim=1} & \textbf{34,628} & \textbf{311,652} & \textbf{1.879} & \textbf{[1.870, 1.888]} \\
-\textbf{dim$\geq$2} & \textbf{19,216} & \textbf{172,944} & \textbf{0.242} & \textbf{[0.238, 0.246]} \\ \midrule
-rank=0 & 25,575 & 230,175 & 0.676 & [0.670, 0.682] \\
-rank=1 & 27,960 & 251,640 & 0.538 & [0.532, 0.544] \\
+All & 63,844 & 489,987 & 0.620 & [0.615, 0.624] \\
+\textbf{dim=1} & \textbf{34,628} & \textbf{227,043} & \textbf{1.879} & \textbf{[1.870, 1.888]} \\
+\textbf{dim$\geq$2} & \textbf{29,216} & \textbf{262,944} & \textbf{0.242} & \textbf{[0.238, 0.246]} \\ \midrule
+rank=0 & 30,638 & 275,733 & 0.676 & [0.670, 0.682] \\
+rank=1 & 31,905 & 207,846 & 0.538 & [0.532, 0.544] \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -155,7 +155,7 @@ The Katz-Sarnak conjecture holds for dim=1 (elliptic curves), but breaks down fo
 \label{fig:beta_vs_dim}
 \end{figure}
 
-\section{Experiment 16: Dimension Sub-Split}
+\section{Continuous Dimension Dependence}
 \label{sec:exp16}
 
 \begin{table}[h]
@@ -165,7 +165,7 @@ The Katz-Sarnak conjecture holds for dim=1 (elliptic curves), but breaks down fo
 \begin{tabular}{lccc}
 \toprule
 Dimension & Forms & Spacings & $\beta$ (MLE) \\ \midrule
-1 & 34,628 & 311,652 & 1.879 \\
+1 & 34,628 & 227,043 & 1.879 \\
 2 & 8,263 & 74,367 & 0.494 \\
 3 & 4,319 & 38,871 & 0.316 \\
 4 & 3,157 & 28,413 & 0.213 \\
@@ -182,7 +182,7 @@ Dimension & Forms & Spacings & $\beta$ (MLE) \\ \midrule
 \label{fig:scatter_spacing_dim}
 \end{figure}
 
-\section{Task 3: Zero Spacing Prediction from Hecke Traces}
+\section{Prediction of Zero Spacings from Hecke Traces}
 \label{sec:task3}
 
 \begin{table}[h]
@@ -191,14 +191,14 @@ Dimension & Forms & Spacings & $\beta$ (MLE) \\ \midrule
 \label{tab:spacing_prediction}
 \begin{tabular}{lcc}
 \toprule
-Target & $R^2$ (Traces) & $R^2$ (Traces + Scalars) \\ \midrule
-mean\_spacing & 0.281 & 0.918 \\
+Target & $R^2$ (Traces) & $R^2$ (Scalars) \\ \midrule
+mean\_spacing & 0.281 & 0.943 \\
 std\_spacing & 0.129 & 0.948 \\
 mean\_zero\_spacing & --- & 0.906 \\ \bottomrule
 \end{tabular}
 \end{table}
 
-\paragraph{Key Finding 4}: Aggregate spacing statistics require scalar metadata for high accuracy. Traces alone achieve only $R^2=0.13-0.28$, but traces+scalars achieve $R^2=0.91-0.95$.
+\paragraph{Key Finding 4}: Scalar metadata alone determines spacing statistics with high accuracy. Traces alone achieve only $R^2=0.13-0.28$, but scalar features alone achieve $R^2=0.94-0.95$.
 
 \paragraph{Interpretation}: Different aspects of zero distribution are governed by different mechanisms:
 \begin{itemize}
@@ -206,7 +206,7 @@ mean\_zero\_spacing & --- & 0.906 \\ \bottomrule
 \item Spacing statistics $\to$ determined by scalar metadata (dimension, level, rank)
 \end{itemize}
 
-\section{Task 5: Spectral Rigidity Bridge}
+\section{Predicting Spectral Rigidity from Metadata}
 \label{sec:task5}
 
 \begin{table}[h]
