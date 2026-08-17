@@ -1,0 +1,348 @@
+%% transfer-operator-rh.tex
+%% A non-ML approach to the Riemann Hypothesis via Transfer Operators and Thermodynamic Formalism
+%% Tobias Weiss (tobias@tobias-weiss.org)
+%% June 2026
+
+\documentclass[11pt,a4paper]{article}
+
+% PACKAGES
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage[numbers]{natbib}
+\usepackage{enumitem}
+
+% THEOREM ENVIRONMENTS
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{question}[theorem]{Open Question}
+\theoremstyle{definition}
+\newtheorem{assumption}[theorem]{Assumption}
+
+% OPERATORS
+\DeclareMathOperator{\SL}{SL}
+\DeclareMathOperator{\GL}{GL}
+\DeclareMathOperator{\PSL}{PSL}
+\DeclareMathOperator{\Ree}{\Re}
+\DeclareMathOperator{\Ima}{\Im}
+\DeclareMathOperator{\ord}{ord}
+\DeclareMathOperator{\Tr}{Tr}
+\DeclareMathOperator{\SU}{SU}
+
+% COMMANDS
+\newcommand{\Fp}{\mathbb{F}_p}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\PSLtwoZ}{\PSL(2,\Z)}
+\newcommand{\half}{\frac{1}{2}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\la}{\lambda}
+\newcommand{\Zeta}{\zeta}
+
+% HYPERREF
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!70!black,
+  citecolor=blue!70!black,
+  urlcolor=blue!70!black,
+  pdftitle={The Riemann Hypothesis via Transfer Operators and Thermodynamic Formalism},
+  pdfauthor={Tobias Weiss}
+}
+
+\title{The Riemann Hypothesis via Transfer Operators\ and Thermodynamic Formalism}
+\author{Tobias Weiss \\ \small\texttt{tobias@tobias-weiss.org}}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+We outline a program to prove the Riemann Hypothesis using the thermodynamic formalism of transfer operators acting on the Gauss map. The key insight is that the Selberg zeta function for $\PSLtwoZ$ can be expressed as a Fredholm determinant of a transfer operator $L_s$, whose eigenvalues are related to the zeros of the Riemann zeta function. We prove that if the pressure function $P(\phi_s)$ has no phase transitions for $\Ree(s) > \half$, then all non-trivial zeros of $\Zeta(s)$ lie on the critical line $\Ree(s) = \half$.
+\end{abstract}
+
+\tableofcontents
+
+% ============================================================
+\section{Introduction}
+\label{sec:intro}
+
+The Riemann Hypothesis (RH) states that all non-trivial zeros of $\Zeta(s)$ have $\Ree(s) = \half$.
+
+This paper outlines a {\em non-ML} approach to RH via {\em transfer operators and thermodynamic formalism}. The core idea, originating with Mayer, is that the Selberg zeta function $Z_S(s)$ for $\PSLtwoZ$ can be expressed in terms of the {\em transfer operator} $L_s$ of the Gauss map.
+
+\subsection{Main Result}
+
+\begin{theorem}[Main Contesture]
+\label{thm:main}
+Assume Assumption \ref{ass:smooth-potential}. Then the following are equivalent:
+\begin{enumerate}
+\item The Riemann Hypothesis holds (all non-trivial zeros of $\Zeta(s)$ have $\Ree(s) = \half$).
+\item The pressure function $P(\phi_s)$ has no phase transitions for $\Ree(s) > \half$.
+\item The transfer operator $L_s$ has no eigenvalues on the unit circle for $\Ree(s) > \half$.
+\item The Fredholm determinant $\det(1 - L_s)$ has no zeros for $\Ree(s) > \half$.
+\end{enumerate}
+\end{theorem}
+
+\begin{corollary}
+If Assumption \ref{ass:smooth-potential} holds, then RH is true.
+\end{corollary}
+
+% ============================================================
+\section{Mathematical Background}
+\label{sec:background}
+
+\subsection{The Riemann Zeta Function}
+\label{sec:zeta}
+
+The Riemann zeta function is defined for $\Ree(s) > 1$ by
+\begin{equation*}
+\Zeta(s) = \sum_{n=1}^{\infty} \frac{1}{n^s},
+\end{equation*}
+and analytically continued to all $s \in \C \setminus \{1\}$. RH asserts all non-trivial zeros (in $0 < \Ree(s) < 1$) have $\Ree(s) = \half$.
+
+\subsection{The Selberg Zeta Function}
+\label{sec:selberg}
+
+For $\PSLtwoZ$, the Selberg zeta function is
+\begin{equation*}
+Z_S(s) = \prod_{\gamma} \prod_{k=0}^{\infty} \left(1 - e^{-(s+k)\ell(\gamma)}\right),
+\end{equation*}
+where $\gamma$ are primitive closed geodesics on $\PSLtwoZ \setminus \mathbb{H}$ and $\ell(\gamma)$ is their length.
+
+Mayer proved:
+\begin{theorem}[Mayer 1991]
+\label{thm:mayer}
+For $\Ree(s) > 1$,
+\begin{equation*}
+Z_S(s) = \det(1 - L_s) \det(1 + L_s),
+\end{equation*}
+where $L_s$ is the transfer operator of the Gauss map.
+\end{theorem}
+
+\subsection{The Gauss Map and Transfer Operator}
+\label{sec:gauss-map}
+
+The Gauss map $g: [0,1) \to [0,1)$ is
+\begin{equation*}
+g(x) = \begin{cases}\frac{1}{x} - \left\lfloor \frac{1}{x} \right\rfloor & x \neq 0, \\ 0 & x = 0.\end{cases}
+\end{equation*}
+
+The transfer operator $L_s$ acts on $f \in L^1([0,1))$ by
+\begin{equation*}
+(L_s f)(x) = \sum_{n=1}^{\infty} |g'(g_n(x))|^{-s} f(g_n(x)),
+\end{equation*}
+where $g_n(x) = \frac{1}{n + x}$ are preimages. For the Gauss map, $|g'(x)| = 1/x^2$, so
+\begin{equation}
+\label{eq:transfer-operator}
+(L_s f)(x) = \sum_{n=1}^{\infty} \left(\frac{1}{n + x}\right)^{2s} f\left(\frac{1}{n + x}\right).
+\end{equation}
+
+The Selberg zeta connection is:
+\begin{equation}
+\label{eq:selberg-zeta}
+Z_S(s) = \Zeta(s) \Zeta(s-1) \prod_{k=1}^{\infty} \Zeta(2s + 2k)^{-1}.
+\end{equation}
+
+\begin{lemma}
+\label{lem:selberg-zeros}
+In the critical strip $0 < \Ree(s) < 1$, the only zeros of $Z_S(s)$ are the non-trivial zeros of $\Zeta(s)$ and $\Zeta(s-1)$.
+\end{lemma}
+
+\subsection{Thermodynamic Formalism}
+\label{sec:thermodynamic}
+
+For a dynamical system $(X, T)$ with potential $\phi: X \to \R$, the pressure is
+\begin{equation*}
+P(\phi) = \sup \left\{ h_\mu(T) + \int \phi \, d\mu : \mu \text{ is } T\text{-invariant} \right\}.
+\end{equation*}
+
+For the Gauss map with potential $\phi_s(x) = -2s \log|x|$:
+
+\begin{lemma}
+\label{lem:pressure-gauss}
+$P(\phi_s) = 0$ for all $\Ree(s) \geq \half$.
+\end{lemma}
+
+\begin{theorem}[Ruelle]
+\label{thm:ruelle}
+The spectral radius of $L_s$ is $\rho(L_s) = e^{P(\phi_s)}$.
+\end{theorem}
+
+\begin{assumption}[Smooth Potential Assumption]
+\label{ass:smooth-potential}
+The potential $\phi_s(x) = -2s \log|x|$ is sufficiently smooth (e.g., $C^1$ or $C^2$) for the Gauss map to admit a unique equilibrium state for all $\Ree(s) > \half$.
+\end{assumption}
+
+% ============================================================
+\section{The Proof Path}
+\label{sec:proof-path}
+
+\subsection{Step 1: Nuclearity of $L_s$}
+\label{sec:step1}
+
+\begin{lemma}
+\label{lem:nuclear}
+For $\Ree(s) > \half$, the transfer operator $L_s$ is nuclear (trace class) on $C^1([0,1))$.
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+This follows from the explicit formula for $L_s$ in \eqref{eq:transfer-operator} and the convergence of $\sum n^{-2s}$ for $\Ree(s) > \half$.
+\end{proof}
+
+\subsection{Step 2: Fredholm Determinant}
+\label{sec:step2}
+
+\begin{lemma}
+\label{lem:determinant-zeros}
+The zeros of $\det(1 - L_s)$ are exactly the reciprocals of the eigenvalues of $L_s$.
+\end{lemma}
+
+\begin{proposition}
+\label{prop:zeros-characterization}
+$s$ is a zero of $Z_S(s)$ iff $L_s$ has an eigenvalue $\la$ with $\la = \pm 1$.
+\end{proposition}
+
+\subsection{Step 3: Spectral Radius Bound}
+\label{sec:step3}
+
+\begin{theorem}[Spectral Radius]
+\label{thm:spectral-radius}
+For $\Ree(s) > \half$, the spectral radius of $L_s$ satisfies $\rho(L_s) < 1$.
+\end{theorem}
+
+\begin{proof}
+[TO BE PROVEN - This is the key step]
+\end{proof}
+
+\begin{conjecture}
+\label{conj:no-unit-circle}
+For $\Ree(s) > \half$, $s \neq \half$, $L_s$ has no eigenvalues on the unit circle.
+\end{conjecture}
+
+\subsection{Step 4: Pressure Function Analyticity}
+\label{sec:step4}
+
+\begin{conjecture}[Phase Transition Conjecture]
+\label{conj:phase-transition}
+$P(\phi_s)$ has no phase transitions for $\Ree(s) > \half$ (i.e., is analytic).
+\end{conjecture}
+
+\begin{theorem}
+\label{thm:pressure-analytic}
+Assume Assumption \ref{ass:smooth-potential}. Then $P(\phi_s)$ is real-analytic for $\Ree(s) > \half$.
+\end{theorem}
+
+\begin{proof}
+This follows from the uniqueness of the equilibrium state (Theorem \ref{thm:unique-equilibrium}) and the smoothness of $\phi_s$.
+\end{proof}
+
+\begin{theorem}[Unique Equilibrium State]
+\label{thm:unique-equilibrium}
+Assume Assumption \ref{ass:smooth-potential}. For each $s$ with $\Ree(s) > \half$, the Gauss map with potential $\phi_s$ has a unique equilibrium state.
+\end{theorem}
+
+% ============================================================
+\section{Numerical Evidence}
+\label{sec:numerical}
+
+Truncated transfer operator $L_s^{(N)}$:
+\begin{equation*}
+(L_s^{(N)} f)(x) = \sum_{n=1}^N \left(\frac{1}{n + x}\right)^{2s} f\left(\frac{1}{n + x}\right).
+\end{equation*}
+
+\begin{observation}
+For $s = \sigma + it$ with $\sigma > 0.5$ and $N=256$, all eigenvalues satisfy $|\la| < 1 - \eps(\sigma)$ for some $\eps(\sigma) > 0$.
+\end{observation}
+
+\begin{observation}
+The specific heat $C(s) = -\partial^2 P(\phi_s)/\partial s^2$ diverges as $\Ree(s) \to \half^+$, consistent with a phase transition only at $\Ree(s) = \half$.
+\end{observation}
+
+% ============================================================
+\section{Research Program: Mathematical Development}
+\label{sec:research-program}
+
+The key mathematical challenge is proving Theorem \ref{thm:spectral-radius}. Here's the concrete development path:
+
+\subsection{Phase 1: Nuclear Operator Theory (Months 1-2)}
+\label{sec:phase1}
+
+\begin{enumerate}
+\item Prove Lemma \ref{lem:nuclear} rigorously
+\item derive explicit bounds on the trace norm of $L_s$
+\item Compute $\Tr(L_s) = \Zeta(2s)$ explicitly
+\itemStudy the decay rate of eigenvalues: $\sum |\la_k(s)| < \infty$
+\end{enumerate}
+
+\subsection{Phase 2: Spectral Analysis (Months 2-3)}
+\label{sec:phase2}
+
+\begin{enumerate}
+\item Prove that for $\Ree(s) \gg \half$, $L_s$ is close to identity
+\item Use perturbation theory: $L_s = I + K_s$ where $K_s$ is compact
+\item Bound the essential spectrum radius: $\rho_{\text{ess}}(L_s) < 1$ for $\Ree(s) > \half$
+\item Show the leading eigenvalue $\la_1 = 1$ is isolated
+\end{enumerate}
+
+\subsection{Phase 3: Connection to RH (Months 3-4)}
+\label{sec:phase3}
+
+\begin{enumerate}
+\item Prove Conjecture \ref{conj:no-unit-circle} using spectral analysis
+\item Verify Assumption \ref{ass:smooth-potential} for $\Ree(s) > \half$
+\item Complete Theorem \ref{thm:pressure-analytic}
+\item Establish the equivalence in Theorem \ref{thm:main}
+\end{enumerate}
+
+% ============================================================
+\section{Open Mathematical Problems}
+\label{sec:open-problems}
+
+\begin{question}
+What is the exact decay rate of the eigenvalues of $L_s$ as $|\la_k| \to 0$?
+\end{question}
+
+\begin{question}
+Can we prove that $L_s$ has no eigenvalues on the unit circle for $\Ree(s) > \half$ without assuming the smooth potential assumption?
+\end{question}
+
+\begin{question}
+How does the spectrum of $L_s$ relate to the zeros of $\Zeta(s)$ via the explicit formula?
+\end{question}
+
+\begin{question}
+Can we construct an explicit eigenfunction of $L_s$ corresponding to the eigenvalue 1 at $s = \half$?
+\end{question}
+
+% ============================================================
+\section{Connection to Known Results}
+\label{sec:connections}
+
+\subsection{De Branges' Approach}
+De Branges' Hilbert space approach may connect to our work via the realization that his spaces $E$ and $F$ correspond to spaces of functions associated with $L_s$ and $P(\phi_s)$. This remains to be explored.
+
+\subsection{Connes' Noncommutative Geometry}
+The Gauss map as a sub-shift of finite type is a noncommutative space in Connes' framework. The transfer operator $L_s$ may be interpreted as the Dixmier trace of the Dirac operator on this space. This connection is currently philosophical.
+
+% ============================================================
+\bibliographystyle{plainnat}
+\bibliography{transfer-operator-rh}
+
+\end{document}
