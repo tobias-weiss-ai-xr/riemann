@@ -111,6 +111,16 @@ kg.close()
 - Hayou 2023: RH ≡ NN density via Nyman-Beurling
 - Loeffler & Stoll 2025: ζ(s) formalized in Lean 4 / Mathlib
 
+## Published Data & Code
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21974748.svg)](https://doi.org/10.5281/zenodo.21974748)
+
+The L-function zero spacing analysis (63,844 weight-2 newforms from LMFDB) is archived on Zenodo:
+
+- **Paper**: `lfunction_zeros_2026_clean.pdf` (12 pages)
+- **Data**: LMFDB CSVs, Brody fit results, Task 3/5 ML results, GUE outlier analysis
+- **Code**: 5 analysis scripts (spectral rigidity bridge, GUE outlier analysis, etc.)
+
 ## Articles
 
 | File | Content |
