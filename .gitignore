@@ -130,6 +130,21 @@ paper/*.bbl
 paper/*.blg
 paper/*.out
 paper/*.pdf
+papers/*.aux
+papers/*.bbl
+papers/*.blg
+papers/*.out
+papers/*.log
+papers/*.toc
+
+# ── Zenodo archives (large binaries) ────────────────────────
+zenodo/*.zip
+
+# ── Old pre-clean paper version ──────────────────────────────
+papers/lfunction_zeros_2026.tex
+papers/lfunction_zeros_2026.aux
+papers/lfunction_zeros_2026.out
+papers/lfunction_zeros_2026.toc
 
 # ── Root temp / test files ──────────────────────────────────
 .temp_plots/
