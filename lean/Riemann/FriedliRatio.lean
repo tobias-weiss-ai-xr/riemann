@@ -6,6 +6,7 @@ Authors: Riemann Project Contributors
 import Mathlib.Analysis.Complex.Basic
 import Mathlib.Analysis.SpecialFunctions.Pow.Complex
 import Mathlib.Data.Real.Basic
+import Mathlib.Data.List.Basic
 import Riemann.CayleyGraphs
 
 /-! # Friedli Spectral Zeta Ratio
@@ -34,31 +35,38 @@ which is a constant distinct from the cyclic case.
 
 namespace Riemann
 
-open Complex
+open Complex RCLike
+
+/-- Local notation for complex conjugation. We bind it to `starRingEnd ℂ`,
+which is exactly the function used internally by `Complex.conj_cpow` and
+`RCLike.norm_conj`, so rewrites involving those lemmas match directly. -/
+local notation "conj" => starRingEnd ℂ
 
 /-! ## Spectral zeta function evaluation -/
 
 /-- Evaluate the spectral zeta function at s:
-  ζ(s) = Σ_{i=1}^{n} (d - λ_i)^{-s/2}
-where {λ_i} are the eigenvalues and d is the degree.
+  ζ(s) = Σ_{i=1}^{n} (d - eig_i)^{-s/2}
+where {eig_i} are the eigenvalues and d is the degree.
 
 Uses `Complex.cpow` for complex exponentiation.
 The result is (in general) a complex number. -/
 noncomputable def spectralZetaEval (eigenvalues : List ℂ) (d s : ℂ) : ℂ :=
-  (eigenvalues.map (fun λ : ℂ => Complex.cpow (d - λ) ((-s/2 : ℂ)))).sum
+  (eigenvalues.map (fun eig : ℂ => Complex.cpow (d - eig) ((-s/2 : ℂ)))).sum
 
 /-- The spectral zeta function of a graph:
-  ζ_G(s) = Σ_{i=1}^{n} (d - λ_i)^{-s/2}
-where {λ_i} are the eigenvalues of the adjacency matrix and d is the degree.
+  ζ_G(s) = Σ_{i=1}^{n} (d - eig_i)^{-s/2}
+where {eig_i} are the eigenvalues of the adjacency matrix and d is the degree.
 
-For 4-regular graphs: d = 4, so ζ_p(s) = Σ (4 - λ_i)^{-s/2}. -/
-structure SpectralZetaFunction (p : ℕ) where
+For 4-regular graphs: d = 4, so ζ_p(s) = Σ (4 - eig_i)^{-s/2}. -/
+structure SpectralZetaFunction where
   /-- The eigenvalues of the Cayley graph adjacency matrix. -/
   eigenvalues : List ℂ
   /-- The degree (4 for our graphs). -/
   d : ℂ := 4
-  /-- Evaluate ζ_p(s) = Σ (d - λ_i)^{-s/2}. -/
-  eval (s : ℂ) : ℂ := spectralZetaEval eigenvalues d s
+
+/-- Evaluate ζ_p(s) = Σ (d - eig_i)^{-s/2}. -/
+noncomputable def SpectralZetaFunction.eval (ζ : SpectralZetaFunction) (s : ℂ) : ℂ :=
+  spectralZetaEval ζ.eigenvalues ζ.d s
 
 /-! ## Functional equation ratio -/
 
@@ -68,8 +76,8 @@ structure SpectralZetaFunction (p : ℕ) where
 By construction, R(s) = 1 for all s with Re(s) = 1/2 for any graph whose
 adjacency eigenvalues are real (i.e., any symmetric matrix — all graphs).
 This is not RH-specific. -/
-noncomputable def functionalEquationRatio (ζ : SpectralZetaFunction ℕ) (s : ℂ) : ℝ :=
-  Complex.abs (ζ.eval (1 - s) / ζ.eval s)
+noncomputable def functionalEquationRatio (ζ : SpectralZetaFunction) (s : ℂ) : ℝ :=
+  ‖ζ.eval (1 - s) / ζ.eval s‖
 
 /-! ## Friedli derivative
 
@@ -99,98 +107,109 @@ with Ramanujan modifications. -/
 theorem friedliConstantPositive : friedliConstant > 0 := by
   unfold friedliConstant; norm_num
 
+/-! ## Auxiliary lemmas
+
+The lemmas `List.map_congr` (for `map`) and the conjugate-of-sum identity
+are not part of this mathlib revision, so we give minimal direct proofs
+using the fact that `conj` (the complex conjugate, equal to `conj`) is an
+additive monoid homomorphism (`star_add` / `star_zero` are `@[simp]`). -/
+
+/-- Pointwise equality of `List.map` results. -/
+lemma list_map_congr {l : List ℂ} {f g : ℂ → ℂ} (h : ∀ x ∈ l, f x = g x) :
+    l.map f = l.map g := by
+  induction l with
+  | nil => rfl
+  | cons x xs ih =>
+    rw [List.map, List.map, h x List.mem_cons_self, ih fun y hy => h y (List.mem_cons_of_mem x hy)]
+
+/-- Conjugate (`conj`) distributes over `List.sum`. -/
+lemma conj_sum (l : List ℂ) : Star.star l.sum = (l.map Star.star).sum := by
+  induction l with
+  | nil => simp [List.sum, star_zero]
+  | cons x xs ih =>
+      change Star.star (x + xs.sum) = (Star.star x :: xs.map Star.star).sum
+      rw [star_add, ih]
+      simp
+
+
 /-! ## Ratio on the critical line -/
 
 /-- Lemma: when Re(s) = 1/2, conj(s) = 1 - s.
 
 Proof: s = 1/2 + it ⇒ conj(s) = 1/2 - it = 1 - (1/2 + it) = 1 - s. -/
-lemma conj_eq_one_minus_s (s : ℂ) (h : s.re = 1/2) : Complex.conj s = 1 - s := by
-  calc
-    Complex.conj s = (s.re : ℂ) - (s.im : ℂ) * I := by
-      rw [Complex.conj_eq_re_sub_im_mul_I]
-    _ = (1/2 : ℂ) - (s.im : ℂ) * I := by rw [h]
-    _ = (1 : ℂ) - ((1/2 : ℂ) + (s.im : ℂ) * I) := by ring
-    _ = 1 - s := by
-      have : s = (1/2 : ℂ) + (s.im : ℂ) * I := by
-        calc
-          s = (s.re : ℂ) + (s.im : ℂ) * I := by rw [Complex.re_add_im s]
-          _ = (1/2 : ℂ) + (s.im : ℂ) * I := by rw [h]
-      rw [this]
+lemma conj_eq_one_minus_s (s : ℂ) (h : s.re = 1/2) : conj s = 1 - s := by
+  apply Complex.ext
+  · rw [Complex.conj_re, sub_re, one_re, h]
+    norm_num
+  · rw [Complex.conj_im, sub_im, one_im]
+    norm_num
 
 /-- Lemma: when Re(s) = 1/2, conj(-s/2) = -(1-s)/2.
 
 This relates the exponent in ζ(1-s) to the conjugate of the exponent in ζ(s). -/
-lemma conj_neg_half_s (s : ℂ) (h : s.re = 1/2) : Complex.conj ((-s/2 : ℂ)) = (-(1 - s)/2 : ℂ) := by
-  calc
-    Complex.conj ((-s)/2) = (Complex.conj (-s)) / 2 := by simp
-    _ = (-Complex.conj s) / 2 := by simp
-    _ = (-(1 - s)) / 2 := by rw [conj_eq_one_minus_s s h]
-    _ = (-(1 - s) / 2 : ℂ) := by ring
+lemma conj_neg_half_s (s : ℂ) (h : s.re = 1/2) :
+    conj (-s / 2 : ℂ) = -(1 - s)/2 := by
+  change Star.star (-s / 2 : ℂ) = -(1 - s)/2
+  rw [star_div₀, star_neg, star_ofNat]
+  rw [show Star.star s = 1 - s by simpa using conj_eq_one_minus_s s h]
 
 /-- For a real base a > 0, conj(a ^ w) = a ^ conj(w).
 
 Uses `Complex.conj_cpow` which requires `a.arg ≠ π`. For positive reals,
 arg(a) = 0 ≠ π. -/
-lemma conj_cpow_of_real_pos {a w : ℂ} (ha : a ∈ ℝ) (ha_pos : 0 < a.re) :
-    Complex.conj (a ^ w) = a ^ (Complex.conj w) := by
-  rcases ha with ⟨r, hr⟩
-  have hr_pos : 0 < r := by
-    simpa [hr] using ha_pos
-  have ha_conj : Complex.conj a = a := by
-    rw [hr, Complex.conj_ofReal]
-  have ha_arg_ne_pi : a.arg ≠ π := by
-    have ha_arg_zero : a.arg = 0 := by
-      rw [hr]
-      exact Complex.arg_ofReal_of_pos hr_pos
-    rw [ha_arg_zero]
-    exact pi_pos.ne'
-  have h := Complex.conj_cpow a (Complex.conj w) ha_arg_ne_pi
-  -- h: conj a ^ (conj w) = conj (a ^ conj (conj w))
-  --   = conj (a ^ w)  since conj (conj w) = w
-  -- Since conj a = a, we get: a ^ conj w = conj (a ^ w)
-  simpa [ha_conj, Complex.conj_conj] using h
+lemma conj_cpow_of_real_pos {a w : ℂ} (ha : conj a = a) (ha_pos : 0 < a.re) :
+    conj (a ^ w) = a ^ (conj w) := by
+  have ha_im_zero : a.im = 0 := (Complex.conj_eq_iff_im.1 ha)
+  have a_real : a = ↑a.re := by
+    rw [← Complex.re_add_im a]
+    rw [ha_im_zero]
+    norm_num
+  have ha_arg_ne_pi : a.arg ≠ Real.pi := by
+    rw [a_real, Complex.arg_ofReal_of_nonneg (le_of_lt ha_pos)]
+    exact Real.pi_pos.ne
+  have h := Complex.conj_cpow a (conj w) ha_arg_ne_pi
+  simpa [ha, starRingEnd_self_apply] using h.symm
 
-/-- Lemma: If all eigenvalue bases (d - λ) are positive real numbers, then
+/-- Lemma: If all eigenvalue bases (d - eig) are positive real numbers, then
   spectralZetaEval(1-s) = conj(spectralZetaEval(s)) on the critical line.
 
-This is the key analytic step for the ratio theorem. For each eigenvalue λ,
-we need (d - λ) > 0 real so that `conj_cpow_of_real_pos` applies. -/
+This is the key analytic step for the ratio theorem. For each eigenvalue eig,
+we need (d - eig) > 0 real so that `conj_cpow_of_real_pos` applies. -/
 lemma spectralZetaEval_conj {eigenvalues : List ℂ} {d s : ℂ}
-    (h_eigs_real : ∀ λ ∈ eigenvalues, (d - λ) ∈ ℝ)
-    (h_eigs_pos : ∀ λ ∈ eigenvalues, 0 < (d - λ).re)
+    (h_eigs_real : ∀ eig ∈ eigenvalues, conj (d - eig) = d - eig)
+    (h_eigs_pos : ∀ eig ∈ eigenvalues, 0 < (d - eig).re)
     (h_s : s.re = 1/2) :
-    spectralZetaEval eigenvalues d (1 - s) = Complex.conj (spectralZetaEval eigenvalues d s) := by
+    spectralZetaEval eigenvalues d (1 - s) = conj (spectralZetaEval eigenvalues d s) := by
   unfold spectralZetaEval
   calc
-    (eigenvalues.map (fun λ : ℂ => Complex.cpow (d - λ) (-(1 - s)/2 : ℂ))).sum
-        = (eigenvalues.map (fun λ : ℂ => Complex.cpow (d - λ) (Complex.conj ((-s/2 : ℂ))))).sum := by
-      -- Replace the exponent using conj_neg_half_s
-      refine congrArg List.sum (List.map_congr fun λ hλ => ?_)
-      rw [conj_neg_half_s s h_s]
-    _ = (eigenvalues.map (fun λ : ℂ => Complex.conj (Complex.cpow (d - λ) ((-s/2 : ℂ))))).sum := by
-      -- Use conj_cpow_of_real_pos to rewrite each term
-      refine congrArg List.sum (List.map_congr fun λ hλ => ?_)
-      have h_real : (d - λ) ∈ ℝ := h_eigs_real λ hλ
-      have h_pos : 0 < (d - λ).re := h_eigs_pos λ hλ
-      rw [(conj_cpow_of_real_pos h_real h_pos).symm]
-    _ = Complex.conj ((eigenvalues.map (fun λ : ℂ => Complex.cpow (d - λ) ((-s/2 : ℂ)))).sum) := by
-      simp [Complex.conj_sum]
+    (eigenvalues.map (fun eig : ℂ => Complex.cpow (d - eig) (-(1 - s)/2 : ℂ))).sum
+        = (eigenvalues.map (fun eig : ℂ => Complex.cpow (d - eig) (conj ((-s/2 : ℂ))))).sum := by
+      refine congrArg List.sum (list_map_congr fun eig heig => ?_)
+      congr 1
+      rw [← conj_neg_half_s s h_s]
+    _ = (eigenvalues.map (fun eig : ℂ => conj (Complex.cpow (d - eig) ((-s/2 : ℂ))))).sum := by
+      refine congrArg List.sum (list_map_congr fun eig heig => ?_)
+      change (d - eig) ^ (conj (-s / 2 : ℂ)) = conj ((d - eig) ^ (-s / 2 : ℂ))
+      exact (conj_cpow_of_real_pos (h_eigs_real eig heig) (h_eigs_pos eig heig)).symm
+    _ = conj ((eigenvalues.map (fun eig : ℂ => Complex.cpow (d - eig) ((-s/2 : ℂ)))).sum) := by
+      rw [← Complex.star_def, conj_sum, List.map_map]
+      rfl
 
 /-- Theorem: For any spectral zeta function with positive real eigenvalue bases,
   |R(s)| = 1 when Re(s) = 1/2 (and ζ.eval s ≠ 0).
 
 Conditions:
-  * `h_eigs_real`: each (d - λ) is a real number
-  * `h_eigs_pos`: each (d - λ) has positive real part (holds for |λ| < d)
-  * `hz`: ζ.eval s ≠ 0 (avoids 0/0 in the ratio; holds for non-empty graphs)
+  * `h_eigs_real`: each (d - eig) is a real number
+  * `h_eigs_pos`: each (d - eig) has positive real part (held for |eig| < d)
+  * `hz`: ζ.eval s ≠ 0 (avoids 0/0 in the ratio; held for non-empty graphs)
 
 Under these conditions, R(s) = |ζ(1-s)/ζ(s)| satisfies:
   ζ(1-s) = conj(ζ(s)) ⇒ R(s) = |conj(ζ(s))/ζ(s)| = 1.
 -/
-theorem ratioOneOnCriticalLine (ζ : SpectralZetaFunction ℕ) (s : ℂ)
+theorem ratioOneOnCriticalLine (ζ : SpectralZetaFunction) (s : ℂ)
     (h_s : s.re = 1/2)
-    (h_eigs_real : ∀ λ ∈ ζ.eigenvalues, (ζ.d - λ) ∈ ℝ)
-    (h_eigs_pos : ∀ λ ∈ ζ.eigenvalues, 0 < (ζ.d - λ).re)
+    (h_eigs_real : ∀ eig ∈ ζ.eigenvalues, conj (ζ.d - eig) = ζ.d - eig)
+    (h_eigs_pos : ∀ eig ∈ ζ.eigenvalues, 0 < (ζ.d - eig).re)
     (hz : ζ.eval s ≠ 0) :
     ‖functionalEquationRatio ζ s‖ = (1 : ℝ) := by
   -- The ratio is nonnegative, so ‖ratio‖ = ratio
@@ -200,18 +219,18 @@ theorem ratioOneOnCriticalLine (ζ : SpectralZetaFunction ℕ) (s : ℂ)
   rw [Real.norm_eq_abs, abs_of_nonneg h_ratio_nonneg]
   unfold functionalEquationRatio
   -- ζ.eval (1-s) = conj (ζ.eval s) via the spectralZetaEval_conj lemma
-  have h_conj : ζ.eval (1 - s) = Complex.conj (ζ.eval s) := by
+  have h_conj : ζ.eval (1 - s) = conj (ζ.eval s) := by
     unfold SpectralZetaFunction.eval
     exact spectralZetaEval_conj h_eigs_real h_eigs_pos h_s
   -- Now compute the ratio
   calc
-    Complex.abs (ζ.eval (1 - s) / ζ.eval s)
-        = Complex.abs (Complex.conj (ζ.eval s) / ζ.eval s) := by rw [h_conj]
-    _ = Complex.abs (Complex.conj (ζ.eval s)) / Complex.abs (ζ.eval s) := by rw [Complex.abs_div]
-    _ = Complex.abs (ζ.eval s) / Complex.abs (ζ.eval s) := by rw [Complex.abs_conj]
+    ‖ζ.eval (1 - s) / ζ.eval s‖
+        = ‖conj (ζ.eval s) / ζ.eval s‖ := by rw [h_conj]
+    _ = ‖conj (ζ.eval s)‖ / ‖ζ.eval s‖ := by rw [norm_div]
+    _ = ‖ζ.eval s‖ / ‖ζ.eval s‖ := by rw [RCLike.norm_conj]
     _ = 1 := by
-      have habs_pos : 0 < Complex.abs (ζ.eval s) :=
-        (Complex.abs_pos.mpr hz)
+      have habs_pos : 0 < ‖ζ.eval s‖ :=
+        norm_pos_iff.mpr hz
       field_simp [habs_pos.ne']
 
 /-- Conjecture: The Friedli constant C(p) encodes the deviation of the
