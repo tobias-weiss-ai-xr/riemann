@@ -153,3 +153,4 @@ test_*.py
 test_*.txt
 verify.txt
 _cols.txt
+data/spectral-radius/

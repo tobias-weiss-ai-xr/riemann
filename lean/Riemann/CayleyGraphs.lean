@@ -177,6 +177,14 @@ def generatorR : SL2Fp p :=
     ring
   ⟩
 
+/-- Matrix form of the S generator (coercion to `Matrix`). -/
+lemma coe_generatorS : ↑(generatorS p) = (!![0, -1; 1, 0] : Matrix (Fin 2) (Fin 2) (ZMod p)) := by
+  ext; simp [generatorS]
+
+/-- Matrix form of the R generator (coercion to `Matrix`). -/
+lemma coe_generatorR : ↑(generatorR p) = (!![1, 1; 0, 1] : Matrix (Fin 2) (Fin 2) (ZMod p)) := by
+  ext; simp [generatorR]
+
 /-- The standard symmetric generating set `{S, S⁻¹, R, R⁻¹}` of `SL(2, F_p)`. -/
 def generators : Set (SL2Fp p) :=
   {generatorS p, (generatorS p)⁻¹, generatorR p, (generatorR p)⁻¹}
@@ -301,9 +309,9 @@ theorem isFourRegular (hp2 : p ≠ 2) : (cayleyGraph p).IsRegularOfDegree 4 := b
     -- S = [[0,-1],[1,0]], so S⁻¹ = adj(S) = [[0,1],[-1,0]].
     -- R = [[1,1],[0,1]], so R⁻¹ = adj(R) = [[1,-1],[0,1]].
     have hSinv_01 : ((generatorS p)⁻¹).val 0 1 = (1 : ZMod p) := by
-      simp [generatorS, adjugate_fin_two]
+      simp [SpecialLinearGroup.coe_inv, coe_generatorS, adjugate_fin_two]
     have hRinv_01 : ((generatorR p)⁻¹).val 0 1 = (-1 : ZMod p) := by
-      simp [generatorR, adjugate_fin_two]
+      simp [SpecialLinearGroup.coe_inv, coe_generatorR, adjugate_fin_two]
     
     -- All 6 pairwise distinctness proofs
     have hS_ne_Sinv : generatorS p ≠ (generatorS p)⁻¹ := by
@@ -337,7 +345,7 @@ theorem isFourRegular (hp2 : p ≠ 2) : (cayleyGraph p).IsRegularOfDegree 4 := b
         congrArg (fun x : SL2Fp p => x.val 0 0) h_eq
       have hS00 : (generatorS p).val 0 0 = (0 : ZMod p) := by simp [generatorS]
       have hRinv00 : ((generatorR p)⁻¹).val 0 0 = (1 : ZMod p) := by
-        simp [generatorR, adjugate_fin_two]
+        simp [SpecialLinearGroup.coe_inv, coe_generatorR, adjugate_fin_two]
       rw [hS00, hRinv00] at h00
       exact zero_ne_one h00
     
@@ -346,7 +354,7 @@ theorem isFourRegular (hp2 : p ≠ 2) : (cayleyGraph p).IsRegularOfDegree 4 := b
       have h00 : ((generatorS p)⁻¹).val 0 0 = (generatorR p).val 0 0 :=
         congrArg (fun x : SL2Fp p => x.val 0 0) h_eq
       have hSinv00 : ((generatorS p)⁻¹).val 0 0 = (0 : ZMod p) := by
-        simp [generatorS, adjugate_fin_two]
+        simp [SpecialLinearGroup.coe_inv, coe_generatorS, adjugate_fin_two]
       have hR00 : (generatorR p).val 0 0 = (1 : ZMod p) := by simp [generatorR]
       rw [hSinv00, hR00] at h00
       exact zero_ne_one h00
@@ -356,9 +364,9 @@ theorem isFourRegular (hp2 : p ≠ 2) : (cayleyGraph p).IsRegularOfDegree 4 := b
       have h00 : ((generatorS p)⁻¹).val 0 0 = ((generatorR p)⁻¹).val 0 0 :=
         congrArg (fun x : SL2Fp p => x.val 0 0) h_eq
       have hSinv00 : ((generatorS p)⁻¹).val 0 0 = (0 : ZMod p) := by
-        simp [generatorS, adjugate_fin_two]
+        simp [SpecialLinearGroup.coe_inv, coe_generatorS, adjugate_fin_two]
       have hRinv00 : ((generatorR p)⁻¹).val 0 0 = (1 : ZMod p) := by
-        simp [generatorR, adjugate_fin_two]
+        simp [SpecialLinearGroup.coe_inv, coe_generatorR, adjugate_fin_two]
       rw [hSinv00, hRinv00] at h00
       exact zero_ne_one h00
     
@@ -536,7 +544,7 @@ theorem isConnected : (cayleyGraph p).Connected := by
     have hRpow_val (k : ℕ) : ((generatorR p) ^ k).val = !![1, (k : ZMod p); 0, 1] := by
       induction k with
       | zero =>
-        simp [generatorR, coe_one, Matrix.one_fin_two]
+        simp [coe_pow, coe_generatorR, pow_zero, Matrix.one_fin_two]
       | succ k ih =>
         have hstep : ((generatorR p) ^ (k+1)).val = !![1, (↑(k+1) : ZMod p); 0, 1] := by
           calc
@@ -552,9 +560,8 @@ theorem isConnected : (cayleyGraph p).Connected := by
     have h_val_cast (t : ZMod p) : (t.val : ZMod p) = t := by
       simpa using ZMod.nat_cast_zmod_val t
     -- Inverse of generatorS
-    have hSinv_val : ((generatorS p)⁻¹).val = !![0, 1; -1, 0] := by
-      have := SL2_inv_expl (generatorS p)
-      simpa [generatorS] using congrArg Subtype.val this
+    have hSinv_val : ↑(generatorS p)⁻¹ = (!![0, 1; -1, 0] : Matrix (Fin 2) (Fin 2) (ZMod p)) := by
+      simpa [SpecialLinearGroup.coe_inv, coe_generatorS, adjugate_fin_two]
     -- Diagonal matrices diag(t, t⁻¹) are in H
     have h_diag (t : ZMod p) (ht : t ≠ 0) :
         (⟨!![t, 0; 0, t⁻¹], by
@@ -585,7 +592,7 @@ theorem isConnected : (cayleyGraph p).Connected := by
             simp [coe_mul]
           _ = !![0, 1; -1, 0] * !![1, (m : ZMod p); 0, 1] * !![0, -1; 1, 0] *
               !![1, (n : ZMod p); 0, 1] * !![0, -1; 1, 0] * !![1, (m : ZMod p); 0, 1] := by
-            simp [generatorS, hRpow_val, hSinv_val]
+            simp [coe_generatorS, hRpow_val, hSinv_val]
           _ = !![0, 1; -1, 0] * !![1, t⁻¹; 0, 1] * !![0, -1; 1, 0] *
               !![1, t; 0, 1] * !![0, -1; 1, 0] * !![1, t⁻¹; 0, 1] := by
             simp [hn_val, hm_val]
