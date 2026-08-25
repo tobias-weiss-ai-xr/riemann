@@ -154,3 +154,6 @@ test_*.txt
 verify.txt
 _cols.txt
 data/spectral-radius/
+
+# Lean build artifacts — lake-managed (packages are gitlinks without .gitmodules, broken for clones)
+lean/.lake/
