@@ -129,3 +129,26 @@ The L-function zero spacing analysis (63,844 weight-2 newforms from LMFDB) is ar
 | `ai-algorithmen-p-vs-np.md` | AI algorithm discoveries, P-vs-NP feasibility (DE) |
 | `ki-und-riemann-hypothese.md` | AI approaches to RH (DE) |
 | `gnn-zahlentheorie-riemann.md` | GNNs for number theory deep-dive (DE) |
+
+## Literature Base
+
+Structured corpus of **3,460 RH-related papers** (categorized by research area) in [`literature/`](literature/).
+
+Transferred from `riemann-research` to support literature review and discovery.
+
+| File | Description |
+|------|-------------|
+| `literature/papers.yaml` | Full corpus (3,460 papers, 10 categories) |
+| `literature/papers_core.yaml` | Priority subset (1,104 papers: spectral-theory, machine-learning, dynam-systems) |
+| `literature/config/taxonomy.yaml` | Taxonomy + discovery queries (arXiv, OpenAlex, other sources) |
+| `literature/references.bib` | BibTeX export (3,460 entries) |
+| `literature/README.md` | Detailed mapping to project research areas |
+
+**Coverage by project focus:**
+- GNNs on Cayley Graphs: 853 papers (spectral-theory + machine-learning)
+- Transfer Operators & Selberg Zeta: 251 papers (dynam-systems)
+- L-Functions & Hecke: 861 papers (number-theory)
+- RH Equivalences: 660 papers (equivalences)
+- Lean 4 Formalization: 15 papers (formalization)
+- Surveys & Reviews: 64 papers (survey)
+

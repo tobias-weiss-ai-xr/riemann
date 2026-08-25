@@ -1,0 +1,292 @@
+topic:
+  name: Riemann Hypothesis & Spectral Number Theory
+  short: riemann-research
+  description: Research corpus for the Riemann Hypothesis, Cayley graphs of SL(2,F_p),
+    spectral gaps, Ramanujan property, Hecke operators, L-functions, and their connections
+    through graph theory, dynamical systems, and machine learning.
+  openalex_mailto: riemann@graphwiz.ai
+taxonomy:
+  categories:
+  - id: spectral-theory
+    display: Spectral Theory & Graphs
+    description: Cayley graphs, spectral gaps, Ramanujan property, expander graphs,
+      Cheeger constants
+  - id: number-theory
+    display: Number Theory
+    description: L-functions, modular forms, Hecke operators, Galois representations,
+      Langlands
+  - id: dynam-systems
+    display: Dynamical Systems
+    description: Transfer operators, Gauss map, Selberg zeta, thermodynamic formalism,
+      Mayer identity
+  - id: machine-learning
+    display: Machine Learning
+    description: GNNs, spectral prediction, Hecke eigenvalue learning, L-function
+      zero classification, excess mass prediction
+  - id: equivalences
+    display: RH Equivalences & Bridges
+    description: Nyman-Beurling, Hilbert-Pólya, Weil, Granville (Goldbach), Bertini,
+      Denjoy, Beurling primes, LH positivity, etc.
+  - id: formalization
+    display: Proof & Formalization
+    description: Lean 4 formalization, mathlib integration, verification, automated
+      theorem proving
+  - id: survey
+    display: Surveys & Exposition
+    description: Overview papers, pedagogy, history, status reports
+  subcategories:
+  - id: cayley-graphs
+    display: Cayley Graphs
+    category: spectral-theory
+    description: SL(2,F_p), PSL(2,F_p), vertex-transitive graphs, generators, eigenvalue
+      spectra
+  - id: spectral-gaps
+    display: Spectral Gaps
+    category: spectral-theory
+    description: λ₂, Cheeger bound, Laplacian eigenvalues, algebraic connectivity,
+      expansion
+  - id: ramanujan
+    display: Ramanujan Property
+    category: spectral-theory
+    description: Ramanujan graphs, LPS graphs, optimal spectral gap, Alon-Boppana
+      bound, Pizer theorem
+  - id: brandt-pizer
+    display: Brandt & Pizer Matrices
+    category: spectral-theory
+    description: Brandt matrices = Hecke operators = adjacency on supersingular isogeny
+      graphs
+  - id: hecke
+    display: Hecke Operators
+    category: number-theory
+    description: T_p, U_p, Atkin-Lehner, Hecke algebras, eigenvalue statistics, Sato-Tate
+  - id: l-functions
+    display: L-Functions & Zeta
+    category: number-theory
+    description: Riemann zeta, Dirichlet L, modular L, Euler products, functional
+      equations
+  - id: modular-forms
+    display: Modular Forms
+    category: number-theory
+    description: Cusp forms, Eisenstein series, CM forms, newforms, weight 2, Dirichlet
+      series
+  - id: transfer-operator
+    display: Transfer Operators
+    category: dynam-systems
+    description: L_s operator, Gauss map, Perron-Frobenius, nuclear operators, spectral
+      radius
+  - id: selberg-zeta
+    display: Selberg Zeta & Trace Formulas
+    category: dynam-systems
+    description: Selberg zeta function, Gutzwiller trace, prime geodesic theorem,
+      Efrat identity
+  - id: gnn-cayley
+    display: GNNs on Cayley Graphs
+    category: machine-learning
+    description: Spectral gap prediction, GAT, ChebConv, subgraph augmentation, node
+      features
+  - id: gnn-fullgraph
+    display: Full-Graph GNNs
+    category: machine-learning
+    description: ChebConv, spectral convolution, global pooling, full-graph processing
+  - id: ml-hecke
+    display: ML on Hecke Traces
+    category: machine-learning
+    description: ' sklearn, XGBoost, neural networks, Hecke eigenvalue prediction,
+      LMFDB data'
+  - id: ml-zeros
+    display: L-Function Zero Classification
+    category: machine-learning
+    description: Excess mass, zero spacing distribution, GUE/GOE classification, random
+      matrix theory
+  - id: nyman-beurling
+    display: Nyman-Beurling Criterion
+    category: equivalences
+    description: Density of shifted fractional part functions in L²(0,1)
+  - id: hilbert-polya
+    display: Hilbert-Pólya Conjecture
+    category: equivalences
+    description: Zeros of ζ(s) as eigenvalues of a self-adjoint operator
+  - id: weil
+    display: Weil Criterion
+    category: equivalences
+    description: Positivity condition → RH, finite field analogue, André Weil
+  - id: granville
+    display: Granville / Goldbach-Bridge
+    category: equivalences
+    description: RH equivalent to averaged Goldbach bound, explicit formula, G(2N)-J(2N)
+  - id: lean-foundation
+    display: Lean & Mathlib
+    category: formalization
+    description: Core Lean proofs, mathlib integration, diagrams, category theory
+      in Lean
+  - id: lean-riemann
+    display: Lean Formalization of RH
+    category: formalization
+    description: SL(2,F_p), Cayley graphs, spectral gaps, Ramanujan property, RH in
+      Lean
+  - id: verification
+    display: Formal Verification
+    category: formalization
+    description: Hadamard product gap, partial results, open gaps, TODO formalization
+      work
+arxiv_queries:
+- query: cat:math.CO AND (abs:"Cayley graph" OR abs:"SL(2,F_p)" OR abs:"spectral gap"
+    OR abs:"Ramanujan")
+  category: spectral-theory
+- query: cat:math.GR AND (abs:"expander" OR abs:"Cheeger" OR abs:"Laplacian")
+  category: spectral-theory
+- query: cat:math.GT AND (abs:"vertex-transitive" OR abs:"edge-transitive")
+  category: spectral-theory
+- query: cat:math.OC AND (abs:"Pizer" OR abs:"Brandt matrix")
+  category: spectral-theory
+- query: cat:math.NT AND (abs:"Riemann Hypothesis" OR abs:"zeta zeros" OR abs:"L-function")
+  category: number-theory
+- query: cat:math.NT AND (abs:"Hecke operator" OR abs:"modular form" OR abs:"newform")
+  category: number-theory
+- query: cat:math.NT AND (abs:"Sato-Tate" OR abs:"GUE" OR abs:"GOE" OR abs:"random
+    matrix")
+  category: number-theory
+- query: cat:math.NT AND abs:"Langlands"
+  category: number-theory
+- query: cat:math.DS AND (abs:"transfer operator" OR abs:"Gauss map" OR abs:"Selberg
+    zeta")
+  category: dynam-systems
+- query: cat:37-XX AND (abs:"thermodynamic formalism" OR abs:"pressure function")
+  category: dynam-systems
+- query: cat:math.DS AND (abs:"Mayer" OR abs:"Efrat")
+  category: dynam-systems
+- query: cat:cs.LG AND (abs:"Riemann" OR abs:"zeta" OR abs:"spectral gap")
+  category: machine-learning
+- query: cat:cs.LG OR cat:cs.AI AND (abs:"graph neural network" AND abs:"Cayley")
+  category: machine-learning
+- query: cat:cs.LG AND (abs:"Hecke" OR abs:"modular form")
+  category: machine-learning
+- query: cat:cs.ML AND (abs:"L-function" OR abs:"zero classification")
+  category: machine-learning
+- query: cat:math.NT AND (abs:"Nyman-Beurling" OR abs:"Hilbert-Polya" OR abs:"Weil")
+  category: equivalences
+- query: cat:math.NT AND (abs:"Granville" OR abs:"Goldbach")
+  category: equivalences
+- query: cat:math.GM AND (abs:"Riemann" OR abs:"zeta")
+  category: equivalences
+- query: cat:math.PR AND (abs:"Bertini" OR abs:"Denjoy" OR abs:"Beurling primes")
+  category: equivalences
+- query: cat:math.CV AND abs:"Lee-Yang"
+  category: equivalences
+- query: cat:math.PR AND abs:"Lee-Yang"
+  category: equivalences
+- query: cat:82-XX AND abs:"Lee-Yang"
+  category: equivalences
+# ── Survey / exposition ─────────────────────────────────────────────────────
+- query: cat:math.NT AND (abs:"Riemann hypothesis" AND abs:"survey" OR abs:"review"
+    OR abs:"overview" OR abs:"introduction")
+  category: survey
+- query: cat:math.NT AND (abs:"zeta function" AND abs:"survey" OR abs:"history"
+    OR abs:"status")
+  category: survey
+# ── Applications ────────────────────────────────────────────────────────────
+- query: cat:math.NT AND (abs:"Riemann hypothesis" AND abs:"cryptography" OR abs:"prime"
+    OR abs:"distribution")
+  category: application
+- query: cat:math-ph AND (abs:"Riemann hypothesis" OR abs:"zeta" OR abs:"random matrix")
+  category: application
+- query: cat:quant-ph AND (abs:"Riemann hypothesis" OR abs:"zeta zeros" OR abs:"Berry-Keating")
+  category: application
+# ── Evaluation / computation ────────────────────────────────────────────────
+- query: cat:math.NA AND (abs:"Riemann zeta" OR abs:"zeros" OR abs:"computation"
+    OR abs:"verification")
+  category: evaluation
+- query: cat:cs.DS AND (abs:"Riemann" OR abs:"zeta" OR abs:"zero" OR abs:"algorithm")
+  category: evaluation
+- query: cat:math.NT AND (abs:"explicit formula" OR abs:"approximate functional equation"
+    OR abs:"zero-free region")
+  category: method
+# ── Methods ─────────────────────────────────────────────────────────────────
+- query: cat:math.NT AND (abs:"moments of zeta" OR abs:"mean value" OR abs:"subconvexity")
+  category: method
+- query: cat:math.CA AND (abs:"Riemann zeta" OR abs:"Dirichlet series" OR abs:"Tauberian")
+  category: method
+other_sources_queries:
+- source: dblp
+  query: riemann hypothesis
+  category: equivalences
+  subcategory_hint: survey
+- source: dblp
+  query: cayley graph spectral gap
+  category: spectral-theory
+  subcategory_hint: spectral-gaps
+- source: dblp
+  query: ramanujan graph
+  category: spectral-theory
+  subcategory_hint: ramanujan
+- source: dblp
+  query: hecke operator modular form
+  category: number-theory
+  subcategory_hint: hecke
+- source: crossref
+  query: transfer operator gauss map mayer
+  category: dynam-systems
+  subcategory_hint: transfer-operator
+- source: crossref
+  query: selberg zeta function
+  category: dynam-systems
+  subcategory_hint: selberg-zeta
+- source: europepmc
+  query: machine learning riemann hypothesis
+  category: machine-learning
+  subcategory_hint: gnn-cayley
+- source: semantic_scholar
+  query: Riemann hypothesis survey review
+  category: survey
+  subcategory_hint: survey
+- source: semantic_scholar
+  query: Riemann hypothesis applications cryptography
+  category: application
+  subcategory_hint: application
+- source: semantic_scholar
+  query: Riemann zeta zeros computation verification
+  category: evaluation
+  subcategory_hint: evaluation
+- source: crossref
+  query: Riemann zeta explicit formula moments
+  category: method
+  subcategory_hint: method
+openalex_queries:
+- category: spectral-theory
+  query: Cayley graph spectral gap SL(2,F_p) Ramanujan property expander expanders
+- category: number-theory
+  query: Riemann Hypothesis L-functions modular forms Hecke operators newforms Sato-Tate
+- category: dynam-systems
+  query: transfer operator Gauss map Selberg zeta Mayer Efrat thermodynamic formalism
+- category: machine-learning
+  query: graph neural network Cayley SL(2,F_p) spectral gap RNN from graphs
+- category: equivalences
+  query: Nyman-Beurling Hilbert-Polya Weil Granville Goldbach equivalences rh equivalent
+- category: formalization
+  query: Lean 4 Riemann Hypothesis mathlib formalization theorem prover
+- category: survey
+  query: Riemann Hypothesis survey review overview zeta function history status
+- category: application
+  query: Riemann Hypothesis cryptography prime distribution physics quantum random
+    matrix
+- category: evaluation
+  query: Riemann zeta zeros computation verification numerical explicit formula
+- category: method
+  query: Riemann zeta explicit formula moments mean value subconvexity approximate
+    functional equation
+github_queries:
+- query: topic:riemann-hypothesis+stars:>10
+  category: equivalences
+  subcategory_hint: survey
+- query: topic:graph-neural-network+riemann OR topic:gnn+cayley
+  category: machine-learning
+  subcategory_hint: gnn-cayley
+- query: topic:sl2f OR topic:cayley-graph+stars:>5
+  category: spectral-theory
+  subcategory_hint: cayley-graphs
+- query: 'topic: lean4+riemann OR topic:formal-math+riemann'
+  category: formalization
+  subcategory_hint: lean-riemann
+- query: topic:hecke-operators OR topic:modular-forms stars:>10
+  category: number-theory
+  subcategory_hint: hecke
