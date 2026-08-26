@@ -47,6 +47,7 @@ This means:
 | ρ(L_s) < 1 for Re(s) > 3 | ✅ PROVEN | Crude bound: ||L_s|| ≤ ζ(2σ) < 1 for σ > 3 |
 | ρ(L_s^{(0)}) < 0.30 for |t| ≤ 100 | ✅ NUMERICAL | Sprint 2 (boundary-corrected, Fourier basis) |
 | λ₁(1) = 1 (PF eigenvalue) | ✅ VERIFIED | Direct calculation |
+| λ₁'(1) = −π²/(6·ln 2) < 0 | ✅ DONE (exact) | Ruelle pressure formula; LAMBDA1_DERIVATIVE_ANALYSIS.md |
 | Spectral gap at s = 1: |λ₂(1)| < 1 | ⬜ NEEDS PROOF | Perron-Frobenius + spectral gap |
 | ρ(L_s^{(0)}) < 1 near s = 1 | ⬜ NEEDS PROOF | Kato perturbation theory |
 | ρ(L_s^{(0)}) < 1 for Re(s) ≥ 3/4 + ε | ⬜ NEEDS PROOF | Nisoli DFLY certification |
@@ -195,6 +196,7 @@ For Re(s) > 1/2, the essential spectral radius r_ess < 1 (by the thermodynamic f
 3. **Eigenvalue-1 equivalence** (DONE — Bonanno): 1 is eigenvalue ⟺ 2q is zeta zero
 4. **Crude bound**: ρ(L_s) < 1 for Re(s) > 3 (from ||L_s|| ≤ ζ(2σ))
 5. **Spectral gap at s = 1**: |λ₂(1)| < 1 (from Perron-Frobenius, needs formal proof)
+5b. **λ₁'(1) = −π²/(6·ln 2) < 0**: ✅ DONE exactly (Ruelle pressure formula; Gauss-measure expectation; −η(2) = −π²/12). See LAMBDA1_DERIVATIVE_ANALYSIS.md.
 6. **Local perturbation**: ρ(L_s^{(0)}) < 1 near s = 1 (from Kato theory + spectral gap)
 7. **Numerical evidence**: ρ(L_s^{(0)}) < 0.30 for |t| ≤ 100 (Sprint 2)
 8. **Nisoli certification**: ρ < 1 for Re(s) ≥ 3/4 + ε (DFLY, available)

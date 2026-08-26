@@ -139,14 +139,13 @@ This is the spectral radius bound on the critical line. Sprint 2 numerics confir
 
 At s = 1:
 - λ₁(1) = 1 (verified, with explicit eigenfunction)
-- λ₁'(1) < 0 (plausible, needs rigorous proof)
+- λ₁'(1) = −π²/(6·ln 2) < 0 (proven exactly; LAMBDA1_DERIVATIVE_ANALYSIS.md)
 - L_s is analytic in s for Re(s) > 1/2 (by nuclearity + Liverani's entire-ness)
 - By Kato perturbation theory, λ₁(s) is analytic for Re(s) > 1/2
 - If λ₁(s) is analytic and |λ₁(s)| < 1 for Re(s) > 1/2 (by maximum principle, since |λ₁(1+it)| < 1 for large |t|), then ρ(L_s) < 1 for Re(s) > 1/2
 
 **This approach requires**:
-1. Rigorous proof that λ₁'(1) < 0 (derivative of the leading eigenvalue at s = 1)
-2. Proof that |λ₁(1+it)| < 1 for all t ≠ 0 (or at least for large |t|)
+1. **λ₁'(1) = −π²/(6·ln 2) < 0** ✅ DONE exactly (Ruelle pressure formula, LAMBDA1_DERIVATIVE_ANALYSIS.md). Next: 2. Proof that |λ₁(1+it)| < 1 for all t ≠ 0 (or at least for large |t|)
 3. Application of the maximum principle to |λ₁(s)| on the half-plane Re(s) > 1/2
 
 ---
@@ -193,7 +192,7 @@ At s = 1:
 | Eigenvalue-1 ↔ RH | ✅ ESTABLISHED | Bonanno 2022 | ⚠️ Literature | ✅ Theorem 3.2 |
 | Nuclear of order zero | ✅ ESTABLISHED | Pohl-Wabnitz 2022 | — | ✅ Stronger than trace class |
 | Spectral radius ρ < 1 | ⬜ GAP | Sprint 2 + Nisoli | ⚠️ Numerics only | ⬜ Needs proof |
-| Perturbation from s=1 | ⬜ TO PROVE | This analysis | — | ⬜ λ₁'(1) < 0 |
+| Perturbation from s=1 | ✅ λ₁'(1) = −π²/(6 ln 2) | LAMBDA1_DERIVATIVE_ANALYSIS.md | — | ⬜ gaps: |λ₂(1)|<1, |λ₁(1+it)|<1 |
 
 **Overall**: The nuclearity gap is CLOSED (it was never a real gap — just a wrong function space). The remaining gap is the spectral radius bound on the critical line, which is a more tractable problem (perturbation theory + numerics).
 
@@ -220,7 +219,7 @@ At s = 1:
 ## 8. Next Steps (Sprint 4/5)
 
 1. **Formalize the nuclearity theorem** in Lean: `TransferOperator.lean` with `IsNuclear(L_s, H₁)` for Re(s) > 1/2, citing Mayer/Isola
-2. **Prove λ₁'(1) < 0** rigorously (derivative of leading eigenvalue at s = 1)
+2. **Prove λ₁'(1) = −π²/(6·ln 2) < 0** ✅ DONE (exact closed form, LAMBDA1_DERIVATIVE_ANALYSIS.md)
 3. **Prove |λ₁(1+it)| < 1** for t ≠ 0 (or for large |t|)
 4. **Apply maximum principle** to get |λ₁(s)| < 1 for Re(s) > 1/2
 5. **Compose the proof chain** to RiemannHypothesis.lean

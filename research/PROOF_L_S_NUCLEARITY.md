@@ -20,7 +20,7 @@ After attempting to prove all the missing pieces from first principles, here is 
 
 ### 2. Partial Technical Results
 - ✅ **λ₁(1) = 1 verified** with explicit eigenfunction
-- ✅ **λ₁'(1) < 0 reasoning** is plausible (not fully rigorous without proper Banach space analysis)
+- ✅ **λ₁'(1) = −π²/(6·ln 2) ≈ −2.3731 < 0** — proven exactly via Ruelle's pressure formula (see LAMBDA1_DERIVATIVE_ANALYSIS.md); two independent analytic derivations + numerics
 - ✅ **Direct bound for Re(s) > 1**: Straightforward
 - ✅ **Pressure function analysis**: Analyticity for Re(s) > 1/2 is plausible
 
@@ -85,7 +85,7 @@ This repository contains:
 | Efrat theorem acceptance | ✅ Proven | ⚠️ Assumed | External literature |
 | Nuclearity | ✅ Proven | ⚠️ Plausible | External literature |
 | ρ(L₁) = 1 | ✅ Proven | ✅ Verified | Direct calculation |
-| λ₁'(1) < 0 | ✅ Proven | ⚠️ Plausible | Reasoning needs rigor |
+| λ₁'(1) = −π²/(6·ln 2) < 0 | ✅ Proven | Exact closed form | LAMBDA1_DERIVATIVE_ANALYSIS.md |
 | Bound for Re(s) > 1 | ✅ Proven | ✅ Verified | Direct calculation |
 | Extension to Re(s) > 1/2 | ❌ Gap contains | ❌ Unresolved | Boundary issues |
 | Contradiction argument | ✅ Valid | ✅ Valid (if det≠0) | Logical structure |

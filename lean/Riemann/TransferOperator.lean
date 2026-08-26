@@ -179,6 +179,83 @@ axiom eigenvalueOneEquivalence (q : ℂ) (hq : q.re > 0) (hq_ne : q ≠ 1/2) :
     -- P̃_q⁺ has eigenvalue 1 ⟺ 2q is a non-trivial zero of ζ(s)
     True
 
+/-! ### The Leading Eigenvalue λ₁(s) and its Derivative at s = 1
+
+The perturbation approach to the spectral radius bound starts at s = 1,
+where the transfer operator L₁ is the Ruelle operator of the Gauss map with
+the *geometric* potential φ₁(y) = −2·log(1/y) = −log|T'(y)|.  For such a
+positive (Perron-Frobenius) operator:
+
+  * λ₁(1) = 1 (the eigenvalue of maximal modulus), with right eigenfunction
+    f(x) = 1/(1+x) — the invariant density of the Gauss map: the identity
+        (L₁ f)(x) = Σₙ (n+1+x)⁻² f(1/(n+1+x)) = Σₙ 1/((n+1+x)(n+2+x)) = 1/(1+x)
+    telescopes exactly.
+  * The LEFT eigenfunction is constant: Lebesgue measure is invariant because
+    the branch intervals [1/(n+2), 1/(n+1)] partition (0,1], so
+        ∫₀¹ (L₁ f)(x) dx = ∫₀¹ f(u) du   for every f.
+
+By Ruelle's pressure formula (thermodynamic formalism; classical for the
+Gauss map — Mayer 1991), the derivative of the leading eigenvalue is the
+expectation of the derivative of the potential w.r.t. the equilibrium state,
+which at s = 1 is the Gauss measure dμ(x) = dx/((1+x)·ln 2):
+
+    λ₁'(1) = ∫ (∂φ_s/∂s) dμ = (2/ln 2) · ∫₀¹ ln(x)/(1+x) dx = −π²/(6·ln 2)
+
+using ∫₀¹ ln(x)/(1+x) dx = −η(2) = −π²/12.  Equivalently λ₁'(1) = −2·(Lévy
+constant), where the Lévy constant of continued fractions is π²/(12·ln 2).
+In particular **λ₁'(1) < 0**: the leading eigenvalue decreases through 1,
+so |λ₁(s)| < 1 on the spectral-gap side of s = 1.
+
+This is the first step of the perturbation programme (Sprint 5): with the
+spectral gap |λ₂(1)| < 1 (Perron-Frobenius) and Kato analyticity of λ₁(s),
+the derivative being strictly negative gives a *local* spectral radius bound. -/
+
+/-- The leading (Perron-Frobenius) eigenvalue of L_s.  In the full
+formalization this is the eigenvalue of maximal modulus of the operator on H₁. -/
+noncomputable def leadingEigenvalue (s : ℂ) : ℝ := sorry
+
+/-- The derivative of the leading eigenvalue w.r.t. the parameter s.  In the
+full formalization this is the derivative of the analytic eigenvalue branch
+(Kato perturbation theory; the branch is analytic for Re(s) > 1/2 by
+trace-class nuclearity). -/
+noncomputable def leadingEigenvalueDerivative (s : ℂ) : ℝ := sorry
+
+/-- Axiom (thermodynamic formalism, Ruelle 1978; Mayer 1991): The leading
+eigenvalue satisfies λ₁(1) = 1 with the Gauss-density eigenfunction. -/
+axiom leadingEigenvalue_at_one :
+    leadingEigenvalue 1 = 1
+
+/-- Axiom (Ruelle's pressure formula at s = 1): the derivative of the leading
+eigenvalue equals the expectation of ∂φ_s/∂s under the Gauss measure:
+
+        λ₁'(1) = (2/ln 2) · ∫₀¹ ln(x)/(1+x) dx = −π²/(6·ln 2) .
+
+The middle equality uses the classical evaluation ∫₀¹ ln(x)/(1+x) dx = −π²/12
+(Dirichlet eta at 2), which is a theorem of real analysis; the first equality
+is the thermodynamic-formalism fact imported from the literature. -/
+axiom ruellePressureFormula_at_one :
+    leadingEigenvalueDerivative 1 = -(Real.pi ^ 2) / (6 * Real.log 2)
+
+/-- The derivative of the leading eigenvalue at s = 1 is strictly negative.
+
+**Proof**: λ₁'(1) = −π²/(6·ln 2) by `ruellePressureFormula_at_one`, and both
+π² > 0 and ln 2 > 0, so the quotient is strictly negative. -/
+theorem lambdaOneDerivative_negative :
+    leadingEigenvalueDerivative 1 < 0 := by
+  rw [ruellePressureFormula_at_one]
+  have hnum : -(Real.pi ^ 2) < (0 : ℝ) :=
+    neg_lt_zero.mpr (sq_pos_of_ne_zero Real.pi_pos.ne')
+  have hden : (0 : ℝ) < 6 * Real.log 2 := by
+    exact mul_pos (by norm_num) (Real.log_pos (by norm_num))
+  exact div_neg_of_neg_of_pos hnum hden
+
+/-- Corollary of the exposed formulas: the derivative constant −π²/(6·ln 2)
+is exactly minus twice the Lévy constant π²/(12·ln 2) of continued fractions. -/
+theorem lambdaOneDerivative_is_minus_twice_levy :
+    leadingEigenvalueDerivative 1 = -2 * (Real.pi ^ 2 / (12 * Real.log 2)) := by
+  rw [ruellePressureFormula_at_one]
+  ring_nf
+
 /-! ### The Spectral Radius Conjecture
 
 The spectral radius bound ρ(L_s) < 1 for Re(s) > 1/2 is the key conjecture.

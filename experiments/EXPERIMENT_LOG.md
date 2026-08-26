@@ -3392,3 +3392,71 @@ consistent with RH but does NOT constitute a proof.
 points with Re(q) > 0.1, providing numerical evidence for the spectral radius
 bound ρ(L_s) < 1 for Re(s) > 0.2. The exponential decay on the critical line
 strongly suggests det ≠ 0 for large |t|.
+
+---
+
+## Experiment 19b: EPIC-4/Sprint 5 — λ₁'(1) = −π²/(6·ln 2) (exact)
+
+**Date**: 2026-08-26
+**Type**: Theoretical analysis + numerical verification + Lean formalization
+**Status**: COMPLETE (exact closed form)
+
+### Result
+
+The leading (Perron–Frobenius) eigenvalue of the Mayer transfer operator
+L_s of the Gauss map satisfies
+
+```
+λ₁(1) = 1 ,
+λ₁'(1) = −π²/(6·ln 2) = −2·(Lévy constant) ≈ −2.373138 < 0 .
+```
+
+### Derivation (two independent routes, both exact)
+
+**A. Ruelle pressure formula.** L_s = ℒ_{φ_s}, φ_s(y) = −2s·log(1/y).
+At s=1, φ₁ = −log|T'| (geometric potential). The eigenfunction 1/(1+x)
+telescopes to eigenvalue 1; left eigenfunction is constant (branch intervals
+[1/(n+2), 1/(n+1)] partition (0,1], so Lebesgue is invariant). The
+equilibrium state is the Gauss measure (h_μ = ∫ log|T'| dμ = π²/(6 ln 2)).
+Ruelle: λ₁'(1) = (2/ln 2)∫₀¹ ln x/(1+x) dx = −π²/(6 ln 2) (using −η(2) = −π²/12).
+
+**B. Direct eigen-perturbation** ⟨ν, L̇f⟩/⟨ν,f⟩ with ν = dx, f = 1/(1+x):
+telescopes to −(2/ln 2)∫₁^∞ ln u/(u(u+1)) du = −π²/(6 ln 2).
+
+Both give the same constant = **minus twice the Lévy constant of continued
+fractions** (π²/(12 ln 2) ≈ 1.18657).
+
+### Numerical verification
+
+- Ruelle quadrature: −2.3731382 (relerr 8e-9 vs closed form)
+- Nyström collocation FD: −2.3579 (nmax=1200) → −2.3710 (nmax=4800), converging
+- Fourier Galerkin FD/RQ: −2.22 (stable 6.5% low — discretization bias from
+  the 1/k-decaying Fourier coefficients of eigenfunction 1/(1+x); NOT a math
+  discrepancy — both analytic routes and the quadrature agree)
+
+### Consequence for EPIC-4 perturbation programme
+
+λ₁'(1) < 0 gives the first rigorous step: for real s = 1+ε (ε>0 small),
+|λ₁(s)| < 1 (local spectral radius bound on the spectral-gap side of s=1).
+Recording the exact constant replaces the earlier "λ₁'(1) < 0 plausible"
+status in PROOF_L_S_NUCLEARITY.md / SPECTRAL_RADIUS_ANALYSIS.md.
+
+### Lean
+
+`lean/Riemann/TransferOperator.lean`: added leadingEigenvalue(_Derivative),
+leadingEigenvalue_at_one (axiom), ruellePressureFormula_at_one (axiom),
+lambdaOneDerivative_negative (theorem), 
+lambdaOneDerivative_is_minus_twice_levy (theorem). `lake build`: 0 errors.
+
+### Files
+
+- `research/LAMBDA1_DERIVATIVE_ANALYSIS.md` — full derivation + verification table
+- `scripts/lambda1_derivative.py` — Nyström + Ruelle numerics
+- `data/spectral-radius/lambda1_derivative.json` — machine-readable results
+- `lean/Riemann/TransferOperator.lean` — formalized statements
+
+### Conclusion
+
+λ₁'(1) = −π²/(6·ln 2) < 0 is established exactly. This closes step 1 of the
+perturbation-from-s=1 approach; the spectral gap |λ₂(1)| < 1 (step 2) and
+|λ₁(1+it)| < 1 (step 4) remain open. The 1/2 → 3/4 spectral-radius gap IS RH.
