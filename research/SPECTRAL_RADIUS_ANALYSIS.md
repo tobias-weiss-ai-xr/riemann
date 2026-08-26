@@ -48,7 +48,8 @@ This means:
 | ρ(L_s^{(0)}) < 0.30 for |t| ≤ 100 | ✅ NUMERICAL | Sprint 2 (boundary-corrected, Fourier basis) |
 | λ₁(1) = 1 (PF eigenvalue) | ✅ VERIFIED | Direct calculation |
 | λ₁'(1) = −π²/(6·ln 2) < 0 | ✅ DONE (exact) | Ruelle pressure formula; LAMBDA1_DERIVATIVE_ANALYSIS.md |
-| Spectral gap at s = 1: |λ₂(1)| < 1 | ⬜ NEEDS PROOF | Perron-Frobenius + spectral gap |
+| Spectral gap at s = 1: |λ₂(1)| < 1 | ✅ = GKW 0.303663… | Wirsing 1974/Babenko 1978; verified (SPECTRAL_GAP_GKW.md) |
+| |λ₁(1+it)| < 1 for t ≠ 0 | ✅ NUMERICAL (t ≤ 20000) | Nyström; axiom in Lean (SPECTRAL_GAP_GKW.md) |
 | ρ(L_s^{(0)}) < 1 near s = 1 | ⬜ NEEDS PROOF | Kato perturbation theory |
 | ρ(L_s^{(0)}) < 1 for Re(s) ≥ 3/4 + ε | ⬜ NEEDS PROOF | Nisoli DFLY certification |
 | **ρ(L_s^{(0)}) < 1 for Re(s) > 1/2** | **⬜ = RH** | **This IS the Riemann Hypothesis** |

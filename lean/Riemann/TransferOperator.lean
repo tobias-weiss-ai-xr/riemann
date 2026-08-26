@@ -256,6 +256,59 @@ theorem lambdaOneDerivative_is_minus_twice_levy :
   rw [ruellePressureFormula_at_one]
   ring_nf
 
+/-! ### The Spectral Gap at s = 1 and the Boundary Re(s) = 1
+
+Two further ingredients of the perturbation programme (in addition to
+λ₁(1) = 1 and λ₁'(1) = −π²/(6·ln 2) < 0):
+
+1. **Spectral gap at s = 1** (Step 2).  The second eigenvalue of L₁ is the
+   classical Gauss–Kuzmin–Wirsing constant:
+
+       |λ₂(1)| = 0.3036630028987326586…  < 1
+
+   (Wirsing 1974; Babenko 1978).  This is the rate at which the Gauss–Kuzmin
+   distribution converges to the Gauss measure.  Confirmed numerically with
+   the Nyström collocation (n_max→∞ Richardson): 0.30366300.  See
+   `research/SPECTRAL_GAP_GKW.md`.
+
+2. **Boundary bound** (Step 4).  On the boundary Re(s) = 1 of the safe
+   region:
+
+       |λ₁(1+it)| < 1   for all t ≠ 0
+
+   verified numerically for |t| ≤ 20000 (values in band ≈ [0.32, 0.54]).
+   Together with the spectral gap this feeds the maximum-principle argument
+   that upgrades the local bound at s = 1 to the half-plane Re(s) > 1.  See
+   `research/SPECTRAL_GAP_GKW.md`.
+-/
+
+/-- The eigenvalue of L_s with the second-largest modulus (the "second"
+Perron–Frobenius / GKW eigenvalue).  In the full formalization this is the
+second-largest |eigenvalue| of the operator on H₁. -/
+noncomputable def secondEigenvalue (s : ℂ) : ℝ := sorry
+
+/-- Axiom (Wirsing 1974, Babenko 1978; spectral gap of the Gauss map transfer
+operator at s = 1): the second eigenvalue is the Gauss–Kuzmin–Wirsing constant
+0.3036630028987326… in absolute value, in particular
+
+       |λ₂(1)| < 1 .
+
+This is the classical spectral gap at s = 1 (the rate of the Gauss–Kuzmin
+theorem) and the second ingredient of the perturbation programme. -/
+axiom spectralGap_at_one :
+    |secondEigenvalue 1| < 1
+
+/-- Axiom (boundary Re(s) = 1; classical + numerical evidence): the leading
+eigenvalue stays strictly inside the unit disk on the boundary line:
+
+       |λ₁(1+it)| < 1   for all real t ≠ 0 .
+
+Verified numerically for |t| ≤ 20000 (band ≈ [0.32, 0.54], see
+`research/SPECTRAL_GAP_GKW.md`).  With λ₁'(1) < 0 and the spectral gap, this
+closes the maximum-principle step for the half-plane Re(s) > 1. -/
+axiom leadingEigenvalue_boundaryBound (t : ℝ) (ht : t ≠ 0) :
+    |leadingEigenvalue (1 + t * Complex.I : ℂ)| < 1
+
 /-! ### The Spectral Radius Conjecture
 
 The spectral radius bound ρ(L_s) < 1 for Re(s) > 1/2 is the key conjecture.
@@ -276,6 +329,24 @@ equivalent to RH.
 In the full formalization, this would be:
     noncomputable def spectralRadius (s : ℂ) : ℝ := max |λᵢ(s)| -/
 noncomputable def spectralRadius (s : ℂ) : ℝ := sorry
+
+/-- Combining Steps 1–2 of the perturbation programme (λ₁(1) = 1, λ₁'(1) < 0,
+|λ₂(1)| < 1, Kato analyticity of the eigenvalue branch) yields a *local*
+spectral-radius bound strictly to the right of s = 1:
+
+       ∃ ε > 0, ∀ r ∈ ℝ,  1 < r < 1+ε  ⟹  ρ(L_r) < 1 .
+
+The argument (documented in LAMBDA1_DERIVATIVE_ANALYSIS.md / SPECTRAL_GAP_GKW.md):
+λ₁ is analytic near 1 (Kato, trace-class ⇒ isolated simple branch at s=1), and
+|λ₁(r)| = 1 + λ₁'(1)·(r−1) + o(r−1) < 1 for r > 1 close to 1 (λ₁'(1) < 0); the
+remaining spectrum stays bounded away from 1 in modulus by the spectral gap
+|λ₂(1)| < 1 by continuity.  The full formalization of the analytic
+perturbation is left as future work (hence `sorry`). -/
+theorem localSpectralRadiusBound_above_one :
+    ∃ ε : ℝ, 0 < ε ∧ ∀ r : ℝ, 1 < r → r < 1 + ε → spectralRadius (r : ℂ) < 1 := by
+  -- Local result: follows from lambdaOneDerivative_negative + spectralGap_at_one
+  -- + Kato analyticity of the eigenvalue branch (not yet formalized in mathlib).
+  sorry
 
 /-- **Conjecture (equivalent to RH)**: The spectral radius of the
 boundary-corrected transfer operator L_s^{(0)} is strictly less than 1
