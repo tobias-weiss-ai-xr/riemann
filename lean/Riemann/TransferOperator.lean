@@ -309,6 +309,29 @@ closes the maximum-principle step for the half-plane Re(s) > 1. -/
 axiom leadingEigenvalue_boundaryBound (t : ℝ) (ht : t ≠ 0) :
     |leadingEigenvalue (1 + t * Complex.I : ℂ)| < 1
 
+/-- Axiom (thermodynamic formalism, **second-order** pressure at s = 1): in a
+neighbourhood of the worst point t = 0 (where |λ₁(1)| = 1) the boundary bound
+holds
+
+       ∃ δ > 0, ∀ t ≠ 0, |t| < δ  ⟹  |λ₁(1+it)| < 1 .
+
+**Justification** (see research/SPECTRAL_GAP_GKW.md §7): λ₁(s) = e^{P(s)} with
+P holomorphic near s = 1, so
+
+       log λ₁(1+it) = P(1+it) = P'(1)·it − ½P''(1)·t² + O(t⁴)
+       (the O(t³) term is purely imaginary)
+       |λ₁(1+it)| = exp(−½·P''(1)·t² + O(t⁴)) .
+
+P'(1) = −π²/(6·ln 2) (exact, `ruellePressureFormula_at_one`), and
+P''(1) = σ²(ψ) is the CLT asymptotic variance of ψ = 2·log y under the Gauss
+measure (numerically ≈ 3.40), strictly positive because the pressure is
+strictly convex and ψ is not cohomologous to a constant.  Hence the boundary
+bound holds with a quadratic margin at t = 0. -/
+axiom localBoundaryBound_near_zero :
+    ∃ delta : ℝ, delta > 0 ∧
+      ∀ t : ℝ, t ≠ 0 → |t| < delta →
+        |leadingEigenvalue (1 + t * Complex.I : ℂ)| < 1
+
 /-! ### The Spectral Radius Conjecture
 
 The spectral radius bound ρ(L_s) < 1 for Re(s) > 1/2 is the key conjecture.

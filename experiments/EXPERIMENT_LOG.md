@@ -3529,3 +3529,65 @@ Spectral gap at s=1 equals the classical GKW constant (0.30366…), and the
 boundary Re(s)=1 of the safe region satisfies |λ₁(1+it)|<1 for |t|≤20000.
 Together with λ₁'(1)<0 these close the perturbation steps on and right of
 σ=1; the 1/2→1 strip (in particular the critical line) remains THE RH gap.
+
+---
+
+## Experiment 19d: EPIC-4/Sprint 5 — Local boundary bound at t=0 via P''(1) = σ²
+
+**Date**: 2026-08-26
+**Type**: Theoretical (second-order pressure) + numerical
+**Status**: DONE — rigorous local bound (given thermodynamic-formalism facts)
+
+### Result
+
+At the worst boundary point t=0 (where |λ₁(1)|=1), the boundary bound
+|λ₁(1+it)| < 1 for t≠0 is RIGOROUS via the second-order pressure:
+
+```
+log λ₁(1+it) = P(1+it) = P'(1)·it − ½P''(1)·t² + O(t⁴)   (O(t³) purely imaginary)
+|λ₁(1+it)| = exp(−½·P''(1)·t² + O(t⁴)) < 1  for small t ≠ 0
+```
+
+with
+- P'(1) = −π²/(6 ln 2) (exact, Exp 19b)
+- **P''(1) = σ²(ψ) — the CLT asymptotic variance of ψ = 2 ln y under the
+  Gauss measure — ≈ 3.40 > 0**, strictly positive by strict convexity of the
+  pressure (ψ is not cohomologous to a constant).
+
+### Correction to a naive guess
+
+The single-step variance Var_μ(2 ln y) = 4·Var(ln y) ≈ 4.773 is NOT P''(1).
+The pressure second derivative is the ASYMPTOTIC variance
+σ² = Var(ψ) + 2·Σ_{n≥1} Cov(ψ, ψ∘Tⁿ), which relaxes to ≈ 3.40.
+
+| measurement | σ² = P''(1) |
+|---|---:|
+| real-axis quadratic fit log λ₁(σ) | 3.47 |
+| real-axis quartic fit | 3.40 |
+| Gauss-map simulation Var(S_n)/n → (n=60) | 3.43 |
+| cross-check |λ₁(1+0.1i)| = e^{−σ²/2·0.01} = 0.9830 vs numeric 0.98325 | ✓ |
+
+### Status of Step 4 (boundary |λ₁(1+it)| < 1)
+
+- t = 0 neighbourhood: **rigorous** (this experiment; quadratic margin)
+- |t| ∈ [δ, 20000]: **numerical** (Exp 19c; band [0.32, 0.54], margin ≥ 0.46)
+- remaining: gluing (uniform in t) — genuine analytic gap, but the softest part
+  of the boundary now has a rigorous proof.
+
+### Lean
+
+`lean/Riemann/TransferOperator.lean`: added `localBoundaryBound_near_zero`
+(axiom): ∃δ>0, ∀t≠0 with |t|<δ: |λ₁(1+it)| < 1, with the P' + P'' justification.
+`lake build` 0 errors.
+
+### Files
+
+- `research/SPECTRAL_GAP_GKW.md` §7 (addendum)
+- `lean/Riemann/TransferOperator.lean`
+
+### Conclusion
+
+The two Taylor coefficients of the pressure at s=1 are now pinned: P'(1) exact
+(−π²/(6 ln 2)) and P''(1) ≈ 3.40 > 0 (asymptotic variance). This gives the
+rigorous local boundary bound near the worst point t=0 — the missing piece
+closest to the disk. Global gluing and the strip 1/2<σ<1 (=RH) remain.

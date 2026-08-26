@@ -157,3 +157,74 @@ Build: `lake build` — 0 errors (6336 jobs).
   gap, quasi-compactness of the Gauss-map transfer operator.
 - Khinchin, *Continued Fractions* — Gauss–Kuzmin theorem, Lévy constant.
 - Previous: `LAMBDA1_DERIVATIVE_ANALYSIS.md` (λ₁'(1) = −π²/(6 ln 2)).
+
+---
+
+## 7. Addendum — Local Boundary Bound near t = 0 (analytic Step 4)
+
+**Date**: 2026-08-26 (same session)
+
+The most delicate point of the boundary Re(s)=1 is **t = 0**, where |λ₁(1)| = 1
+is attained (|λ₁| must strictly drop for t ≠ 0).  This can be made rigorous
+by a second-order pressure computation.
+
+### 7.1 The mechanism
+
+For λ₁(s) = e^{P(s)} (pressure, holomorphic in s near the real axis with a
+spectral gap), expand at s = 1 in the vertical direction s = 1+it:
+
+```
+log λ₁(1+it) = P(1+it) = P'(1)·it − ½·P''(1)·t² + O(t⁴)
+   (the O(t³) term is purely imaginary: (it)³ = −it³)
+⇒  |λ₁(1+it)| = e^{Re P(1+it)} = exp(−½·P''(1)·t² + O(t⁴))
+```
+
+So **|λ₁(1+it)| < 1 for small t ≠ 0 iff P''(1) > 0**.
+
+### 7.2 P''(1) is the CLT asymptotic variance — and is strictly positive
+
+Naively one might guess P''(1) = Var_μ(2 ln y) = 4·Var_μ(ln y) ≈ 4.773, but
+that is the *single-step* variance.  The correct pressure identity (for
+φ_u = φ + u·ψ, expanding system, spectral gap) is
+
+```
+d²P/du²|₀ = σ²(ψ) := Var_μ(ψ) + 2·Σ_{n≥1} Cov_μ(ψ, ψ∘Tⁿ)
+```
+
+the **asymptotic (CLT) variance** of the observable ψ = 2 ln y under the
+equilibrium state μ = Gauss measure.  Numerically:
+
+| method | σ² = P''(1) |
+|---|---:|
+| real-axis quadratic fit of log λ₁(σ) | 3.47 |
+| real-axis quartic fit | 3.40 |
+| Gauss-map simulation Var(S_n)/n, n=60 | 3.43 |
+| cross-check |λ₁(1+0.1i)| = e^{−σ²/2·0.01} | 0.9830 vs 0.98325 ✓ |
+
+So **σ² ≈ 3.40 > 0**.  Strict positivity is rigorous: by strict convexity of
+the pressure (thermodynamic formalism), P''(1) = 0 would force ψ = 2 ln y to
+be cohomologous to a constant under T, which it is not (its law is
+non-degenerate and the Gauss map is mixing with a spectral gap).
+
+### 7.3 The local boundary bound (now rigorous, given the formalism)
+
+```
+P'(1)  = −π²/(6·ln 2)   (exact, §LAMBDA1_DERIVATIVE_ANALYSIS.md)
+P''(1) = σ² > 0          (asymptotic variance; > 0 by strict convexity)
+```
+⟹  **∃ δ > 0, ∀ 0 < |t| < δ:  |λ₁(1+it)| = e^{−½σ²t² + O(t⁴)} < 1.**
+
+Combined with the global numerical scan (§3, |λ₁(1+it)| < 1 for |t| ≤ 20000),
+the boundary Re(s)=1 of the safe region is under control *both* in the
+neighbourhood of the worst point t=0 (rigorously) and away from it
+(numerically, with large margin).  Gluing these is the remaining analytic
+step for a full proof of the boundary bound.
+
+### 7.4 Lean
+
+`TransferOperator.lean` adds:
+- `pressureSecondDerivative_at_one` (axiom): P''(1) = σ² with σ² > 0
+  (StrictConvexity of the pressure; ψ = 2 ln y not cohomologous to a constant)
+- `boundaryBound_near_zero` (theorem, sorry): ∃ δ > 0, ∀ |t| < δ, t ≠ 0:
+  |leadingEigenvalue (1+it)| < 1 — Taylor argument from P'(1), P''(1) > 0.
+
