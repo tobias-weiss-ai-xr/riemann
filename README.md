@@ -152,3 +152,18 @@ Transferred from `riemann-research` to support literature review and discovery.
 - Lean 4 Formalization: 15 papers (formalization)
 - Surveys & Reviews: 64 papers (survey)
 
+
+## Interactive Visualization (GitHub Pages)
+
+An interactive [three.js](https://threejs.org/) page that visualises the Riemann
+Hypothesis and this project's findings is served from `docs/`:
+
+- **ζ Landscape** — `|ζ(σ + i t)|` over the critical strip, with the critical line and zeros as glowing orbs
+- **Critical Line** — `|ζ(½ + i t)|` evaluated live, every dip to zero is a non-trivial zero
+- **Dimension Split** — Brody repulsion `β` per Hecke-field dimension (CM forms GUE-like ≈ 1.88, non-CM near-Poisson ≈ 0.24, aggregate 0.62 a mixing artifact)
+- **GUE → Poisson** — Brody distribution waterfall through the phase transition
+- **L-Function Spectrum** — correlation eigenvalues per dimension (effective rank collapses with dimension)
+
+See [docs/VISUALIZATION.md](docs/VISUALIZATION.md). Enable GitHub Pages in repo
+Settings → Pages → Source: *Deploy from a branch* → Branch `master`, Folder `/docs`
+(or let `.github/workflows/pages.yml` deploy via the Pages action).

@@ -1,0 +1,206 @@
+/* =========================================================================
+   Visualizing the Riemann Hypothesis — UI styling
+   ========================================================================= */
+
+:root {
+  --bg: #05060a;
+  --panel: rgba(14, 18, 30, 0.72);
+  --panel-border: rgba(120, 160, 220, 0.18);
+  --text: #e8ecf4;
+  --muted: #8a93a8;
+  --accent: #3fe0ff;
+  --gold: #ffcf5c;
+  --green: #33d6a6;
+  --magenta: #ff5cc8;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono: "SF Mono", "JetBrains Mono", "Fira Code", ui-monospace, Menlo, Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+#scene {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  display: block;
+}
+
+/* ---------- Loading overlay ---------- */
+#loading {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  background: radial-gradient(circle at 50% 40%, #0a0f1c 0%, #05060a 70%);
+  z-index: 50;
+  transition: opacity 0.8s ease;
+}
+#loading.hidden { opacity: 0; pointer-events: none; }
+.spinner {
+  width: 46px;
+  height: 46px;
+  border: 3px solid rgba(63, 224, 255, 0.18);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+.loading-text { color: var(--muted); font-family: var(--mono); font-size: 13px; letter-spacing: 0.04em; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---------- HUD (title) ---------- */
+#hud {
+  position: fixed;
+  top: 22px;
+  left: 26px;
+  z-index: 20;
+  pointer-events: none;
+  max-width: min(46vw, 560px);
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.8);
+}
+#hud h1 {
+  margin: 0;
+  font-size: clamp(17px, 2.3vw, 27px);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  background: linear-gradient(90deg, #ffffff, var(--accent) 60%, var(--gold));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+#hud .sub {
+  margin: 6px 0 0;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+}
+
+/* ---------- Nav ---------- */
+#nav {
+  position: fixed;
+  left: 26px;
+  bottom: 24px;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 60vw;
+}
+.nav-btn {
+  appearance: none;
+  border: 1px solid var(--panel-border);
+  background: var(--panel);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  letter-spacing: 0.02em;
+  padding: 9px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: all 0.18s ease;
+}
+.nav-btn:hover { color: var(--text); border-color: rgba(63, 224, 255, 0.45); transform: translateY(-1px); }
+.nav-btn.active {
+  color: #04121a;
+  background: linear-gradient(120deg, var(--accent), #7ea8ff);
+  border-color: transparent;
+  font-weight: 600;
+  box-shadow: 0 4px 22px rgba(63, 224, 255, 0.35);
+}
+
+/* ---------- Info panel ---------- */
+#info {
+  position: fixed;
+  top: 90px;
+  right: 22px;
+  z-index: 20;
+  width: min(340px, 38vw);
+  max-height: calc(100vh - 180px);
+  overflow: hidden;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 14px;
+  padding: 16px 18px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+#info.collapsed { transform: translateX(calc(100% + 30px)); opacity: 0; }
+.info-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 10px;
+  letter-spacing: 0.01em;
+}
+.info-body { font-size: 13px; line-height: 1.55; color: var(--muted); overflow-y: auto; max-height: calc(100vh - 240px); }
+.info-body p { margin: 0 0 10px; }
+.info-body strong { color: var(--text); }
+.info-body .stat { color: var(--accent); font-family: var(--mono); }
+.info-body .stat.gold { color: var(--gold); }
+.info-body .stat.green { color: var(--green); }
+.info-body ul { margin: 6px 0 10px; padding-left: 18px; }
+.info-body li { margin-bottom: 5px; }
+.info-body code { font-family: var(--mono); font-size: 12px; color: var(--gold); background: rgba(255, 207, 92, 0.08); padding: 1px 5px; border-radius: 4px; }
+.info-body .cite { color: #6f7891; font-size: 11.5px; font-style: italic; }
+
+.info-toggle {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  border: 1px solid var(--panel-border);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+}
+.info-toggle:hover { color: var(--text); border-color: var(--accent); }
+
+/* ---------- Footer ---------- */
+#foot {
+  position: fixed;
+  bottom: 26px;
+  right: 24px;
+  z-index: 20;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--muted);
+  pointer-events: none; /* let clicks pass through to nav behind it */
+  max-width: 38vw;
+  justify-content: flex-end;
+  text-align: right;
+}
+#foot a { pointer-events: auto; }
+#foot a { color: var(--accent); text-decoration: none; opacity: 0.8; }
+#foot a:hover { opacity: 1; text-decoration: underline; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 720px) {
+  #hud { max-width: 86vw; }
+  #info { width: 80vw; top: auto; bottom: 90px; right: 10px; }
+  #nav { max-width: 92vw; }
+  #foot { display: none; }
+}

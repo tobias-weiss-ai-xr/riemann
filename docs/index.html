@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>Visualizing the Riemann Hypothesis · GNN × Number Theory</title>
+  <meta name="description" content="An interactive 3D visualization of the Riemann Hypothesis: the zeta landscape, the critical line, and the L-function dimension split discovered in this project." />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="stylesheet" href="assets/style.css" />
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <canvas id="scene"></canvas>
+
+  <div id="loading">
+    <div class="spinner"></div>
+    <div class="loading-text">Loading ζ(s) surface…</div>
+  </div>
+
+  <header id="hud">
+    <h1>The Riemann Hypothesis, in Three Dimensions</h1>
+    <p class="sub">
+      ζ-landschaft · kritische Gerade · Dimensions-Split der L-Funktionen-Nullstellen
+    </p>
+  </header>
+
+  <nav id="nav" aria-label="Visualisation scenes">
+    <button class="nav-btn active" data-view="landscape">ζ Landscape</button>
+    <button class="nav-btn" data-view="critical">Critical Line</button>
+    <button class="nav-btn" data-view="dimension">Dimension Split</button>
+    <button class="nav-btn" data-view="brody">GUE → Poisson</button>
+    <button class="nav-btn" data-view="spectral">L-Function Spectrum</button>
+  </nav>
+
+  <aside id="info">
+    <div class="info-title" id="info-title">ζ(s) Landscape</div>
+    <div class="info-body" id="info-body"></div>
+    <button class="info-toggle" id="info-toggle" title="Collapse">⟨</button>
+  </aside>
+
+  <footer id="foot">
+    <span id="foot-text"></span>
+    <a id="foot-repo" href="https://github.com/tobias-weiss-ai-xr/riemann" target="_blank" rel="noopener">github · riemann</a>
+  </footer>
+
+  <!-- Research data + live zeta computation (classic scripts, run before the module) -->
+  <script src="assets/data.js"></script>
+  <script src="assets/zeta.js"></script>
+  <script type="module" src="assets/viz.js"></script>
+</body>
+</html>
