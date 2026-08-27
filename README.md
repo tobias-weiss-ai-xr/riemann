@@ -2,6 +2,10 @@
 
 Research environment for exploring graph neural networks on Cayley graphs of SL(2,F_p) and connections to the Riemann Hypothesis.
 
+> 🎥 **Interactive visualization** — explore the Riemann Hypothesis in 3D:
+> [**ζ landscape, critical line & spectral statistics**](https://tobias-weiss-ai-xr.github.io/riemann/) (three.js, GitHub Pages).
+> See [docs/VISUALIZATION.md](docs/VISUALIZATION.md) for the scenes and how to deploy/serve it.
+
 ## Quick Start
 
 ```bash
