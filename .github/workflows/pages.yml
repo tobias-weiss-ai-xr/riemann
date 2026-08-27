@@ -1,0 +1,44 @@
+# Deploy the Riemann Hypothesis three.js visualisation to GitHub Pages.
+#
+# Two ways to serve this site (pick ONE in repo Settings → Pages → Build and deployment):
+#
+#  A) GitHub Actions (this file) — Source = "GitHub Actions".
+#     The workflow uploads the `docs/` folder as a Pages artifact on every push to master.
+#
+#  B) Deploy from a branch — Source = "Deploy from a branch", Branch = "master", Folder = "/docs".
+#     No workflow needed; the static site is served directly from docs/.
+#
+# Either way the site root is docs/index.html.
+
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'docs/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
