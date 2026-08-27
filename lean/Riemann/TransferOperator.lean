@@ -298,6 +298,29 @@ theorem) and the second ingredient of the perturbation programme. -/
 axiom spectralGap_at_one :
     |secondEigenvalue 1| < 1
 
+/-- Axiom (Kato analyticity / trace-class ⇒ isolated simple branch): near
+s = 1 from the right the real branch λ₁(r) admits the first-order Taylor
+bound
+
+       ∃ c > 0, ∃ δ > 0, ∀ r, 1 ≤ r < 1+δ:
+         |λ₁(r)| ≤ 1 + λ₁'(1)·(r−1) + c·(r−1)² .
+
+(λ₁ is real-analytic in a neighbourhood of 1 with bounded second derivative;
+this is the content of "Kato theory" used in the perturbation argument.) -/
+axiom leadingEigenvalue_neighborBound :
+    ∃ c : ℝ, 0 < c ∧ ∃ δ : ℝ, 0 < δ ∧
+      ∀ r : ℝ, 1 ≤ r → r < 1 + δ →
+        |leadingEigenvalue (r : ℂ)| ≤
+          1 + leadingEigenvalueDerivative 1 * (r - 1) + c * (r - 1) ^ 2
+
+/-- Axiom (continuity of the isolated spectrum; the spectral gap |λ₂(1)| < 1
+persists in a neighbourhood of s = 1):
+
+       ∃ q < 1, ∃ δ > 0, ∀ r, 1 ≤ r < 1+δ:  |λ₂(r)| ≤ q . -/
+axiom secondEigenvalue_gapPersistence :
+    ∃ q : ℝ, q < 1 ∧ ∃ δ : ℝ, 0 < δ ∧
+      ∀ r : ℝ, 1 ≤ r → r < 1 + δ → |secondEigenvalue (r : ℂ)| ≤ q
+
 /-- Axiom (boundary Re(s) = 1; classical + numerical evidence): the leading
 eigenvalue stays strictly inside the unit disk on the boundary line:
 
@@ -353,6 +376,15 @@ In the full formalization, this would be:
     noncomputable def spectralRadius (s : ℂ) : ℝ := max |λᵢ(s)| -/
 noncomputable def spectralRadius (s : ℂ) : ℝ := sorry
 
+/-- Axiom (definitional, by the "second-largest modulus" meaning of
+`secondEigenvalue`): for real r the spectral radius is bounded by the two
+leading eigenvalues:
+
+       ρ(L_r) ≤ max(|λ₁(r)|, |λ₂(r)|) . -/
+axiom spectralRadius_le_eigenpair (r : ℝ) (hr : (r : ℂ).re > 1/2) :
+    spectralRadius (r : ℂ) ≤
+      max (|leadingEigenvalue (r : ℂ)|) (|secondEigenvalue (r : ℂ)|)
+
 /-- Combining Steps 1–2 of the perturbation programme (λ₁(1) = 1, λ₁'(1) < 0,
 |λ₂(1)| < 1, Kato analyticity of the eigenvalue branch) yields a *local*
 spectral-radius bound strictly to the right of s = 1:
@@ -361,15 +393,83 @@ spectral-radius bound strictly to the right of s = 1:
 
 The argument (documented in LAMBDA1_DERIVATIVE_ANALYSIS.md / SPECTRAL_GAP_GKW.md):
 λ₁ is analytic near 1 (Kato, trace-class ⇒ isolated simple branch at s=1), and
-|λ₁(r)| = 1 + λ₁'(1)·(r−1) + o(r−1) < 1 for r > 1 close to 1 (λ₁'(1) < 0); the
-remaining spectrum stays bounded away from 1 in modulus by the spectral gap
-|λ₂(1)| < 1 by continuity.  The full formalization of the analytic
-perturbation is left as future work (hence `sorry`). -/
+|λ₁(r)| ≤ 1 + λ₁'(1)(r−1) + c(r−1)² < 1 for r > 1 close to 1 (λ₁'(1) < 0);
+the remaining spectrum stays bounded away from 1 in modulus by the spectral
+gap |λ₂(1)| < 1 by continuity (`secondEigenvalue_gapPersistence`).  The
+analytic perturbation content lives in the axioms
+`leadingEigenvalue_neighborBound` / `secondEigenvalue_gapPersistence`; this
+theorem performs the real analysis (choosing ε from them). -/
 theorem localSpectralRadiusBound_above_one :
     ∃ ε : ℝ, 0 < ε ∧ ∀ r : ℝ, 1 < r → r < 1 + ε → spectralRadius (r : ℂ) < 1 := by
-  -- Local result: follows from lambdaOneDerivative_negative + spectralGap_at_one
-  -- + Kato analyticity of the eigenvalue branch (not yet formalized in mathlib).
-  sorry
+  rcases leadingEigenvalue_neighborBound with ⟨c, hc, δ₁, hδ₁, h1⟩
+  rcases secondEigenvalue_gapPersistence with ⟨q, hq, δ₂, hδ₂, h2⟩
+  have hcpos : 0 < c := hc
+  have hd1pos : 0 < δ₁ := hδ₁
+  have hd2pos : 0 < δ₂ := hδ₂
+  have hneg : leadingEigenvalueDerivative 1 < 0 := lambdaOneDerivative_negative
+  have hrule : 0 < (-leadingEigenvalueDerivative 1) / (2 * c) := by
+    exact div_pos (neg_pos.mpr hneg) (by positivity)
+  let ε : ℝ := min δ₁ (min δ₂ ((-leadingEigenvalueDerivative 1) / (2 * c)))
+  refine ⟨ε, ?_, ?_⟩
+  · have hmid : 0 < min δ₂ ((-leadingEigenvalueDerivative 1) / (2 * c)) :=
+      by exact lt_min hd2pos hrule
+    exact lt_min hd1pos hmid
+  · intro r hr1 hr
+    have hd : 0 < r - 1 := sub_pos.mpr hr1
+    have hre : r - 1 < ε := by linarith
+    have h1a : r - 1 < δ₁ :=
+      lt_of_lt_of_le hre (min_le_left _ _)
+    have h2a : r - 1 < δ₂ :=
+      lt_of_lt_of_le hre (le_trans (min_le_right _ _) (min_le_left _ _))
+    have h3a : r - 1 < (-leadingEigenvalueDerivative 1) / (2 * c) :=
+      lt_of_lt_of_le hre (le_trans (min_le_right _ _) (min_le_right _ _))
+    have hrle : 1 ≤ r := le_of_lt hr1
+    have hl1 :
+        |leadingEigenvalue (r : ℂ)| ≤
+          1 + leadingEigenvalueDerivative 1 * (r - 1) + c * (r - 1) ^ 2 :=
+      h1 r hrle (by linarith [h1a])
+    have hl2 : |secondEigenvalue (r : ℂ)| ≤ q := h2 r hrle (by linarith [h2a])
+    -- |λ₁(r)| ≤ 1 + λ₁'(1)(r−1) + c(r−1)² ≤ 1 + (r−1)(λ₁'(1) + c·ε) < 1
+    have hmono : c * (r - 1) ^ 2 ≤ c * (r - 1) * ε := by
+      have hsq : (r - 1) ^ 2 ≤ (r - 1) * ε := by
+        rw [sq]
+        exact mul_le_mul_of_nonneg_left (le_of_lt hre) (le_of_lt hd)
+      calc
+        c * (r - 1) ^ 2 ≤ c * ((r - 1) * ε) :=
+          mul_le_mul_of_nonneg_left hsq (le_of_lt hcpos)
+        _ = c * (r - 1) * ε := by ring
+    have hcε : c * ε ≤ (-leadingEigenvalueDerivative 1) / 2 := by
+      have h3b : ε ≤ (-leadingEigenvalueDerivative 1) / (2 * c) := by
+        exact le_trans (min_le_right _ _) (min_le_right _ _)
+      calc
+        c * ε ≤ c * ((-leadingEigenvalueDerivative 1) / (2 * c)) :=
+          mul_le_mul_of_nonneg_left h3b (le_of_lt hcpos)
+        _ = (-leadingEigenvalueDerivative 1) / 2 := by
+          field_simp [hcpos.ne']
+    have haddclt : leadingEigenvalueDerivative 1 + c * ε < 0 := by
+      have ha2 : leadingEigenvalueDerivative 1 / 2 < 0 :=
+        div_neg_of_neg_of_pos hneg (by norm_num)
+      have hm : leadingEigenvalueDerivative 1 + c * ε ≤
+          leadingEigenvalueDerivative 1 / 2 := by
+        nlinarith [hcε]
+      exact lt_of_le_of_lt hm ha2
+    have hl1lt : |leadingEigenvalue (r : ℂ)| < 1 := by
+      have ht :
+          1 + leadingEigenvalueDerivative 1 * (r - 1) + c * (r - 1) ^ 2 ≤
+          1 + (r - 1) * (leadingEigenvalueDerivative 1 + c * ε) := by
+        nlinarith [hmono]
+      have ht2 : 1 + (r - 1) * (leadingEigenvalueDerivative 1 + c * ε) < 1 := by
+        have mneg : (r - 1) * (leadingEigenvalueDerivative 1 + c * ε) < 0 :=
+          mul_neg_of_pos_of_neg hd haddclt
+        nlinarith
+      exact lt_of_le_of_lt (le_trans hl1 ht) ht2
+    have hl2lt : |secondEigenvalue (r : ℂ)| < 1 := lt_of_le_of_lt hl2 hq
+    have hmax : max (|leadingEigenvalue (r : ℂ)|) (|secondEigenvalue (r : ℂ)|) < 1 :=
+      max_lt hl1lt hl2lt
+    have hρ : spectralRadius (r : ℂ) ≤
+        max (|leadingEigenvalue (r : ℂ)|) (|secondEigenvalue (r : ℂ)|) :=
+      spectralRadius_le_eigenpair r (by simpa using (show r > 1/2 from by linarith))
+    exact lt_of_le_of_lt hρ hmax
 
 /-- **Conjecture (equivalent to RH)**: The spectral radius of the
 boundary-corrected transfer operator L_s^{(0)} is strictly less than 1
