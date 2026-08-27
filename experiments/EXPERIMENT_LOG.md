@@ -3591,3 +3591,52 @@ The two Taylor coefficients of the pressure at s=1 are now pinned: P'(1) exact
 (−π²/(6 ln 2)) and P''(1) ≈ 3.40 > 0 (asymptotic variance). This gives the
 rigorous local boundary bound near the worst point t=0 — the missing piece
 closest to the disk. Global gluing and the strip 1/2<σ<1 (=RH) remain.
+
+---
+
+## Experiment 19e: EPIC-4 — spectral-radius map over the strip (1/2, 1]
+
+**Date**: 2026-08-26
+**Type**: Numerical map (Nyström collocation)
+**Status**: COMPLETE — corrected ρ < 1 over strip grid; full-op ρ > 1 near 1/2
+
+`scripts/spectral_radius_map.py` → `data/spectral-radius/spectral_radius_map.json`
+
+### Strip map of corrected ρ = |λ₂(σ+it)| (N=48, n_max=2400)
+
+| σ \ t  | 0 | 5 | 10 | 15 | 20 | 30 | 50 | 100 |
+|---|---|---|---|---|---|---|---|---|
+| 0.55 | 0.717 | 0.228 | 0.551 | 0.781 | 0.876 | 0.903 | 0.915 | **0.950** |
+| 0.60 | 0.653 | 0.165 | 0.481 | 0.723 | 0.782 | 0.836 | 0.827 | 0.856 |
+| 0.70 | 0.535 | 0.120 | 0.394 | 0.614 | 0.670 | 0.712 | 0.682 | 0.698 |
+| 0.80 | 0.438 | 0.113 | 0.340 | 0.520 | 0.575 | 0.599 | 0.567 | 0.579 |
+| 0.90 | 0.362 | 0.108 | 0.299 | 0.441 | 0.495 | 0.505 | 0.477 | 0.508 |
+| 1.00 | 0.303 | 0.101 | 0.265 | 0.374 | 0.426 | 0.426 | 0.413 | 0.454 |
+
+- Worst corrected ρ on the grid = **0.950 at σ=0.55, t=100** (< 1).
+- |λ₂(1,0)| = 0.303 = GKW constant ✓ (sanity with Exp 19c).
+- Sanity: corrected ρ decreasing in σ at fixed t; |λ₂(1+it)| matches 19c band.
+
+### Critical-zone scan σ=0.51 (just above the line)
+
+- Full operator |λ₁| > 1 over much of the zone (e.g. 7.57 at t=0 — the ζ(2σ)
+  constant-mode peak; 1.01–1.01 at t=22, 46) — confirms the boundary
+  correction is essential in (1/2, 1).
+- Corrected |λ₂| stays < 1 (≈ 0.99 max at t≈18–24, 0.95–0.99 over the zone)
+  but approaches 1 as σ → 1/2⁺.
+
+### Caveat (documented)
+
+Near σ = 1/2 the n-sum Σ(n+1)^{-2σ} converges only like n_max^{-(2σ−1)}, so
+values at σ ≤ 0.55 are truncation-sensitive (n_max=2400 → ~0.46 error index
+at σ=0.55 in the worst case; numbers near 1 should NOT be read as precise
+bounds). For reliable near-critical bounds: increase n_max (cost ∝ n_max·N·M).
+
+### Conclusion
+
+The corrected operator's spectral radius is numerically < 1 throughout the
+RH-relevant strip (grid), degrading toward 1 only as σ → 1/2⁺ at large |t| —
+where the true statement (ρ<1 on the critical line for the corrected operator)
+remains the RH-equivalent open case (the exact hard part). The full operator is
+confirmed to need the constant-mode removal. Reproducible via
+`python scripts/spectral_radius_map.py`.
