@@ -471,6 +471,116 @@ theorem localSpectralRadiusBound_above_one :
       spectralRadius_le_eigenpair r (by simpa using (show r > 1/2 from by linarith))
     exact lt_of_le_of_lt hρ hmax
 
+/-! ### Ruelle Domination: Re(s) > 1 closed uniformly, and the Envelope Obstruction
+
+For real σ the operator L_σ is positive.  Pointwise domination
+|L_{σ+it} f| ≤ L_σ |f| (because |y^{2(σ+it)}| = y^{2σ}) iterates to
+||L_{σ+it}^n|| ≤ ||L_σ^n||, so by the Gelfand formula
+
+       ρ(L_{σ+it}) ≤ ρ(L_σ) = λ₁(σ).                         (Ruelle domination)
+
+Since λ₁ is non-increasing in σ > 1/2, λ₁(1) = 1 and λ₁'(1) < 0 give
+λ₁(σ) < 1 for all σ > 1, hence **ρ(L_s) < 1 for all Re(s) > 1, uniformly in
+Im(s)** with the explicit quantitative bound ρ ≤ λ₁(σ) = e^{P(σ)}.
+
+On the other side, λ₁(σ) ≥ λ₁(1) = 1 for σ ≤ 1, so |λ₁(σ + 0·i)| ≥ 1
+along the whole strip (1/2, 1] at t = 0 — the **Envelope Obstruction**: no
+bound of the shape |λ₁(σ+it)| ≤ f(σ) with f(σ) < 1 can exist in the strip,
+so the missing input (RH) is necessarily t-anisotropic.  See
+`research/RUELLE_DOMINATION.md`. -/
+
+/-- Axiom (Ruelle domination; pointwise |L_{σ+it} f| ≤ L_σ |f| + Gelfand
+formula): the spectral radius does not increase under complexification of
+the temperature,
+
+       ρ(L_{σ+it}) ≤ ρ(L_σ)   for σ > 1/2, t ∈ ℝ . -/
+axiom spectralRadius_dominated (σ : ℝ) (t : ℝ) (hσ : 1/2 < σ) :
+    spectralRadius (σ + t * Complex.I : ℂ) ≤ spectralRadius (σ : ℂ)
+
+/-- Axiom (positive operator): for real σ > 1/2 the leading eigenvalue IS the
+spectral radius, ρ(L_σ) = λ₁(σ). -/
+axiom spectralRadius_real_isLeading (σ : ℝ) (hσ : 1/2 < σ) :
+    spectralRadius (σ : ℂ) = leadingEigenvalue (σ : ℂ)
+
+/-- Axiom (monotonicity of the real branch): λ₁ is non-increasing in σ > 1/2
+(L_σ₂ ≤ L_σ₁ in the operator order when σ₁ ≤ σ₂, since y^{2σ} ↓ pointwise). -/
+axiom leadingEigenvalue_real_mono (σ₁ σ₂ : ℝ) (h₁ : 1/2 < σ₁) (h₂ : σ₁ ≤ σ₂) :
+    leadingEigenvalue (σ₂ : ℂ) ≤ leadingEigenvalue (σ₁ : ℂ)
+
+/-- Axiom (positive operator / Perron–Frobenius): λ₁(σ) ≥ 0 for real σ > 1/2. -/
+axiom leadingEigenvalue_real_nonneg (σ : ℝ) (hσ : 1/2 < σ) :
+    0 ≤ leadingEigenvalue (σ : ℂ)
+
+/-- Axiom (analytic content of λ₁'(1) < 0): the real branch dips strictly
+below 1 immediately to the right of s = 1,
+
+       ∃ ε > 0, ∀ r, 1 < r < 1+ε  ⟹  λ₁(r) < 1 . -/
+axiom leadingEigenvalue_strictBelowOne_above :
+    ∃ ε : ℝ, 0 < ε ∧ ∀ r : ℝ, 1 < r → r < 1 + ε → leadingEigenvalue (r : ℂ) < 1
+
+/-- **Theorem**: λ₁(σ) < 1 for every σ > 1.
+
+Proof: monotonicity of λ₁ + a single strictly-below-1 point right of 1
+(`leadingEigenvalue_strictBelowOne_above`, the analytic content of
+λ₁'(1) < 0). -/
+theorem realBranch_strictBelowOne_above (σ : ℝ) (hσ : 1 < σ) :
+    leadingEigenvalue (σ : ℂ) < 1 := by
+  rcases leadingEigenvalue_strictBelowOne_above with ⟨ε, hε, hdip⟩
+  let r₀ : ℝ := 1 + ε / 2
+  have hr₀gt : 1 < r₀ := by dsimp [r₀]; linarith
+  have hr₀lt : r₀ < 1 + ε := by dsimp [r₀]; linarith
+  have hdip₀ : leadingEigenvalue (r₀ : ℂ) < 1 := hdip r₀ hr₀gt hr₀lt
+  by_cases hcase : σ ≤ r₀
+  · have hσlt : σ < 1 + ε := by linarith
+    exact hdip σ hσ hσlt
+  · have hr₀le : r₀ ≤ σ := le_of_not_ge hcase
+    have hmono : leadingEigenvalue (σ : ℂ) ≤ leadingEigenvalue (r₀ : ℂ) :=
+      leadingEigenvalue_real_mono r₀ σ (by linarith) hr₀le
+    exact lt_of_le_of_lt hmono hdip₀
+
+/-- **Theorem (half-plane closed, uniform in t)**: ρ(L_s) < 1 for every s
+with Re(s) > 1.
+
+Proof: Ruelle domination ρ(L_{σ+it}) ≤ ρ(L_σ) = λ₁(σ) < 1.
+This is an explicit, |t|-independent bound — no maximum principle, no
+boundary axioms, quantitative in σ. -/
+theorem spectralRadiusBound_above_one (s : ℂ) (hs : 1 < s.re) :
+    spectralRadius s < 1 := by
+  let σ : ℝ := s.re
+  let t : ℝ := s.im
+  have hσ : 1/2 < σ := by dsimp [σ]; linarith
+  have hσgt : 1 < σ := by dsimp [σ]; exact hs
+  have hs_eq : s = (σ + t * Complex.I : ℂ) := by
+    apply Complex.ext <;> simp [σ, t]
+  have hdom : spectralRadius s ≤ spectralRadius (σ : ℂ) := by
+    rw [hs_eq]
+    exact spectralRadius_dominated σ t hσ
+  have hre : spectralRadius (σ : ℂ) = leadingEigenvalue (σ : ℂ) :=
+    spectralRadius_real_isLeading σ hσ
+  have hmain : leadingEigenvalue (σ : ℂ) < 1 :=
+    realBranch_strictBelowOne_above σ hσgt
+  calc
+    spectralRadius s ≤ spectralRadius (σ : ℂ) := hdom
+    _ = leadingEigenvalue (σ : ℂ) := hre
+    _ < 1 := hmain
+
+/-- **Theorem (Envelope Obstruction)**: for every σ ∈ (1/2, 1),
+
+       1 ≤ |λ₁(σ)|   (at t = 0 the modulus is at least 1)
+
+so no function f : (1/2, 1] → ℝ with f(σ) < 1 can bound
+|λ₁(σ+it)| ≤ f(σ); the RH region REQUIRES t-anisotropic input. -/
+theorem envelopeObstruction (σ : ℝ) (hσ1 : 1/2 < σ) (hσ2 : σ < 1) :
+    1 ≤ |leadingEigenvalue (σ : ℂ)| := by
+  have hmono : leadingEigenvalue (1 : ℂ) ≤ leadingEigenvalue (σ : ℂ) :=
+    leadingEigenvalue_real_mono σ 1 hσ1 (le_of_lt hσ2)
+  have hl1 : leadingEigenvalue (1 : ℂ) = 1 := leadingEigenvalue_at_one
+  have hone : (1 : ℝ) ≤ leadingEigenvalue (σ : ℂ) := by linarith
+  have hnn : 0 ≤ leadingEigenvalue (σ : ℂ) := leadingEigenvalue_real_nonneg σ hσ1
+  have habs : |leadingEigenvalue (σ : ℂ)| = leadingEigenvalue (σ : ℂ) :=
+    abs_of_nonneg hnn
+  linarith
+
 /-- **Conjecture (equivalent to RH)**: The spectral radius of the
 boundary-corrected transfer operator L_s^{(0)} is strictly less than 1
 for all s with Re(s) > 1/2.
@@ -483,18 +593,12 @@ and the eigenvalue-1 equivalence.
 axiom spectralRadiusConjecture (s : ℂ) (hs : s.re > 1/2) :
     spectralRadius s < 1
 
-/-- The spectral radius bound for Re(s) > 3 is proven by the crude norm bound
-||L_s|| ≤ ζ(2σ) < 1 for σ > 3.
-
-This is a theorem (not a conjecture) because it follows from a direct
-operator norm estimate. -/
+/-- The spectral radius bound for Re(s) > 3 follows from the much stronger
+half-plane theorem `spectralRadiusBound_above_one` (Re(s) > 1), which is
+proved from the Ruelle domination inequality — no conjecture involved. -/
 theorem spectralRadiusBound_real_gt_3 (s : ℂ) (hs : s.re > 3) :
     spectralRadius s < 1 := by
-  -- For Re(s) > 3, we have Re(s) > 1/2, so the spectral radius conjecture applies.
-  -- (The crude bound ||L_s|| ≤ ζ(2σ) on C([0,1]) gives ζ(6) ≈ 1.017 > 1,
-  -- but on H₁ (holomorphic functions), the bound is much better due to the
-  -- faster decay of matrix elements in the Laguerre basis.)
-  exact spectralRadiusConjecture s (by linarith)
+  exact spectralRadiusBound_above_one s (by linarith)
 
 /-! ### The RH Equivalence
 
