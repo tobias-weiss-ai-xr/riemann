@@ -736,7 +736,19 @@ This is the key conjecture of the transfer operator approach to RH.
 It is equivalent to the Riemann Hypothesis via the Mayer identity
 and the eigenvalue-1 equivalence.
 
-**Evidence**: See `spectralRadiusConjecture_evidence` below. -/
+**Precision (Experiment 19k)**: the *precise* avatar of RH is the
+eigenvalue-1 statement `1 ∉ Spec(L_s)` for Re(s) > 1/2 (Bonanno 2022).
+`spectralRadius s < 1` is strictly stronger: numerically the full
+operator has eigenvalues of modulus > 1 in a deep-strip sliver near
+σ ≈ 0.507, t ≈ 150 (|λ₂| ≈ 1.010, slow-tail regime) yet never equal
+to 1, so `rhImpliesSpectralRadius` is likely false as literally stated.
+The implication `spectralRadiusConjecture → RH` (LMayer identity)
+remains valid.
+
+**Evidence**: See `spectralRadiusConjecture_evidence` and
+`research/ZERO_SLIVER_MARGIN.md` (Exp 19k: m(s)=min_j|1−λ_j(s)| ≥ 0.02
+throughout the numerically accessible corner, dipping only toward
+zeta-zero heights). -/
 axiom spectralRadiusConjecture (s : ℂ) (hs : s.re > 1/2) :
     spectralRadius s < 1
 
