@@ -119,3 +119,43 @@ margin is ≥ 0.15.  Next numerical targets:
   (c) track the eigenvalue that creeps to 1 at zero heights as σ → ½⁺
       (its rate ∝ |Z_S'(½ + iγ)|·(σ − ½) is a clean slope to measure once
       σ = 0.51 → 0.505 is certified).
+
+---
+
+## 6. High-t refinement (Experiment 19l): the tight region is NOT corner-only
+
+The margin map was extended globally in t (N=256–512, nmax=6000–8000, log-stable
+barycentric weights to avoid N≥384 overflow).  Definitive results at σ=0.52 over
+t ∈ [0, 3000]:
+
+| t | corrected-|λ2| | m = min|1−λ| | notes |
+|---|---|---|---|
+| 0   | 0.774  | 0.799 | constant-mode removed (|λ1|=7.72) |
+| 125 | 0.971  | 0.042 | corner dip (near γ41) |
+| 600 | 0.965  | 0.045 | first high-t dip |
+| 900 | 0.972  | 0.037 | dip (N=512) |
+| 1100| 0.985  | **0.015** | tightest height found (zeros #729–733 = 1098.8–1102.6; N=512) |
+| 1500| 0.970  | 0.082 | plateau |
+| 3000| 0.979  | 0.068 | plateau persists |
+
+**Correction to §2/§5**: the single tight sliver [0.505,0.56]×[75,200] is NOT the
+whole story — the corrected spectral radius develops a **broad high-t plateau
+t≈900–1200 with |λ2| ≈ 0.98–0.99 at σ=0.52**, and the margin dips there are at
+least as deep as at the corner (0.015 at t=1100 vs 0.042 at t=125).  At σ=0.51,
+t=1100 (N=512): **|λ2| = 1.010 > 1**, |λ1| = 1.028 — the unit-circle crossing
+regime found in 19k at (0.505,150) extends to high t along the zero-rich strand
+(gaps ~1.2–1.6 near 1100); yet m = 0.0107 (never equal to 1).  Per σ, global
+min-m over all tested t: 0.011 (σ=0.51), 0.015 (σ=0.52), 0.039 (σ=0.53),
+0.084 (σ=0.55) — roughly m ≈ c·(σ−½) with c ≈ 2–3.
+
+**Numerical caveat (honest)**: at t > 800 the N-convergence is only ±1%
+(N=384 vs N=512 |λ2| differ by ~1e-2), so high-t |λ2| values carry ±0.01
+uncertainty.  The qualitative structure (plateau ~0.98, dips at zero heights,
+no eigenvalue equal to 1) is robust; precise certified numbers there require
+higher N and/or the DFLY/Nisoli enclosure machinery, and the certified corner
+remains [0.505,0.56]×[75,200] where N=128–256 suffices.
+
+**Net**: the falsification lever has two arms — the corner (tight margin near
+point 1, N-converged) and the high-t strand t≈900–1200 (corrected |λ2|→~1.0 as
+σ→½⁺, N-marginal).  Both stay below the critical point 1 (m ≥ 0.011 at
+σ = 0.51), consistent with RH; a certified enclosure must cover BOTH.

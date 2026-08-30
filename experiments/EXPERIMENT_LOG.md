@@ -4016,3 +4016,42 @@ eigenvalue ever equals 1 (RH-consistent).  A certified (Nisoli/DFLY) enclosure
 of m at the 5-6 tightest points (σ∈[0.505,0.56], t∈[75,200]) is the next target;
 outside the corner margin ≥ 0.15.  Formal note: the Lean RH avatar should be
 `1 ∉ Spec(L_s)` (eigenvalue-1), not ρ(L_s⁰)<1.
+
+## Experiment 19l: global-in-t falsification map — high-t plateau refines the tight region
+
+**Date**: 2026-08-30
+**Status**: numerical (Nyström N=256–512, nmax=6000–8000, log-stable barycentric weights);
+          no new Lean
+**Files**: `research/ZERO_SLIVER_MARGIN.md` §6 (updated), temp scripts
+          `_global_margin.py`, `_hight_ext.py`, `_hight_pin.py`, `_hight_pin2.py`,
+          `_z1100*.py` (gitignored)
+
+### Findings
+1. **Global margin map σ=0.52, t∈[0,3000]**: min m = 0.015 at t=1100 (near zeros
+   #729–733 = 1098.8–1102.6), vs 0.042 at the corner t=125.  The tight region is
+   NOT corner-only: corrected-|λ2| has a high-t plateau ≈ 0.98–0.99 at
+   t≈900–1200, with dips at zero-rich heights.
+2. **σ=0.51, t=1100 (N=512)**: |λ2| = 1.010 > 1, |λ1| = 1.028 — the 19k
+   unit-circle-crossing regime (previously seen at (0.505,150)) extends to high t.
+   m = 0.0107 (no eigenvalue equals 1).  Global min-m per σ (all t tested):
+   0.0107@0.51, 0.0151@0.52, 0.0389@0.53, 0.0843@0.55 → m ≈ c(σ−½), c≈2–3.
+3. **Corrective**: §2/§5 of ZERO_SLIVER_MARGIN.md claimed the worst sliver is
+   [0.505,0.56]×[75,200]; 19l corrects this to a two-arm structure: corner arm
+   (N-converged, tight margin near point 1) + high-t arm t≈900–1200 (corrected
+   |λ2|→~1.0 as σ→½⁺, N-marginal ±1% at t>800: N=384 vs 512 differ ~1e-2).
+4. **Tooling**: naive barycentric weights overflow at N≥384; log-stable version
+   (sum of log|differences| + sign product) fixes it — use for N≥256 sweeps.
+   mpmath zetazero: zeros below 1100 are #716–733 area; count ≈ 730 (density
+   formula (t/2π)(ln(t/2π)−1)+7/8).
+5. **Attempted (and documented as infeasible)**: analytic-tail Nyström via
+   Taylor-at-0 + Hurwitz zeta — fails because Legendre nodes bunch near y=0
+   (scale ~3e-5), so the boundary Lagrange cards oscillate at that scale and
+   their Taylor coefficients at 0 are numerically unusable; the y→0 cluster is
+   intrinsic to collocation, not fixable by series acceleration.  The plain
+   truncation remains the tool (down to σ=0.51); below that is physical wall.
+
+### Net position after 19l
+The falsification lever is now resolved into two certified-numerics targets:
+corner [0.505,0.56]×[75,200] (N-converged, m ≥ 0.015) and high-t strand
+t≈[900,1200] (|λ2|≈0.98–1.01 as σ→½⁺, needs N≥512 + DFLY machinery).
+Both remain m ≥ 0.011 at σ=0.51 in all tested points; RH-consistent.
