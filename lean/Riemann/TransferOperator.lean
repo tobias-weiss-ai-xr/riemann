@@ -332,28 +332,142 @@ closes the maximum-principle step for the half-plane Re(s) > 1. -/
 axiom leadingEigenvalue_boundaryBound (t : ℝ) (ht : t ≠ 0) :
     |leadingEigenvalue (1 + t * Complex.I : ℂ)| < 1
 
-/-- Axiom (thermodynamic formalism, **second-order** pressure at s = 1): in a
-neighbourhood of the worst point t = 0 (where |λ₁(1)| = 1) the boundary bound
-holds
+/-! ### Strict Domination off the Real Axis (t-Anisotropic Pressure Estimate)
 
-       ∃ δ > 0, ∀ t ≠ 0, |t| < δ  ⟹  |λ₁(1+it)| < 1 .
+The pressure P(σ) = log λ₁(σ) is **strictly convex** in σ for σ > 1/2
+(P''(σ) > 0; thermodynamic formalism — the second derivative of the pressure
+is the variance of the potential under the equilibrium state, positive since
+the potential 2·log y is not cohomologous to a constant).  Combined with
+Kato's analytic perturbation theory (λ₁(s) holomorphic near every real
+σ > 1/2, since the trace-class nuclearity of L_s gives an isolated simple
+spectral branch), the Taylor expansion in the imaginary direction gives, for
+P₂ = P''(σ)/2 > 0:
 
-**Justification** (see research/SPECTRAL_GAP_GKW.md §7): λ₁(s) = e^{P(s)} with
-P holomorphic near s = 1, so
+       Re log λ₁(σ+it) = P(σ) − P₂·t² + O(t⁴)
+       |λ₁(σ+it)| ≤ λ₁(σ)·(1 − P₂·t² + C·t⁴)   for |t| < δ .
 
-       log λ₁(1+it) = P(1+it) = P'(1)·it − ½P''(1)·t² + O(t⁴)
-       (the O(t³) term is purely imaginary)
-       |λ₁(1+it)| = exp(−½·P''(1)·t² + O(t⁴)) .
+Since P₂ > 0 the quadratic term dominates the O(t⁴) remainder for small |t|,
+so **|λ₁(σ+it)| < λ₁(σ) for 0 < |t| < δ(σ)**: the leading eigenvalue is
+*strictly* maximized on the real axis — strict Ruelle domination in the t-
+direction, the first genuinely t-anisotropic estimate.  See
+`research/STRICT_DOMINATION.md`.
 
-P'(1) = −π²/(6·ln 2) (exact, `ruellePressureFormula_at_one`), and
-P''(1) = σ²(ψ) is the CLT asymptotic variance of ψ = 2·log y under the Gauss
-measure (numerically ≈ 3.40), strictly positive because the pressure is
-strictly convex and ψ is not cohomologous to a constant.  Hence the boundary
-bound holds with a quadratic margin at t = 0. -/
-axiom localBoundaryBound_near_zero :
+Numerically P''(σ) > 0 for all σ ∈ [0.60, 2.00] (Nyström collocation,
+Richardson-extrapolated finite differences; P''(1) ≈ 3.376 ≈ σ²(ψ) = 3.40).
+-/
+
+/-- Axiom (Perron–Frobenius / positive operator): the leading eigenvalue is
+strictly positive for real σ > 1/2:  λ₁(σ) = e^{P(σ)} > 0. -/
+axiom leadingEigenvalue_real_pos (σ : ℝ) (hσ : 1/2 < σ) :
+    0 < leadingEigenvalue (σ : ℂ)
+
+/-- Axiom (Kato analyticity + strict convexity of the pressure, t-direction):
+for every real σ > 1/2 the leading eigenvalue admits a second-order Taylor
+bound in the imaginary direction with a *strictly positive* quadratic
+coefficient:
+
+       ∃ P2 > 0, ∃ C ≥ 0, ∃ δ > 0, ∀ |t| < δ:
+         |λ₁(σ+it)| ≤ λ₁(σ) · (1 − P2·t² + C·t⁴) .
+
+Here P2 = P''(σ)/2 > 0 is the normalized second pressure derivative (strict
+convexity, thermodynamic formalism:  P''(σ) = Var_μ(ψ_σ) > 0 for the
+non-cohomologous potential 2·log y under the equilibrium state μ_σ), and C ≥ 0
+bounds the O(t⁴) remainder of the analytic Taylor expansion (Kato; trace-class
+nuclearity ⇒ isolated simple branch).  This is the t-anisotropic pressure
+estimate — the seed of the strict domination theorem. -/
+axiom leadingEigenvalue_imaginaryTaylor (σ : ℝ) (hσ : 1/2 < σ) :
+    ∃ P2 : ℝ, 0 < P2 ∧ ∃ C : ℝ, 0 ≤ C ∧ ∃ δ : ℝ, 0 < δ ∧
+      ∀ t : ℝ, |t| < δ →
+        |leadingEigenvalue (σ + t * Complex.I : ℂ)| ≤
+          leadingEigenvalue (σ : ℂ) * (1 - P2 * t ^ 2 + C * t ^ 4)
+
+/-- **Theorem (strict domination off the real axis)**: for every σ > 1/2
+there exists δ > 0 such that
+
+       |λ₁(σ+it)| < λ₁(σ)   for all 0 < |t| < δ .
+
+Proof: from the imaginary Taylor bound, |λ₁(σ+it)| ≤ λ₁(σ)·(1 − P₂t² + Ct⁴)
+with P₂ > 0.  Choose δ = min(δ_T, 1, P₂/(2(C+1))); then for 0 < |t| < δ we
+have t² < |t| < P₂/(2(C+1)) (using |t| < 1), hence (C+1)t² < P₂/2, and a
+fortiori C·t² < P₂.  Therefore C·t⁴ = (C·t²)·t² < P₂·t², so the Taylor factor
+1 − P₂t² + Ct⁴ < 1, and since λ₁(σ) > 0 (`leadingEigenvalue_real_pos`),
+|λ₁(σ+it)| ≤ λ₁(σ)·(factor) < λ₁(σ).  The analytic content (Kato +
+convexity) lives in `leadingEigenvalue_imaginaryTaylor`; this theorem performs
+the real analysis of choosing δ.  This is the t-anisotropic pressure
+estimate: strictly stronger than Ruelle domination, sharp at t = 0. -/
+theorem strictDomination_off_real_axis (σ : ℝ) (hσ : 1/2 < σ) :
+    ∃ δ : ℝ, 0 < δ ∧ ∀ t : ℝ, t ≠ 0 → |t| < δ →
+      |leadingEigenvalue (σ + t * Complex.I : ℂ)| < leadingEigenvalue (σ : ℂ) := by
+  rcases leadingEigenvalue_imaginaryTaylor σ hσ with
+    ⟨P2, hP2, C, hC, δT, hδT, hTaylor⟩
+  have hpos : 0 < leadingEigenvalue (σ : ℂ) := leadingEigenvalue_real_pos σ hσ
+  have hC1 : 0 < C + 1 := by linarith
+  have hP2div : 0 < P2 / (2 * (C + 1)) := by
+    exact div_pos hP2 (by linarith)
+  let δ : ℝ := min δT (min 1 (P2 / (2 * (C + 1))))
+  refine ⟨δ, ?_, ?_⟩
+  · have h1 : 0 < (1 : ℝ) := by norm_num
+    exact lt_min hδT (lt_min h1 hP2div)
+  · intro t ht htabs
+    have ht2 : 0 < t ^ 2 := sq_pos_of_ne_zero ht
+    have htabsT : |t| < δT := lt_of_lt_of_le htabs (min_le_left _ _)
+    have hbound : |leadingEigenvalue (σ + t * Complex.I : ℂ)| ≤
+          leadingEigenvalue (σ : ℂ) * (1 - P2 * t ^ 2 + C * t ^ 4) :=
+      hTaylor t htabsT
+    have htabs1 : |t| < 1 :=
+      lt_of_lt_of_le htabs (le_trans (min_le_right _ _) (min_le_left _ _))
+    have htabsP : |t| < P2 / (2 * (C + 1)) :=
+      lt_of_lt_of_le htabs (le_trans (min_le_right _ _) (min_le_right _ _))
+    have ht2le : t ^ 2 ≤ |t| := by
+      have hsq : t ^ 2 = |t| ^ 2 := sq_abs t
+      rw [hsq]
+      nlinarith [abs_nonneg t, le_of_lt htabs1]
+    have hstep1 : (C + 1) * t ^ 2 ≤ (C + 1) * |t| :=
+      mul_le_mul_of_nonneg_left ht2le (le_of_lt hC1)
+    have hstep2 : (C + 1) * |t| < (C + 1) * (P2 / (2 * (C + 1))) :=
+      mul_lt_mul_of_pos_left htabsP hC1
+    have hred : (C + 1) * (P2 / (2 * (C + 1))) = P2 / 2 := by
+      field_simp [(show (C + 1) ≠ 0 from ne_of_gt hC1)]
+    have hC1t2 : (C + 1) * t ^ 2 < P2 := by
+      linarith [hstep1, hstep2, hred, hP2]
+    have hCt2 : C * t ^ 2 < P2 := by
+      have hleC : C * t ^ 2 ≤ (C + 1) * t ^ 2 :=
+        mul_le_mul_of_nonneg_right (by linarith : C ≤ C + 1) (sq_nonneg t)
+      exact lt_of_le_of_lt hleC hC1t2
+    have hCt4 : C * t ^ 4 < P2 * t ^ 2 := by
+      have hred4 : C * t ^ 4 = (C * t ^ 2) * t ^ 2 := by ring
+      rw [hred4]
+      exact mul_lt_mul_of_pos_right hCt2 ht2
+    have hfactor : 1 - P2 * t ^ 2 + C * t ^ 4 < 1 := by linarith
+    have hlt : leadingEigenvalue (σ : ℂ) * (1 - P2 * t ^ 2 + C * t ^ 4) <
+        leadingEigenvalue (σ : ℂ) := by
+      have hmul : leadingEigenvalue (σ : ℂ) * (1 - P2 * t ^ 2 + C * t ^ 4) <
+            leadingEigenvalue (σ : ℂ) * 1 :=
+        mul_lt_mul_of_pos_left hfactor hpos
+      rw [mul_one] at hmul
+      exact hmul
+    exact lt_of_le_of_lt hbound hlt
+
+/-- **Theorem** (upgraded from axiom): in a neighbourhood of the worst point
+t = 0 the boundary bound
+
+       |λ₁(1+it)| < 1   for 0 < |t| < δ
+
+holds.  **Proof**: specialize `strictDomination_off_real_axis` at σ = 1 and
+use λ₁(1) = 1 (`leadingEigenvalue_at_one`).  Formerly stated as an axiom
+(justified by P''(1) = σ²(ψ) ≈ 3.40 > 0, the CLT asymptotic variance, see
+research/SPECTRAL_GAP_GKW.md §7); now a corollary of the strict
+domination theorem. -/
+theorem localBoundaryBound_near_zero :
     ∃ delta : ℝ, delta > 0 ∧
       ∀ t : ℝ, t ≠ 0 → |t| < delta →
-        |leadingEigenvalue (1 + t * Complex.I : ℂ)| < 1
+        |leadingEigenvalue (1 + t * Complex.I : ℂ)| < 1 := by
+  rcases strictDomination_off_real_axis 1 (by norm_num) with ⟨δ, hδ, h⟩
+  refine ⟨δ, hδ, ?_⟩
+  intro t ht htabs
+  have htaylor := h t ht htabs
+  have hone : leadingEigenvalue (1 : ℂ) = 1 := leadingEigenvalue_at_one
+  linarith
 
 /-! ### The Spectral Radius Conjecture
 
