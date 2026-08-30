@@ -201,6 +201,12 @@ global-in-t upgrade (|λ₁(σ+it)| < λ₁(σ) for ALL t, or the stronger
 
 ## 5b. Global t-Profile (Numerics) and the Corrected-Branch Caveat
 
+*(The global verification, the Lean axiom `strictDomination_global_off_real_axis`
+and the upgrade of `leadingEigenvalue_boundaryBound` to a theorem are documented
+in `research/GLOBAL_STRICT_DOMINATION.md` (Exp 19i) and `lean/Riemann/
+TransferOperator.lean`.  This section adds the corrected-branch structural
+finding and a correction on the large-t shape; see also Exp 19j.)*
+
 **Global strict domination (numerical).**  The local-in-t theorem extends
 numerically to the *whole* t-axis: for σ ∈ {0.6, 0.8, 1.0, 1.25} and all
 0 < |t| ≤ 200 (N=128 Nyström, n_max=4000),

@@ -5,8 +5,13 @@
 
 ## Statement verified
 
-Two numerical probes at high resolution (vectorized Nyström collocation,
-N = 160, n_max = 6000, worst points re-checked at N = 256):
+**Two numerical probes at high resolution** (vectorized Nyström collocation,
+N = 160, n_max = 6000, worst points re-checked at N = 256).  *Clarification
+(see Experiment 19j): on a denser t-grid the small-t→large-t approach is
+NOT monotone — the ratio dips (e.g. 0.081 at t≈3.2, σ=0.6) then recovers to
+a strictly-below-λ₁(σ) large-t plateau (≈0.198 at σ=0.6).  The max over
+t≠0 is still at the smallest sampled |t|, so the domination conclusion and
+the table below are unaffected.*
 
 **(A) Global strict domination.** For σ ∈ {0.6, …, 2.0} and **every** t ≠ 0
 with |t| ≤ 1000:
