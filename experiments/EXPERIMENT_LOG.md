@@ -3955,3 +3955,64 @@ the quadratic drop extends to a full-profile strict domination, with |λ₁|/λ�
 dipping through a minimum (e.g. 0.081 at t≈3.2 for σ=0.6) then rising to a
 large-t plateau strictly below 1 (0.86 / 0.64 / 0.49 / 0.35 for σ=0.6/0.8/1.0/1.25).
 
+
+## Experiment 19k: zero-sliver margin min|1−λ| — falsification protocol + eigenvalue-1 ↔ zeta-zero correspondence
+
+**Date**: 2026-08-30
+**Status**: numerical (Nyström N=128-320, n_max=1000-32000; converged for σ ≥ 0.51), no new Lean
+**Files**: `scripts/_corner_sweep.py`, `_corner_deep.py`, `_corner_nmaxdep.py`, `_spec_dump.py`,
+          `_zero_margin_map.py` (gitignored temp), `research/ZERO_SLIVER_MARGIN.md` (new, committed),
+          `data/spectral-radius/zero_margin_map.json` (gitignored).
+
+### (A) The honest RH proxy: m(s) = min_j |1 − λ_j(s)|
+
+RH ⟺ det(I − L_s) ≠ 0 ⟺ 1 ∉ Spec(L_s); "ρ(L_s) < 1" is strictly stronger.
+The full operator already has ρ > 1 in the strip at t=0 (ζ(2σ) mode, 7.57@(0.51,0)),
+so `spectralRadiusConjecture` (Lean) can only mean the corrected operator — and
+even there the ρ<1 reading is over-strengthened (see (C)).  The robust numerical
+proxy is m(s), the distance of the spectrum to the critical point 1; RH ⟺ m > 0.
+
+### (B) Corrected-ρ = |λ₂| corner map (converged): margin closes as σ → ½⁺
+
+N and n_max convergence verified (N=160/200/320 agree 6 dp; n_max 1k..32k agree
+2e-3 at σ≥0.52).  Worst points per σ (N=256, n_max=8000):
+
+| σ   | max_t |λ₂| | at t | margin to 1 |
+|0.60 | 0.8496 | 100 | 0.150 |
+|0.55 | 0.9193 | 100 | 0.081 |
+|0.53 | 0.9518 |  90 | 0.048 |
+|0.52 | 0.9707 | 150 | 0.029 |
+|0.51 | 0.9991 | ~150 | ~1e-3 |
+|≤0.507| ≈1.010 | 150 | unresolvable (slow-tail) |
+
+Sharpens 19e's 0.950@(0.55,100) (truncation-inflated → true 0.9193) and 19i's
+0.855@(0.60,750).  The tightest sliver is (σ,t) ∈ [0.505,0.56]×[75,200].
+
+### (C) |λ₂| > 1 near σ ≈ 0.507 @ t=150 → "ρ(L_s⁰)<1 ⟺ RH" questionable
+
+At (0.505,150): |λ₁| = 1.0115, |λ₂| = 1.0102 (N=256, n_max=32000; slow downward
+drift with n_max, not resolvable below σ≈0.51).  At (0.51,150): λ₁ = 0.99907
+(still < 1).  So the full operator's eigenvalues exceed modulus 1 in a strip
+sliver, yet none equals 1 (m ≥ 0.021 in the deepest tested region, floor
+0.02-0.06 across t∈[88,160] at σ=0.51).  Interpretation: correct-RH-avatar =
+eigenvalue-1; `rhImpliesSpectralRadius` (RH ⇒ ρ(L_s⁰)<1, Lean sorry) is likely
+false as stated.  Flagged in the repo record (Sprint-2 "ρ⁰<0.30" also
+inconsistent with converged 0.8496@(0.6,100) — crude Fourier ghost bound).
+
+### (D) eigenvalue-1 ↔ zeta-zero correspondence confirmed at height ~125
+
+The nearest-to-1 eigenvalue creeps into 1 with phase→0 at zeta-zero heights:
+σ=0.51, t=124.5 (near γ41=124.257): m=0.0211, λ = 0.9792−0.0037i; σ=0.51, t=100
+(Δγ30=1.3): m=0.2135.  Margin map t∈[88,160] (41 dips, depths 0.02-0.06) clusters
+at zero heights γ28..γ57 (114.4↔γ36, 124.8↔γ41, 127.2↔γ42, 131.2↔γ44, 157.6↔γ57),
+smeared by σ>½.  At fixed zero height m decreases toward 0 as σ→½⁺ (γ41:
+0.117@0.55 → 0.083@0.51); collapse not resolvable below σ≈0.51 (n_max^{−(2σ−1)} tail).
+
+### Net position after 19k
+
+The falsification lever is now quantitative: m(s) ≥ 0.02 over the deepest
+numerically-accessible corner, dipping only toward zeta-zero heights; no
+eigenvalue ever equals 1 (RH-consistent).  A certified (Nisoli/DFLY) enclosure
+of m at the 5-6 tightest points (σ∈[0.505,0.56], t∈[75,200]) is the next target;
+outside the corner margin ≥ 0.15.  Formal note: the Lean RH avatar should be
+`1 ∉ Spec(L_s)` (eigenvalue-1), not ρ(L_s⁰)<1.
