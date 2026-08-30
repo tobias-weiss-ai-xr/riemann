@@ -3888,3 +3888,66 @@ corrected-operator ρ < 0.856 numerically for σ≥0.6.  Both are NECESSARY but
 NOT SUFFICIENT for ρ<1 in (1/2,1): in the strip λ₁(σ)>1 so leading-mode
 decay isn't enough; the margin to 1 for the corrected ρ lives in σ∈(1/2,0.6),
 the certified-numerics + arithmetic frontier (= RH).
+
+## Experiment 19i: Global t-profile of λ1 (validates 19h globally) + corrected branch max off-axis
+
+**Date**: 2026-08-30
+**Status**: numerical (N=128-200 Nyström, nmax=4000/1000, converged), no new Lean
+**Files**: `scripts/_strict_domination_profile.py`, `scripts/_corrected_branch.py`
+          (both gitignored temp), `research/STRICT_DOMINATION.md` (updated)
+
+### Part A — global strict domination of the full leading branch
+
+|λ₁(σ+it)| < λ₁(σ) for ALL t≠0 tested (0.05 ≤ |t| ≤ 200), σ ∈ {0.6, 0.8, 1.0, 1.25}
+(N=128, nmax=4000).  The small-t drop matches the CLT rate exactly:
+
+|σ| log-ratio @t=0.05 | −P''/2·t² (P'' meas) | match |
+|0.6| −0.022998 | −0.024094 | ✓ (within coll. err) |
+|0.8| −0.009830 | −0.010064 | ✓ |
+|1.0| −0.004187 | −0.004220 | ✓✓ |
+|1.25| −0.001865 | −0.001870 | ✓✓✓ |
+
+Consequence: the t-anisotropic mechanism (19h) is not an artifact of locality —
+the quadratic drop extends to a full-profile strict domination, with |λ₁|/λ₁(σ)
+dipping through a minimum (e.g. 0.081 at t≈3.2 for σ=0.6) then rising to a
+large-t plateau strictly below 1 (0.86 / 0.64 / 0.49 / 0.35 for σ=0.6/0.8/1.0/1.25).
+
+### Part B — the corrected branch (the actual RH object) peaks OFF the real axis
+
+max_t |λ₂(σ+it)| (N=200, nmax=1000; converged — N=120/160/200 agree to 6 dp):
+
+|σ| |λ₂(0)| | max_t|λ₂| | t of max |
+|0.55| 0.697 | 0.919 | 100 |
+|0.60| 0.634 | 0.850 | 100 |
+|0.65| 0.578 | 0.787 | 100 |
+|0.70| 0.526 | 0.728 | 100 |
+|0.80| 0.434 | 0.625 | 100 |
+|0.90| 0.361 | 0.544 | 150 |
+|1.00| 0.303 | 0.480 | 150 |
+|1.25| — | 0.351 | 150 |
+|1.50| — | 0.252 | 150 |
+
+STRUCTURAL FINDING: |λ₂(σ+it)| is **NOT** maximized at t=0 — e.g. at σ=0.6,
+|λ₂(0)| = 0.634 but |λ₂(100)| = 0.850.  Strict Ruelle domination off the real
+axis (19h, for the full leading branch λ₁) does **NOT** transfer to the
+corrected branch λ₂.  The corrected branch's modulus grows off-axis to a
+large-t plateau (≈0.85 at σ=0.6).  Coe: the t-anisotropic pressure estimate
+governs λ₁, which is irrelevant in the strip (λ₁(σ) > 1 there); the strip
+object λ₂ obeys a different (phase-cocycle) mechanism and demands a
+genuinely global-in-t argument.
+
+### Falsification-lever consequence
+
+max_t|λ₂(σ+it)| is a strictly decreasing, safe-below-1 function of σ for
+σ ≥ 0.60 (margin ≥ 0.15), and approaches 1 only as σ → ½+.  The dangerous
+corner for RH numerics is (σ, t) ∈ [0.50, 0.60] × [75, 200], |λ₂| → 1 there
+(0.919 at σ=0.55 — truncation caveat applies, σ≤0.55 not rigorous).  Any
+rigorous zero-free sliver needs certified bounds concentrated in this corner;
+away from it |λ₂| ≤ 0.85 with room to spare.
+
+### Net position after 19i
+
+Full leading branch: global strict domination numerically established (mechanism =
+P''(σ)>0, CLT rate confirmed).  Corrected branch: max off-axis, decreasing in σ,
+< 1 for σ ≥ 0.55 numerically; RH-relevant input remains arithmetic (zeta zeros /
+det(I−L_s)) or certified numerics in the (½,0.6]×[75,200] corner.

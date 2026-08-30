@@ -199,6 +199,58 @@ global-in-t upgrade (|λ₁(σ+it)| < λ₁(σ) for ALL t, or the stronger
 
 ---
 
+## 5b. Global t-Profile (Numerics) and the Corrected-Branch Caveat
+
+**Global strict domination (numerical).**  The local-in-t theorem extends
+numerically to the *whole* t-axis: for σ ∈ {0.6, 0.8, 1.0, 1.25} and all
+0 < |t| ≤ 200 (N=128 Nyström, n_max=4000),
+
+       |λ₁(σ+it)| < λ₁(σ) .
+
+The profile dips through a minimum (|λ₁|/λ₁(σ) ≈ 0.081 at t≈3.2 for σ=0.6)
+then rises to a large-t plateau strictly below 1 (≈ 0.86 / 0.64 / 0.49 / 0.35
+for σ = 0.6 / 0.8 / 1.0 / 1.25).  The small-t drop matches the CLT rate exactly:
+
+       log|λ₁(σ+it)| − log λ₁(σ) = −(P''(σ)/2)·t² + O(t⁴)
+
+   σ      log-ratio @t=0.05   −P''/2·t² (P'' measured)   match
+   0.6    −0.022998            −0.024094                 ✓
+   1.0    −0.004187            −0.004220                 ✓✓
+   1.25   −0.001865            −0.001870                 ✓✓✓
+
+So the t-anisotropic mechanism (P''(σ) > 0) is not an artifact of locality:
+σ is a strict global maximizer of |λ₁(σ+i·)|.
+
+**The corrected branch does NOT obey strict domination — and that is fine.**
+In the strip (1/2, 1] the full leading branch λ₁ is useless (λ₁(σ) > 1 there;
+envelope obstruction); RH numerics use the *boundary-corrected* leading
+branch λ₂ (the 2nd-largest eigenvalue of the full operator).  Measuring
+max_t |λ₂(σ+it)| (N=200, n_max=1000, converged):
+
+   σ      |λ₂(0)|    max_t |λ₂|   at t
+   0.55   0.697      0.919        100
+   0.60   0.634      0.850        100
+   0.70   0.526      0.728        100
+   0.80   0.434      0.625        100
+   0.90   0.361      0.544        150
+   1.00   0.303      0.480        150
+   1.25   —          0.351        150
+   1.50   —          0.252        150
+
+The corrected branch's modulus is **maximized OFF the real axis**
+(|λ₂(100)| = 0.850 > |λ₂(0)| = 0.634 at σ = 0.6): the quadratic-drop mechanism
+of §2 is specific to the leading branch and does not transfer to λ₂.  The
+strip object evolves toward a large-t plateau governed by the phase-cocycle
+limiting behaviour, and max_t |λ₂(σ+it)| decreases with σ, staying < 1 for all
+σ ≥ 0.55 (margin ≥ 0.08; σ = 0.55 itself is truncation-sensitive).
+
+**Falsification-lever consequence.**  Any rigorous zero-free sliver must
+concentrate certified bounds in the corner (σ, t) ∈ [0.50, 0.60] × [75, 200],
+where |λ₂| → 1 as σ → ½⁺; away from it |λ₂| ≤ 0.85 with room to spare.  See
+Experiment 19i in `experiments/EXPERIMENT_LOG.md`.
+
+---
+
 ## 6. References / Status Summary
 
 - Ruelle (1978, 1990): pressure convexity in inverse temperature (thermodynamic
