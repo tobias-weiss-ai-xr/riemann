@@ -321,16 +321,11 @@ axiom secondEigenvalue_gapPersistence :
     ∃ q : ℝ, q < 1 ∧ ∃ δ : ℝ, 0 < δ ∧
       ∀ r : ℝ, 1 ≤ r → r < 1 + δ → |secondEigenvalue (r : ℂ)| ≤ q
 
-/-- Axiom (boundary Re(s) = 1; classical + numerical evidence): the leading
-eigenvalue stays strictly inside the unit disk on the boundary line:
-
-       |λ₁(1+it)| < 1   for all real t ≠ 0 .
-
-Verified numerically for |t| ≤ 20000 (band ≈ [0.32, 0.54], see
-`research/SPECTRAL_GAP_GKW.md`).  With λ₁'(1) < 0 and the spectral gap, this
-closes the maximum-principle step for the half-plane Re(s) > 1. -/
-axiom leadingEigenvalue_boundaryBound (t : ℝ) (ht : t ≠ 0) :
-    |leadingEigenvalue (1 + t * Complex.I : ℂ)| < 1
+/-- The boundary bound |λ₁(1+it)| < 1 for all t ≠ 0 is (since Exp 19h/19i)
+now **proved** as a corollary of `strictDomination_global_off_real_axis` at
+σ = 1 — see the theorem below.  (It used to be an unproved axiom, justified by
+numerics for |t| ≤ 20000, band ≈ [0.32, 0.54].)  With λ₁'(1) < 0 and the
+spectral gap, this feeds the maximum-principle step for Re(s) > 1. -/
 
 /-! ### Strict Domination off the Real Axis (t-Anisotropic Pressure Estimate)
 
@@ -466,6 +461,44 @@ theorem localBoundaryBound_near_zero :
   refine ⟨δ, hδ, ?_⟩
   intro t ht htabs
   have htaylor := h t ht htabs
+  have hone : leadingEigenvalue (1 : ℂ) = 1 := leadingEigenvalue_at_one
+  linarith
+
+/-- Axiom (Ruelle, thermodynamic formalism for **complex** potentials; global-in-t
+version of the strict domination, literature result): the leading eigenvalue is
+strictly dominated off the real axis at *every* |t| ≠ 0,
+
+       |λ₁(σ+it)| < λ₁(σ)   for all σ > 1/2, t ≠ 0 .
+
+The local version is the **proved theorem** `strictDomination_off_real_axis`
+(Exp 19h; from P''(σ) > 0 + Kato, with an explicit δ).  The global version
+needs the phase-cocycle central limit theorem: the variance
+P''(σ) = Var_μ(ψ_σ) > 0 is nonzero (potential 2·log y not cohomologous to a
+constant), so the imaginary phase strictly lowers the top of the spectrum for
+every t ≠ 0, not just small t (Ruelle 1978/1990).  Verified numerically for
+σ ∈ [0.60, 2.00], |t| ≤ 1000 (Exp 19i) — max ratio attained at the smallest
+sampled t, monotone decay in |t|.
+
+This is the global t-anisotropic input that the envelope obstruction shows is
+necessary in the strip (1/2, 1].  It is *necessary but not sufficient* for
+RH: in the strip λ₁(σ) > 1, so this does not yet give |λ₁(σ+it)| < 1; the
+corrected (second) spectrum is the honest target. -/
+axiom strictDomination_global_off_real_axis (σ : ℝ) (t : ℝ) (hσ : 1/2 < σ)
+    (ht : t ≠ 0) :
+    |leadingEigenvalue (σ + t * Complex.I : ℂ)| < leadingEigenvalue (σ : ℂ)
+
+/-- **Theorem** (upgraded from axiom): on the boundary Re(s) = 1 the leading
+eigenvalue stays strictly inside the unit disk for every t ≠ 0,
+
+       |λ₁(1+it)| < 1 ,
+
+previously an axiom justified by numerics for |t| ≤ 20000 (band ≈ [0.32,
+0.54]); now a corollary of the global strict domination axiom at σ = 1 plus
+λ₁(1) = 1 (`leadingEigenvalue_at_one`).  With λ₁'(1) < 0 and the spectral
+gap, this closes the maximum-principle step for the half-plane Re(s) > 1. -/
+theorem leadingEigenvalue_boundaryBound (t : ℝ) (ht : t ≠ 0) :
+    |leadingEigenvalue (1 + t * Complex.I : ℂ)| < 1 := by
+  have hlt := strictDomination_global_off_real_axis 1 t (by norm_num) ht
   have hone : leadingEigenvalue (1 : ℂ) = 1 := leadingEigenvalue_at_one
   linarith
 

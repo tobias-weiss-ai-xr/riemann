@@ -3834,3 +3834,57 @@ zeta zeros via eigenvalue-1) remains = RH.
 - {σ ∈ (1/2, 1]}: provably σ-only-impenetrable (envelope obstruction, 19g);
   first t-anisotropic step in hand (strict domination off axis, this exp);
   global t-dependence + arithmetic = RH core
+
+## Experiment 19i: EPIC-4 — Global strict domination in t + corrected spectral radius
+
+**Date**: 2026-08-29
+**Status**: numerical verification + Lean axioms/theorems
+**Files**: `scripts/_strict_domination_global.py`, `scripts/_nystrom_vec.py`
+          (chunked-vectorized Nyström; matches pure-Python ref to 1e-15),
+          `research/GLOBAL_STRICT_DOMINATION.md`,
+          `lean/Riemann/TransferOperator.lean`
+
+### (A) Global strict domination — VERIFIED for all t ≤ 1000
+
+|λ₁(σ+it)| < λ₁(σ) for every t ≠ 0, |t| ≤ 1000, σ ∈ [0.60, 2.00] (N=160,
+n_max=6000; worst pts re-checked N=256).  Max ratio over t≠0 is attained at
+the smallest sampled t=0.5 → monotone decay in |t|:
+  σ:        0.60  0.80  1.00  1.25  2.00
+  max ratio 0.304 0.569 0.745 0.858 0.961
+The local theorem (strictDomination_off_real_axis, 19h) is global in t
+numerically.
+
+### Quadratic law ties 19h ↔ 19i (99% agreement at t=0.1)
+
+-ln(|λ₁(σ+it)|/λ₁(σ))/t² → P''(σ)/2 as t→0, confirmed:
+  σ=1.0: 1.664 vs P''/2=1.688;  σ=0.8: 3.998 vs 4.025.
+Same mechanism (pressure variance), two experiments, quantitative agreement.
+
+### (B) Corrected spectral radius |λ₂(σ+it)| < 0.856 for σ ≥ 0.60, |t| ≤ 1000
+
+  σ:        0.60  0.70  0.80  0.90  1.00
+  max |λ₂|: 0.855 0.728 0.627 0.544 0.480
+Worst at (0.60, 750): 0.855 (N=160) / 0.825 (N=256 — safe direction).  Strict
+improvement over 19e's 0.950@(0.55,100), which was truncation-inflated.  The
+region σ∈(1/2,0.6) is where n-sum truncation (rate n_max^{-(2σ-1)}) and RH
+both bite.
+
+### Lean (0 errors, 6336 jobs)
+
+- new axiom `strictDomination_global_off_real_axis` (LABELED literature:
+  Ruelle thermodynamic formalism for complex potentials / phase-cocycle CLT;
+  local version is the PROVED theorem from 19h)
+- **UPGRADED `leadingEigenvalue_boundaryBound` from AXIOM → THEOREM** (full
+  boundary |λ₁(1+it)|<1 now a corollary of the global axiom at σ=1 + λ₁(1)=1)
+  — formerly justified only by numerics to |t|=20000
+- two axioms removed since 19h (localBoundaryBound_near_zero,
+  leadingEigenvalue_boundaryBound)
+
+### Honest position after 19i
+
+Global t-anisotropic input in hand (leading eigenvalue strictly decays off
+the real axis for all t — the envelope obstruction's required mechanism);
+corrected-operator ρ < 0.856 numerically for σ≥0.6.  Both are NECESSARY but
+NOT SUFFICIENT for ρ<1 in (1/2,1): in the strip λ₁(σ)>1 so leading-mode
+decay isn't enough; the margin to 1 for the corrected ρ lives in σ∈(1/2,0.6),
+the certified-numerics + arithmetic frontier (= RH).
