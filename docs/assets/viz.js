@@ -735,11 +735,179 @@ function buildConnections() {
   return { group: g, update, defaultFocus: () => focus(rhRec) };
 }
 
+
+// ---------------------------------------------------------------------------
+//  Hommage an Riemann — eine Hommage an die ζ-Funktion
+// ---------------------------------------------------------------------------
+
+function buildHommage() {
+  const g = new THREE.Group();
+  const zeta = RESEARCH.zeta || {};
+  const zeros = (zeta.firstZerosImag || [14.13, 21.02, 25.01, 30.42, 32.94, 37.59, 40.92, 43.33, 48.01, 49.77]).slice(0, 12);
+  const Z_SCALE = 0.32;
+
+  // ── Zentraler Kern: das Herz der ζ-Funktion ──
+  const core = new THREE.Mesh(
+    new THREE.SphereGeometry(0.55, 48, 48),
+    new THREE.MeshStandardMaterial({ color: 0xffcf5c, emissive: 0xffcf5c, emissiveIntensity: 1.5 })
+  );
+  g.add(core);
+  const coreHalo = makeGlow(0xffcf5c, 4.2);
+  g.add(coreHalo);
+
+  // ── Kritische Gerade: leuchtende vertikale Achse ──
+  const lineHeight = 26;
+  const critLine = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.035, 0.035, lineHeight, 16),
+    new THREE.MeshBasicMaterial({ color: 0xffcf5c, transparent: true, opacity: 0.22 })
+  );
+  g.add(critLine);
+
+  // ── Nullstellen: goldene Kugeln entlang der kritischen Geraden ──
+  const zeroOrbs = [];
+  zeros.forEach((t, i) => {
+    const y = t * Z_SCALE;
+    const orb = new THREE.Mesh(
+      new THREE.SphereGeometry(0.16, 20, 20),
+      new THREE.MeshStandardMaterial({ color: 0xffcf5c, emissive: 0xffcf5c, emissiveIntensity: 1.3 })
+    );
+    orb.position.set(0, y, 0);
+    g.add(orb);
+    const halo = makeGlow(0xffcf5c, 0.9);
+    halo.position.set(0, y, 0);
+    g.add(halo);
+    zeroOrbs.push({ orb, halo, y, phase: i * 0.52 });
+
+    // Spiegeln unterhalb (Symmetrie der Funktionalgleichung)
+    const ym = -y;
+    const orbM = new THREE.Mesh(
+      new THREE.SphereGeometry(0.16, 20, 20),
+      new THREE.MeshStandardMaterial({ color: 0xffcf5c, emissive: 0xffcf5c, emissiveIntensity: 1.3 })
+    );
+    orbM.position.set(0, ym, 0);
+    g.add(orbM);
+    const haloM = makeGlow(0xffcf5c, 0.9);
+    haloM.position.set(0, ym, 0);
+    g.add(haloM);
+    zeroOrbs.push({ orb: orbM, halo: haloM, y: ym, phase: i * 0.52 + Math.PI });
+  });
+
+  // ── Primresonanz: Partikelwolke in einer Kugelschale ──
+  const N_PART = 1200;
+  const ppos = new Float32Array(N_PART * 3);
+  const pcol = new Float32Array(N_PART * 3);
+  for (let i = 0; i < N_PART; i++) {
+    const phi = Math.acos(2 * Math.random() - 1);
+    const theta = Math.random() * Math.PI * 2;
+    const r = 10 + Math.random() * 8;
+    ppos[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+    ppos[i * 3 + 1] = r * Math.cos(phi);
+    ppos[i * 3 + 2] = r * Math.sin(phi) * Math.sin(theta);
+    // Farbverlauf: gold → cyan
+    const mix = Math.random();
+    pcol[i * 3] = 1.0 - mix * 0.8;
+    pcol[i * 3 + 1] = 0.81 - mix * 0.3;
+    pcol[i * 3 + 2] = 0.36 + mix * 0.6;
+  }
+  const pGeo = new THREE.BufferGeometry();
+  pGeo.setAttribute('position', new THREE.BufferAttribute(ppos, 3));
+  pGeo.setAttribute('color', new THREE.BufferAttribute(pcol, 3));
+  const pMat = new THREE.PointsMaterial({
+    size: 0.07, transparent: true, opacity: 0.55,
+    vertexColors: true, sizeAttenuation: true, depthWrite: false,
+    blending: THREE.AdditiveBlending,
+  });
+  const particles = new THREE.Points(pGeo, pMat);
+  g.add(particles);
+
+  // ── Innere Spirale: Primzahlen als strahlende Punkte ──
+  const N_SPIRAL = 200;
+  const spos = new Float32Array(N_SPIRAL * 3);
+  for (let i = 0; i < N_SPIRAL; i++) {
+    const angle = i * 0.5;
+    const r = 2.5 + i * 0.06;
+    spos[i * 3] = r * Math.cos(angle);
+    spos[i * 3 + 1] = (i - N_SPIRAL / 2) * 0.08;
+    spos[i * 3 + 2] = r * Math.sin(angle);
+  }
+  const sGeo = new THREE.BufferGeometry();
+  sGeo.setAttribute('position', new THREE.BufferAttribute(spos, 3));
+  const sMat = new THREE.PointsMaterial({
+    color: 0x3fe0ff, size: 0.05, transparent: true, opacity: 0.4,
+    sizeAttenuation: true, depthWrite: false, blending: THREE.AdditiveBlending,
+  });
+  const spiral = new THREE.Points(sGeo, sMat);
+  g.add(spiral);
+
+  // ── Beschriftung ──
+  const lblRiemann = makeLabel('Bernhard Riemann', { color: '#ffcf5c', size: 60, mono: false });
+  lblRiemann.position.set(0, 10.5, 0);
+  g.add(lblRiemann);
+
+  const lblDates = makeLabel('1826 — 1866', { color: '#7ea8ff', size: 30, mono: false });
+  lblDates.position.set(0, 8.8, 0);
+  g.add(lblDates);
+
+  const lblFormula = makeLabel('\u03b6(s) = \u03a3 1/n\u02e2', { color: '#dfe6f2', size: 42 });
+  lblFormula.position.set(0, -9, 0);
+  g.add(lblFormula);
+
+  const lblRH = makeLabel('\u201eAlle nichttrivialen Nullstellen haben den Realteil \u00bd\u201c', { color: '#7ea8ff', size: 24, mono: false });
+  lblRH.position.set(0, -10.8, 0);
+  g.add(lblRH);
+
+  // ── Beleuchtung ──
+  const warm = new THREE.PointLight(0xffcf5c, 1.2, 60);
+  warm.position.set(0, 0, 0);
+  g.add(warm);
+  const cool = new THREE.PointLight(0x3fe0ff, 0.6, 80);
+  cool.position.set(-10, 5, 10);
+  g.add(cool);
+
+  g.userData = { pickable: [], focus: null, repaint: () => {} };
+
+  function update(dt, t) {
+    const pulse = 1 + 0.14 * Math.sin(t * 1.4);
+    coreHalo.scale.setScalar(4.2 * pulse);
+    core.material.emissiveIntensity = 1.3 + 0.35 * Math.sin(t * 1.4);
+
+    zeroOrbs.forEach(({ orb, halo, phase }) => {
+      const p = 1 + 0.18 * Math.sin(t * 1.8 + phase);
+      halo.scale.setScalar(0.9 * p);
+      orb.material.emissiveIntensity = 0.9 + 0.5 * Math.sin(t * 1.8 + phase);
+    });
+
+    particles.rotation.y += dt * 0.04;
+    particles.rotation.x += dt * 0.015;
+    spiral.rotation.y += dt * 0.12;
+  }
+
+  return { group: g, update, defaultFocus: null };
+}
+
 // ---------------------------------------------------------------------------
 //  View registry
 // ---------------------------------------------------------------------------
 
 const VIEWS = {
+  hommage: {
+    title: 'Hommage an Riemann — die Schönheit der ζ-Funktion',
+    camera: { pos: [0, 5, 30], target: [0, 1, 0], autoRotate: true, autoRotateSpeed: 0.25 },
+    info: `
+      <p><strong>Bernhard Riemann</strong> (1826 — 1866) veröffentlichte 1859 seine Arbeit
+      „Über die Anzahl der Primzahlen unter einer gegebenen Grösse" — neun Seiten, die die
+      Mathematik für immer veränderten.</p>
+      <p>Die <span class="stat gold">goldenen Kugeln</span> entlang der kritischen Geraden
+      <strong>Re(s) = ½</strong> sind die <em>nichttrivialen Nullstellen</em> der Zetafunktion.
+      Ihre Positionen sind kein Zufall — sie codieren die Verteilung der Primzahlen.</p>
+      <p>Die <span class="stat">zyanfarbenen Partikel</span> sind die Resonanz der Primzahlen,
+      die innere Spirale erinnert an die Euler-Produkt-Struktur. Alles dreht sich um das
+      <span class="stat gold">goldene Zentrum</span> — ζ(s) selbst.</p>
+      <p class="cite">„Alle nichttrivialen Nullstellen der Zetafunktion haben den Realteil ½.“
+      — die Riemannsche Vermutung, noch heute unbewiesen.</p>
+    `,
+    build: buildHommage,
+  },
   landscape: {
     title: 'ζ(s) Landscape — the critical strip',
     camera: { pos: [0, 11, 27], target: [0, 1.5, 0], autoRotate: true },
@@ -1012,7 +1180,7 @@ loadData().then(() => {
   // Deep-link support: ?view=approaches&node=<index> opens a scene directly
   const params = new URLSearchParams(location.search);
   const want = params.get('view');
-  setView(VIEWS[want] ? want : 'connections');
+  setView(VIEWS[want] ? want : 'hommage');
   const nodeParam = params.get('node');
   if (nodeParam !== null) {
     const nodeIdx = Number(nodeParam);
