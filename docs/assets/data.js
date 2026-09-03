@@ -292,7 +292,48 @@ RESEARCH.approaches = {
       ],
     },
   ],
+  // Verbindungen zwischen den Herangehensweisen (Bögen im Verbindungs-View).
+  // from/to sind "<Gruppenindex>-<Item-Index>" (0-basiert) oder "RH" (goldener Kern).
+  // type: prerequisite | evidence | tool | formalization | independent
+  connections: [
+    // — Voraussetzungen innerhalb des Hauptstrangs A —
+    { from: "0-1", to: "0-2", type: "prerequisite", label: "Ruelle → Spektrum",
+      detail: "Ruelle-Domination liefert die uniforme Schranke <strong>ρ(L_s) &lt; 1 für Re(s) &gt; 1</strong>, die die Spektralanalyse bei s = 1 überhaupt erst sinnvoll macht. Ohne die t-unabhängige Ausgangsschranke gäbe es keinen Fuß in den Streifen." },
+    { from: "0-0", to: "0-4", type: "prerequisite", label: "Mayer → t-Dynamik",
+      detail: "Die t-Dynamik untersucht <code>L_{σ+it}</code> entlang des kritischen Streifens — die direkte Fortsetzung der Mayer-Äquivalenz. Die Envelope-Obstruction zeigt: ohne echte t-Abhängigkeit bleibt der Streifen (½, 1] verschlossen." },
+    { from: "0-2", to: "0-5", type: "prerequisite", label: "s=1-Spektrum → Lean",
+      detail: "<strong>λ₁′(1) = −π²/(6·ln 2)</strong> ist das erste rigorose Theorem des Hauptstrangs, das in Lean formalisiert wurde (<code>sorry</code> entfernt). Es ist der Anker für die weitere Formalisierung." },
+    // — Evidenz: Numerik validiert die Theorie —
+    { from: "0-3", to: "0-0", type: "evidence", label: "Numerics → Mayer",
+      detail: "Certified Numerics (Nisoli/DFLY-Intervallarithmetik, Nyström N=256) validieren <strong>m(s) ≥ c &gt; 0</strong> im kritischen Schlitz. Die maschinengeprüfte Schranke bestätigt, dass der Mayer-Operator im Streifen keine Eins als Eigenwert hat." },
+    { from: "0-4", to: "1-3", type: "evidence", label: "t-Dynamik → de Bruijn–Newman",
+      detail: "Die Messung <strong>m(σ+iγ) ≈ c·(σ−½)</strong> an Nullstellenhöhen koppelt direkt an die de Bruijn–Newman-Konstante: Λ misst, wie weit Nullstellen unter Verschiebung des Streifens von der kritischen Geraden abweichen können." },
+    { from: "1-4", to: "1-3", type: "evidence", label: "Regionen → Λ-Schranken",
+      detail: "Explizite nullstellenfreie Regionen (Platt–Trudgian, Mossinghoff–Trudgian) liefern obere Schranken für die de Bruijn–Newman-Konstante Λ. Jede Verbesserung der Regionen zwingt Λ enger." },
+    // — Werkzeuge füttern die Angriffsachsen —
+    { from: "3-0", to: "0-4", type: "tool", label: "FunSearch → Majorante",
+      detail: "FunSearch (Programm-Synthese) sucht genau das, was der Hauptstrang braucht: eine explizite t-abhängige Majorante <code>|λ₂(σ+it)| ≤ φ(σ,t) &lt; 1</code> im Streifen. Das fehlende Lemma hat präzise Syntax — ein Kandidat wird von Mensch/Lean verifiziert." },
+    { from: "3-1", to: "0-3", type: "tool", label: "ML → Friedli",
+      detail: "ML auf LMFDB (R² 0.73–0.99) fand die <strong>Friedli-Konstante 1.1367</strong> und den Brody-Split β = 1.88 vs 0.24 — empirische Strukturen, die die numerische Strategie des Hauptstrangs informieren." },
+    { from: "3-1", to: "1-1", type: "tool", label: "LMFDB → Li-Koeffizienten",
+      detail: "Die Li-Koeffizienten <code>λ_n</code> sind über die ζ-Funktion direkt berechenbar — die LMFDB-Pipeline (53k–63k neue Formen) liefert die Datenbasis, um λ_n ≥ 0 numerisch zu testen und Ausreißer zu finden." },
+    { from: "3-1", to: "2-0", type: "tool", label: "Murmurations → Ihara",
+      detail: "Murmurations (kollektive Hecke-Eigenwert-Oszillationen) und die Hecke-Eigenwert-Vorhersage (R² 0.73–0.99) verbinden die Cayley-Graph-Daten mit der Graphentheorie: gleiche Eigenwerte, verschiedene Geometrie." },
+    // — Formalisierung: gemeinsame Lean-Ziele —
+    { from: "2-0", to: "0-5", type: "formalization", label: "Ihara → mathlib",
+      detail: "Ihara-Zeta in Lean verheiratet die zwei fertigen Projekt-Zweige: <code>CayleyGraphs.lean</code> + <code>RamanujanProperty.lean</code> mit <code>LMFDBConjectures.lean</code>. Fehlendes Werkzeug: das Lemma „Zeta_G(u) = ∏ L-Funktionen“." },
+    { from: "1-2", to: "0-5", type: "formalization", label: "Lagarias → mathlib",
+      detail: "Lagarias–Robin ist die einzige rein arithmetische RH-Äquivalenz — elementare Zahlentheorie, die gut in mathlib passt. Reduktion auf kolossal-abundante Zahlen + analytischer Tail; maschinell bis 10⁹+ verifiziert." },
+    { from: "0-1", to: "0-5", type: "formalization", label: "Ruelle → Lean",
+      detail: "Der elementare Beweis der Ruelle-Domination (2026) ist bereits in Lean formalisiert — ohne Maximumsprinzip, rein punktweise Majorisierung. Beispiel für den Lean-Workflow: Theorem beweisen, dann formalisieren." },
+    // — Unabhängige Achsen (faint, zum RH-Kern) —
+    { from: "1-0", to: "RH", type: "independent", label: "Nyman–Beurling",
+      detail: "Zweite, unabhängige Angriffsachse: RH ⟺ ℓ²-Abschluss der <code>{ρ_k(x/k)}</code>. Anderes funktionalanalytisches Gepäck als Mayer; nur elementare harmonische Analysis. Im Projekt noch unberührt — bewusste Diversifikation." },
+    { from: "1-1", to: "RH", type: "independent", label: "Li-Kriterium",
+      detail: "RH ⟺ alle Li-Koeffizienten <code>λ_n ≥ 0</code>. Konkret berechenbar, klar falsifizierbar, unabhängig vom Transferoperator. Numerisch starke Evidenz, aber formal offen." },
+  ],
 };
+
 
 // Compact L-function correlation-spectrum data (data/phase_transition_spectral/spectral_analysis.json)
 RESEARCH.spectral = [{"dim": 1, "n_forms": 57270, "effective_rank": 24.888, "spectral_entropy_norm": 0.9993, "top1_concentration": 0.0493, "top_eigs": [1.2331, 1.1262, 1.0837, 1.0519, 1.0344, 1.0282, 1.0238, 1.0159, 1.0031, 0.9989, 0.9925, 0.9877]}, {"dim": 2, "n_forms": 24377, "effective_rank": 24.27, "spectral_entropy_norm": 0.9958, "top1_concentration": 0.0656, "top_eigs": [1.64, 1.2977, 1.2156, 1.1279, 1.0872, 1.0623, 1.0402, 1.0353, 1.0033, 0.991, 0.9744, 0.9635]}, {"dim": 3, "n_forms": 11964, "effective_rank": 23.1, "spectral_entropy_norm": 0.9891, "top1_concentration": 0.0822, "top_eigs": [2.0546, 1.5768, 1.387, 1.1598, 1.0912, 1.0735, 1.0432, 1.0206, 0.9957, 0.9767, 0.931, 0.912]}, {"dim": 4, "n_forms": 9438, "effective_rank": 21.835, "spectral_entropy_norm": 0.9816, "top1_concentration": 0.0977, "top_eigs": [2.4429, 1.721, 1.4482, 1.2457, 1.101, 1.0948, 1.0833, 1.0191, 1.0083, 0.9714, 0.9208, 0.8992]}, {"dim": 5, "n_forms": 5704, "effective_rank": 19.444, "spectral_entropy_norm": 0.966, "top1_concentration": 0.1217, "top_eigs": [3.042, 2.0978, 1.599, 1.2758, 1.1392, 1.0949, 1.0313, 1.0187, 0.9832, 0.9499, 0.8715, 0.8578]}, {"dim": 6, "n_forms": 5895, "effective_rank": 18.677, "spectral_entropy_norm": 0.9606, "top1_concentration": 0.1304, "top_eigs": [3.2592, 2.1567, 1.6375, 1.2515, 1.1674, 1.1191, 1.0405, 1.0094, 0.9876, 0.9497, 0.8531, 0.8276]}, {"dim": 7, "n_forms": 3691, "effective_rank": 16.072, "spectral_entropy_norm": 0.9386, "top1_concentration": 0.1556, "top_eigs": [3.8912, 2.5685, 1.7506, 1.3614, 1.1267, 1.1236, 1.0164, 0.9981, 0.9752, 0.9046, 0.8054, 0.7812]}, {"dim": 8, "n_forms": 4282, "effective_rank": 15.878, "spectral_entropy_norm": 0.9369, "top1_concentration": 0.1598, "top_eigs": [3.9952, 2.4951, 1.7235, 1.4201, 1.1459, 1.0756, 1.0514, 1.0033, 0.9854, 0.921, 0.8373, 0.7567]}, {"dim": 9, "n_forms": 3020, "effective_rank": 13.629, "spectral_entropy_norm": 0.914, "top1_concentration": 0.1881, "top_eigs": [4.7021, 2.7483, 1.8593, 1.4186, 1.1204, 1.0507, 1.0052, 0.972, 0.9282, 0.8676, 0.767, 0.7104]}, {"dim": 10, "n_forms": 3178, "effective_rank": 13.601, "spectral_entropy_norm": 0.9124, "top1_concentration": 0.1874, "top_eigs": [4.6847, 2.7383, 1.8626, 1.495, 1.1493, 1.0469, 1.0245, 0.9927, 0.9708, 0.8558, 0.8213, 0.7109]}, {"dim": 11, "n_forms": 2316, "effective_rank": 11.92, "spectral_entropy_norm": 0.8901, "top1_concentration": 0.2103, "top_eigs": [5.2574, 3.0144, 1.9805, 1.4287, 1.0843, 1.0618, 1.004, 0.9572, 0.8885, 0.8749, 0.8136, 0.6597]}, {"dim": 12, "n_forms": 3005, "effective_rank": 12.461, "spectral_entropy_norm": 0.9009, "top1_concentration": 0.2095, "top_eigs": [5.2364, 2.636, 1.8627, 1.3801, 1.2051, 1.0413, 1.0022, 0.9522, 0.9234, 0.8484, 0.8024, 0.6935]}];

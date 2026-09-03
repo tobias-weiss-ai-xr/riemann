@@ -535,6 +535,206 @@ function buildApproaches() {
   return { group: g, update, defaultFocus: () => focus(nodes[0]) };
 }
 
+
+// ---------------------------------------------------------------------------
+//  Verbindungs-Konstellation — Bögen zwischen den Forschungsströmen
+// ---------------------------------------------------------------------------
+
+const CONNECTION_TYPE_COLOR = {
+  prerequisite: 0x33d6a6,
+  evidence: 0x3fe0ff,
+  formalization: 0xffcf5c,
+  tool: 0xb08cff,
+  independent: 0x7ea8ff,
+};
+
+function buildConnections() {
+  const g = new THREE.Group();
+  const ap = RESEARCH.approaches;
+  const groups = ap.groups;
+  const conns = ap.connections || [];
+  const R = 7.2;
+  const nGroups = groups.length;
+  const nodes = [];
+  const nodeMap = {};
+  const arcs = [];
+
+  [7.2, 4.8, 2.4].forEach((rr) => {
+    const ring = new THREE.Mesh(
+      new THREE.RingGeometry(rr - 0.025, rr + 0.025, 128),
+      new THREE.MeshBasicMaterial({ color: 0x152038, transparent: true, opacity: 0.6, side: THREE.DoubleSide })
+    );
+    ring.rotation.x = -Math.PI / 2;
+    ring.position.y = 0.002;
+    g.add(ring);
+  });
+
+  const rhOrb = new THREE.Mesh(
+    new THREE.SphereGeometry(0.5, 32, 32),
+    new THREE.MeshStandardMaterial({ color: 0xffcf5c, emissive: 0xffcf5c, emissiveIntensity: 1.3 })
+  );
+  g.add(rhOrb);
+  const rhHalo = makeGlow(0xffcf5c, 3.1);
+  g.add(rhHalo);
+  const rhLabel = makeLabel('RH', { color: '#0d0a03', size: 58, bg: 'rgba(255,207,92,0.92)' });
+  rhLabel.position.y = -1.15;
+  g.add(rhLabel);
+
+  const rhRec = { isRH: true, orb: rhOrb, halo: rhHalo, color: 0xffcf5c };
+  nodeMap.RH = rhRec;
+  const pickList = [{ obj: rhOrb, rec: rhRec }];
+
+  groups.forEach((grp, gi) => {
+    const thetaC = (gi / nGroups) * Math.PI * 2 - Math.PI / 2;
+    const items = grp.items;
+    const fan = Math.min(0.85, 0.5 + items.length * 0.06);
+
+    const grpPos = new THREE.Vector3(Math.cos(thetaC) * R * 0.62, 0, Math.sin(thetaC) * R * 0.62);
+    const glab = makeLabel(grp.name, { color: grp.color, size: 30 });
+    glab.position.set(grpPos.x, 1.5, grpPos.z);
+    g.add(glab);
+
+    items.forEach((item, k) => {
+      const frac = items.length === 1 ? 0 : k / (items.length - 1) - 0.5;
+      const theta = thetaC + frac * fan;
+      const pos = new THREE.Vector3(Math.cos(theta) * R, 0, Math.sin(theta) * R);
+      const color = APPROACH_STATUS_COLOR[item.status] || 0x7ea8ff;
+
+      const orb = new THREE.Mesh(
+        new THREE.SphereGeometry(0.34, 24, 24),
+        new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.85 })
+      );
+      orb.position.copy(pos);
+      g.add(orb);
+
+      const halo = makeGlow(color, 1.55);
+      halo.position.copy(pos);
+      g.add(halo);
+
+      const lab = makeLabel(item.label, { color: '#dfe6f2', size: 26 });
+      lab.position.set(pos.x, -0.9, pos.z);
+      g.add(lab);
+
+      const rec = { isNode: true, item, k, grp, orb, halo, color, id: gi + '-' + k };
+      nodeMap[rec.id] = rec;
+      pickList.push({ obj: orb, rec });
+      nodes.push(rec);
+    });
+  });
+
+  conns.forEach((conn) => {
+    const fromRec = nodeMap[conn.from];
+    const toRec = nodeMap[conn.to];
+    if (!fromRec || !toRec) return;
+
+    const p0 = fromRec.orb.position.clone();
+    const p2 = toRec.orb.position.clone();
+    const dist = p0.distanceTo(p2);
+    const toCore = conn.from === 'RH' || conn.to === 'RH';
+    const mid = new THREE.Vector3().addVectors(p0, p2).multiplyScalar(0.5);
+    mid.y += toCore ? Math.max(0.9, dist * 0.14) : Math.max(1.4, dist * 0.32);
+
+    const pts = new THREE.QuadraticBezierCurve3(p0, mid, p2).getPoints(48);
+    const color = CONNECTION_TYPE_COLOR[conn.type] || 0x7ea8ff;
+    const base = conn.type === 'independent' ? 0.2 : 0.3;
+
+    let mat;
+    if (conn.type === 'independent') {
+      mat = new THREE.LineDashedMaterial({ color, transparent: true, opacity: base, dashSize: 0.22, gapSize: 0.16 });
+    } else {
+      mat = new THREE.LineBasicMaterial({ color, transparent: true, opacity: base });
+    }
+    const arc = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), mat);
+    if (conn.type === 'independent') arc.computeLineDistances();
+    g.add(arc);
+
+    const rec = { isArc: true, conn, arc, fromRec, toRec, color, base };
+    arcs.push(rec);
+    pickList.push({ obj: arc, rec });
+  });
+
+  function paint() {
+    const sel = selectedNode;
+    const hov = hoverNode === sel ? null : hoverNode;
+    const activeNodes = new Set();
+    const activeArcs = new Set();
+
+    [sel, hov].forEach((rec) => {
+      if (!rec) return;
+      if (rec.isArc) {
+        activeArcs.add(rec);
+        activeNodes.add(rec.fromRec);
+        activeNodes.add(rec.toRec);
+      } else {
+        activeNodes.add(rec);
+        arcs.forEach((a) => {
+          if (a.fromRec === rec || a.toRec === rec) activeArcs.add(a);
+        });
+      }
+    });
+
+    nodes.forEach((r) => {
+      const isSel = r === sel;
+      const isHov = r === hov;
+      const active = activeNodes.has(r);
+      r.halo.userData.r = isSel ? 2.2 : isHov ? 2.0 : active ? 1.9 : 1.2;
+      r.halo.material.opacity = isSel || isHov ? 0.9 : active ? 0.8 : 0.28;
+      r.orb.material.emissiveIntensity = isSel ? 1.6 : isHov ? 1.3 : active ? 1.05 : 0.55;
+    });
+
+    const rhActive = activeNodes.has(rhRec);
+    rhHalo.material.opacity = rhActive ? 0.95 : 0.45;
+    rhOrb.material.emissiveIntensity = rhActive ? 1.6 : 1.3;
+
+    arcs.forEach((a) => {
+      const isSel = a === sel;
+      const isHov = a === hov;
+      const active = activeArcs.has(a);
+      a.arc.material.opacity = isSel ? 0.9 : isHov ? 0.8 : active ? 0.65 : a.base * 0.3;
+    });
+  }
+
+  const LEGEND =
+    '<p class="cite">Bogentyp&nbsp;\u00b7 <span style="color:#33d6a6">Voraussetzung</span> &nbsp;\u00b7 ' +
+    '<span style="color:#3fe0ff">Evidenz</span> &nbsp;\u00b7 <span style="color:#ffcf5c">Formalisierung</span> &nbsp;\u00b7 ' +
+    '<span style="color:#b08cff">Werkzeug</span> &nbsp;\u00b7 <span style="color:#7ea8ff">unabh\u00e4ngig</span>' +
+    '&nbsp;\u2014 klicke einen Bogen oder Knoten.</p>';
+
+  function focus(rec) {
+    selectedNode = rec;
+    if (!rec) return;
+    if (rec.isArc) {
+      infoTitle.textContent = rec.conn.label;
+      infoBody.innerHTML = rec.conn.detail + LEGEND;
+    } else if (rec.isRH) {
+      infoTitle.textContent = ap.target.label || 'Riemann-Hypothese';
+      infoBody.innerHTML = ap.target.detail + LEGEND;
+    } else {
+      infoTitle.textContent = rec.item.title || rec.item.label;
+      infoBody.innerHTML = rec.item.detail + LEGEND;
+    }
+    infoBody.scrollTop = 0;
+    paint();
+  }
+
+  g.userData = {
+    pickable: pickList,
+    focus,
+    repaint: paint,
+  };
+
+  function update(dt, t) {
+    const ps = 1 + 0.16 * Math.sin(t * 2.1);
+    rhHalo.scale.setScalar(3.1 * ps);
+    nodes.forEach((r) => {
+      const target = (r.halo.userData.r || 1.55) * (1 + 0.08 * Math.sin(t * 2 + r.k));
+      r.halo.scale.setScalar(THREE.MathUtils.lerp(r.halo.scale.x, target, dt * 5));
+    });
+  }
+
+  return { group: g, update, defaultFocus: () => focus(rhRec) };
+}
+
 // ---------------------------------------------------------------------------
 //  View registry
 // ---------------------------------------------------------------------------
@@ -635,6 +835,23 @@ const VIEWS = {
     `,
     build: buildApproaches,
   },
+  connections: {
+    title: 'Verbindungen — die Konstellation der Forschungsströme',
+    camera: { pos: [0, 15, 26], target: [0, 0, 0], autoRotate: true, autoRotateSpeed: 0.35 },
+    info: `
+      <p>Die Konstellation der Forschungsströme: Knoten wie in „Herangehensweisen", verbunden durch Bögen, die Abhängigkeiten und Werkzeuge zeigen.</p>
+      <p><strong>Klicke einen Bogen</strong>, um die Verbindung zu lesen; <strong>klicke einen Knoten</strong>, um die Herangehensweise zu lesen.</p>
+      <ul>
+        <li><span style="color:#33d6a6">Voraussetzung</span> — eine Route liefert die Grundlage für eine andere</li>
+        <li><span style="color:#3fe0ff">Evidenz</span> — numerische Daten stützen eine Theorie</li>
+        <li><span style="color:#ffcf5c">Formalisierung</span> — gemeinsames Lean-Ziel</li>
+        <li><span style="color:#b08cff">Werkzeug</span> — ein Projekt-Tool füttert eine Angriffsachse</li>
+        <li><span style="color:#7ea8ff">unabhängig (gestrichelt)</span> — eigene Achse zum RH-Kern</li>
+      </ul>
+      <p class="cite">Der goldene Kern ist RH. Bögen kurven über der Ebene; Farben kodieren den Verbindungstyp.</p>
+    `,
+    build: buildConnections,
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -717,6 +934,7 @@ function init() {
 
   // Picking for the Approaches scene (click / hover a node)
   const raycaster = new THREE.Raycaster();
+  raycaster.params.Line.threshold = 0.3; // allow clicking arcs
   const pickPos = new THREE.Vector2();
   function handlePointer(e, click) {
     if (!currentGroup || !currentGroup.userData.pickable) return;
@@ -794,11 +1012,14 @@ loadData().then(() => {
   // Deep-link support: ?view=approaches&node=<index> opens a scene directly
   const params = new URLSearchParams(location.search);
   const want = params.get('view');
-  setView(VIEWS[want] ? want : 'landscape');
-  const nodeIdx = Number(params.get('node'));
-  if (currentGroup && currentGroup.userData.focus && Number.isInteger(nodeIdx) && nodeIdx >= 0) {
-    const pick = currentGroup.userData.pickable;
-    if (nodeIdx < pick.length) currentGroup.userData.focus(pick[nodeIdx].rec);
+  setView(VIEWS[want] ? want : 'connections');
+  const nodeParam = params.get('node');
+  if (nodeParam !== null) {
+    const nodeIdx = Number(nodeParam);
+    if (currentGroup && currentGroup.userData.focus && Number.isInteger(nodeIdx) && nodeIdx >= 0) {
+      const pick = currentGroup.userData.pickable;
+      if (nodeIdx < pick.length) currentGroup.userData.focus(pick[nodeIdx].rec);
+    }
   }
   footText.textContent = 'GNN × Number Theory → Riemann Hypothesis';
 });
