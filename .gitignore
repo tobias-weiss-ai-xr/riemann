@@ -73,6 +73,7 @@ check_*.txt
 ps_*.txt
 *_out.txt
 *_test.txt
+pizer_*output.txt
 collect_out.txt
 lmfdb_test.txt
 test_snip.txt
@@ -88,9 +89,15 @@ quick_test*.py
 quick_check*.py
 quick_list*.py
 quick_publish*.py
+quick_explore_*.py
 run_collect*.py
 run_collect*.sh
 run_verify*.sh
+run_filter_*.py
+run_sklearn_*.py
+run_validate_*.py
+search_existing_*.sh
+verify_*.sh
 wait_training*.py
 test_docker.sh
 
