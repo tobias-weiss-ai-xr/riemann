@@ -15,7 +15,8 @@ Data sources:
   - Hecke traces: data/lmfdb/lmfdb_sql_weight2_ml.csv (53k newforms, p=11..5000)
 
 Usage:
-    python scripts/spectral_gap_hecke_correlation.py
+    python scripts/spectral_gap_hecke_correlation.py              # full run
+    python scripts/spectral_gap_hecke_correlation.py --test-only  # smoke test
 
 Outputs:
     data/experiment16/ — correlation tables, plots, summary JSON
@@ -23,6 +24,7 @@ Outputs:
 
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 import time
@@ -38,6 +40,13 @@ try:
     import pandas as pd
 except ImportError:
     pd = None  # type: ignore[assignment]
+
+# Windows consoles often default to cp1252, which cannot encode characters like
+# '↔' used in the banner. Force UTF-8 so the script behaves identically to the
+# Docker (Linux) environment it was written for.
+for _stream in (sys.stdout, sys.stderr):
+    if _stream is not None and (_stream.encoding or "").lower() not in ("utf-8", "utf8"):
+        _stream.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[union-attr]
 
 # ---------------------------------------------------------------------------
 # Spectral data from experiment log (Exp 1-4, statistical summary table)
@@ -348,11 +357,34 @@ def _save_results(results: dict, output_dir: Path) -> None:
     print(f"[INFO] Results saved: {path}")
 
 
-def main() -> None:
-    """Run the correlation analysis."""
+def main(argv: list[str] | None = None) -> int:
+    """Run the correlation analysis.
+
+    Returns process exit code (0 = success).
+    """
+    parser = argparse.ArgumentParser(
+        description="Experiment 16: Spectral Gap ↔ Hecke Trace Correlation (Direction B)"
+    )
+    parser.add_argument(
+        "--test-only",
+        action="store_true",
+        help=(
+            "smoke-test mode: run the full correlation pipeline (spectral data "
+            "+ LMFDB aggregation + Pearson correlations) but write no plots "
+            "or artifacts; prints a success banner"
+        ),
+    )
+    args = parser.parse_args(argv)
+
     print("=" * 60)
     print("Experiment 16: Spectral Gap ↔ Hecke Trace Correlation")
+    if args.test_only:
+        print("MODE: --test-only (smoke test, no artifacts written)")
     print("=" * 60)
+
+    if pd is None:
+        print("[ERROR] pandas is required but not installed (pip install pandas)")
+        return 2
 
     spectral_df = _build_spectral_df()
     print(f"\nSpectral data: {len(spectral_df)} primes")
@@ -360,12 +392,15 @@ def main() -> None:
 
     lmfdb_df = _load_lmfdb_csv()
     if lmfdb_df is None:
+        if args.test_only:
+            print("\n[TEST-ONLY] FAIL: LMFDB CSV missing - cannot verify correlation pipeline")
+            return 1
         print("\n[INFO] No LMFDB data available. Run with Docker:")
         print("  docker compose exec research python scripts/collect_lmfdb_sql.py")
         print("\nSaving spectral-only data for inspection...")
         OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
         spectral_df.to_csv(OUTPUT_DIR / "spectral_data.csv", index=False)
-        return
+        return 0
 
     hecke_agg = _compute_level_aggregates(lmfdb_df)
     print(f"\nHecke aggregates: {len(hecke_agg)} levels (primes)")
@@ -373,6 +408,14 @@ def main() -> None:
 
     # Merge and correlate
     results = _compute_correlations(spectral_df, hecke_agg)
+
+    if args.test_only:
+        n_pairs = len(results) - (1 if "trace_correlation_series" in results else 0)
+        print(
+            f"\n[TEST-ONLY] success: spectral gap <-> Hecke correlation pipeline verified "
+            f"({len(spectral_df)} spectral primes, {n_pairs} correlation pairs computed)"
+        )
+        return 0
 
     # Plot
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -382,7 +425,8 @@ def main() -> None:
     _save_results(results, OUTPUT_DIR)
 
     print("\n[DONE] Experiment 16 complete.")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
