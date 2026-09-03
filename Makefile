@@ -136,6 +136,10 @@ lean-test: ## Run Lean verification (#eval statements)
 
 lean-ci: lean-build lean-test ## Full Lean CI pipeline
 
+test: ## Run frontend visualization test suite (data + headless render)
+	@node tests/data_check.mjs
+	@node tools/headless_check.mjs
+
 # ── Utilities ────────────────────────────────────────────────────
 logs: ## Tail all service logs
 	$(DOCKER_COMPOSE) logs -f
