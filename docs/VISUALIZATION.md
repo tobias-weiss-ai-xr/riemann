@@ -10,6 +10,7 @@ Live at `https://<user>.github.io/riemann/` once GitHub Pages is enabled.
 | Tab | What it shows | Source |
 |---|---|---|
 | **ζ Landscape** | 3D surface of `|ζ(σ + i t)|` over the critical strip `0 ≤ σ ≤ 1`, `0 ≤ t ≤ 60`. The cyan line is `Re(s) = ½`; the golden orbs are the first non-trivial zeros; the spike at `σ → 1` is the pole at `s = 1`. | `assets/zeta-data.json` (precomputed via `scripts/precompute_zeta_surface.py`, Euler–Maclaurin) |
+| **Approaches** | Interactive **strategy map**: the golden core is RH, the cyan orbit is the active main line (EPIC-4 Mayer transfer operator), and the other orbits group the alternative attack routes (Nyman–Beurling–Báez-Duarte, Li, Lagarias–Robin, de Bruijn–Newman, Ihara/Hashimoto zeta, FunSearch, ML). **Click / hover a node** to read its description; colour encodes status: green = proven, gold = partial, cyan = numerical, blue = proposed, violet = tool. Deep-links: `?view=approaches` and `?view=approaches&node=<i>`. | `assets/data.js` (`RESEARCH.approaches`) — step map of the strategic discussion |
 | **Critical Line** | `|ζ(½ + i t)|` for `0 ≤ t ≤ 80`, evaluated live in the browser. Every dip to zero is a non-trivial zero. | live `assets/zeta.js` |
 | **Dimension Split** | Brody repulsion parameter `β` per Hecke-field dimension. CM forms (dim = 1) are GUE-like (`β ≈ 1.88`); non-CM forms (dim ≥ 2) are near-Poisson (`β ≈ 0.24`); the aggregate `β ≈ 0.62` is a mixing artifact. | `data/spectral_rigidity/*` |
 | **GUE → Poisson** | The Brody distribution `P(s;β)` as `β` sweeps `0 → 2` — a waterfall through the phase transition. | analytic |
@@ -29,6 +30,16 @@ docs/
     └── zeta-data.json      ← precomputed |ζ| surface grid (40 × 151 points)
 scripts/
 └── precompute_zeta_surface.py   ← regenerate zeta-data.json
+```
+
+## Deep links
+
+Every scene is deep-linkable via `?view=<name>`. The Approaches scene additionally
+accepts `&node=<index>` (0-based, order of `RESEARCH.approaches.groups[].items`):
+
+```
+https://<user>.github.io/riemann/?view=approaches
+https://<user>.github.io/riemann/?view=approaches&node=4    # t-Dynamik
 ```
 
 ## Regenerate the ζ surface

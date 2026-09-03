@@ -15,6 +15,8 @@ let renderer, scene, camera, controls, clock;
 let currentGroup = null;
 let currentUpdate = null;
 let glowTex = null;
+let selectedNode = null;   // approaches scene pick state
+let hoverNode = null;
 
 const canvas = document.getElementById('scene');
 const infoTitle = document.getElementById('info-title');
@@ -398,6 +400,142 @@ function buildSpectral() {
 }
 
 // ---------------------------------------------------------------------------
+//  Approaches — interactive strategy map of the attack routes to RH
+// ---------------------------------------------------------------------------
+
+const APPROACH_STATUS_COLOR = {
+  proven: 0x33d6a6,     // green  — theorem (some Lean-formalised)
+  partial: 0xffcf5c,    // gold   — half of a criterion known
+  numerical: 0x3fe0ff,  // cyan   — strong convergent numerics
+  proposed: 0x7ea8ff,   // blue   — candidate route, untouched
+  tool: 0xb08cff,       // violet — hypothesis generator
+};
+
+function buildApproaches() {
+  const g = new THREE.Group();
+  const ap = RESEARCH.approaches;
+  const groups = ap.groups;
+  const R = 7.2;
+  const nGroups = groups.length;
+  const nodes = [];
+
+  // Ground guide rings
+  [7.2, 4.8, 2.4].forEach((rr) => {
+    const ring = new THREE.Mesh(
+      new THREE.RingGeometry(rr - 0.025, rr + 0.025, 128),
+      new THREE.MeshBasicMaterial({ color: 0x152038, transparent: true, opacity: 0.6, side: THREE.DoubleSide })
+    );
+    ring.rotation.x = -Math.PI / 2;
+    ring.position.y = 0.002;
+    g.add(ring);
+  });
+
+  // Central RH orb
+  const rhOrb = new THREE.Mesh(
+    new THREE.SphereGeometry(0.5, 32, 32),
+    new THREE.MeshStandardMaterial({ color: 0xffcf5c, emissive: 0xffcf5c, emissiveIntensity: 1.3 })
+  );
+  g.add(rhOrb);
+  const rhHalo = makeGlow(0xffcf5c, 3.1);
+  g.add(rhHalo);
+  const rhLabel = makeLabel('RH', { color: '#0d0a03', size: 58, bg: 'rgba(255,207,92,0.92)' });
+  rhLabel.position.y = -1.15;
+  g.add(rhLabel);
+
+  const pickList = [];
+  groups.forEach((grp, gi) => {
+    const thetaC = (gi / nGroups) * Math.PI * 2 - Math.PI / 2; // group A at "north"
+    const items = grp.items;
+    const fan = Math.min(0.85, 0.5 + items.length * 0.06);
+
+    // Group label, pulled slightly toward the centre
+    const grpPos = new THREE.Vector3(Math.cos(thetaC) * R * 0.62, 0, Math.sin(thetaC) * R * 0.62);
+    const glab = makeLabel(grp.name, { color: grp.color, size: 30 });
+    glab.position.set(grpPos.x, 1.5, grpPos.z);
+    g.add(glab);
+
+    items.forEach((item, k) => {
+      const frac = items.length === 1 ? 0 : k / (items.length - 1) - 0.5;
+      const theta = thetaC + frac * fan;
+      const pos = new THREE.Vector3(Math.cos(theta) * R, 0, Math.sin(theta) * R);
+      const color = APPROACH_STATUS_COLOR[item.status] || 0x7ea8ff;
+
+      // Beam from the centre to the node
+      const beam = new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(0, 0.04, 0),
+          new THREE.Vector3(pos.x, 0.04, pos.z),
+        ]),
+        new THREE.LineBasicMaterial({ color: new THREE.Color(grp.color), transparent: true, opacity: 0.18 })
+      );
+      g.add(beam);
+
+      const orb = new THREE.Mesh(
+        new THREE.SphereGeometry(0.34, 24, 24),
+        new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.85 })
+      );
+      orb.position.copy(pos);
+      g.add(orb);
+
+      const halo = makeGlow(color, 1.55);
+      halo.position.copy(pos);
+      g.add(halo);
+
+      const lab = makeLabel(item.label, { color: '#dfe6f2', size: 26 });
+      lab.position.set(pos.x, -0.9, pos.z);
+      g.add(lab);
+
+      const rec = { item, k, grp, orb, halo, beam, color, label: lab };
+      pickList.push({ obj: orb, rec });
+      nodes.push(rec);
+    });
+  });
+
+  function paint() {
+    nodes.forEach((r) => {
+      const sel = r === selectedNode;
+      const hov = r === hoverNode && !sel;
+      r.halo.material.opacity = sel ? 0.95 : 0.72;
+      r.halo.userData.r = sel ? 2.2 : hov ? 1.9 : 1.55; // target glow radius
+      r.orb.material.emissiveIntensity = sel ? 1.5 : hov ? 1.25 : 0.85;
+      r.beam.material.opacity = sel ? 0.6 : 0.18;
+    });
+  }
+
+  const LEGEND =
+    '<p class="cite">status&nbsp;· <span class="stat green">bewiesen</span> &nbsp;· ' +
+    '<span class="stat gold">teilweise</span> &nbsp;· <span class="stat">numerisch</span> &nbsp;· ' +
+    '<span style="color:#7ea8ff">Kandidat</span> &nbsp;· <span style="color:#b08cff">Werkzeug</span>' +
+    '&nbsp;— klicke einen Knoten, um eine Herangehensweise zu lesen.</p>';
+
+  function focus(rec) {
+    selectedNode = rec;
+    if (!rec) return;
+    infoTitle.textContent = rec.item.title || rec.item.label;
+    infoBody.innerHTML = rec.item.detail + LEGEND;
+    infoBody.scrollTop = 0;
+    paint();
+  }
+
+  g.userData = {
+    pickable: pickList,
+    focus,
+    repaint: paint,
+  };
+
+  function update(dt, t) {
+    const ps = 1 + 0.16 * Math.sin(t * 2.1);
+    rhHalo.scale.setScalar(3.1 * ps);
+    nodes.forEach((r) => {
+      const target = (r.halo.userData.r || 1.55) * (1 + 0.08 * Math.sin(t * 2 + r.k));
+      r.halo.scale.setScalar(THREE.MathUtils.lerp(r.halo.scale.x, target, dt * 5));
+    });
+  }
+
+  return { group: g, update, defaultFocus: () => focus(nodes[0]) };
+}
+
+// ---------------------------------------------------------------------------
 //  View registry
 // ---------------------------------------------------------------------------
 
@@ -479,6 +617,24 @@ const VIEWS = {
     `,
     build: buildSpectral,
   },
+  approaches: {
+    title: 'Herangehensweisen — the attack routes to RH',
+    camera: { pos: [0, 15, 26], target: [0, 0, 0], autoRotate: true, autoRotateSpeed: 0.35 },
+    info: `
+      <p>Strategy map of the routes this project pursues toward the Riemann Hypothesis.
+      <strong>Klicke einen Knoten</strong>, um die jeweilige Herangehensweise zu lesen;
+      die Farbe kodiert den Status.</p>
+      <ul>
+        <li><span class="stat green">bewiesen</span> — Theorem (teils schon Lean-formalisiert)</li>
+        <li><span class="stat gold">teilweise</span> — die halbe Äquivalenz ist bekannt</li>
+        <li><span class="stat">numerisch</span> — starke, konvergente Numerik</li>
+        <li style="color:#7ea8ff">Kandidat</li> — unberührte Angriffsroute
+        <li style="color:#b08cff">Werkzeug</li> — Hypothese-Generator
+      </ul>
+      <p class="cite">Der goldene Kern ist RH; die cyan Gruppe A ist der aktive Hauptstrang (EPIC-4, Mayer-Transferoperator).</p>
+    `,
+    build: buildApproaches,
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -488,6 +644,10 @@ const VIEWS = {
 function setView(name) {
   const view = VIEWS[name];
   if (!view) return;
+
+  renderer.domElement.style.cursor = '';
+  selectedNode = null;
+  hoverNode = null;
 
   if (currentGroup) {
     scene.remove(currentGroup);
@@ -506,6 +666,8 @@ function setView(name) {
   currentGroup = built.group;
   currentUpdate = built.update;
   scene.add(currentGroup);
+
+  if (built.defaultFocus) built.defaultFocus();
 
   const cam = view.camera;
   camera.position.set(...cam.pos);
@@ -552,6 +714,31 @@ function init() {
 
   glowTex = makeGlowTexture();
   clock = new THREE.Clock();
+
+  // Picking for the Approaches scene (click / hover a node)
+  const raycaster = new THREE.Raycaster();
+  const pickPos = new THREE.Vector2();
+  function handlePointer(e, click) {
+    if (!currentGroup || !currentGroup.userData.pickable) return;
+    const rect = renderer.domElement.getBoundingClientRect();
+    pickPos.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    pickPos.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+    raycaster.setFromCamera(pickPos, camera);
+    const entries = currentGroup.userData.pickable;
+    const hits = raycaster.intersectObjects(entries.map((p) => p.obj));
+    if (hits.length) {
+      const entry = entries.find((p) => p.obj === hits[0].object);
+      renderer.domElement.style.cursor = 'pointer';
+      if (click) currentGroup.userData.focus(entry.rec);
+      hoverNode = entry.rec;
+    } else {
+      renderer.domElement.style.cursor = '';
+      hoverNode = null;
+    }
+    if (currentGroup.userData.repaint) currentGroup.userData.repaint();
+  }
+  renderer.domElement.addEventListener('pointermove', (e) => handlePointer(e, false));
+  renderer.domElement.addEventListener('pointerdown', (e) => handlePointer(e, true));
 
   // UI wiring
   document.querySelectorAll('.nav-btn').forEach((btn) => {
@@ -604,6 +791,14 @@ async function loadData() {
 
 init();
 loadData().then(() => {
-  setView('landscape');
+  // Deep-link support: ?view=approaches&node=<index> opens a scene directly
+  const params = new URLSearchParams(location.search);
+  const want = params.get('view');
+  setView(VIEWS[want] ? want : 'landscape');
+  const nodeIdx = Number(params.get('node'));
+  if (currentGroup && currentGroup.userData.focus && Number.isInteger(nodeIdx) && nodeIdx >= 0) {
+    const pick = currentGroup.userData.pickable;
+    if (nodeIdx < pick.length) currentGroup.userData.focus(pick[nodeIdx].rec);
+  }
   footText.textContent = 'GNN × Number Theory → Riemann Hypothesis';
 });
