@@ -4207,3 +4207,45 @@ being strictly-false near σ=½ (the Lean conjecture `spectralRadiusConjecture`
 should indeed be retired in favor of `1 ∉ Spec`, per 19l note). The certified
 enclosure targets remain: corner [0.505,0.56]×[75,200] and high-t
 t≈[900,1200]; DFLY/Nisoli machinery is the next stop.
+
+---
+
+## Experiment 21: Cross-bridge test — Cayley SL(2,F_p) vs isogeny graph (proper Exp 17)
+
+**Date**: 2026-09-09
+**Status**: numerical, COMPLETED — honest NULL result (bridges are independent objects)
+**Files**: `scripts/cross_bridge_correlation.py`, outputs `data/experiment21/`
+
+### Setup
+The originally-planned Exp 17 (spectral gap × Hecke trace correlation) was confounded
+(across-prime size effect: log|SL(2,F_p)| correlated at r=+0.588) AND used the
+column-shifted CSV (`trace_k = a_{k+2}`). Corrected version: SAME-prime comparison of
+the two graph bridges — Cayley 4-regular SL(2,F_p) graph spectral gap (Exp 1-4) vs the
+isogeny/Brandt graph spectrum at level p (q=2: a_2 embeddings over newforms, Pizer).
+
+### Result
+```
+correlations over 17 primes (p=11..79):
+  pearson(cayley_gap, iso2_gap)     = -0.079
+  pearson(cayley_ratio, iso2_max)   = -0.038
+  spearman(cayley_gap, iso2_gap)    = +0.218 (p=0.40, NS)
+  spearman(cayley_ratio, iso2_max)  = +0.194 (p=0.46, NS)
+```
+**Null.** The isogeny-gap values are near-constant (1-2, max|a_2| ∈ {0,1,2} on small-p
+data) while the Cayley gap trends smoothly down with p — genuinely different objects:
+|V| = |SL(2,F_p)| ≈ p³ vs ≈ p/12, degrees 4 vs 3. No naive eigenvalue cross-predicts
+across the two bridges.
+
+### Interpretation (why this is consistent, not a failure)
+The bridges in the KG are *structural* (Brandt matrix = Hecke action on supersingular
+locus; Cayley graph = group combinatorics), not *eigenvalue-isomorphic*. What Pizer
+actually connects is the isogeny graph spectrum to Hecke eigenvalues — and THAT holds
+(Exp 18: Ramanujan, 0 violations). The Cayley graph's gap is a different function of p
+(Alon-Boppana-type, from the group's representation theory). Cross-correlation of the
+two gaps was never implied by the bridge language and is now measured: it is null.
+Any future "bridge" claim should be stated as structural (object-level), not as
+statistical (eigenvalue-level) correlation.
+
+### Falsification/byproduct
+iso2_viol = 0 at every p and q=3 too: the complete small-p isogeny spectra are
+Ramanujan exactly (Deligne). Also confirms per-level spectral data for Exp 18.
