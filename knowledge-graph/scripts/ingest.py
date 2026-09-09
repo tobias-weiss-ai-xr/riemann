@@ -35,6 +35,7 @@ CYPHER_FILES = {
     "papers-extended": "08-papers-extended.cypher",
     "graphs-extended": "09-graphs-extended.cypher",
     "equivalences-extended": "10-rh-equivalences-extended.cypher",
+    "graph-bridges": "11-graph-bridges-extended.cypher",
 }
 
 THEORY_FILES = [
@@ -45,6 +46,7 @@ THEORY_FILES = [
     "theorems",
     "equivalences",
     "equivalences-extended",
+    "graph-bridges",
 ]
 PAPERS_FILES = ["papers", "papers-extended"]
 GRAPH_FILES = ["graphs", "graphs-extended"]

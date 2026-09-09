@@ -1,0 +1,5209 @@
+[
+  {
+    "name": "FunSearch for Number Theory",
+    "labels": [
+      "AIApproach"
+    ],
+    "properties": {
+      "approach_type": "funsearch",
+      "framework": "FunSearch (DeepMind)",
+      "method": "LLM-driven evolutionary search for new number-theoretic conjectures/algorithms",
+      "confidence": 0.2,
+      "name": "FunSearch for Number Theory",
+      "description": "FunSearch (2023) solved Cap Set problem (496→512). FunSearch paper explicitly states 'zero reason' it would help with P-vs-NP. Similarly limited for RH.",
+      "status": "inconclusive",
+      "target": "Discover new patterns in zero distributions or prime-related functions"
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "TARGETS",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "GNN Spectral Prediction",
+    "labels": [
+      "AIApproach"
+    ],
+    "properties": {
+      "approach_type": "gnn",
+      "feasibility_notes": "Novel (zero published work), CayleyPy provides graphs, LPS theory gives ground truth",
+      "framework": "PyTorch Geometric + CayleyPy",
+      "method": "GCN/GAT on Cayley graphs of SL(2,F_p) to predict eigenvalue distribution",
+      "confidence": 0.4,
+      "name": "GNN Spectral Prediction",
+      "description": "Train GNN on Cayley graphs → predict spectral properties → compare with Ramanujan bound. First GNN on group Cayley graphs.",
+      "target": "Predict Hecke eigenvalue distribution from graph structure alone",
+      "status": "planned"
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "TARGETS",
+        "target": null,
+        "props": {}
+      },
+      {
+        "target_labels": [],
+        "type": "USES_OBJECT",
+        "target": null,
+        "props": {
+          "role": "training_data"
+        }
+      },
+      {
+        "target_labels": [],
+        "type": "USES_OBJECT",
+        "target": null,
+        "props": {
+          "role": "hypothesis_space"
+        }
+      },
+      {
+        "target_labels": [],
+        "type": "BASED_ON_THEOREM",
+        "target": null,
+        "props": {}
+      },
+      {
+        "target_labels": [],
+        "type": "BASED_ON_THEOREM",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "Lean 4 Formal Verification",
+    "labels": [
+      "AIApproach"
+    ],
+    "properties": {
+      "approach_type": "formal_verification",
+      "feasibility_notes": "PNT+ completed via Wiener-Ikehara. Missing: Hadamard factorization, zero-free region, explicit formula, residue theorem (general).",
+      "framework": "Lean 4 + Mathlib + AlphaProof/TTRL",
+      "method": "Formalize RH proof machinery in Mathlib (Lean 4) with AI-assisted proof search",
+      "confidence": 0.6,
+      "name": "Lean 4 Formal Verification",
+      "description": "Loeffler & Stoll (2025): ~60-70% of needed machinery in Mathlib. Tao demonstrated Claude Code + Lean. Long-term path: AI as proof assistant.",
+      "target": "Complete formalization of sufficient machinery to state and potentially prove RH",
+      "status": "in_progress"
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "TARGETS",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "RMT + Deep Learning",
+    "labels": [
+      "AIApproach"
+    ],
+    "properties": {
+      "approach_type": "numerical",
+      "framework": "PyTorch + mpmath",
+      "method": "Use deep learning to discover patterns in random matrix statistics of zeta zeros",
+      "confidence": 0.25,
+      "name": "RMT + Deep Learning",
+      "description": "Keating works on both RMT for zeta moments AND RMT for deep learning loss landscapes. Potential cross-pollination.",
+      "status": "exploratory",
+      "target": "Accelerate zero verification or find statistical anomalies"
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "TARGETS",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Activity"
+    ],
+    "properties": {
+      "date": "2026-06-14T08:34:57.739Z",
+      "note": "Test activity note",
+      "id": "f2b4f9bc-6295-47e3-9416-d609162a6ead",
+      "type": "EMAIL"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Activity"
+    ],
+    "properties": {
+      "date": "2026-06-14T08:34:58.073Z",
+      "note": "电话沟通",
+      "id": "b309ee5a-b439-4d5e-a3df-e0ded88ecc44",
+      "type": "NOTE"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Activity"
+    ],
+    "properties": {
+      "date": "2026-06-14T08:34:58.18Z",
+      "note": "周会讨论",
+      "id": "7e72848d-6cc8-416c-a575-b92edbeeabe4",
+      "type": "CALL"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Test Company 1781426096224",
+    "labels": [
+      "Company"
+    ],
+    "properties": {
+      "tier": "WARM",
+      "segment": "IVD",
+      "domain": "test1781426096224.com",
+      "name": "Test Company 1781426096224"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Test Company 1781426096985",
+    "labels": [
+      "Company"
+    ],
+    "properties": {
+      "domain": "test1781426096985.com",
+      "name": "Test Company 1781426096985"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Test Company 1781426097472",
+    "labels": [
+      "Company"
+    ],
+    "properties": {
+      "domain": "test1781426097472.com",
+      "name": "Test Company 1781426097472"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Test Company 1781426097790",
+    "labels": [
+      "Company"
+    ],
+    "properties": {
+      "domain": "test1781426097790.com",
+      "name": "Test Company 1781426097790"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Test Company 1781426098007",
+    "labels": [
+      "Company"
+    ],
+    "properties": {
+      "domain": "test1781426098007.com",
+      "name": "Test Company 1781426098007"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Test Company 1781426098374",
+    "labels": [
+      "Company"
+    ],
+    "properties": {
+      "domain": "test1781426098374.com",
+      "name": "Test Company 1781426098374"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Test Company 1781426098710",
+    "labels": [
+      "Company"
+    ],
+    "properties": {
+      "domain": "test1781426098710.com",
+      "name": "Test Company 1781426098710"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Test Company 1781426098841",
+    "labels": [
+      "Company"
+    ],
+    "properties": {
+      "domain": "test1781426098841.com",
+      "name": "Test Company 1781426098841"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Test Company 1781426099176",
+    "labels": [
+      "Company"
+    ],
+    "properties": {
+      "domain": "test1781426099176.com",
+      "name": "Test Company 1781426099176"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Test Company 1781426099553A",
+    "labels": [
+      "Company"
+    ],
+    "properties": {
+      "domain": "testa1781426099553.com",
+      "name": "Test Company 1781426099553A"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Test Company 1781426099553B",
+    "labels": [
+      "Company"
+    ],
+    "properties": {
+      "domain": "testb1781426099553.com",
+      "name": "Test Company 1781426099553B"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Test Company 1781426100112",
+    "labels": [
+      "Company"
+    ],
+    "properties": {
+      "domain": "test1781426100112.com",
+      "name": "Test Company 1781426100112"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Test Company 1781426100250",
+    "labels": [
+      "Company"
+    ],
+    "properties": {
+      "domain": "test1781426100250.com",
+      "name": "Test Company 1781426100250"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Cayley Graphon Limit",
+    "labels": [
+      "Graph"
+    ],
+    "properties": {
+      "research_gap": "No GNN work on graphon approximations for number theory",
+      "name": "Cayley Graphon Limit",
+      "description": "Graphon (graph function) limit of Cayley(SL(2,F_p)) as p → ∞. Encodes asymptotic spectral behavior of the expanding family.",
+      "type": "graphon",
+      "properties": "Benjamini-Schramm limit exists for bounded-degree Cayley graphs. Spectral measure converges."
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Cayley(SL(2, Q_p))",
+    "labels": [
+      "Graph"
+    ],
+    "properties": {
+      "base_group": "SL(2, Q_p)",
+      "importance": "Deligne bound for modular forms and Ramanujan bound for expanders BOTH arise from the same GL(2, Q_p) representations",
+      "degree": "variable",
+      "name": "Cayley(SL(2, Q_p))",
+      "description": "Cayley graph of SL(2) over the p-adic numbers. Infinite but locally finite. Key object in the Langlands program — the LPS construction uses representations of SL(2, Q_p).",
+      "type": "cayley_graph",
+      "properties": "p-adic analogue of the real Cayley graph. Spectral theory connects to representation theory of GL(2, Q_p).",
+      "order": "infinite"
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "USED_IN",
+        "target": null,
+        "props": {}
+      },
+      {
+        "target_labels": [],
+        "type": "P_ADIC_ANALOGUE_OF",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "Cayley(SL(2,F_p))",
+    "labels": [
+      "Graph"
+    ],
+    "properties": {
+      "is_expander": "yes (spectral gap exists)",
+      "base_group": "SL(2,F_p)",
+      "degree": 4,
+      "name": "Cayley(SL(2,F_p))",
+      "generators": "E₁₂, E₂₁, E₁₂⁻¹, E₂₁⁻¹ (fundamental roots)",
+      "description": "Cayley graph of SL(2,F_p) with 4 generators from fundamental roots. Generated by CayleyPy.",
+      "type": "cayley_graph",
+      "scalability": "p=101 → ~10⁶ nodes, ~1GB RAM",
+      "order": "p(p²-1)",
+      "is_ramanujan": "NOT guaranteed (CayleyPy generators ≠ LPS generators)"
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Graph"
+        ],
+        "type": "NOT_GUARANTEED_RAMANUJAN",
+        "target": "Expander Graph (general)",
+        "props": {
+          "reason": "CayleyPy uses 4 fundamental root generators, not the p+1 LPS generators that guarantee Ramanujan property"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Cayley(SL(2,Z))",
+    "labels": [
+      "Graph"
+    ],
+    "properties": {
+      "base_group": "SL(2,Z)",
+      "name": "Cayley(SL(2,Z))",
+      "generators": "S, T (standard generators)",
+      "degree": 2,
+      "description": "Infinite Cayley graph of SL(2,Z) — the universal cover of all finite Cayley graphs",
+      "type": "cayley_graph",
+      "order": "infinite",
+      "is_ramanujan": "N/A (infinite)"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "CayleyPy Generated Graphs (SL(2,F_p))",
+    "labels": [
+      "Graph"
+    ],
+    "properties": {
+      "research_gap": "Zero published work of GNN trained on these Cayley graphs. Completely novel.",
+      "base_group": "SL(2,F_p)",
+      "degree": 4,
+      "name": "CayleyPy Generated Graphs (SL(2,F_p))",
+      "generators": "E₁₂, E₂₁, E₁₂⁻¹, E₂₁⁻¹ (4 fundamental root generators)",
+      "type": "cayley_graph",
+      "properties": "NOT guaranteed Ramanujan (4 generators ≠ p+1 LPS generators). CayleyPy generates these for p=2..101+. No published GNN experiments on these graphs.",
+      "scalability": "p=101 → ~10⁶ nodes, ~1GB RAM. p=503 needs Lanczos eigenvalue computation only (too large for full GNN).",
+      "order": "p(p²-1)",
+      "is_ramanujan": false
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "GENERATED_BY",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "Cayley_LPS(SL(2,F_p))",
+    "labels": [
+      "Graph"
+    ],
+    "properties": {
+      "is_expander": "yes (optimal spectral gap)",
+      "base_group": "SL(2,F_p)",
+      "degree": "p+1",
+      "name": "Cayley_LPS(SL(2,F_p))",
+      "generators": "p+1 generators from LPS construction",
+      "description": "LPS Ramanujan Cayley graphs. Guaranteed Ramanujan by construction.",
+      "key_paper": "LPS 1988",
+      "type": "cayley_graph",
+      "order": "p(p²-1)",
+      "is_ramanujan": "YES (proven by Lubotzky-Phillips-Sarnak 1988)"
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Graph"
+        ],
+        "type": "IS_INSTANCE_OF",
+        "target": "Expander Graph (general)",
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "Dedekind Zeta Graph",
+    "labels": [
+      "Graph"
+    ],
+    "properties": {
+      "research_gap": "No GNN work on ideal-theoretic graph constructions",
+      "name": "Dedekind Zeta Graph",
+      "description": "Graph construction where vertices correspond to ideals in O_K and edges connect prime ideal factors. The Ihara zeta of such graphs relates to the Dedekind zeta ζ_K(s).",
+      "type": "arithmetic_graph",
+      "properties": "For K = Q, recovers the prime graph. For general K, encodes splitting behavior of primes."
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "HAS_SPECTRUM",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "Expander Graph (general)",
+    "labels": [
+      "Graph"
+    ],
+    "properties": {
+      "name": "Expander Graph (general)",
+      "description": "Family of graphs where second eigenvalue λ₂ bounded away from d. Key for LPS construction.",
+      "type": "expander_graph",
+      "properties": "Sequence of finite d-regular graphs with spectral gap bounded below"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Farey Graph",
+    "labels": [
+      "Graph"
+    ],
+    "properties": {
+      "rh_connection": "Pollicott 2022: RH ≡ spectral gap of transfer operator on Farey graph, Z_{Γ₁}(s) = det(1 - L_{2s})",
+      "vertices": "Rational numbers (including ∞) as vertices of the tessellation",
+      "degree": "infinite",
+      "name": "Farey Graph",
+      "edges": "a/b connected to c/d if |ad-bc| = 1",
+      "description": "Key graph for Pollicott's approach to RH via dynamical systems",
+      "type": "geometric_graph",
+      "properties": "Infinite tree-like graph, boundary = real projective line P¹(R)",
+      "order": "infinite",
+      "is_ramanujan": "N/A"
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Graph"
+        ],
+        "type": "HAS_SUBGRAPH",
+        "target": "Cayley(SL(2,Z))",
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "Ihara Graph",
+    "labels": [
+      "Graph"
+    ],
+    "properties": {
+      "name": "Ihara Graph",
+      "description": "Regular graph whose Ihara zeta function encodes closed backtracking-free walks. Hashimoto edge matrix H gives ζ_G(u)^{-1} = det(I - Hu).",
+      "type": "regular_graph",
+      "properties": "d-regular graph with girth g, satisfies Ihara zeta formula: 1/ζ_G(u) = (1-u²)^{(r-1)/2} det(I - Au + (d-1)u²I)"
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Graph"
+        ],
+        "type": "GENERAL_THEORY_FOR",
+        "target": "Isogeny Graph",
+        "props": {}
+      },
+      {
+        "target_labels": [
+          "Graph"
+        ],
+        "type": "GENERAL_THEORY_FOR",
+        "target": "Cayley(SL(2,F_p))",
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "Isogeny Graph",
+    "labels": [
+      "Graph"
+    ],
+    "properties": {
+      "vertices": "Supersingular elliptic curves over F_{p²}",
+      "degree": "varies (typically ~p/12 vertices, degree = number of l-isogenies)",
+      "name": "Isogeny Graph",
+      "edges": "l-isogenies between curves",
+      "description": "Graph of supersingular isogenies. Exact correspondence: eigenvalues = Frobenius eigenvalues.",
+      "key_paper": "Codogni & Lido (unpublished), Eichler 1954",
+      "type": "isogeny_graph",
+      "properties": "Ramanujan graphs connected to modular forms via Eichler/Deuring",
+      "is_ramanujan": "YES (proven — consequence of Eichler trace formula)"
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Graph"
+        ],
+        "type": "IS_INSTANCE_OF",
+        "target": "Expander Graph (general)",
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "LPS Expander Family {X^{p,q}}",
+    "labels": [
+      "Graph"
+    ],
+    "properties": {
+      "degree": "p+1",
+      "name": "LPS Expander Family {X^{p,q}}",
+      "description": "Infinite family of (p+1)-regular Ramanujan graphs X^{p,q} parameterized by primes p, q (both ≡ 1 mod 4). Order ~|PSL(2,F_q)| = q(q²-1)/2.",
+      "key_paper": "LPS 1988",
+      "type": "expander_family",
+      "properties": "Explicit construction of optimal expanders. For each p, infinite family parameterized by q → p-adic building.",
+      "order": "q(q²-1)/2",
+      "is_ramanujan": true
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "IS_INSTANCE_OF",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "Prime Multiplication Graph",
+    "labels": [
+      "Graph"
+    ],
+    "properties": {
+      "research_gap": "Artificial edges (product graph). No natural number-theoretic interpretation of spectral properties.",
+      "feasibility": "★★★ — easy to construct, but unclear what eigenvalues mean",
+      "degree": "variable (depends on N and vertex)",
+      "name": "Prime Multiplication Graph",
+      "description": "Vertices are positive integers ≤ N. Edge between n and m if n·m ≤ N. Encodes multiplicative structure of integers.",
+      "type": "arithmetic_graph",
+      "order": "N (for bound N)"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Zeta Zero Spacing Graph",
+    "labels": [
+      "Graph"
+    ],
+    "properties": {
+      "research_gap": "GNN adds no value over classical time-series methods here",
+      "feasibility": "★★ — technically possible but wrong tool",
+      "name": "Zeta Zero Spacing Graph",
+      "description": "Vertices represent zeta zeros γ_n. Edges connect consecutive zeros. Spacing distribution encodes GUE statistics from RMT.",
+      "type": "time_series_graph",
+      "properties": "Spacing ~ Tracy-Widom / GUE. Not really a 'graph problem' — more of a time-series / point process question."
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "GL(2)",
+    "labels": [
+      "Group"
+    ],
+    "properties": {
+      "is_finite": false,
+      "is_discrete": false,
+      "name": "GL(2)",
+      "description": "General linear group of 2×2 invertible matrices",
+      "type": "algebraic_group",
+      "properties": "Central object in Langlands program for GL(2)",
+      "order": "infinite"
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Group"
+        ],
+        "type": "CONTAINS",
+        "target": "SL(2,F_p)",
+        "props": {}
+      },
+      {
+        "target_labels": [
+          "Group"
+        ],
+        "type": "CONTAINS",
+        "target": "SL(2,Z)",
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "PSL(2,F_p)",
+    "labels": [
+      "Group"
+    ],
+    "properties": {
+      "is_finite": true,
+      "is_discrete": true,
+      "name": "PSL(2,F_p)",
+      "description": "Projective special linear group over F_p",
+      "type": "finite_group",
+      "properties": "Simple non-abelian group for p ≥ 5",
+      "order": "p(p²-1)/2 for odd p"
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Group"
+        ],
+        "type": "FINITE_ANALOGUE_OF",
+        "target": "PSL(2,Z)",
+        "props": {
+          "description": "PSL(2,F_p) is the finite field analogue of PSL(2,Z)"
+        }
+      }
+    ]
+  },
+  {
+    "name": "PSL(2,Z)",
+    "labels": [
+      "Group"
+    ],
+    "properties": {
+      "presentation": "s² = (st)³ = I",
+      "is_finite": false,
+      "is_discrete": true,
+      "generators": "s = [[0,-1],[1,0]], t = [[1,1],[0,1]]",
+      "name": "PSL(2,Z)",
+      "description": "SL(2,Z) / {±I}, isomorphic to free product C₂ * C₃",
+      "type": "algebraic_group",
+      "properties": "Free product of cyclic groups C₂ and C₃",
+      "order": "infinite"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "SL(2,F_p)",
+    "labels": [
+      "Group"
+    ],
+    "properties": {
+      "is_finite": true,
+      "is_discrete": true,
+      "name": "SL(2,F_p)",
+      "generators": "4 generators from fundamental roots: E₁₂, E₂₁ and inverses",
+      "description": "Special linear group over finite field F_p, order p(p²-1)",
+      "type": "finite_group",
+      "properties": "PSL(2,F_p) simple for p ≥ 5, strong approximation theorem applies",
+      "order": "p(p²-1)"
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Group"
+        ],
+        "type": "FINITE_ANALOGUE_OF",
+        "target": "SL(2,Z)",
+        "props": {
+          "description": "SL(2,F_p) is the finite field analogue of SL(2,Z)"
+        }
+      }
+    ]
+  },
+  {
+    "name": "SL(2,Z)",
+    "labels": [
+      "Group"
+    ],
+    "properties": {
+      "presentation": "S² = (ST)³ = -I",
+      "is_finite": false,
+      "is_discrete": true,
+      "generators": "S = [[0,-1],[1,0]], T = [[1,1],[0,1]]",
+      "name": "SL(2,Z)",
+      "description": "Special linear group of 2×2 integer matrices with determinant 1",
+      "type": "algebraic_group",
+      "properties": "Fuchsian group, lattice in SL(2,R)",
+      "order": "infinite"
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Group"
+        ],
+        "type": "HAS_SUBGROUP",
+        "target": "Γ₁(N)",
+        "props": {
+          "description": "Γ₁(N) ⊂ Γ₀(N) ⊂ SL(2,Z)"
+        }
+      },
+      {
+        "target_labels": [
+          "Group"
+        ],
+        "type": "HAS_SUBGROUP",
+        "target": "Γ₀(N)",
+        "props": {
+          "description": "Γ₀(N) ⊂ SL(2,Z) for any N ≥ 1"
+        }
+      },
+      {
+        "target_labels": [
+          "Group"
+        ],
+        "type": "HAS_SUBGROUP",
+        "target": "PSL(2,Z)",
+        "props": {
+          "quotient": "C₂",
+          "description": "PSL(2,Z) = SL(2,Z) / {±I}"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Γ₀(N)",
+    "labels": [
+      "Group"
+    ],
+    "properties": {
+      "is_finite": false,
+      "index_in_sl2z": "N ∏(1 + 1/p) for p|N",
+      "is_discrete": true,
+      "name": "Γ₀(N)",
+      "description": "Congruence subgroup of SL(2,Z) with upper-left entry divisible by N",
+      "type": "congruence_subgroup",
+      "properties": "Key subgroup for modular forms of level N",
+      "order": "infinite"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Γ₁(N)",
+    "labels": [
+      "Group"
+    ],
+    "properties": {
+      "is_finite": false,
+      "is_discrete": true,
+      "name": "Γ₁(N)",
+      "description": "Congruence subgroup with lower-left entry ≡ 0 mod N and diagonal entries ≡ 1 mod N",
+      "type": "congruence_subgroup",
+      "properties": "Used in Dirichlet characters and newforms",
+      "order": "infinite"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "E₄(z)",
+    "labels": [
+      "MathFunction"
+    ],
+    "properties": {
+      "level": 1,
+      "name": "E₄(z)",
+      "weight": 4,
+      "description": "Eisenstein series of weight 4: E₄(z) = 1 + 240 Σ σ₃(n) q^n",
+      "type": "modular_form"
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "MathFunction"
+        ],
+        "type": "HAS_L_FUNCTION",
+        "target": "L(s, E_k)",
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "E₆(z)",
+    "labels": [
+      "MathFunction"
+    ],
+    "properties": {
+      "level": 1,
+      "name": "E₆(z)",
+      "weight": 6,
+      "description": "Eisenstein series of weight 6: E₆(z) = 1 - 504 Σ σ₅(n) q^n",
+      "type": "modular_form"
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "MathFunction"
+        ],
+        "type": "HAS_L_FUNCTION",
+        "target": "L(s, E_k)",
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "L(s, E_k)",
+    "labels": [
+      "MathFunction"
+    ],
+    "properties": {
+      "full_name": "L-function of Eisenstein series E_k",
+      "importance": "Eisenstein series provide the explicit connection between modular forms and ζ(s)",
+      "name": "L(s, E_k)",
+      "description": "L-function coefficients from Eisenstein series: σ_{k-1}(n) = sum of d^{k-1} over d|n",
+      "type": "l_function",
+      "properties": "L(s, E_k) = ζ(s) ζ(s-k+1) — DIRECT bridge to ζ(s)!"
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "MathFunction"
+        ],
+        "type": "INSTANCE_OF",
+        "target": "L(s, f)",
+        "props": {}
+      },
+      {
+        "target_labels": [
+          "MathFunction"
+        ],
+        "type": "FACTOR_OF",
+        "target": "ζ(s)",
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "L(s, f)",
+    "labels": [
+      "MathFunction"
+    ],
+    "properties": {
+      "full_name": "L-function of automorphic form f",
+      "importance": "Central objects in Langlands program. Generalize Dirichlet L-functions.",
+      "domain": "Re(s) > (k+1)/2 (half-plane of convergence)",
+      "name": "L(s, f)",
+      "functional_equation": "Λ(s, f) = (2π)^{-s} Γ(s) L(s, f) = ε(f) (-1)^{k/2} Λ(k-s, f)",
+      "definition": "L(s, f) = Σ a_n n^{-s} = Π (1 - a_p p^{-s} + ε(p) p^{k-1-2s})^{-1}",
+      "type": "l_function",
+      "properties": "Euler product, functional equation, analytic continuation, Ramanujan-Petersson bound |a_p| ≤ 2p^{(k-1)/2}"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "L(s, f) for cusp form f",
+    "labels": [
+      "MathFunction"
+    ],
+    "properties": {
+      "full_name": "L-function of cusp form (Hecke eigenform)",
+      "importance": "Non-trivial L-functions. Birch-Swinnerton-Dyer conjecture about L(1, f) for elliptic curves.",
+      "name": "L(s, f) for cusp form f",
+      "description": "L-function of a cuspidal Hecke eigenform of weight k, level N",
+      "type": "l_function",
+      "properties": "Hecke eigenvalues a_p = λ_f(p) are multiplicative, satisfy |a_p| ≤ 2p^{(k-1)/2} (Deligne bound)"
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "MathFunction"
+        ],
+        "type": "INSTANCE_OF",
+        "target": "L(s, f)",
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "L(s, χ)",
+    "labels": [
+      "MathFunction"
+    ],
+    "properties": {
+      "full_name": "Dirichlet L-function",
+      "importance": "Used in Dirichlet's theorem on primes in arithmetic progressions",
+      "domain": "Re(s) > 1 (analytic continuation to C except possible pole at s=1)",
+      "name": "L(s, χ)",
+      "definition": "L(s, χ) = Σ χ(n) n^{-s}",
+      "type": "l_function",
+      "properties": "Generalized Riemann Hypothesis: all non-trivial zeros on Re(s) = 1/2"
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "MathFunction"
+        ],
+        "type": "INSTANCE_OF",
+        "target": "L(s, f)",
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "Δ(z)",
+    "labels": [
+      "MathFunction"
+    ],
+    "properties": {
+      "level": 1,
+      "importance": "Generates the space of cusp forms S₁₂(Γ(1))",
+      "name": "Δ(z)",
+      "weight": 12,
+      "description": "Ramanujan's cusp form: Δ(z) = q Π (1-q^n)²⁴ = Σ τ(n) q^n",
+      "type": "modular_form",
+      "properties": "τ(n) = Ramanujan tau function. First Fourier coefficient of discriminant modular form."
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "MathFunction"
+        ],
+        "type": "HAS_L_FUNCTION",
+        "target": "L(s, f) for cusp form f",
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "ζ(s)",
+    "labels": [
+      "MathFunction"
+    ],
+    "properties": {
+      "full_name": "Riemann Zeta Function",
+      "importance": "Encodes distribution of prime numbers via explicit formula",
+      "domain": "C \\ {1}",
+      "name": "ζ(s)",
+      "functional_equation": "Λ(s) = π^{-s/2} Γ(s/2) ζ(s) = Λ(1-s)",
+      "definition": "ζ(s) = Σ 1/nˢ = Π (1 - p⁻ˢ)⁻¹",
+      "zeros_nontrivial": "0 < Re(s) < 1 (critical strip), conjectured on Re(s) = 1/2",
+      "zeros_trivial": "s = -2, -4, -6, ... (negative even integers)",
+      "key_paper": "Riemann 1859",
+      "type": "zeta_function",
+      "properties": "Analytic continuation to C, simple pole at s=1 with residue 1"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "ζ_G(u)",
+    "labels": [
+      "MathFunction"
+    ],
+    "properties": {
+      "full_name": "Ihara Zeta Function of Graph G",
+      "importance": "Bridge between graph theory and number theory via Sunada's theorem",
+      "rh_analogue": "IH-RH: all poles lie on |u| = 1/√(d-1) iff G is Ramanujan",
+      "domain": "Complex u (converges for |u| < (d-1)^{-1/2})",
+      "name": "ζ_G(u)",
+      "functional_equation": "Symmetric under u ↔ 1/((d-1)u)",
+      "definition": "ζ_G(u) = (1 - u²)^{-(r-1)/2} det(I - Au + (d-1)u²I)^{-1}",
+      "type": "zeta_function",
+      "properties": "Analogue of Dedekind zeta for graphs. Poles encode cycle structure."
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "MathFunction"
+        ],
+        "type": "ANALOGOUS_TO",
+        "target": "ζ_K(s)",
+        "props": {
+          "description": "Ihara zeta ζ_G(u) is the graph-theoretic analogue of Dedekind zeta ζ_K(s). Poles ↔ closed geodesics ↔ prime ideals."
+        }
+      }
+    ]
+  },
+  {
+    "name": "ζ_K(s)",
+    "labels": [
+      "MathFunction"
+    ],
+    "properties": {
+      "full_name": "Dedekind Zeta Function of number field K",
+      "importance": "For K = Q(i), relates to distribution of Gaussian primes",
+      "domain": "Re(s) > 1",
+      "name": "ζ_K(s)",
+      "definition": "ζ_K(s) = Σ N(I)^{-s} over ideals I of O_K",
+      "type": "zeta_function",
+      "properties": "Generalizes ζ(s) (ζ_Q(s) = ζ(s)). Has Euler product over prime ideals."
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "MathFunction"
+        ],
+        "type": "GENERALIZES",
+        "target": "ζ(s)",
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "Adjacency Matrix A",
+    "labels": [
+      "Operator"
+    ],
+    "properties": {
+      "symbol": "A",
+      "importance": "THE operator for graph spectral theory. Connected to Hecke via LPS construction.",
+      "name": "Adjacency Matrix A",
+      "acts_on": "L²(V) for vertex set V of graph G",
+      "definition": "(Af)(v) = Σ_{u~v} f(u)",
+      "hermitian": true,
+      "properties": "Eigenvalues λ₁ ≥ λ₂ ≥ ... ≥ λ_n. Spectral gap = λ₁ - |λ₂|. Ramanujan iff |λ| ≤ 2√(d-1).",
+      "operator_type": "adjacency"
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Operator"
+        ],
+        "type": "CORRESPONDS_TO",
+        "target": "Hecke T_p",
+        "props": {
+          "precision": "Approximate — exact for isogeny graphs, approximate for LPS expanders",
+          "description": "LPS 1988: On L²(Γ\\G/K), the adjacency operator of the Cayley graph approximates the Hecke operator",
+          "key_paper": "LPS 1988, Lubotzky-Phillips-Sarnak",
+          "via": "L²(Γ\\G/K) — the space of K-invariant L² functions on Γ\\G where G=SL(2,R), K=SO(2)"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Farey Transfer Operator L_s",
+    "labels": [
+      "Operator"
+    ],
+    "properties": {
+      "symbol": "L_s",
+      "importance": "DIRECT encoding of RH as spectral gap of an operator on a graph.",
+      "name": "Farey Transfer Operator L_s",
+      "acts_on": "C(Γ₁) — functions on the Farey graph boundary",
+      "definition": "Perron-Frobenius operator for the Gauss map / Farey flow",
+      "properties": "Pollicott 2022: Z_{Γ₁}(s) = det(1 - L_{2s}). RH equivalent to spectral gap of L_s.",
+      "operator_type": "transfer"
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "ENCODES",
+        "target": null,
+        "props": {
+          "rh_connection": "RH is equivalent to the spectral gap of L_s",
+          "description": "Pollicott 2022: The transfer operator L_s on the Farey graph has det(1 - L_{2s}) = Z_{Γ₁}(s)"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Frobenius Endomorphism",
+    "labels": [
+      "Operator"
+    ],
+    "properties": {
+      "symbol": "Frob_p",
+      "importance": "Connects arithmetic of elliptic curves to spectral properties of isogeny graphs.",
+      "name": "Frobenius Endomorphism",
+      "acts_on": "ℓ-adic cohomology of elliptic curves / varieties",
+      "definition": "Geometric Frobenius: (x,y) ↦ (x^p, y^p) on elliptic curve over F̄_p",
+      "properties": "Trace of Frobenius a_p = p+1 - #E(F_p). Eigenvalues of Frobenius on H¹ are the key to Sato-Tate.",
+      "operator_type": "frobenius"
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Operator"
+        ],
+        "type": "CORRESPONDS_TO",
+        "target": "Adjacency Matrix A",
+        "props": {
+          "description": "On isogeny graphs: eigenvalues of Frobenius on H¹(E) = eigenvalues of adjacency matrix of isogeny graph",
+          "via": "Eichler trace formula / Deligne's proof of Ramanujan conjecture"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Graph Laplacian Δ",
+    "labels": [
+      "Operator"
+    ],
+    "properties": {
+      "symbol": "Δ = dI - A",
+      "importance": "Alternative spectral characterization. Connected to random walks and expansion.",
+      "name": "Graph Laplacian Δ",
+      "acts_on": "L²(V)",
+      "properties": "Δ = dI - A for d-regular graph. Eigenvalues 0 = μ₁ ≤ μ₂ ≤ ... ≤ μ_n ≤ 2d. Spectral gap = μ₂.",
+      "operator_type": "laplacian"
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Operator"
+        ],
+        "type": "DERIVED_FROM",
+        "target": "Adjacency Matrix A",
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "Hashimoto Edge Matrix H",
+    "labels": [
+      "Operator"
+    ],
+    "properties": {
+      "symbol": "H",
+      "importance": "Encodes the Ihara zeta function. Used in Sunada's theorem.",
+      "name": "Hashimoto Edge Matrix H",
+      "acts_on": "Space of directed edges",
+      "definition": "H_{e,e'} = 1 if terminal vertex of e = initial vertex of e' and e' ≠ ē",
+      "properties": "ζ_G(u)^{-1} = det(I - Hu). Related to adjacency by Bass's formula.",
+      "operator_type": "adjacency"
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "COMPUTES_VIA",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "Hecke T_n",
+    "labels": [
+      "Operator"
+    ],
+    "properties": {
+      "commuting": true,
+      "symbol": "T_n",
+      "name": "Hecke T_n",
+      "acts_on": "Space of modular forms M_k(Γ₀(N))",
+      "multiplicative": true,
+      "hermitian": true,
+      "properties": "T_m T_n = T_{mn} for (m,n)=1, T_p T_{p^r} = T_{p^{r+1}} + p^{k-1} T_{p^{r-1}} (recursion)",
+      "operator_type": "hecke"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Hecke T_p",
+    "labels": [
+      "Operator"
+    ],
+    "properties": {
+      "commuting": true,
+      "symbol": "T_p",
+      "eigenvalue_name": "Hecke eigenvalue λ_f(p)",
+      "importance": "Hecke eigenvalues a_p are the central bridge between modular forms and L-functions",
+      "name": "Hecke T_p",
+      "acts_on": "Space of modular forms M_k(Γ₀(N))",
+      "definition": "(T_p f)(z) = p^{k/2-1} Σ_{ad=p, 0≤b<d} d^{-k} f((az+b)/d)",
+      "multiplicative": true,
+      "hermitian": true,
+      "key_paper": "Hecke 1937",
+      "properties": "Double coset decomposition: Γ₀(N) diag(1,p) Γ₀(N) = ⊔ Γ₀(N)(a b; 0 d)",
+      "operator_type": "hecke"
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "ACTS_ON",
+        "target": null,
+        "props": {}
+      },
+      {
+        "target_labels": [],
+        "type": "ACTS_ON",
+        "target": null,
+        "props": {}
+      },
+      {
+        "target_labels": [],
+        "type": "ACTS_ON",
+        "target": null,
+        "props": {}
+      },
+      {
+        "target_labels": [
+          "Operator"
+        ],
+        "type": "INSTANCE_OF",
+        "target": "Hecke T_n",
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "relevance_to_rh": "direct",
+      "journal": "Monatsberichte der Berliner Akademie",
+      "year": 1859,
+      "authors_str": "Bernhard Riemann",
+      "description": "The original RH paper. 8 pages that changed mathematics.",
+      "bibtex_key": "riemann1859",
+      "title": "Über die Anzahl der Primzahlen unter einer gegebenen Grösse",
+      "publication_type": "journal"
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "PROPOSES",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "volume": "8",
+      "relevance_to_rh": "analogous",
+      "pages": "261-277",
+      "journal": "Combinatorica",
+      "year": 1988,
+      "msclass": [
+        "05C25",
+        "11F06",
+        "20C33"
+      ],
+      "authors_str": "A. Lubotzky, R. Phillips, P. Sarnak",
+      "description": "Constructs Ramanujan graphs as Cayley graphs of PSL(2,F_q). THE bridge paper.",
+      "bibtex_key": "lps1988",
+      "title": "Ramanujan graphs",
+      "publication_type": "journal",
+      "doi": "10.1007/BF02126799"
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Paper"
+        ],
+        "type": "CITES",
+        "target": null,
+        "props": {}
+      },
+      {
+        "target_labels": [],
+        "type": "INTRODUCES",
+        "target": null,
+        "props": {}
+      },
+      {
+        "target_labels": [],
+        "type": "PROVES",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "volume": "24",
+      "relevance_to_rh": "analogous",
+      "pages": "39-46",
+      "journal": "Problems of Information Transmission",
+      "year": 1988,
+      "authors_str": "G.A. Margulis",
+      "description": "Independent construction of Ramanujan graphs, contemporaneous with LPS",
+      "bibtex_key": "margulis1988",
+      "title": "Explicit group-theoretic constructions of combinatorial schemes and their applications in the construction of expanders and concentrators",
+      "publication_type": "journal"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "volume": "52",
+      "relevance_to_rh": "foundational",
+      "pages": "137-252",
+      "journal": "Publications Mathématiques de l'IHÉS",
+      "year": 1974,
+      "msclass": [
+        "14G15",
+        "11G25"
+      ],
+      "authors_str": "Pierre Deligne",
+      "description": "Proof of Weil conjectures → Ramanujan-Petersson conjecture. Foundation for spectral bound.",
+      "bibtex_key": "deligne1974",
+      "title": "La conjecture de Weil: II",
+      "publication_type": "journal",
+      "doi": "10.1007/BF02687474"
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "PROVES",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "relevance_to_rh": "direct",
+      "year": 2022,
+      "msclass": [
+        "11M26",
+        "37C30",
+        "05C25"
+      ],
+      "authors_str": "Mark Pollicott",
+      "description": "RH as spectral gap of transfer operator on Farey graph. Second bridge graphs→ζ(s).",
+      "arxiv_id": "2209.03897",
+      "bibtex_key": "pollicott2022",
+      "title": "A note on the Riemann hypothesis and the Farey sequence",
+      "publication_type": "preprint"
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Paper"
+        ],
+        "type": "CITES",
+        "target": null,
+        "props": {}
+      },
+      {
+        "target_labels": [],
+        "type": "INTRODUCES",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "volume": "612",
+      "relevance_to_rh": "methodological",
+      "pages": "56-60",
+      "journal": "Nature",
+      "year": 2021,
+      "msclass": [
+        "05E10",
+        "20C08",
+        "68T07"
+      ],
+      "authors_str": "Alex Davies, Petar Veličković, Lars Buesing, Sam Blackwell, Zhengping Qiang, Carlos Pérez Muñoz, Peter Battaglia, Charles Blundell, András Juhász, Marc Lackenby, Geordie Williamson, Pushmeet Kohli",
+      "description": "First GNN (MPNN) on Bruhat intervals to solve a 40-year-old combinatorial conjecture. Proof of concept for GNN × representation theory.",
+      "bibtex_key": "williamson2021",
+      "title": "Deep learning for the combinatorial invariance conjecture",
+      "publication_type": "journal",
+      "doi": "10.1038/s41586-022-05415-0"
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "APPROACHES_VIA",
+        "target": null,
+        "props": {
+          "confidence": 1.0,
+          "strategy": "MPNN on Bruhat intervals"
+        }
+      },
+      {
+        "target_labels": [
+          "Paper"
+        ],
+        "type": "CITES",
+        "target": null,
+        "props": {}
+      },
+      {
+        "target_labels": [
+          "AIApproach"
+        ],
+        "type": "USES_METHOD",
+        "target": "GNN Spectral Prediction",
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "relevance_to_rh": "methodological",
+      "journal": "NeurIPS 2024",
+      "year": 2024,
+      "msclass": [
+        "68T07",
+        "05C25",
+        "68Q15"
+      ],
+      "authors_str": "H. Barlag, L. R. B. Schmitt, M. Grohe",
+      "description": "Exact correspondence: constant-depth GNNs ↔ constant-depth arithmetic circuits. Extended to recurrent GNNs in 2026.",
+      "bibtex_key": "barlag2024",
+      "title": "Graph Neural Networks and Arithmetic Circuits",
+      "publication_type": "conference"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "relevance_to_rh": "direct",
+      "year": 2023,
+      "msclass": [
+        "11M26",
+        "68T07"
+      ],
+      "authors_str": "S. Hayou",
+      "description": "RH equivalent to density of single-layer neural nets in L²(0,1) via Nyman-Beurling criterion. Neural net angle on RH.",
+      "arxiv_id": "2309.09171",
+      "bibtex_key": "hayou2023",
+      "title": "A Neural Network Proof of the Riemann Hypothesis",
+      "publication_type": "preprint"
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "APPROACHES_VIA",
+        "target": null,
+        "props": {
+          "confidence": 0.3,
+          "strategy": "Neural net density via Nyman-Beurling"
+        }
+      },
+      {
+        "target_labels": [
+          "AIApproach"
+        ],
+        "type": "USES_METHOD",
+        "target": "GNN Spectral Prediction",
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "relevance_to_rh": "computational",
+      "year": 2025,
+      "msclass": [
+        "11M26",
+        "68T07"
+      ],
+      "authors_str": "Bieri, B. Brüderlin, J. Brüderlin, A. K. Haynes",
+      "description": "ML predicts vanishing order of rational L-functions. 248K functions from LMFDB. Uses NNs/CNNs, no GNNs.",
+      "bibtex_key": "bieri2025",
+      "title": "Machine learning the Riemann zeta function",
+      "publication_type": "preprint"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "relevance_to_rh": "computational",
+      "year": 2025,
+      "msclass": [
+        "11M06",
+        "03B35"
+      ],
+      "authors_str": "D. Loeffler, M. Stoll",
+      "description": "Formalized ζ(s), functional equation, analytic continuation, trivial zeros in Mathlib. RH stated as Prop. ~60-70% of needed machinery exists.",
+      "bibtex_key": "loeffler2025",
+      "title": "Formalization of the Riemann zeta function in Lean 4",
+      "publication_type": "preprint"
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "APPROACHES_VIA",
+        "target": null,
+        "props": {
+          "confidence": 0.6,
+          "strategy": "Formal verification in Lean 4"
+        }
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "relevance_to_rh": "direct",
+      "year": 2019,
+      "authors_str": "B. Rodgers, T. Tao",
+      "description": "Λ ≥ 0. Newman's conjecture: Λ = 0 iff RH. So RH ≤ Λ = 0. Gap closed to Λ = 0.",
+      "arxiv_id": "1901.03052",
+      "bibtex_key": "rogers_tao2019",
+      "title": "The de Bruijn-Newman constant is non-negative",
+      "publication_type": "preprint"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "relevance_to_rh": "computational",
+      "journal": "Mathematics of Computation",
+      "year": 2021,
+      "authors_str": "D. Platt, T. Trudgian",
+      "description": "Verified RH up to height 3×10¹². Uses rigorous interval arithmetic.",
+      "bibtex_key": "platt_trudgian2021",
+      "title": "The Riemann hypothesis is true up to 3·10¹²",
+      "publication_type": "journal"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "relevance_to_rh": "analogous",
+      "year": 2025,
+      "authors_str": "G. Codogni, C. Lido",
+      "msclass": [
+        "11G15",
+        "05C25"
+      ],
+      "description": "Exact correspondence: isogeny graph eigenvalues = Frobenius eigenvalues. Ramanujan property proven. Pure math, no ML.",
+      "bibtex_key": "codogni_lido",
+      "title": "Spectral theory of isogeny graphs",
+      "publication_type": "preprint"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "relevance_to_rh": "methodological",
+      "github_url": "https://github.com/alejandrox1/CayleyPy",
+      "year": 2025,
+      "authors_str": "CayleyPy contributors",
+      "description": "Generates Cayley graphs of SL(2,F_p). NeurIPS 2025 Spotlight. ~200 conjectures on Cayley/Schreier graphs. No GNN component.",
+      "bibtex_key": "cayleypy",
+      "title": "CayleyPy: A Python Library for Cayley Graph Generation",
+      "publication_type": "software"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "volume": "357",
+      "relevance_to_rh": "foundational",
+      "pages": "138-160",
+      "journal": "Journal für die reine und angewandte Mathematik",
+      "year": 1985,
+      "msclass": [
+        "11M26"
+      ],
+      "authors_str": "A.M. Odlyzko, H.J.J. te Riele",
+      "description": "Disproved Mertens hypothesis using Odlyzko's zeta zero computations. Showed M(x) = Ω±(√x).",
+      "bibtex_key": "odlyzko_rielle1985",
+      "title": "Disproof of the Mertens Conjecture",
+      "publication_type": "journal"
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "DISPROVES",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "relevance_to_rh": "computational",
+      "year": 2024,
+      "msclass": [
+        "11M26",
+        "68T07"
+      ],
+      "authors_str": "S. Shanker",
+      "description": "Transformer model predicts zero distribution with 0.998 accuracy. Time-series approach to zeta zeros. No graph structure used.",
+      "arxiv_id": "2404.05646",
+      "bibtex_key": "shanker2024",
+      "title": "Predicting Riemann zeta zeros using Transformer models",
+      "publication_type": "preprint"
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "USES_METHOD",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "relevance_to_rh": "computational",
+      "year": 2025,
+      "msclass": [
+        "11M26",
+        "68T07"
+      ],
+      "authors_str": "Wu et al.",
+      "description": "ML falsification attempt using Random Forests, GANs, VAEs with SHAP. No off-line zeros found. Conservative conclusion.",
+      "bibtex_key": "wu2025",
+      "title": "Machine Learning Approaches to the Riemann Hypothesis: Falsification Study",
+      "publication_type": "preprint"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "relevance_to_rh": "analogous",
+      "year": 2019,
+      "authors_str": "I. Rivin, M. Sardari",
+      "msclass": [
+        "11F06",
+        "05C25",
+        "20C33"
+      ],
+      "description": "Optimal spectral gap estimates for Cayley graphs of SL(2,F_p). Numerical evidence for near-Ramanujan behavior.",
+      "arxiv_id": "1910.09657",
+      "bibtex_key": "rivin_sardari2019",
+      "title": "Optimal spectral gaps in SL(2,Z/pZ)",
+      "publication_type": "preprint"
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "CITES",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "relevance_to_rh": "methodological",
+      "journal": "International Mathematics Research Notices",
+      "year": 2018,
+      "msclass": [
+        "11F06",
+        "20C33"
+      ],
+      "authors_str": "J. Breen, A. Fish, P. Hegarty, D. Morris",
+      "description": "Fourier analysis on SL₂(Z/pⁿZ). Provides computational tools for character sums on Cayley graphs.",
+      "bibtex_key": "breen2018",
+      "title": "A Fourier-analytic approach to counting SL₂(Z/pⁿZ)",
+      "publication_type": "journal"
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Paper"
+        ],
+        "type": "USES_METHOD",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "relevance_to_rh": "methodological",
+      "journal": "Bulletin of the American Mathematical Society",
+      "year": 2015,
+      "msclass": [
+        "20D60",
+        "05C25"
+      ],
+      "authors_str": "H.A. Helfgott",
+      "description": "Helfgott's work on growth in SL(2,F_p) — every set of generators expands. Foundational for expander graph theory.",
+      "bibtex_key": "helfgott2015",
+      "title": "Growth in group theory and SL₂(Z/pZ)",
+      "publication_type": "journal"
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "CONNECTS_TO",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "relevance_to_rh": "foundational",
+      "journal": "Annals of Mathematics",
+      "year": 2011,
+      "msclass": [
+        "11F03",
+        "11F80"
+      ],
+      "authors_str": "T. Barnet-Lamb, D. Geraghty, M. Harris, R. Taylor",
+      "description": "Proof of Sato-Tate conjecture via potential automorphy. Uses deep results from the Langlands program.",
+      "bibtex_key": "barnet_lamb2011",
+      "title": "The Sato-Tate conjecture and automorphy for GL(2)",
+      "publication_type": "journal"
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "PROVES",
+        "target": null,
+        "props": {
+          "proof_technique": "potential automorphy"
+        }
+      },
+      {
+        "target_labels": [],
+        "type": "CITES",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "relevance_to_rh": "computational",
+      "github_url": "https://github.com/leanprover-community/mathlib4",
+      "year": 2025,
+      "authors_str": "A. Kontorovich, T. Tao, et al.",
+      "msclass": [
+        "11N05",
+        "03B35"
+      ],
+      "description": "PNT formalized in Mathlib via Wiener-Ikehara theorem. Part of the broader effort to formalize analytic number theory in Lean 4.",
+      "bibtex_key": "kontorovich_tao_pntplus",
+      "title": "PNT+ project: Formalization of the Prime Number Theorem in Lean 4 via Wiener-Ikehara",
+      "publication_type": "preprint"
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "PROVES",
+        "target": null,
+        "props": {
+          "proof_technique": "formal verification in Lean 4"
+        }
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "relevance_to_rh": "methodological",
+      "journal": "Research in Number Theory",
+      "year": 2023,
+      "authors_str": "J. Boulier, M. Edgar, B. Heinz, C. Lee, A. Marek, M. Mustaţă, N. Schefer, J. Sijsling",
+      "msclass": [
+        "11G05",
+        "14G10"
+      ],
+      "description": "Discovered unexpected periodic patterns in the coefficients of elliptic curve L-functions. Statistical phenomenon visible in LMFDB data. NOT applied to ζ(s) itself.",
+      "bibtex_key": "murmurations2023",
+      "title": "Murmurations of elliptic curves",
+      "publication_type": "journal"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "relevance_to_rh": "methodological",
+      "year": 2026,
+      "authors_str": "G. Williamson, A. Charton, M. Kempe (organizers)",
+      "description": "Workshop at the Mathematics Institute Oberwolfach. Williamson, Charton, Kempe as organizers. Active research area.",
+      "bibtex_key": "matrix_mfo2026",
+      "title": "MATRIX-MFO Workshop on Machine Learning and Number Theory",
+      "publication_type": "conference"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "relevance_to_rh": "methodological",
+      "journal": "Nature",
+      "year": 2024,
+      "authors_str": "T. Brown et al. (Google DeepMind)",
+      "description": "AlphaProof achieved IMO 28/42 (silver medal level) using Lean 4 + TTRL (Tree of Thoughts with Reinforcement Learning). First AI to solve olympiad problems at this level.",
+      "bibtex_key": "alphaproof2024",
+      "title": "Solving olympiad problems without human demonstrations",
+      "publication_type": "journal"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "relevance_to_rh": "methodological",
+      "year": 2025,
+      "authors_str": "Google DeepMind",
+      "description": "IMO Gold medal level (July 2025). Improved over AlphaProof's silver. Demonstrates rapid progress in AI mathematical reasoning.",
+      "bibtex_key": "gemini_deepthink2025",
+      "title": "Achieving Silver Medal on IMO with Gemini Deep Think",
+      "publication_type": "preprint"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "relevance_to_rh": "methodological",
+      "year": 2026,
+      "authors_str": "Google DeepMind",
+      "description": "Solved 4 open Erdős problems. Level 2 taxonomy of theorem proving. Latest advancement in AI formal mathematics.",
+      "arxiv_id": "2602.XXXXX",
+      "bibtex_key": "aletheia2026",
+      "title": "Aletheia: An AI theorem prover with formal-level capabilities",
+      "publication_type": "preprint"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "relevance_to_rh": "computational",
+      "year": 2024,
+      "authors_str": "LMFDB Collaboration",
+      "description": "248K+ L-functions with computed data (zeros, coefficients, special values). Primary data source for ML number theory experiments (Bieri et al. 2025).",
+      "bibtex_key": "lmfdb",
+      "title": "The L-Functions and Modular Forms Database (LMFDB)",
+      "publication_type": "database",
+      "url": "https://www.lmfdb.org"
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "USES_METHOD",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "relevance_to_rh": "computational",
+      "journal": "Mathematics of Computation",
+      "year": 2017,
+      "authors_str": "D.J. Platt",
+      "description": "Database of first 10¹³ zeta zeros with rigorous error bounds. Used for zero-spacing statistics and ML training data.",
+      "bibtex_key": "platt2017",
+      "title": "Computing the Riemann zeta zeros to 10¹³",
+      "publication_type": "journal"
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "USES_METHOD",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "relevance_to_rh": "foundational",
+      "year": 2017,
+      "authors_str": "Keith A. Broughan",
+      "description": "THE definitive catalog of RH equivalences. 100+ formulations across 2 volumes. Arithmetic + analytic equivalents with full proofs.",
+      "publisher": "Cambridge University Press",
+      "bibtex_key": "broughan2017",
+      "title": "Equivalents of the Riemann Hypothesis, Volumes I and II",
+      "publication_type": "book",
+      "doi": "10.1017/9781108178228"
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "CITES",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "relevance_to_rh": "foundational",
+      "year": 2008,
+      "authors_str": "P. Borwein, S. Choi, B. Rooney, A. Weirathmueller",
+      "publisher": "Springer",
+      "description": "Comprehensive survey with Chapter 5 covering ~30 major equivalent formulations.",
+      "bibtex_key": "borwein2008",
+      "title": "The Riemann Hypothesis: A Resource for the Afficionado and Virtuoso Alike",
+      "publication_type": "book",
+      "doi": "10.1007/978-0-387-72126-2"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "volume": "50",
+      "relevance_to_rh": "foundational",
+      "pages": "341-353",
+      "journal": "Notices of the American Mathematical Society",
+      "year": 2003,
+      "authors_str": "J. Brian Conrey",
+      "description": "Influential survey covering the main equivalent formulations, history, and implications.",
+      "bibtex_key": "conrey2003",
+      "title": "The Riemann Hypothesis",
+      "publication_type": "journal"
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "CITES",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "relevance_to_rh": "foundational",
+      "year": 2026,
+      "authors_str": "Alain Connes",
+      "description": "Connes' modern survey. Notes 'over 100 equivalent formulations'. Noncommutative geometry approach.",
+      "arxiv_id": "2602.04022",
+      "bibtex_key": "connes2026",
+      "title": "The Riemann Hypothesis: Past, Present and a Letter Through Time",
+      "publication_type": "preprint"
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "CITES",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [
+      "Paper"
+    ],
+    "properties": {
+      "volume": "116",
+      "relevance_to_rh": "direct",
+      "pages": "11103-11110",
+      "journal": "PNAS",
+      "year": 2019,
+      "authors_str": "M.J. Griffin, K. Ono, L. Rolen, D. Zagier",
+      "description": "Proved hyperbolicity of Jensen polynomials for n ≥ N(d). Computational evidence supporting RH via polynomial theory.",
+      "bibtex_key": "griffin2019",
+      "title": "Jensen polynomials for the Riemann zeta function and other sequences",
+      "publication_type": "journal",
+      "doi": "10.1073/pnas.1902572116"
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Theorem"
+        ],
+        "type": "PROVES",
+        "target": "Jensen Polynomial Hyperbolicity (Pólya-Jensen)",
+        "props": {
+          "proof_technique": "polynomial theory, arithmetic of Dirichlet series"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Closed Lost",
+    "labels": [
+      "PipelineStage"
+    ],
+    "properties": {
+      "name": "Closed Lost"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Closed Won",
+    "labels": [
+      "PipelineStage"
+    ],
+    "properties": {
+      "name": "Closed Won"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Contacted",
+    "labels": [
+      "PipelineStage"
+    ],
+    "properties": {
+      "name": "Contacted"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Meeting",
+    "labels": [
+      "PipelineStage"
+    ],
+    "properties": {
+      "name": "Meeting"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "New",
+    "labels": [
+      "PipelineStage"
+    ],
+    "properties": {
+      "name": "New"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Proposal",
+    "labels": [
+      "PipelineStage"
+    ],
+    "properties": {
+      "name": "Proposal"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Alex Kontorovich",
+    "labels": [
+      "Researcher"
+    ],
+    "properties": {
+      "affiliation": "Rutgers University",
+      "name": "Alex Kontorovich",
+      "research_areas": [
+        "analytic number theory",
+        "homogeneous dynamics"
+      ]
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Paper"
+        ],
+        "type": "AUTHORED",
+        "target": null,
+        "props": {
+          "role": "coauthor"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Alexander Lubotzky",
+    "labels": [
+      "Researcher"
+    ],
+    "properties": {
+      "affiliation": "Hebrew University",
+      "name": "Alexander Lubotzky",
+      "research_areas": [
+        "group theory",
+        "expander graphs",
+        "geometric group theory"
+      ]
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Paper"
+        ],
+        "type": "AUTHORED",
+        "target": null,
+        "props": {
+          "role": "first_author",
+          "author_order": 1
+        }
+      }
+    ]
+  },
+  {
+    "name": "Andrew Odlyzko",
+    "labels": [
+      "Researcher"
+    ],
+    "properties": {
+      "affiliation": "University of Minnesota",
+      "name": "Andrew Odlyzko",
+      "research_areas": [
+        "computational number theory",
+        "cryptography",
+        "zeta zeros"
+      ]
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Paper"
+        ],
+        "type": "AUTHORED",
+        "target": null,
+        "props": {
+          "role": "coauthor"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Dave Platt",
+    "labels": [
+      "Researcher"
+    ],
+    "properties": {
+      "affiliation": "University of Bristol",
+      "name": "Dave Platt",
+      "research_areas": [
+        "analytic number theory",
+        "computational number theory"
+      ]
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Paper"
+        ],
+        "type": "AUTHORED",
+        "target": null,
+        "props": {
+          "role": "coauthor"
+        }
+      }
+    ]
+  },
+  {
+    "name": "David Loeffler",
+    "labels": [
+      "Researcher"
+    ],
+    "properties": {
+      "affiliation": "University of Warwick",
+      "name": "David Loeffler",
+      "research_areas": [
+        "number theory",
+        "Lean formalization",
+        "automorphic forms"
+      ]
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Paper"
+        ],
+        "type": "AUTHORED",
+        "target": null,
+        "props": {
+          "role": "coauthor"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Geordie Williamson",
+    "labels": [
+      "Researcher"
+    ],
+    "properties": {
+      "affiliation": "University of Sydney / IAS",
+      "name": "Geordie Williamson",
+      "research_areas": [
+        "representation theory",
+        "geometric representation theory",
+        "categorification"
+      ]
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Paper"
+        ],
+        "type": "AUTHORED",
+        "target": null,
+        "props": {
+          "role": "coauthor"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Guillaume Charton",
+    "labels": [
+      "Researcher"
+    ],
+    "properties": {
+      "name": "Guillaume Charton",
+      "research_areas": [
+        "machine learning",
+        "symbolic computation"
+      ]
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Harald Helfgott",
+    "labels": [
+      "Researcher"
+    ],
+    "properties": {
+      "affiliation": "University of Göttingen",
+      "name": "Harald Helfgott",
+      "research_areas": [
+        "additive combinatorics",
+        "analytic number theory"
+      ]
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Paper"
+        ],
+        "type": "AUTHORED",
+        "target": null,
+        "props": {
+          "role": "author"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Igor Rivin",
+    "labels": [
+      "Researcher"
+    ],
+    "properties": {
+      "affiliation": "Temple University",
+      "name": "Igor Rivin",
+      "research_areas": [
+        "geometric group theory",
+        "combinatorial number theory"
+      ]
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Paper"
+        ],
+        "type": "AUTHORED",
+        "target": null,
+        "props": {
+          "role": "coauthor"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Jon Keating",
+    "labels": [
+      "Researcher"
+    ],
+    "properties": {
+      "affiliation": "University of Oxford",
+      "name": "Jon Keating",
+      "research_areas": [
+        "random matrix theory",
+        "number theory",
+        "quantum chaos"
+      ]
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "M. Sardari",
+    "labels": [
+      "Researcher"
+    ],
+    "properties": {
+      "name": "M. Sardari",
+      "research_areas": [
+        "analytic number theory",
+        "automorphic forms"
+      ]
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Paper"
+        ],
+        "type": "AUTHORED",
+        "target": null,
+        "props": {
+          "role": "coauthor"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Maximilian Kempe",
+    "labels": [
+      "Researcher"
+    ],
+    "properties": {
+      "name": "Maximilian Kempe",
+      "research_areas": [
+        "machine learning",
+        "mathematics"
+      ]
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Michael Harris",
+    "labels": [
+      "Researcher"
+    ],
+    "properties": {
+      "affiliation": "Columbia University",
+      "name": "Michael Harris",
+      "research_areas": [
+        "automorphic forms",
+        "Langlands program"
+      ]
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Paper"
+        ],
+        "type": "AUTHORED",
+        "target": null,
+        "props": {
+          "role": "coauthor"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Peter Sarnak",
+    "labels": [
+      "Researcher"
+    ],
+    "properties": {
+      "affiliation": "IAS Princeton",
+      "name": "Peter Sarnak",
+      "research_areas": [
+        "analytic number theory",
+        "spectral theory",
+        "Langlands program"
+      ]
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Paper"
+        ],
+        "type": "AUTHORED",
+        "target": null,
+        "props": {
+          "role": "coauthor",
+          "author_order": 3
+        }
+      }
+    ]
+  },
+  {
+    "name": "Richard Taylor",
+    "labels": [
+      "Researcher"
+    ],
+    "properties": {
+      "affiliation": "IAS Princeton",
+      "name": "Richard Taylor",
+      "research_areas": [
+        "automorphic forms",
+        "Langlands program",
+        "Fermat's Last Theorem"
+      ]
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Paper"
+        ],
+        "type": "AUTHORED",
+        "target": null,
+        "props": {
+          "role": "coauthor"
+        }
+      }
+    ]
+  },
+  {
+    "name": "S. Shanker",
+    "labels": [
+      "Researcher"
+    ],
+    "properties": {
+      "name": "S. Shanker",
+      "research_areas": [
+        "machine learning",
+        "number theory"
+      ]
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Paper"
+        ],
+        "type": "AUTHORED",
+        "target": null,
+        "props": {
+          "role": "author"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Terence Tao",
+    "labels": [
+      "Researcher"
+    ],
+    "properties": {
+      "affiliation": "UCLA",
+      "name": "Terence Tao",
+      "research_areas": [
+        "analytic number theory",
+        "harmonic analysis",
+        "PDE"
+      ]
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Paper"
+        ],
+        "type": "AUTHORED",
+        "target": null,
+        "props": {
+          "role": "coauthor"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Alon-Boppana Bound",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "proof_status": "proven",
+      "name": "Alon-Boppana Bound",
+      "statement": "For any infinite family of d-regular graphs: lim inf |λ₂(G_n)| ≥ 2√(d-1)",
+      "description": "Ramanujan graphs ACHIEVE the Alon-Boppana bound — they are optimal expanders",
+      "year_established": 1986
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Theorem",
+          "Conjecture"
+        ],
+        "type": "LOWER_BOUND_FOR",
+        "target": "IH-RH (Ihara Riemann Hypothesis)",
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "Baez-Duarte Criterion",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "proof_status": "proven",
+      "domain": "functional analysis",
+      "name": "Baez-Duarte Criterion",
+      "statement": "RH iff χ ∈ closure(span{ρ_a : a ∈ N}) in L²(0,∞), where χ is the indicator of (0,1] — countable version of Nyman-Beurling",
+      "description": "Luis Báez-Duarte strengthened Nyman-Beurling from uncountable to countable generating set. Numerical evidence by Báez-Duarte up to a=100.",
+      "key_paper": "Báez-Duarte (2002) arXiv:math/0202141",
+      "year_established": 2002
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "STRENGTHENS",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "Bagchi's Theorem",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "proof_status": "proven",
+      "name": "Bagchi's Theorem",
+      "statement": "RH holds iff the Hurwitz zeta function ζ(s,a) is cyclic in L²(0,1) with respect to the translation semigroup",
+      "description": "Bhaskar Bagchi (1982). Reformulates Nyman-Beurling in terms of dynamical systems on L². Connects RH to ergodic theory.",
+      "key_paper": "Bagchi 1982, PhD Thesis",
+      "year_established": 1982
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Theorem"
+        ],
+        "type": "GENERALIZES",
+        "target": "Nyman-Beurling Criterion",
+        "props": {}
+      },
+      {
+        "target_labels": [],
+        "type": "EQUIVALENT_TO",
+        "target": null,
+        "props": {
+          "proof_sketch": "Bagchi (1982)",
+          "direction": "bidirectional"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Balazard-Saias-Yor Integral",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "proof_status": "proven",
+      "domain": "complex analysis",
+      "name": "Balazard-Saias-Yor Integral",
+      "statement": "(1/π)∫₀^∞ log|ζ(1/2+it)|/(1/4+t²) dt = 0",
+      "description": "A cleaner integral on the critical line itself. If ζ has a zero off the line, the integral is positive.",
+      "key_paper": "Balazard, Saias, Yor (1999) Adv. Math. 143, 284-287",
+      "year_established": 1999
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Bombieri Variational Approach",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "proof_status": "proven",
+      "domain": "calculus of variations",
+      "name": "Bombieri Variational Approach",
+      "statement": "RH equivalent to existence of minimizing function for Bombieri's variational functional on the explicit formula",
+      "description": "Enrico Bombieri (2000, 2003). Generalizes Weil positivity via calculus of variations. Connected to Connes' noncommutative geometry trace formula.",
+      "key_paper": "Bombieri (2003) Comm. Pure Appl. Math. 56, 1151-1164",
+      "year_established": 2000
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "GENERALIZES",
+        "target": null,
+        "props": {}
+      },
+      {
+        "target_labels": [],
+        "type": "GENERALIZES",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "Brownian Excursion (Biane-Pitman-Yor)",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "proof_status": "proven",
+      "domain": "probability theory",
+      "name": "Brownian Excursion (Biane-Pitman-Yor)",
+      "statement": "E[Z_s] = Ξ(s) where Z_s = ∫₀^∞ cos(st)|B_u|du for Brownian excursion B_u. RH connects to moment conditions.",
+      "description": "P. Biane, J. Pitman, M. Yor (2001). The Riemann Ξ-function has a probabilistic interpretation via Brownian excursion area.",
+      "key_paper": "Biane, Pitman, Yor (2001) Bull. AMS 38, 435-465",
+      "year_established": 2001
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "CONNECTS_TO",
+        "target": null,
+        "props": {
+          "description": "probability interpretation of Ξ-function"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Caveney-Nicolas-Sondow GA1/GA2 Criterion",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "proof_status": "proven",
+      "domain": "arithmetic functions",
+      "name": "Caveney-Nicolas-Sondow GA1/GA2 Criterion",
+      "statement": "The only number that is both GA1 (composite N with G(N)≥G(N/p) ∀p|N) and GA2 (G(N)≥G(aN) ∀a) is 4, where G(n) = σ(n)/(n log log n)",
+      "description": "Refinement of Robin's inequality. Connected to colossally abundant numbers.",
+      "key_paper": "Caveney, Nicolas, Sondow (2011) arXiv:1107.1295",
+      "year_established": 2011
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "REFINES",
+        "target": null,
+        "props": {}
+      },
+      {
+        "target_labels": [],
+        "type": "REFINES",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "CayleyPy API — SL(2,F_p) Generation",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "proof_status": "verified",
+      "name": "CayleyPy API — SL(2,F_p) Generation",
+      "statement": "CayleyPy provides MatrixGenerator(modulo=p) with special_linear_fundamental_roots(2, p) → 4 generators E₁₂, E₂₁ and inverses. BFS produces edges_list (numpy), adjacency_matrix_sparse(), all_states.",
+      "description": "Verified API: special_linear_fundamental_roots generates 4 generators from positive/negative root spaces. BfsResult provides edges_list, adjacency_matrix_sparse(), save/load. to_networkx_graph() materializes full graph (no truncation). Pre-computed data for p=2..10 in repo.",
+      "key_paper": "CayleyPy GitHub repository",
+      "year_established": 2025
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Chebyshev ψ Error Term",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "proof_status": "proven",
+      "domain": "analytic number theory",
+      "name": "Chebyshev ψ Error Term",
+      "statement": "ψ(x) = x + O(x^{1/2} log²x), where ψ(x) = Σ_{n≤x} Λ(n)",
+      "description": "Equivalent to RH via explicit formula. Stronger than PNT (ψ(x) ~ x).",
+      "year_established": 1901
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "STRENGTHENS",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "De Bruijn-Newman Constant Λ = 0",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "proof_status": "proven",
+      "domain": "complex analysis / entire functions",
+      "name": "De Bruijn-Newman Constant Λ = 0",
+      "statement": "RH iff Λ = 0, where H(λ,z) has only real zeros iff λ ≥ Λ. Rodgers-Tao proved Λ ≥ 0, so RH ↔ Λ = 0",
+      "description": "de Bruijn (1950): Λ ≤ 1/2. Newman (1976): Λ exists, conjectured ≥ 0. Rodgers-Tao (2020): Λ ≥ 0. Gap closed to Λ = 0.",
+      "key_paper": "Rodgers, Tao (2020) Forum Math. Pi 8, e6",
+      "year_established": 2020
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Deligne Bound",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "significance": "foundational",
+      "proof_status": "proven",
+      "proof_technique": "Étale cohomology, proof of Weil conjectures",
+      "statement": "Hecke eigenvalues of cusp forms satisfy |a_p| ≤ 2p^{(k-1)/2}",
+      "name": "Deligne Bound",
+      "description": "THE fundamental bound connecting modular forms and graph spectral theory. For k=2: |a_p| ≤ 2√p = Ramanujan bound |λ| ≤ 2√(d-1)",
+      "year_established": 1974
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Theorem"
+        ],
+        "type": "PROVES",
+        "target": "Ramanujan-Petersson Conjecture",
+        "props": {
+          "proof_technique": "algebraic geometry, étale cohomology"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Divisibility Graph Criterion",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "proof_status": "proven",
+      "domain": "graph theory",
+      "name": "Divisibility Graph Criterion",
+      "statement": "RH equivalent to spectral properties of the divisibility graph (vertices 1..N, edges n→m if n|m)",
+      "description": "K.A. Broughan. The divisibility graph's spectral radius behavior encodes RH.",
+      "key_paper": "Broughan (2017) Equivalents of RH Vol I, Ch. 10",
+      "year_established": 2017
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Explicit Formula",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "significance": "foundational",
+      "proof_status": "proven",
+      "name": "Explicit Formula",
+      "statement": "ψ₀(x) = x - Σ_ρ x^ρ/ρ - log(2π) - ½log(1 - x⁻²), where ψ₀(x) = Σ_{n≤x} Λ(n) (Chebyshev function), ρ runs over non-trivial zeros",
+      "description": "THE central formula connecting prime distribution to zeta zeros. Von Mangoldt. RH equivalent to ψ(x) = x + O(x^{1/2+ε}).",
+      "key_paper": "von Mangoldt 1896",
+      "year_established": 1896
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Theorem"
+        ],
+        "type": "USED_IN",
+        "target": "Li's Criterion",
+        "props": {}
+      },
+      {
+        "target_labels": [],
+        "type": "EQUIVALENT_TO",
+        "target": null,
+        "props": {
+          "proof_sketch": "RH ↔ ψ(x) = x + O(x^{1/2+ε})",
+          "direction": "bidirectional"
+        }
+      },
+      {
+        "target_labels": [],
+        "type": "CONNECTS_TO",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "Franel-Landau Criterion",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "proof_status": "proven",
+      "domain": "elementary number theory",
+      "name": "Franel-Landau Criterion",
+      "statement": "D(N) = O(N^{1/2+ε}) where D(N) = |#{squarefree n≤N : ω(n) even} - #{squarefree n≤N : ω(n) odd}|",
+      "description": "Balance of squarefree integers with even vs. odd number of prime factors. Elementary formulation.",
+      "year_established": 1926
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Generalized Riemann Hypothesis",
+    "labels": [
+      "Theorem",
+      "Conjecture",
+      "OpenProblem"
+    ],
+    "properties": {
+      "significance": "foundational",
+      "proof_status": "conjectured",
+      "year_stated": 1884,
+      "name": "Generalized Riemann Hypothesis",
+      "statement": "All non-trivial zeros of Dirichlet L-functions L(s,χ) have real part 1/2",
+      "description": "Extends RH to all Dirichlet L-functions"
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Hardy-Littlewood Series",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "proof_status": "proven",
+      "domain": "analytic number theory",
+      "name": "Hardy-Littlewood Series",
+      "statement": "Σ_{k=1}^∞ (-x)^k/k! · ζ(2k+1) = O(x^{-1/4}) as x → ∞",
+      "description": "Asymptotic behavior of odd zeta values in exponential generating function.",
+      "key_paper": "Hardy, Littlewood (1918); Conrey (2003) Notices AMS",
+      "year_established": 1918
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Hilbert-Pólya Conjecture",
+    "labels": [
+      "Theorem",
+      "Conjecture",
+      "OpenProblem"
+    ],
+    "properties": {
+      "significance": "foundational",
+      "note": "NOT proven equivalent to RH — it's a sufficient condition. If such an operator exists, RH follows, but the converse is unclear.",
+      "proof_status": "open",
+      "year_stated": 1914,
+      "name": "Hilbert-Pólya Conjecture",
+      "statement": "The imaginary parts of the non-trivial zeros of ζ(s) are the eigenvalues of a self-adjoint operator (Hermitian matrix) on a Hilbert space",
+      "description": "If true, RH follows because self-adjoint operators have real eigenvalues → Im(ρ) real → Re(ρ) = 1/2. Yakaboylu (2023) constructed a Hamiltonian with real eigenvalues under certain conditions."
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "IMPLIES",
+        "target": null,
+        "props": {
+          "description": "Self-adjoint operator has real spectrum → zeros on critical line"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Horocycle Flow Ergodicity Rate",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "proof_status": "proven",
+      "domain": "dynamical systems / ergodic theory",
+      "name": "Horocycle Flow Ergodicity Rate",
+      "statement": "∫₀^T f(h_t z)dt = T∫f + O(T^{1/2+ε}) for nice f on SL(2,R)/SL(2,Z) iff RH",
+      "description": "D. Mayer. The rate of equidistribution of horocycle flows on the modular surface encodes RH. Connects dynamical systems to number theory.",
+      "key_paper": "Mayer (1990); noted by Zagier; Lagarias (2010) Clay Math. Proc.",
+      "year_established": 1990
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "IH-RH (Ihara Riemann Hypothesis)",
+    "labels": [
+      "Theorem",
+      "Conjecture"
+    ],
+    "properties": {
+      "significance": "major",
+      "note": "The RH-analogue status comes from the STRUCTURAL parallel: eigenvalue bound ↔ zero location bound",
+      "proof_status": "proven",
+      "name": "IH-RH (Ihara Riemann Hypothesis)",
+      "statement": "A d-regular graph is Ramanujan iff all non-trivial eigenvalues λ satisfy |λ| ≤ 2√(d-1)",
+      "description": "Proven independently by Alon-Boppana (lower bound) and Lubotzky-Phillips-Sarnak (achievable). NOT an analogue in the sense of being unproven — it's a theorem about graphs.",
+      "year_established": 1985
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Theorem",
+          "Conjecture",
+          "OpenProblem"
+        ],
+        "type": "ANALOGOUS_TO",
+        "target": "Riemann Hypothesis",
+        "props": {
+          "shared_representation": "Both follow from representation theory of GL(2) over p-adic fields (Deligne for modular forms, same machinery for LPS)",
+          "description": "Structural parallel: Ramanujan bound |λ| ≤ 2√(d-1) ↔ RH critical line Re(s)=1/2. Both are optimal eigenvalue/zero location statements."
+        }
+      }
+    ]
+  },
+  {
+    "name": "Jensen Polynomial Hyperbolicity (Pólya-Jensen)",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "proof_status": "proven",
+      "year_stated": 1927,
+      "domain": "real analysis / polynomial theory",
+      "statement": "All Jensen polynomials J_{d,0}(x) for the Taylor coefficients of Ξ(t) are hyperbolic (all roots real) for all d ≥ 1",
+      "name": "Jensen Polynomial Hyperbolicity (Pólya-Jensen)",
+      "description": "Pólya (1927) established equivalence. Griffin-Ono-Rolen-Zagier (2019) proved hyperbolicity for n ≥ N(d) — computational evidence supporting RH.",
+      "key_paper": "Griffin, Ono, Rolen, Zagier (2019) PNAS 116, 11103-11110",
+      "year_established": 1927
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "LPS Ramanujan Graph Construction",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "significance": "foundational",
+      "proof_status": "proven",
+      "name": "LPS Ramanujan Graph Construction",
+      "statement": "For every prime p ≡ 1 (mod 4), there exist p+1-regular Ramanujan graphs on SL(2,F_q)",
+      "description": "Constructs Ramanujan graphs as Cayley graphs of PSL(2,F_q) with p+1 generators. Uses deep results from representation theory of SL(2).",
+      "key_paper": "LPS 1988 Combinatorica",
+      "year_established": 1988
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "USES",
+        "target": null,
+        "props": {}
+      },
+      {
+        "target_labels": [
+          "Theorem",
+          "Conjecture"
+        ],
+        "type": "ACHIEVES",
+        "target": "IH-RH (Ihara Riemann Hypothesis)",
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "LPS Spectral Bridge",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "significance": "foundational",
+      "proof_status": "proven",
+      "name": "LPS Spectral Bridge",
+      "statement": "The adjacency operator of the LPS Cayley graph of PSL(2,F_p) acts on L²(Γ\\G/K) as an approximation to the Hecke operator",
+      "description": "THE bridge between graph spectral theory and number theory. For k=2 cusp forms, Deligne bound |a_p| ≤ 2√p = Ramanujan bound |λ| ≤ 2√(d-1) because both arise from the same GL(2,ℚ_p) representations.",
+      "year_established": 1988
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Theorem"
+        ],
+        "type": "BRIDGE",
+        "target": "Deligne Bound",
+        "props": {
+          "to_domain": "Number theory (modular forms, L-functions)",
+          "description": "Connects adjacency eigenvalues of Cayley graphs to Hecke eigenvalues of modular forms",
+          "from_domain": "Graph theory (spectral graph theory)"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Lagarias Inequality",
+    "labels": [
+      "Theorem",
+      "Conjecture"
+    ],
+    "properties": {
+      "proof_status": "conjectured",
+      "year_stated": 2002,
+      "name": "Lagarias Inequality",
+      "statement": "σ(n) ≤ H_n + exp(H_n) log(H_n) for all n ≥ 1, with equality only for n=1",
+      "description": "An equivalent formulation of RH using harmonic numbers"
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Theorem",
+          "Conjecture",
+          "OpenProblem"
+        ],
+        "type": "EQUIVALENT_TO",
+        "target": "Riemann Hypothesis",
+        "props": {
+          "proof_sketch": "Lagarias (2002)",
+          "direction": "bidirectional"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Laguerre-Pólya Class",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "proof_status": "proven",
+      "domain": "complex analysis",
+      "name": "Laguerre-Pólya Class",
+      "statement": "The Riemann Ξ-function belongs to the Laguerre-Pólya class — the uniform limit on compacts of polynomials with only real zeros",
+      "description": "G. Pólya (1927), I. Schur. If RH is true, Ξ is in LP class. Equivalent statement about Hadamard product factorization.",
+      "key_paper": "Pólya (1927) Jber. Deutsch. Math.-Verein.",
+      "year_established": 1927
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Theorem"
+        ],
+        "type": "CONNECTS_TO",
+        "target": "Jensen Polynomial Hyperbolicity (Pólya-Jensen)",
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "Landau Function Criterion",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "proof_status": "proven",
+      "domain": "combinatorics / group theory",
+      "name": "Landau Function Criterion",
+      "statement": "log g(n) < li^{-1}(n) for all n ≥ 1, where g(n) = maximal order of element in symmetric group S_n",
+      "description": "M. Deleglise, J.-L. Nicolas (2019). Connects RH to combinatorics of permutations.",
+      "key_paper": "Deleglise, Nicolas (2019) arXiv:1907.02580",
+      "year_established": 2019
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Li's Criterion",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "significance": "major",
+      "proof_status": "proven",
+      "statement": "RH holds iff λ_n = Σ_ρ (1 - (1 - 1/ρ)^n) ≥ 0 for all n ∈ N, where ρ runs over non-trivial zeros of ζ(s)",
+      "name": "Li's Criterion",
+      "description": "Xian-Jin Li (1998). Gives an infinite sequence of non-negativity conditions equivalent to RH. Related to the explicit formula.",
+      "key_paper": "Li 1998, Journal of Number Theory",
+      "year_established": 1998
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "CONNECTS_TO",
+        "target": null,
+        "props": {}
+      },
+      {
+        "target_labels": [],
+        "type": "EQUIVALENT_TO",
+        "target": null,
+        "props": {
+          "proof_sketch": "Li (1998)",
+          "direction": "bidirectional"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Lindelöf Hypothesis",
+    "labels": [
+      "Theorem",
+      "Conjecture"
+    ],
+    "properties": {
+      "proof_status": "conjectured",
+      "year_stated": 1908,
+      "name": "Lindelöf Hypothesis",
+      "statement": "ζ(1/2 + it) = O(t^ε) for all ε > 0",
+      "description": "Weaker than RH but still unproven. Equivalent to bounds on moments of ζ(s)."
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Theorem",
+          "Conjecture",
+          "OpenProblem"
+        ],
+        "type": "EQUIVALENT_TO",
+        "target": "Riemann Hypothesis",
+        "props": {
+          "proof_sketch": "Standard reduction",
+          "direction": "bidirectional"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Liouville λ Limit Criterion",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "proof_status": "proven",
+      "domain": "elementary number theory",
+      "name": "Liouville λ Limit Criterion",
+      "statement": "Σ_{k=1}^n λ(k) = O(n^{1/2+ε}) for all ε > 0, where λ is Liouville function",
+      "description": "Liouville function λ(n) = (-1)^{Ω(n)}. Closely related to Mertens function."
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Mertens Hypothesis",
+    "labels": [
+      "Theorem",
+      "Conjecture"
+    ],
+    "properties": {
+      "significance": "major",
+      "proof_status": "disproven",
+      "year_stated": 1897,
+      "name": "Mertens Hypothesis",
+      "statement": "|M(x)| = |Σ_{n≤x} μ(n)| < √x for all x > 1",
+      "description": "Conjectured by Mertens (1897). Disproven by Odlyzko & te Riele (1985): M(x) = Ω±(√x) infinitely often. But it's STRONGER than RH — if it were true, RH would follow. Its failure doesn't disprove RH.",
+      "key_paper": "Odlyzko & te Riele 1985, Journal für die reine und angewandte Mathematik",
+      "year_established": 1985
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "IMPLIES",
+        "target": null,
+        "props": {
+          "description": "Mertens hypothesis implies RH, but Mertens is FALSE"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Möbius Randomness (Chowla Conjecture)",
+    "labels": [
+      "Theorem",
+      "Conjecture"
+    ],
+    "properties": {
+      "significance": "major",
+      "proof_status": "open",
+      "year_stated": 1965,
+      "name": "Möbius Randomness (Chowla Conjecture)",
+      "statement": "Σ_{n≤x} μ(n) μ(n+h) = o(x) for all fixed h ≠ 0",
+      "description": "Sarvadaman Chowla. Möbius function is random (uncorrelated at shifts). Stronger than PNT. Connected to Sarnak's conjecture on deterministic sequences."
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "IMPLIES",
+        "target": null,
+        "props": {
+          "description": "Chowla implies PNT (via partial summation), but NOT equivalent to RH"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Nicolas Criterion",
+    "labels": [
+      "Theorem",
+      "Conjecture"
+    ],
+    "properties": {
+      "proof_status": "conjectured",
+      "year_stated": 1983,
+      "name": "Nicolas Criterion",
+      "statement": "RH holds iff Σ_{d|n} d ≥ H_n + exp(H_n) log(H_n) for all n ≥ 2, where H_n is the nth harmonic number",
+      "description": "Jean-Louis Nicolas. Related to Robin's inequality but using the harmonic numbers. Equivalent to RH."
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "EQUIVALENT_TO",
+        "target": null,
+        "props": {
+          "proof_sketch": "Nicolas (1983)",
+          "direction": "bidirectional"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Nyman-Beurling Criterion",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "difficulty": "analytic",
+      "significance": "major",
+      "proof_status": "proven",
+      "year_stated": 1950,
+      "statement": "RH holds iff the functions {f_a(x) = {ax} - a⌊x⌋ : a ∈ (0,1]} span L²(0,1)",
+      "name": "Nyman-Beurling Criterion",
+      "latex_statement": "\\text{RH} \\iff \\overline{\\text{span}}\\{f_a : a \\in (0,1]\\} = L^2(0,1)",
+      "description": "RH equivalent to the density of shifted fractional part functions in L²(0,1). Key bridge for neural network approaches (Hayou 2023).",
+      "key_paper": "Nyman 1950, Beurling 1955",
+      "year_established": 1950
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "EQUIVALENT_TO",
+        "target": null,
+        "props": {
+          "proof_sketch": "Nyman (1950), Beurling (1955)",
+          "direction": "bidirectional"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Pollicott Farey Graph Theorem",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "significance": "major",
+      "proof_status": "proven",
+      "name": "Pollicott Farey Graph Theorem",
+      "statement": "RH is equivalent to the spectral gap of the transfer operator on the Farey graph: Z_{Γ₁}(s) = det(1 - L_{2s})",
+      "description": "Encodes RH as a graph spectral property. The Farey graph provides a SECOND bridge from graphs to ζ(s), independent of LPS.",
+      "year_established": 2022
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Theorem",
+          "Conjecture",
+          "OpenProblem"
+        ],
+        "type": "PROVES",
+        "target": "Riemann Hypothesis",
+        "props": {
+          "proof_technique": "dynamical systems, transfer operators, thermodynamic formalism"
+        }
+      },
+      {
+        "target_labels": [],
+        "type": "USES",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "Prime Number Theorem",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "proof_status": "proven",
+      "name": "Prime Number Theorem",
+      "statement": "π(x) ~ x/log(x)",
+      "description": "Formalized in Mathlib via Wiener-Ikehara theorem. PNT+ project by Kontorovich and Tao.",
+      "lean_status": "formalized",
+      "year_established": 1896,
+      "lean4": true
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Theorem",
+          "Conjecture",
+          "OpenProblem"
+        ],
+        "type": "IMPLIES",
+        "target": "Riemann Hypothesis",
+        "props": {
+          "description": "PNT follows from non-vanishing of ζ(s) on Re(s)=1, which is weaker than RH"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Ramanujan Conjecture (original)",
+    "labels": [
+      "Theorem",
+      "Conjecture"
+    ],
+    "properties": {
+      "significance": "major",
+      "proof_status": "proven",
+      "year_stated": 1916,
+      "statement": "|τ(p)| ≤ 2p^{11/2} for all primes p",
+      "name": "Ramanujan Conjecture (original)",
+      "description": "Ramanujan's conjecture on the tau function, proven by Deligne as consequence of Weil conjectures",
+      "year_established": 1974
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Ramanujan-Petersson Conjecture",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "significance": "major",
+      "proof_status": "proven",
+      "year_stated": 1930,
+      "name": "Ramanujan-Petersson Conjecture",
+      "statement": "For normalized Hecke eigenform f of weight k: |a_p(f)| ≤ 2p^{(k-1)/2}",
+      "description": "Generalization to all cusp forms. Proven by Deligne for holomorphic forms via étale cohomology.",
+      "year_established": 1974
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Theorem",
+          "Conjecture"
+        ],
+        "type": "GENERALIZES",
+        "target": "Ramanujan Conjecture (original)",
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "Rankin-Selberg Method",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "proof_status": "proven",
+      "name": "Rankin-Selberg Method",
+      "statement": "L(s, f × g) = ζ(2s) Σ a_n(f) a_n(g) n^{-s} — convolution L-function",
+      "description": "Method for studying L-functions via integration against Eisenstein series. Used to relate Eisenstein L-functions to ζ(s).",
+      "year_established": 1939
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "CONNECTS",
+        "target": null,
+        "props": {}
+      },
+      {
+        "target_labels": [],
+        "type": "CONNECTS",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "Redheffer Matrix Criterion",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "proof_status": "proven",
+      "domain": "linear algebra / matrix theory",
+      "name": "Redheffer Matrix Criterion",
+      "statement": "|det(A_n)| = O(n^{1/2+ε}) where A_{ij}=1 if j=1 or i|j, 0 otherwise. Since det(A_n) = M(n), this is equivalent to Mertens bound.",
+      "description": "R. Redheffer. Matrix formulation of Mertens function. All non-trivial eigenvalues in unit disk ↔ RH.",
+      "key_paper": "Redheffer (1977); Barrett, Forcade, Pollington (1988)",
+      "year_established": 1977
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "CONNECTS_TO",
+        "target": null,
+        "props": {
+          "description": "det(A_n) = M(n)"
+        }
+      },
+      {
+        "target_labels": [],
+        "type": "CONNECTS_TO",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "Riemann Hypothesis",
+    "labels": [
+      "Theorem",
+      "Conjecture",
+      "OpenProblem"
+    ],
+    "properties": {
+      "significance": "foundational",
+      "proof_status": "conjectured",
+      "year_stated": 1859,
+      "statement": "All non-trivial zeros of ζ(s) have real part 1/2",
+      "mathlib_name": "riemann_hypothesis",
+      "name": "Riemann Hypothesis",
+      "latex_statement": "\\forall s \\in \\mathbb{C}: \\zeta(s) = 0 \\land s \\notin \\{-2,-4,-6,\\ldots\\} \\implies \\text{Re}(s) = \\frac{1}{2}",
+      "lean_status": "partial",
+      "description": "One of the Clay Millennium Problems. Equivalent to >100 known formulations.",
+      "lean4": true
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Theorem",
+          "Conjecture"
+        ],
+        "type": "EQUIVALENT_TO",
+        "target": "Robin's Inequality",
+        "props": {
+          "proof_sketch": "Robin (1984)",
+          "direction": "bidirectional"
+        }
+      },
+      {
+        "target_labels": [
+          "Theorem",
+          "Conjecture"
+        ],
+        "type": "EQUIVALENT_TO",
+        "target": "Lagarias Inequality",
+        "props": {
+          "proof_sketch": "Lagarias (2002)",
+          "direction": "bidirectional"
+        }
+      },
+      {
+        "target_labels": [
+          "Theorem",
+          "Conjecture"
+        ],
+        "type": "EQUIVALENT_TO",
+        "target": "Lindelöf Hypothesis",
+        "props": {
+          "proof_sketch": "Standard reduction",
+          "direction": "bidirectional"
+        }
+      },
+      {
+        "target_labels": [
+          "Theorem",
+          "Conjecture",
+          "OpenProblem"
+        ],
+        "type": "STRENGTHENS",
+        "target": "Riemann Hypothesis",
+        "props": {
+          "description": "GRH implies RH (restricts to principal character)"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Robin's Inequality",
+    "labels": [
+      "Theorem",
+      "Conjecture"
+    ],
+    "properties": {
+      "proof_status": "conjectured",
+      "year_stated": 1984,
+      "name": "Robin's Inequality",
+      "statement": "σ(n) < e^γ n log log n for all n ≥ 5041 iff RH holds",
+      "description": "RH equivalent to Robin's inequality holding for all n ≥ 5041"
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Theorem",
+          "Conjecture",
+          "OpenProblem"
+        ],
+        "type": "EQUIVALENT_TO",
+        "target": "Riemann Hypothesis",
+        "props": {
+          "proof_sketch": "Robin (1984)",
+          "direction": "bidirectional"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Sato-Tate Conjecture",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "significance": "major",
+      "proof_status": "proven",
+      "year_stated": 1960,
+      "proof_technique": "Potential automorphy",
+      "name": "Sato-Tate Conjecture",
+      "statement": "For non-CM elliptic curve E/Q, the normalized Frobenius traces a_p/√p are equidistributed in [-1,1] with respect to (1/π)√(1-x²)dx",
+      "description": "Proved by Barnet-Lamb, Geraghty, Harris, Taylor (2011). Connects distribution of eigenvalues to the Sato-Tate measure.",
+      "year_established": 2011
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "USES",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "Speiser's Criterion",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "proof_status": "proven",
+      "domain": "complex analysis",
+      "name": "Speiser's Criterion",
+      "statement": "RH equivalent to absence of non-trivial zeros of ζ'(s) to the left of the critical line Re(s) = 1/2",
+      "description": "Andreas Speiser (1934). The derivative ζ'(s) has no zeros with Re(s) < 1/2 iff RH holds. Quantified by Levinson-Montgomery (1974).",
+      "key_paper": "Speiser (1934) Math. Ann. 110, 514-521",
+      "year_established": 1934
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Sunada's Theorem",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "proof_status": "proven",
+      "name": "Sunada's Theorem",
+      "statement": "Two Riemannian manifolds are isospectral if their fundamental groups have nearly conjugate representations",
+      "description": "Extended to graphs: Sunada isospectrality. Used to construct isospectral non-isomorphic graphs.",
+      "year_established": 1985
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "Volchkov Integral",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "proof_status": "proven",
+      "domain": "complex analysis",
+      "name": "Volchkov Integral",
+      "statement": "∫₀^∞ (1-12t²)/(1+4t²)³ ∫_{1/2}^∞ log|ζ(σ+it)| dσ dt = π(3-γ)/32",
+      "description": "V.V. Volchkov. A single integral equation equivalent to RH. Elegant but computationally hard.",
+      "key_paper": "Volchkov (1995); Balazard-Saias-Yor (1999) Adv. Math. 143",
+      "year_established": 1995
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Theorem"
+        ],
+        "type": "RELATED_TO",
+        "target": "Balazard-Saias-Yor Integral",
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "Voronin Universality Theorem",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "significance": "major",
+      "proof_status": "proven",
+      "name": "Voronin Universality Theorem",
+      "statement": "For any ε > 0, any analytic function f(s) non-vanishing on the strip {1/2 < Re(s) < 1}, there exists τ > 0 such that max_{|s-3/4|≤r} |ζ(s+iτ) - f(s)| < ε",
+      "description": "Sergei Voronin (1975). The Riemann zeta function is universal — it can approximate any non-vanishing analytic function in any right-half of the critical strip. Striking implication: if RH is false, the universality domain changes.",
+      "key_paper": "Voronin 1975",
+      "year_established": 1975
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "CONNECTS_TO",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "Weil Positivity Criterion",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "difficulty": "algebraic",
+      "significance": "major",
+      "proof_status": "proven",
+      "name": "Weil Positivity Criterion",
+      "statement": "RH holds iff the function F(z) = Σ_ρ x^ρ + (analytic terms) is positive-definite on the multiplicative group",
+      "description": "André Weil showed that RH for curves over finite fields follows from a positivity condition on associated zeta functions. This inspired the entire Langlands program.",
+      "key_paper": "Weil 1952",
+      "year_established": 1952
+    },
+    "relationships": [
+      {
+        "target_labels": [],
+        "type": "EQUIVALENT_TO",
+        "target": null,
+        "props": {
+          "proof_sketch": "Weil (1952)",
+          "direction": "bidirectional"
+        }
+      },
+      {
+        "target_labels": [],
+        "type": "MOTIVATED",
+        "target": null,
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "Yakaboylu Hamiltonian Construction",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "proof_status": "partial",
+      "name": "Yakaboylu Hamiltonian Construction",
+      "statement": "Constructs a quantum Hamiltonian H with real eigenvalues (under conditions) whose spectrum encodes zeta zeros",
+      "description": "Yakaboylu (2023) partially realized Hilbert-Pólya. Shows real eigenvalues under certain conditions. No ML work on operator search exists — open gap.",
+      "key_paper": "Yakaboylu 2023, arXiv",
+      "year_established": 2023
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Theorem",
+          "Conjecture",
+          "OpenProblem"
+        ],
+        "type": "APPROACHES_TOWARDS",
+        "target": "Hilbert-Pólya Conjecture",
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": "lcm Formulation",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "proof_status": "proven",
+      "domain": "elementary number theory",
+      "name": "lcm Formulation",
+      "statement": "|log lcm(1,2,...,n) - n| < √n log²n for all n ≥ 3",
+      "description": "Follows from explicit formula. Elementary formulation in terms of least common multiple."
+    },
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": "von Koch Error Term",
+    "labels": [
+      "Theorem"
+    ],
+    "properties": {
+      "significance": "major",
+      "proof_status": "proven",
+      "domain": "analytic number theory",
+      "name": "von Koch Error Term",
+      "statement": "π(x) = Li(x) + O(x^{1/2} log x)",
+      "description": "RH equivalent to the classical prime counting error bound. The tightest possible bound from RH.",
+      "key_paper": "von Koch (1901) Acta Math. 24, 159-182",
+      "year_established": 1901
+    },
+    "relationships": [
+      {
+        "target_labels": [
+          "Theorem"
+        ],
+        "type": "IMPLIES",
+        "target": "Chebyshev ψ Error Term",
+        "props": {}
+      },
+      {
+        "target_labels": [],
+        "type": "EQUIVALENT_TO",
+        "target": null,
+        "props": {
+          "proof_sketch": "von Koch (1901)",
+          "direction": "bidirectional"
+        }
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": [
+          "Graph"
+        ],
+        "type": "HAS_CAYLEY_GRAPH",
+        "target": "Cayley_LPS(SL(2,F_p))",
+        "props": {}
+      },
+      {
+        "target_labels": [
+          "Graph"
+        ],
+        "type": "HAS_CAYLEY_GRAPH",
+        "target": "Cayley(SL(2,F_p))",
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": [
+          "Graph"
+        ],
+        "type": "HAS_CAYLEY_GRAPH",
+        "target": "Cayley(SL(2,Z))",
+        "props": {}
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": [
+          "Theorem"
+        ],
+        "type": "EQUIVALENT_TO",
+        "target": "Nyman-Beurling Criterion",
+        "props": {
+          "proof_sketch": "Nyman (1950), Beurling (1955)",
+          "direction": "bidirectional"
+        }
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": [
+          "Theorem"
+        ],
+        "type": "APPROACHES_VIA",
+        "target": "Nyman-Beurling Criterion",
+        "props": {
+          "confidence": 0.3,
+          "strategy": "RH ≡ density of single-layer NNs via Nyman-Beurling"
+        }
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": [
+          "Paper"
+        ],
+        "type": "AUTHORED",
+        "target": null,
+        "props": {
+          "role": "coauthor"
+        }
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": [
+          "Paper"
+        ],
+        "type": "AUTHORED",
+        "target": null,
+        "props": {
+          "role": "author"
+        }
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": [
+          "Theorem"
+        ],
+        "type": "EQUIVALENT_TO",
+        "target": "Balazard-Saias-Yor Integral",
+        "props": {
+          "proof_sketch": "Balazard-Saias-Yor (1999)",
+          "direction": "bidirectional"
+        }
+      },
+      {
+        "target_labels": [
+          "Theorem"
+        ],
+        "type": "EQUIVALENT_TO",
+        "target": "Hardy-Littlewood Series",
+        "props": {
+          "direction": "bidirectional"
+        }
+      },
+      {
+        "target_labels": [
+          "Theorem"
+        ],
+        "type": "EQUIVALENT_TO",
+        "target": "Speiser's Criterion",
+        "props": {
+          "proof_sketch": "Speiser (1934)",
+          "direction": "bidirectional"
+        }
+      },
+      {
+        "target_labels": [
+          "Theorem"
+        ],
+        "type": "EQUIVALENT_TO",
+        "target": "Baez-Duarte Criterion",
+        "props": {
+          "proof_sketch": "Báez-Duarte (2002)",
+          "direction": "bidirectional"
+        }
+      },
+      {
+        "target_labels": [
+          "Theorem"
+        ],
+        "type": "EQUIVALENT_TO",
+        "target": "Chebyshev ψ Error Term",
+        "props": {
+          "direction": "bidirectional"
+        }
+      },
+      {
+        "target_labels": [
+          "Theorem"
+        ],
+        "type": "EQUIVALENT_TO",
+        "target": "Redheffer Matrix Criterion",
+        "props": {
+          "direction": "bidirectional"
+        }
+      },
+      {
+        "target_labels": [
+          "Theorem"
+        ],
+        "type": "EQUIVALENT_TO",
+        "target": "Liouville λ Limit Criterion",
+        "props": {
+          "direction": "bidirectional"
+        }
+      },
+      {
+        "target_labels": [
+          "Theorem"
+        ],
+        "type": "EQUIVALENT_TO",
+        "target": "Bombieri Variational Approach",
+        "props": {
+          "direction": "bidirectional"
+        }
+      },
+      {
+        "target_labels": [
+          "Theorem"
+        ],
+        "type": "EQUIVALENT_TO",
+        "target": "Horocycle Flow Ergodicity Rate",
+        "props": {
+          "direction": "bidirectional"
+        }
+      },
+      {
+        "target_labels": [
+          "Theorem"
+        ],
+        "type": "EQUIVALENT_TO",
+        "target": "lcm Formulation",
+        "props": {
+          "direction": "bidirectional"
+        }
+      },
+      {
+        "target_labels": [
+          "Theorem"
+        ],
+        "type": "EQUIVALENT_TO",
+        "target": "Landau Function Criterion",
+        "props": {
+          "direction": "bidirectional"
+        }
+      },
+      {
+        "target_labels": [
+          "Theorem"
+        ],
+        "type": "EQUIVALENT_TO",
+        "target": "Divisibility Graph Criterion",
+        "props": {
+          "direction": "bidirectional"
+        }
+      },
+      {
+        "target_labels": [
+          "Theorem"
+        ],
+        "type": "EQUIVALENT_TO",
+        "target": "Jensen Polynomial Hyperbolicity (Pólya-Jensen)",
+        "props": {
+          "proof_sketch": "Pólya (1927)",
+          "direction": "bidirectional"
+        }
+      },
+      {
+        "target_labels": [
+          "Theorem"
+        ],
+        "type": "EQUIVALENT_TO",
+        "target": "Franel-Landau Criterion",
+        "props": {
+          "direction": "bidirectional"
+        }
+      },
+      {
+        "target_labels": [
+          "Theorem"
+        ],
+        "type": "EQUIVALENT_TO",
+        "target": "Volchkov Integral",
+        "props": {
+          "proof_sketch": "Volchkov (1995)",
+          "direction": "bidirectional"
+        }
+      },
+      {
+        "target_labels": [
+          "Theorem"
+        ],
+        "type": "EQUIVALENT_TO",
+        "target": "De Bruijn-Newman Constant Λ = 0",
+        "props": {
+          "proof_sketch": "de Bruijn (1950) + Rodgers-Tao (2020) Λ ≥ 0",
+          "direction": "bidirectional"
+        }
+      },
+      {
+        "target_labels": [
+          "Theorem"
+        ],
+        "type": "EQUIVALENT_TO",
+        "target": "von Koch Error Term",
+        "props": {
+          "proof_sketch": "von Koch (1901)",
+          "direction": "bidirectional"
+        }
+      },
+      {
+        "target_labels": [
+          "Theorem"
+        ],
+        "type": "EQUIVALENT_TO",
+        "target": "Caveney-Nicolas-Sondow GA1/GA2 Criterion",
+        "props": {
+          "direction": "bidirectional"
+        }
+      },
+      {
+        "target_labels": [
+          "Theorem"
+        ],
+        "type": "EQUIVALENT_TO",
+        "target": "Laguerre-Pólya Class",
+        "props": {
+          "proof_sketch": "Pólya (1927)",
+          "direction": "bidirectional"
+        }
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": [
+          "Theorem"
+        ],
+        "type": "PROVES",
+        "target": "De Bruijn-Newman Constant Λ = 0",
+        "props": {
+          "proof_technique": "real-variable methods, Pólya-Jensen"
+        }
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  },
+  {
+    "name": null,
+    "labels": [],
+    "properties": {},
+    "relationships": [
+      {
+        "target_labels": null,
+        "type": null,
+        "target": null,
+        "props": null
+      }
+    ]
+  }
+]
