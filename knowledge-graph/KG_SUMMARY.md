@@ -57,7 +57,7 @@ Funktionen: ζ(s), ζ_G(u) (Ihara, ANALOGOUS_TO ζ_K), ζ_K(s) (GENERALIZES ζ),
 
 Tao (UCLA), Sarnak (IAS), Lubotzky (Hebrew U), Williamson (Sydney/IAS), Keating (Oxford), Platt (Bristol), Loeffler (Warwick), Odlyzko (Minnesota), Kontorovich (Rutgers), Taylor (IAS), Harris (Columbia), Helfgott (Göttingen), Rivin (Temple), Sardari, Shanker, Charton, Kempe.
 
-## 7. AI-Approaches (4) — mit eigener Bewertung
+## 7. AI-Approaches (11) — mit eigener Bewertung
 
 | Ansatz | Status | Confidence | Anmerkung |
 |---|---|---|---|
@@ -65,6 +65,13 @@ Tao (UCLA), Sarnak (IAS), Lubotzky (Hebrew U), Williamson (Sydney/IAS), Keating 
 | Lean 4 Formal Verification | in_progress | 0.6 | Loeffler-Stoll ~60-70%; größte Lücke: Hadamard-Produkt (fehlt in mathlib) |
 | FunSearch for NT | inconclusive | 0.2 | DeepMind selbst: "kein Grund" für Durchbruch bei P≠NP — ähnlich limitierend für RH |
 | RMT + Deep Learning | exploratory | 0.25 | Keating cross-pollination Idee; wenig konkret |
+| Lean 4 Transfer Operator Formalization | in_progress | 0.6 | Exp-19-Linie: Mayer L_s, Fredholm-Determinante, Transferoperator-Formalisierung |
+| Friedli Constant Computation (Exp 15b) | completed | 0.8 | Karlsson-Friedli-Slope ≈ 1.1367 auf SL(2,F_p)-Cayley-Graphen |
+| Pizer-Brandt Bridge Verification (Exp 18) | completed | 0.85 | Isogeny-Graph-Spektrum aus LMFDB-Hecke-Eigenwerten: RAMANUJAN bestätigt, 0 Verletzungen (q=2..29) |
+| Hecke Murmurations Level Aspect (Exp 20) | completed | 0.7 | Rank-2-Formen systematisch unter Rank-0: Separationssignal stabil in 6/6 Primzahlen |
+| Spectral Gap x Hecke Trace Correlation (Exp 17/21) | completed | 0.6 | NULL: Cayley- vs. Isogeny-Lücke statistisch unabhängig (spearman +0.22 p=0.40) — Bridges strukturell, nicht eigenwert-isomorph |
+| EPIC-4 High-t Strand Pinning (Exp 19m) | completed | 0.75 | Hoch-t-Plateau t=900–1200 gepinnt (Nullstelle #731, t=1100.574), Eigenwert-1-Kriechen zur kritischen Linie (σ*≈0.50), m≥0.015 |
+| Cayley vs Isogeny Cross-Bridge Test (Exp 21) | completed | 0.8 | Siehe Exp 17/21 |
 
 ## 8. Implikationen (IMPLIES-Beziehungen)
 
