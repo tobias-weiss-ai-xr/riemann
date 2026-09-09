@@ -4249,3 +4249,28 @@ statistical (eigenvalue-level) correlation.
 ### Falsification/byproduct
 iso2_viol = 0 at every p and q=3 too: the complete small-p isogeny spectra are
 Ramanujan exactly (Deligne). Also confirms per-level spectral data for Exp 18.
+
+---
+
+## Experiment 19n: creep-slope vs |zeta'(1/2+ig)| proportionality test
+
+**Date**: 2026-09-09
+**Status**: numerical, COMPLETED (mpmath dps=40) — proportionality NOT confirmed
+
+For the three pinning heights (Exp 19m), compare measured creep slope d|l1|/dsigma
+with |zeta'(1/2 + i g)| at the nearest zero:
+
+| t | zero# | creep_slope | |zeta'(1/2+ig)| | ratio c |
+|---|---|---|---|---|
+| 125 | 41 (124.26) | 1.60 | 2.3159 | 0.691 |
+| 600 | 341 (599.55) | 1.88 | 5.5805 | 0.337 |
+| 1100.574 | 731 | 2.04 | 3.4436 | 0.592 |
+
+c is NOT constant -> the naive prediction "creep rate ∝ |zeta'(1/2+ig)|" fails.
+Reason: the transfer-operator eigenvalue near 1 corresponds to a SELBERG-zeta zero
+Z_S (Mayer identity), and d|l1|/dsigma involves the full perturbative Jacobian of
+L_s, not just |zeta'|. Also N=384 discretization error ~1e-2 shadows differences
+in c. Refined model would need: derivative of det(I - L_s) = Z_S(s)/Z_S(s+1) in
+the eigenvalue-1 direction, i.e. the residue/velocity of the Fredholm determinant
+crossing — a clean but heavier computation (Wronskian of the two L_s branches).
+Deferred; margin protocol (m >= 0.011) is unaffected by this negative.
