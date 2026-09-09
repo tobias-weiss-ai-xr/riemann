@@ -1,0 +1,83 @@
+{
+  "test": "Exp 18 Pizer/Brandt bridge (v2)",
+  "results": [
+    {
+      "q": 2,
+      "d": 3,
+      "n": 2479,
+      "max_abs": 2.0,
+      "bound": 2.8284,
+      "violations": 0,
+      "ks_km": 0.39592,
+      "best_gap": [
+        1.0,
+        11
+      ]
+    },
+    {
+      "q": 3,
+      "d": 4,
+      "n": 2479,
+      "max_abs": 3.0,
+      "bound": 3.4641,
+      "violations": 0,
+      "ks_km": 0.35639,
+      "best_gap": [
+        1.0,
+        37
+      ]
+    },
+    {
+      "q": 5,
+      "d": 6,
+      "n": 2479,
+      "max_abs": 4.0,
+      "bound": 4.4721,
+      "violations": 0,
+      "ks_km": 0.32802,
+      "best_gap": [
+        2.0,
+        43
+      ]
+    },
+    {
+      "q": 7,
+      "d": 8,
+      "n": 2479,
+      "max_abs": 5.0,
+      "bound": 5.2915,
+      "violations": 0,
+      "ks_km": 0.33269,
+      "best_gap": [
+        3.0,
+        389
+      ]
+    },
+    {
+      "q": 11,
+      "d": 12,
+      "n": 2479,
+      "max_abs": 6.0,
+      "bound": 6.6332,
+      "violations": 0,
+      "ks_km": 0.31897,
+      "best_gap": [
+        6.0,
+        163
+      ]
+    },
+    {
+      "q": 13,
+      "d": 14,
+      "n": 2479,
+      "max_abs": 7.0,
+      "bound": 7.2111,
+      "violations": 0,
+      "ks_km": 0.306,
+      "best_gap": [
+        7.0,
+        139
+      ]
+    }
+  ]
+}

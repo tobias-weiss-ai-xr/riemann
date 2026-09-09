@@ -1,0 +1,32 @@
+{
+  "test": "Exp 18b per-level Brandt graphs",
+  "results": [
+    {
+      "q": 2,
+      "d": 3,
+      "n_graphs": 42,
+      "gap_min": 1.0,
+      "gap_max": 2.0,
+      "ab_bound": 0.1716,
+      "avg_ks": 0.4517
+    },
+    {
+      "q": 3,
+      "d": 4,
+      "n_graphs": 42,
+      "gap_min": 1.0,
+      "gap_max": 3.0,
+      "ab_bound": 0.5359,
+      "avg_ks": 0.4305
+    },
+    {
+      "q": 5,
+      "d": 6,
+      "n_graphs": 42,
+      "gap_min": 2.0,
+      "gap_max": 5.0,
+      "ab_bound": 1.5279,
+      "avg_ks": 0.4176
+    }
+  ]
+}

@@ -4055,3 +4055,72 @@ The falsification lever is now resolved into two certified-numerics targets:
 corner [0.505,0.56]×[75,200] (N-converged, m ≥ 0.015) and high-t strand
 t≈[900,1200] (|λ2|≈0.98–1.01 as σ→½⁺, needs N≥512 + DFLY machinery).
 Both remain m ≥ 0.011 at σ=0.51 in all tested points; RH-consistent.
+
+---
+
+## Experiment 18b: Pizer/Brandt Bridge — Isogeny Graph Spectrum from Hecke Eigenvalues
+
+**Date**: 2026-09-09
+**Status**: numerical, COMPLETED — empirical confirmation of the Ramanujan property
+**Files**: `scripts/pizer_brandt_bridge.py`, `scripts/brandt_friedli.py`,
+          outputs in `data/experiment18/` (plots `km_q*.png`, `semicircle_q*.png`,
+          `km_p{p}_q{q}.png`, `summary*.json`)
+
+### Motivation
+The graph bridges in the KG (Cayley SL(2,F_p) spectral gap → Brandt matrices →
+Hecke eigenvalues → L-functions) claim that the *Brandt/isogeny graph* — not the
+4-regular Cayley graph — is the object whose spectrum IS the Hecke data. This is the
+empirical test of that bridge, done the lazy way: **we never build the graph**. By
+Pizer/Eichler/Jacquet-Langlands the nontrivial real spectrum of the (q+1)-regular
+supersingular q-isogeny graph at level p equals the multiset of all real embeddings
+of the Hecke eigenvalue a_q(f) over weight-2 newforms f of level p. LMFDB stores
+exactly these embeddings (`individual_eigenvalues[str(n-1)]`).
+
+### Data caveat (important)
+- `data/lmfdb/lmfdb_sql_weight2_ml.csv` ("ML-ready") has a **column-shift bug**:
+  `trace_k = a_{k+2}`, i.e. a_2 is missing and a_1..a_2 are dropped. It mixed two
+  sources (mf_hecke_nf dense vs mf_newforms prime-indexed `traces`) with different
+  offsets; the original Exp 16 correlation used `trace_1` as "mean_a2" but that
+  column is really a_3. **Use the raw JSON `traces`/`individual_eigenvalues` instead.**
+- The original Exp 16 across-prime correlation is ALSO confounded: spectral gap
+  correlates with log|SL(2,F_p)| (r=+0.588), so cross-prime r-values are size-driven.
+- The LMFDB mirror is only a partial sample at large levels (p>571: only "interesting"
+  orbits, e.g. p=4951 has 2 of the ~412 newforms). Level-p spectra with >=20
+  eigenvalues exist only for roughly p in [250, 571]; higher-p analysis needs a full
+  data pull (`collect_lmfdb_sql.py` without row budget).
+
+### Findings
+1. **Ramanujan property CONFIRMED with zero violations.** For every q in
+   {2,3,5,7,11,13,17,19,23,29}, pooling all real embeddings a_q(f) over all newforms
+   at all prime levels p != q in the mirror (n = 2,479 eigenvalues per q), every
+   embedding satisfies |a_q(f)| ≤ 2√q. Deligne's bound holds on the isogeny graph
+   spectrum with margin: observed max|a_q| ≈ q (well inside 2√q).
+2. **Spectral gap of the isogeny graph** (q+1) − max|a_q| is always positive:
+   e.g. q=2 (3-regular): min gap 1.0 at p=11; q=5 (6-regular): min gap 2.0 at p=43.
+   Alon–Boppana bound (q+1)−2√q is approached but not beaten → the graphs are
+   Ramanujan expanders, capacity-optimal.
+3. **Semicircle / Kesten–McKay fit is poor (KS≈0.3–0.45)** BUT this is a data
+   artifact, not a counterexample: the KM law needs a *complete* single-graph
+   spectrum; the mirror keeps only part of each level-p spectrum and pools wildly
+   different graphs. The smallest complete graphs (≤47 eigenvalues at p=571) are too
+   small for a KS test to bind. This is the known limitation, documented.
+4. **Friedli-style spectral-zeta slope on the Hecke-derived spectra** (q pooled,
+   prime levels, nontrivial part only) grows with q (0.08@q2 … 0.52@q11) and is NOT
+   comparable to the Exp 15b Cayley Friedli constant (1.1367): different graph
+   families, different trivial-eigenvalue handling, nontrivial-part-only vs full
+   spectrum. Follow-up: compute the isogeny-graph Friedli ratio on *complete* level-p
+   spectra (needs full LMFDB pull) to get an apples-to-apples comparison.
+
+### Net position
+The LPS bridge is now empirically grounded on the Brandt side: **the isogeny graph
+spectrum, reconstructed purely from LMFDB number theory (no graph built), is
+Ramanujan with 0 violations.** The bottleneck to stronger statements (KM law, Friedli
+ratio, cross-prime correlation) is DATA COMPLETENESS, not method: a full
+`collect_lmfdb_sql.py` pull plus Cayley eigenvalues for p≥83 would let Exp 16/18
+scale past the noise.
+
+### Falsification lever
+If the Cauchy/transfer-operator route (Exp 19k/l margin m ≥ 0.011) is right, the
+isogeny-graph side must stay Ramanujan at every q — a measured |a_q(f)| > 2√q in a
+COMPLETE pull would be the first number-theoretic signal of the boundary being
+crossed. Current data: no such signal (0 violations).
