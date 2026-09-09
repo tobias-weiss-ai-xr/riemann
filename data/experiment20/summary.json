@@ -1,0 +1,10 @@
+{
+  "test": "Exp 20 Hecke murmurations level aspect",
+  "q": 2,
+  "W": 10,
+  "rank_counts": {
+    "0": 22624,
+    "1": 23011,
+    "2": 712
+  }
+}

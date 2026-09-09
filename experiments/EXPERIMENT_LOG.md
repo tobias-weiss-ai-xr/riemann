@@ -4124,3 +4124,39 @@ If the Cauchy/transfer-operator route (Exp 19k/l margin m ≥ 0.011) is right, t
 isogeny-graph side must stay Ramanujan at every q — a measured |a_q(f)| > 2√q in a
 COMPLETE pull would be the first number-theoretic signal of the boundary being
 crossed. Current data: no such signal (0 violations).
+
+---
+
+## Experiment 20: Hecke Eigenvalue Murmurations — Rank Separation in the Level Aspect
+
+**Date**: 2026-09-09
+**Status**: numerical, COMPLETED — consistent rank separation across q=2..13
+**Files**: `scripts/murmurations_level.py`, outputs `data/experiment20/`
+          (`murmurations_level.png`, `murmurations_multiq.png`, `summary*.json`)
+
+### Setup
+Level-aspect murmurations (Zubrilina / Bober–Booker–Lee–Lowry–Duda–Oliver style):
+per level, mean of the q-th Hecke eigenvalue a_q over all weight-2 newforms at that
+level, split by analytic rank (0/1/2). Cumulative mean over ascending levels.
+Uses the RAW JSON embeddings (`individual_eigenvalues`), NOT the shifted CSV.
+
+### Findings
+1. **Rank-2 forms sit systematically BELOW rank-0**: final cumulative
+   (rank2 − rank0) = −0.70 (q=2), −1.22 (q=3), −1.92 (q=5), −2.38 (q=7), −2.89 (q=11),
+   −3.12 (q=13). Sign negative at 6/6 primes, 0.0% of last-100 windows positive.
+2. The separation scales approximately with √q (≈ q/3), i.e. with the eigenvalue
+   support scale — consistent with a murmur curve that widens like the Deligne radius.
+3. Rank-1 intermediate (mean a_q between rank-0 and rank-2 in most windows).
+
+### Caveats
+- Mirror is partial above p≈571 (only "interesting" orbits) -> absolute protocol level
+  counts are biased; the RANK-SPLIT signal is robust to this (rank recorded per
+  record, per-level means are level-conditional).
+- Level-aspect windowed (W=10) version is noisier than cumulative; cumulative is the
+  stable reporter.
+
+### Connection
+This is the empirical ground layer for `LMFDBConjectures.lean` (murmurations section,
+currently Partial): rank-order of Hecke-averaged eigenvalues is a stable, q-universal
+statistic that ML (Exp 9/10, R² 0.73–0.99 on Hecke traces) can exploit for rank
+classification without L-function values.

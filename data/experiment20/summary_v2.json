@@ -1,0 +1,35 @@
+{
+  "test": "Exp 20v2 Hecke murmurations",
+  "results": [
+    {
+      "q": 2,
+      "sep_rank2_minus_rank0_final": -0.70245,
+      "pct_pos_last100": 0.0
+    },
+    {
+      "q": 3,
+      "sep_rank2_minus_rank0_final": -1.22229,
+      "pct_pos_last100": 0.0
+    },
+    {
+      "q": 5,
+      "sep_rank2_minus_rank0_final": -1.91608,
+      "pct_pos_last100": 0.0
+    },
+    {
+      "q": 7,
+      "sep_rank2_minus_rank0_final": -2.3795,
+      "pct_pos_last100": 0.0
+    },
+    {
+      "q": 11,
+      "sep_rank2_minus_rank0_final": -2.89145,
+      "pct_pos_last100": 0.0
+    },
+    {
+      "q": 13,
+      "sep_rank2_minus_rank0_final": -3.11514,
+      "pct_pos_last100": 0.0
+    }
+  ]
+}
