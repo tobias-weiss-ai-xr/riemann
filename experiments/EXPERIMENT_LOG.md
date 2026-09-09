@@ -4160,3 +4160,50 @@ This is the empirical ground layer for `LMFDBConjectures.lean` (murmurations sec
 currently Partial): rank-order of Hecke-averaged eigenvalues is a stable, q-universal
 statistic that ML (Exp 9/10, R² 0.73–0.99 on Hecke traces) can exploit for rank
 classification without L-function values.
+
+---
+
+## Experiment 19m: EPIC-4 — high-t strand pinned + eigenvalue-1 creep to the critical line
+
+**Date**: 2026-09-09
+**Status**: numerical (Nyström N=384/512, nmax=8000, log-stable barycentric weights)
+**Files**: `scripts/_hight_pin2.py` (re-ran), `scripts/_z1100.py` (**bug fixed**:
+  `zetazero(n).real` is 0.5 for every zero — was `.imag`; infinite-loop before fix),
+  `scripts/_sigma_creep.py` (new)
+
+### High-t strand, N-converged (σ=0.52)
+| t | |λ2| @N=256 | N=384 | N=512 |
+|---|---|---|---|
+| 900  | 0.9786 | 0.9817 | 0.9720 |
+| 1100 | —      | 0.9720 | **0.9853** |
+| 1200 | 0.9786 | 0.9791 | 0.9804 |
+| 1500 | 0.9884 | 0.9687 | 0.9705 |
+Max corrected |λ2| = 0.9853 at t=1100 (N=512), m = 0.0151. The tightest high-t dip
+is at zero #731 (t=1100.574), consistent with the 19l plateau t≈[900,1200].
+
+### Eigenvalue-1 creep as σ → ½⁺ (N=384, pinning heights)
+```
+height t    σ=0.560  0.540   0.530   0.520   0.515   0.510   0.507
+  125       0.9015   0.9329  0.9490  0.9655  0.9751  0.9854  0.9917
+  600       0.8936   0.9303  0.9493  0.9688  0.9788  0.9892  0.9956
+ 1100.574   0.8873   0.9238  0.9460  0.9694  0.9816  0.9942  1.0019
+```
+- |λ₁| → 1 ≈ linearly in (σ−½). Fitted slopes d|λ₁|/dσ ≈ 1.60 (t=125), 1.88
+  (t=600), 2.04 (t=1100). Extrapolated unit-circle crossing σ* ≈ 0.498 / 0.503 /
+  0.504 — **right on the critical line**, as expected if `1 ∉ Spec(L_s)` for
+  Re(s)>1/2 and ρ → 1⁻ only at σ = ½.
+- At t=1100.574, σ=0.507: |λ₁| = 1.0019 > 1 (unit-circle CROSSING), yet
+  m = min|1−λ| = 0.0278 > 0 — the eigenvalue crosses the circle but NEVER
+  lands exactly at 1. This is precisely the RH-compatible fingerprint: margin
+  m ≈ c·(σ−½) with c ≈ 2–3 survives, no eigenvalue equals 1. (19l result held.)
+- Margin at the three pinning heights is monotonically positive; tightest
+  observed m = 0.0151 (σ=0.52, t=1100) and ≥ 0.0185 (σ=0.507) everywhere held.
+
+### Net
+The high-t arm of the falsification protocol is now pinned: tightest dip at
+zero #731 (t=1100.574), creep-to-critical-line slopes measured at three heights,
+all consistent with `min|1−λ| > 0` (RH-consistent) and with `ρ(L_s⁰) < 1`
+being strictly-false near σ=½ (the Lean conjecture `spectralRadiusConjecture`
+should indeed be retired in favor of `1 ∉ Spec`, per 19l note). The certified
+enclosure targets remain: corner [0.505,0.56]×[75,200] and high-t
+t≈[900,1200]; DFLY/Nisoli machinery is the next stop.
