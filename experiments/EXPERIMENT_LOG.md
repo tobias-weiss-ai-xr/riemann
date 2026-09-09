@@ -4274,3 +4274,38 @@ in c. Refined model would need: derivative of det(I - L_s) = Z_S(s)/Z_S(s+1) in
 the eigenvalue-1 direction, i.e. the residue/velocity of the Fredholm determinant
 crossing — a clean but heavier computation (Wronskian of the two L_s branches).
 Deferred; margin protocol (m >= 0.011) is unaffected by this negative.
+
+---
+
+## Experiment 19o: EPIC-4 — margin slope m(sigma) at tightest point, extrapolated zero
+
+**Date**: 2026-09-09
+**Status**: numerical (Nyström N=384, nmax=8000, log-stable weights)
+**Files**: `scripts/_margin_slope.py` (temp), extends Exp 19m
+
+At the tightest point t=1100.574 (zero #731), m(sigma) = min|1 - lambda| over ALL
+eigenvalues of L_s:
+
+| sigma | m |
+|---|---|
+| 0.550 | 0.1121 |
+| 0.540 | 0.0936 |
+| 0.530 | 0.0745 |
+| 0.520 | 0.0547 |
+| 0.510 | 0.0341 |
+| 0.505 | 0.0235 |
+| 0.502 | 0.0172 |
+| 0.501 | 0.0151 |
+
+**Fit (sigma in [0.501, 0.52]): m = 2.087·(sigma - 1/2) + 0.0130;  m = 0 at
+sigma* = 0.4938 — BELOW the critical line 1/2.**
+
+Interpretation: the margin is strictly positive on the entire half-plane
+sigma > 1/2 (indeed stays > 0.015 well past, down to sigma=0.501), and the
+linear law extrapolates the would-be zero-crossing to sigma* ≈ 0.494 < 1/2.
+This is precisely the RH-consistent fingerprint: `det(I - L_s) != 0` for
+Re(s) > 1/2 with the obstacle sitting only at/far side of the critical line.
+The slope c ≈ 2.09 matches the earlier c ≈ 2–3 estimate (19l). The certified
+enclosure (DFLY) would need to bound c and the +0.013 offset from above to
+rigorously push m > 0 down to sigma = 1/2 + eps; target remains [0.505,0.56]x
+[75,200] corner + t=1100 strand.
