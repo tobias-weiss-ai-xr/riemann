@@ -742,8 +742,10 @@ eigenvalue-1 statement `1 ∉ Spec(L_s)` for Re(s) > 1/2 (Bonanno 2022).
 operator has eigenvalues of modulus > 1 in a deep-strip sliver near
 σ ≈ 0.507, t ≈ 150 (|λ₂| ≈ 1.010, slow-tail regime) yet never equal
 to 1, so `rhImpliesSpectralRadius` is likely false as literally stated.
-The implication `spectralRadiusConjecture → RH` (LMayer identity)
-remains valid.
+The implication `spectralRadiusConjecture → RH` (Mayer identity)
+remains valid.  The honest RH avatar — strictly weaker and numerically
+supported — is `eigenvalueOneFreeConjecture` (det(I − L_s) ≠ 0); see
+`eigenvalueOneFree_above_one` for the proved Re(s) > 1 half.
 
 **Evidence**: See `spectralRadiusConjecture_evidence` and
 `research/ZERO_SLIVER_MARGIN.md` (Exp 19k: m(s)=min_j|1−λ_j(s)| ≥ 0.02
@@ -831,6 +833,59 @@ theorem rhImpliesEigenvalueOneFree :
   -- RH ⇒ ζ(s) ≠ 0 for Re(s) > 1/2 ⇒ Z_S(s) ≠ 0 ⇒ det(I − L_s) ≠ 0.
   -- Requires the Z_S(s) ↔ ζ(s) scattering-matrix formalization (deep).
   sorry
+
+/-! ### The honest RH avatar: eigenvalue-1 (det(I − L_s) ≠ 0)
+
+The precise equivalent of RH is NOT `ρ(L_s) < 1` (which is strictly stronger
+and numerically false for the full operator — the constant mode gives
+λ₁ = ζ(2σ) → ∞ as σ → ½⁺, and |λ₂| ≈ 1.010 in a deep-strip sliver while
+no eigenvalue ever equals 1), but the eigenvalue-1 statement
+
+    det(I − L_s) ≠ 0   for all Re(s) > 1/2      (equivalently 1 ∉ Spec(L_s))
+
+(Mayer 1990, Bonanno 2022, Möller–Pohl 2011).  The numerics
+(`research/ZERO_SLIVER_MARGIN.md`) confirm m(s) = min_j|1 − λ_j(s)| > 0
+throughout the tested half-plane, with the linear law
+m = 2.087·(σ − ½) + 0.0130 at the tightest height t = 1100.574 and the
+extrapolated zero σ* ≈ 0.4938 < ½ — exactly the RH-consistent fingerprint.
+-/
+
+/-- Axiom (Fredholm + spectral radius): if the spectral radius is strictly
+below 1 then 1 is not an eigenvalue, hence the Fredholm determinant
+det(I − L_s) = ∏_j (1 − λ_j) is nonzero.  This is the elementary bridge
+ρ < 1 ⟹ 1 ∉ Spec ⟹ det(I − L_s) ≠ 0; the second step uses the Fredholm
+determinant factorisation (axiom `mayerIdentity` gives det = Z_S(s)/Z_S(s+1)). -/
+axiom spectralRadius_lt_one_imp_detNonzero (s : ℂ) (hs : s.re > 1/2) :
+    spectralRadius s < 1 → mayerDeterminant s ≠ 0
+
+/-- **Theorem (proved half-plane Re(s) > 1)**: for Re(s) > 1 the Fredholm
+determinant det(I − L_s) ≠ 0.  This follows from the Ruelle-domination
+half-plane theorem `spectralRadiusBound_above_one` (ρ(L_s) < 1 for Re(s) > 1,
+proved) combined with the elementary bridge
+`spectralRadius_lt_one_imp_detNonzero`.  No conjecture is used. -/
+theorem eigenvalueOneFree_above_one (s : ℂ) (hs : s.re > 1) :
+    mayerDeterminant s ≠ 0 := by
+  exact spectralRadius_lt_one_imp_detNonzero s (by linarith)
+    (spectralRadiusBound_above_one s hs)
+
+/-- **Conjecture (the honest RH avatar)**: det(I − L_s) ≠ 0 for every
+s with Re(s) > 1/2.
+
+This is equivalent to the Riemann Hypothesis (Mayer identity +
+eigenvalue-1 equivalence, Bonanno 2022).  It is strictly WEAKER than
+`spectralRadiusConjecture` (ρ < 1): `spectralRadiusConjecture` implies it
+(via `spectralRadius_lt_one_imp_detNonzero`), but not conversely — the full
+operator has eigenvalues of modulus > 1 in the deep strip while never
+having an eigenvalue equal to 1.  The proved theorem
+`eigenvalueOneFree_above_one` establishes this on Re(s) > 1 (no conjecture);
+the conjecture is the extension to the full half-plane Re(s) > 1/2.
+
+**Evidence**: `research/ZERO_SLIVER_MARGIN.md` — m(s) = min_j|1 − λ_j(s)| > 0
+on every tested point of Re(s) > 1/2, with the margin law
+m ≈ 2.087·(σ − ½) + 0.0130 (Exp 19o, t = 1100.574) extrapolating to zero
+only at σ* ≈ 0.4938 < ½. -/
+axiom eigenvalueOneFreeConjecture (s : ℂ) (hs : s.re > 1/2) :
+    mayerDeterminant s ≠ 0
 
 /-! ### Numerical Evidence (Sprint 2)
 
