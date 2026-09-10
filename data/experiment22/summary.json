@@ -1,0 +1,352 @@
+{
+ "test": "Exp 22 direct isogeny graph (Brandt/Phi2 multiplicities) + Pizer spectrum",
+ "n_exact": 10,
+ "n_diff": 0,
+ "n_nodata": 1,
+ "rows": [
+  {
+   "p": 11,
+   "n_ss": 2,
+   "regular": true,
+   "max_abs_ev": 2.0,
+   "n_a2": 1,
+   "viol": 0,
+   "match": "EXACT",
+   "max_imag": 0.0,
+   "nontriv_evs": [
+    2.0
+   ],
+   "hecke_a2_abs": [
+    2.0
+   ],
+   "j_invariants": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ]
+   ]
+  },
+  {
+   "p": 13,
+   "n_ss": 1,
+   "regular": true,
+   "max_abs_ev": NaN,
+   "n_a2": 0,
+   "viol": -1,
+   "match": "no-LMFDB",
+   "max_imag": 0.0,
+   "nontriv_evs": [],
+   "hecke_a2_abs": [],
+   "j_invariants": [
+    [
+     5,
+     0
+    ]
+   ]
+  },
+  {
+   "p": 17,
+   "n_ss": 2,
+   "regular": true,
+   "max_abs_ev": 1.0,
+   "n_a2": 1,
+   "viol": 0,
+   "match": "EXACT",
+   "max_imag": 0.0,
+   "nontriv_evs": [
+    1.0
+   ],
+   "hecke_a2_abs": [
+    1.0
+   ],
+   "j_invariants": [
+    [
+     0,
+     0
+    ],
+    [
+     8,
+     0
+    ]
+   ]
+  },
+  {
+   "p": 19,
+   "n_ss": 2,
+   "regular": true,
+   "max_abs_ev": 0.0,
+   "n_a2": 1,
+   "viol": 0,
+   "match": "EXACT",
+   "max_imag": 0.0,
+   "nontriv_evs": [
+    0.0
+   ],
+   "hecke_a2_abs": [
+    0.0
+   ],
+   "j_invariants": [
+    [
+     7,
+     0
+    ],
+    [
+     18,
+     0
+    ]
+   ]
+  },
+  {
+   "p": 23,
+   "n_ss": 3,
+   "regular": true,
+   "max_abs_ev": 1.618034,
+   "n_a2": 2,
+   "viol": 0,
+   "match": "EXACT",
+   "max_imag": 0.0,
+   "nontriv_evs": [
+    0.618034,
+    1.618034
+   ],
+   "hecke_a2_abs": [
+    1.618034,
+    0.618034
+   ],
+   "j_invariants": [
+    [
+     0,
+     0
+    ],
+    [
+     3,
+     0
+    ],
+    [
+     19,
+     0
+    ]
+   ]
+  },
+  {
+   "p": 29,
+   "n_ss": 3,
+   "regular": true,
+   "max_abs_ev": 2.414214,
+   "n_a2": 2,
+   "viol": 0,
+   "match": "EXACT",
+   "max_imag": 0.0,
+   "nontriv_evs": [
+    0.414214,
+    2.414214
+   ],
+   "hecke_a2_abs": [
+    2.414214,
+    0.414214
+   ],
+   "j_invariants": [
+    [
+     0,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     25,
+     0
+    ]
+   ]
+  },
+  {
+   "p": 31,
+   "n_ss": 3,
+   "regular": true,
+   "max_abs_ev": 1.618034,
+   "n_a2": 2,
+   "viol": 0,
+   "match": "EXACT",
+   "max_imag": 0.0,
+   "nontriv_evs": [
+    0.618034,
+    1.618034
+   ],
+   "hecke_a2_abs": [
+    1.618034,
+    0.618034
+   ],
+   "j_invariants": [
+    [
+     2,
+     0
+    ],
+    [
+     4,
+     0
+    ],
+    [
+     23,
+     0
+    ]
+   ]
+  },
+  {
+   "p": 37,
+   "n_ss": 3,
+   "regular": true,
+   "max_abs_ev": 2.0,
+   "n_a2": 2,
+   "viol": 0,
+   "match": "EXACT",
+   "max_imag": 0.0,
+   "nontriv_evs": [
+    0.0,
+    2.0
+   ],
+   "hecke_a2_abs": [
+    2.0,
+    0.0
+   ],
+   "j_invariants": [
+    [
+     3,
+     10
+    ],
+    [
+     3,
+     27
+    ],
+    [
+     8,
+     0
+    ]
+   ]
+  },
+  {
+   "p": 41,
+   "n_ss": 4,
+   "regular": true,
+   "max_abs_ev": 2.709275,
+   "n_a2": 3,
+   "viol": 0,
+   "match": "EXACT",
+   "max_imag": 0.0,
+   "nontriv_evs": [
+    0.193937,
+    1.903212,
+    2.709275
+   ],
+   "hecke_a2_abs": [
+    2.709275,
+    1.903212,
+    0.193937
+   ],
+   "j_invariants": [
+    [
+     0,
+     0
+    ],
+    [
+     3,
+     0
+    ],
+    [
+     28,
+     0
+    ],
+    [
+     32,
+     0
+    ]
+   ]
+  },
+  {
+   "p": 43,
+   "n_ss": 4,
+   "regular": true,
+   "max_abs_ev": 2.0,
+   "n_a2": 3,
+   "viol": 0,
+   "match": "EXACT",
+   "max_imag": 0.0,
+   "nontriv_evs": [
+    1.414214,
+    1.414214,
+    2.0
+   ],
+   "hecke_a2_abs": [
+    2.0,
+    1.414214,
+    1.414214
+   ],
+   "j_invariants": [
+    [
+     8,
+     0
+    ],
+    [
+     12,
+     8
+    ],
+    [
+     12,
+     35
+    ],
+    [
+     41,
+     0
+    ]
+   ]
+  },
+  {
+   "p": 47,
+   "n_ss": 5,
+   "regular": true,
+   "max_abs_ev": 2.308875,
+   "n_a2": 4,
+   "viol": 0,
+   "match": "EXACT",
+   "max_imag": 0.0,
+   "nontriv_evs": [
+    0.283841,
+    0.673363,
+    2.266079,
+    2.308875
+   ],
+   "hecke_a2_abs": [
+    2.266079,
+    2.308875,
+    0.673363,
+    0.283841
+   ],
+   "j_invariants": [
+    [
+     0,
+     0
+    ],
+    [
+     9,
+     0
+    ],
+    [
+     10,
+     0
+    ],
+    [
+     36,
+     0
+    ],
+    [
+     44,
+     0
+    ]
+   ]
+  }
+ ]
+}

@@ -4309,3 +4309,91 @@ The slope c ≈ 2.09 matches the earlier c ≈ 2–3 estimate (19l). The certifi
 enclosure (DFLY) would need to bound c and the +0.013 offset from above to
 rigorously push m > 0 down to sigma = 1/2 + eps; target remains [0.505,0.56]x
 [75,200] corner + t=1100 strand.
+
+## Experiment 22: Direkter Supersingulaer-Isogeniegraph ueber F_{p^2} + Pizer-Spektrum
+
+**Date**: 2026-09-10
+**Status**: COMPLETE — Pizer/Brandt-Korrespondenz end-to-end verifiziert (10/10 EXACT)
+**Files**: `scripts/isogeny_graph_pizer.py`, `data/experiment22/summary.json`
+
+### Aufbau (von Grund auf, ohne LMFDB-Graphdaten)
+
+1. **Supersingulaere j-Invarianten ueber F_{p^2}**: Scan aller (a,b) in
+   F_{p^2}^2, j = 1728*4a^3/(4a^3+27b^2) (F_{p^2}-Arithmetik via
+   (u,v) = u+v*alpha, alpha^2 = d = kleinste Quadratnichtrest), Deduplizierung
+   nach j, Hasse-Invarianten-Test pro j (Koeffizient von x^{p-1} in
+   (x^3+ax+b)^{(p-1)/2} = 0; dict MUSS {3:1, 1:a, 0:b} sein — der
+   x^3-Koeffizient ist 1, nicht a; dieser Typo-Fix brachte alle Zaehlungen
+   auf die richtigen Werte). Vollstaendig per Konstruktion: alle
+   supersingulaeren j leben in F_{p^2}.
+
+2. **Brandt-Isogeniegraph (MULTIGRAPH)**: A[j][k] = Multiplizitaet von k als
+   Wurzel des klassischen Modulpolynoms Phi_2(j, Y) = 0 (kubisch in Y, alle
+   Wurzeln in F_{p^2}; Multiplizitaeten via synthetische Polynomdivision).
+   KERNERKENNTNIS: der Graph ist ein **(2+1)=3-regulaerer MULTIGRAPH** —
+   Schleifen (Phi_2(j,j)=0, z.B. j=25 bei p=29) zaehlen zur Zeilensumme,
+   parallele Kanten sind real. Der einfache j-Graph ist NICHT regulaer und
+   NICHT das richtige Objekt (p=29: {0,2,25} mit Kanten 0-2 (mult 3),
+   2-25, Schleife 25-25).
+
+3. **Spektrum**: Perron-Eigenwert 3 = q+1 ausgeschlossen; nichttriviales
+   Spektrum (Betraege) = Multiset der a_2(f) ueber alle Einbettungen aller
+   Gewicht-2-Newforms der Stufe p (Pizer/Brandt/Eichler-Jacquet-Langlands).
+
+4. **LMFDB-a_2 aus den Spurdaten**: individual_eigenvalues[k] ist a_{k+1} in
+   **Hecke-Koerper-Koordinaten** (NICHT pro Einbettung); traces[k] = Tr(a_{k+1}).
+   Pro-Einbettung-Werte von a_2 = Wurzeln des Char.-Polynoms von T_2 via
+   Newton-Identitaeten aus den Potenzsummen, mit den Hecke-Relationen
+   T_2^2 = T_4 + 2T_1, T_2^3 = T_8 + 4T_2, T_2^4 = T_16 + 6T_4 + 8T_1
+   (gueltig fuer (2,p)=1). Verifiziert unabhaengig ueber die multiplikativen
+   Relationen in Feld-Koordinaten (a_2*a_3 = a_6, a_2^2 = a_4+2a_1 — beide
+   liefern konsistent beta^2 = A + B*beta, z.B. p=23/31: golden x^2-x-1).
+
+### Ergebnisse (p = 11..47, 69s)
+
+| p | #ss | 3-reg. | max\|ev\| | Grenze 2*sqrt(2) | Viol. | Match |
+|---|---|---|---|---|---|---|
+| 11 | 2 | ja | 2.0000 | 2.828 | 0 | EXACT |
+| 13 | 1 | ja | - | - | - | keine NF (dim S_2 = 0) |
+| 17 | 2 | ja | 1.0000 | 2.828 | 0 | EXACT |
+| 19 | 2 | ja | 0.0000 | 2.828 | 0 | EXACT |
+| 23 | 3 | ja | 1.6180 | 2.828 | 0 | EXACT |
+| 29 | 3 | ja | 2.4142 | 2.828 | 0 | EXACT |
+| 31 | 3 | ja | 1.6180 | 2.828 | 0 | EXACT |
+| 37 | 3 | ja | 2.0000 | 2.828 | 0 | EXACT |
+| 41 | 4 | ja | 2.7093 | 2.828 | 0 | EXACT |
+| 43 | 4 | ja | 2.0000 | 2.828 | 0 | EXACT |
+| 47 | 5 | ja | 2.3089 | 2.828 | 0 | EXACT |
+
+**10/10 EXACT** (p=13: dim S_2(Gamma_0(13)) = 0, keine Newforms — konsistent
+mit #ss = 1 = dim + 1).
+
+### Befunde
+
+- **Pizer/Brandt-Korrespondenz EXAKT bestätigt**: nichttriviales Spektrum des
+  direkt gebauten 2-Isogeniegraphs = Multiset {a_2(f)} ueber alle
+  Einbettungen, 10/10 Primen exakt (auf 1e-6).
+- **#ss = dim S_2(Gamma_0(p)) + 1** fuer alle p (klassische Formel, direkt
+  aus der Konstruktion bestätigt).
+- **Ramanujan-Bund max|a_2| <= 2*sqrt(2)**: 0 Verletzungen; Maximum 2.7093
+  (p=41), nahe aber unter der Grenze.
+- **3-Regulaeritaet als MULTIGRAPH-Theorem**: Zeilensummen = 3 ueberall;
+  Schleifen und parallele Kanten noetig (p=29: Schleife bei j=25,
+  Dreifachkante 0-2).
+- **Interpretation**: Dies ist die direkteste numerische Bestätigung der
+  Bruecke "Isogeniegraph-Spektrum = Hecke-Eigenwerte" — derselbe Satz, auf
+  dem LPS/Ramanujan-Graphen und die Pizer-Konstruktion beruhen, hier
+  komplett aus Primaerdaten (Hasse + Phi_2 + LMFDB-Spuren) rekonstruiert.
+
+### Fehlerprotokoll (lehrreich)
+
+1. `{3:a}` statt `{3:1}` im Hasse-dict: alle Zaehlungen falsch (168 bei
+   p=13 statt 1). Fix per Punktabzaehlungs-Grundwahrheit (#E(F_p)=p+1).
+2. b=1-Parametrisierung unvollstaendig (verpasst nicht-CM supersingulaere j,
+   z.B. p=13, 31): voller F_{p^2}^2-Scan noetig.
+3. Einfacher Graph statt Multigraph: 3-Regulaeritaet "verletzt" — falsch;
+   Phi_2-Multiplizitaeten (Schleifen doppelt/parallel) sind das Objekt.
+4. individual_eigenvalues als "pro Einbettung" gelesen: falsch — Feld-Koordinaten.
+   Newton-Identitaeten aus Spuren + Hecke-Relationen loesen das.
+5. numpy-Poly-Signkonvention: [1, c1, ..., cd], nicht negiert/vertauscht
+   (golden poly verdeckte den Bug zufaellig).
