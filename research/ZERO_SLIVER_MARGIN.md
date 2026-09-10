@@ -159,3 +159,35 @@ remains [0.505,0.56]×[75,200] where N=128–256 suffices.
 point 1, N-converged) and the high-t strand t≈900–1200 (corrected |λ2|→~1.0 as
 σ→½⁺, N-marginal).  Both stay below the critical point 1 (m ≥ 0.011 at
 σ = 0.51), consistent with RH; a certified enclosure must cover BOTH.
+
+---
+
+## 7. Margin slope at the tightest height (Experiment 19o): extrapolated zero below the line
+
+The m(sigma) map at the tightest height t = 1100.574 (zero #731, N=512,
+nmax=8000), m(sigma) = min|1 - lambda| over ALL eigenvalues of L_s:
+
+| sigma | m |
+|---|---|
+| 0.550 | 0.1121 |
+| 0.540 | 0.0936 |
+| 0.530 | 0.0745 |
+| 0.520 | 0.0547 |
+| 0.510 | 0.0341 |
+| 0.505 | 0.0235 |
+| 0.502 | 0.0172 |
+| 0.501 | 0.0151 |
+
+**Fit (sigma in [0.501, 0.52]): m = 2.087*(sigma - 1/2) + 0.0130; m = 0 at
+sigma* = 0.4938 - BELOW the critical line 1/2.**
+
+Interpretation: the margin is strictly positive on the entire tested half-plane
+sigma > 1/2 (stays > 0.015 down to sigma = 0.501), and the linear law
+extrapolates the would-be zero-crossing to sigma* ~ 0.494 < 1/2 — precisely the
+RH-consistent fingerprint: `det(I - L_s) != 0` for Re(s) > 1/2 with the
+obstacle sitting only at/beyond the critical line. The slope c ~ 2.09 matches
+the 19l estimate (c ~ 2-3). A certified enclosure (DFLY/Nisoli) must bound c
+and the +0.013 offset from above to push m > 0 rigorously down to
+sigma = 1/2 + eps. This updates the reading of (c) in section 5: the creep
+slope IS measured (c = 2.087 at zero #731); what remains is the certified
+bound on c and the offset.

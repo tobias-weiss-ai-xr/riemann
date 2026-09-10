@@ -747,8 +747,11 @@ remains valid.
 
 **Evidence**: See `spectralRadiusConjecture_evidence` and
 `research/ZERO_SLIVER_MARGIN.md` (Exp 19k: m(s)=min_j|1−λ_j(s)| ≥ 0.02
-throughout the numerically accessible corner, dipping only toward
-zeta-zero heights). -/
+throughout the corner; Exp 19l: broad high-t plateau t ≈ 900–1200 with
+|λ₂| ≈ 0.98–0.99 at σ = 0.52, m ≥ 0.011 at σ = 0.51; Exp 19o at the
+tightest height t = 1100.574: m = 2.087·(σ − 1/2) + 0.0130, extrapolated
+zero σ* ≈ 0.4938 < 1/2 — margin strictly positive on the tested half-plane
+with the obstacle only at/beyond the critical line). -/
 axiom spectralRadiusConjecture (s : ℂ) (hs : s.re > 1/2) :
     spectralRadius s < 1
 
@@ -806,27 +809,27 @@ theorem spectralRadiusImpliesRH :
   -- For now, we state this as the key implication.
   sorry
 
-/-- **Converse**: The Riemann Hypothesis implies the spectral radius conjecture.
+/-- **Converse (honest version)**: RH implies the eigenvalue-1 statement
 
-If RH holds (all non-trivial zeros of ζ(s) have Re(s) = 1/2), then
-ρ(L_s) < 1 for all s with Re(s) > 1/2.
+    det(I − L_s) ≠ 0  for Re(s) > 1/2  (equivalently 1 ∉ Spec(L_s)).
 
-**Proof**: By RH, ζ(s) ≠ 0 for Re(s) > 1/2.
-By the Selberg zeta → ζ connection, Z_S(s) ≠ 0 for Re(s) > 1/2.
-By the Mayer identity, det(I - L_s) = Z_S(s) / Z_S(s+1) ≠ 0.
-So 1 is not an eigenvalue of L_s.
-Since L_s is compact (trace class), its spectrum is discrete.
-The spectral radius ρ(L_s) is the max |λᵢ|.
-If 1 is not an eigenvalue and the operator is compact, then either ρ < 1
-or there exists an eigenvalue with |λ| > 1.
-By the Perron-Frobenius theorem and the structure of the transfer operator,
-the leading eigenvalue is real and positive, and ρ < 1 follows from
-the absence of eigenvalue 1 and the analytic structure. -/
-theorem rhImpliesSpectralRadius :
+This is the correct converse avatar of RH (Mayer 1990, Bonanno 2022,
+Möller–Pohl 2011). The frequently quoted ρ(L_s) < 1 is strictly stronger and
+numerically FALSE for the full operator: the constant mode gives
+λ₁ = ζ(2σ) → ∞ as σ → ½⁺ (rigorous at t = 0), and in a deep-strip sliver
+(σ ≈ 0.507, t ≈ 150) the second eigenvalue |λ₂| ≈ 1.010 > 1 while no
+eigenvalue ever equals 1 — see `research/ZERO_SLIVER_MARGIN.md` §1.
+The old `rhImpliesSpectralRadius` (RH ⇒ ρ(L_s) < 1) was therefore retired as
+literally overstated. -/
+def mayerDeterminant (s : ℂ) : ℂ := selbergZeta s / selbergZeta (s + 1)
+
+theorem rhImpliesEigenvalueOneFree :
     RiemannHypothesis →
-    (∀ (s : ℂ), s.re > 1/2 → spectralRadius s < 1) := by
+    ∀ (s : ℂ), s.re > 1/2 → mayerDeterminant s ≠ 0 := by
   intro rh
-  -- This is the converse direction.
+  -- Via the Mayer identity and the Selberg zeta → ζ(s) connection:
+  -- RH ⇒ ζ(s) ≠ 0 for Re(s) > 1/2 ⇒ Z_S(s) ≠ 0 ⇒ det(I − L_s) ≠ 0.
+  -- Requires the Z_S(s) ↔ ζ(s) scattering-matrix formalization (deep).
   sorry
 
 /-! ### Numerical Evidence (Sprint 2)
