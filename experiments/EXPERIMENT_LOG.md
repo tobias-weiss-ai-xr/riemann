@@ -4373,6 +4373,14 @@ mit #ss = 1 = dim + 1).
 - **Pizer/Brandt-Korrespondenz EXAKT bestätigt**: nichttriviales Spektrum des
   direkt gebauten 2-Isogeniegraphs = Multiset {a_2(f)} ueber alle
   Einbettungen, 10/10 Primen exakt (auf 1e-6).
+- **SIGNED-Vergleich (Nachbereitung, 63a4476-Nachfolger): 10/10 EXACT** —
+  auch das SIGNIERTE Spektrum stimmt ueberein (nicht nur die Betraege):
+  sortierte Eigenwerte des Graphs = sortierte a_2(f) pro Einbettung, z.B.
+  p=29: Graph {−2.414, +0.414} = {−1−√2, −1+√2} = a_2(29.2.a.a) mit
+  a_2 = −1+α, α = ±√2. Damit ist der volle Pizer-Satz (Eigenwerte mit
+  Vorzeichen, nicht nur Moduli) end-to-end aus Primaerdaten verifiziert.
+  Graph-Spektrum ist durchweg reell (max |Im| ≈ 0), alle a_2 reell
+  (alle Orbits self-dual bei diesen p).
 - **#ss = dim S_2(Gamma_0(p)) + 1** fuer alle p (klassische Formel, direkt
   aus der Konstruktion bestätigt).
 - **Ramanujan-Bund max|a_2| <= 2*sqrt(2)**: 0 Verletzungen; Maximum 2.7093

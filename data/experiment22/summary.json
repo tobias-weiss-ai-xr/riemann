@@ -12,12 +12,19 @@
    "n_a2": 1,
    "viol": 0,
    "match": "EXACT",
+   "match_signed": "EXACT",
    "max_imag": 0.0,
    "nontriv_evs": [
     2.0
    ],
+   "signed_evs": [
+    -2.0
+   ],
    "hecke_a2_abs": [
     2.0
+   ],
+   "hecke_a2_signed": [
+    -2.0
    ],
    "j_invariants": [
     [
@@ -38,9 +45,12 @@
    "n_a2": 0,
    "viol": -1,
    "match": "no-LMFDB",
+   "match_signed": "no-LMFDB",
    "max_imag": 0.0,
    "nontriv_evs": [],
+   "signed_evs": [],
    "hecke_a2_abs": [],
+   "hecke_a2_signed": [],
    "j_invariants": [
     [
      5,
@@ -56,12 +66,19 @@
    "n_a2": 1,
    "viol": 0,
    "match": "EXACT",
+   "match_signed": "EXACT",
    "max_imag": 0.0,
    "nontriv_evs": [
     1.0
    ],
+   "signed_evs": [
+    -1.0
+   ],
    "hecke_a2_abs": [
     1.0
+   ],
+   "hecke_a2_signed": [
+    -1.0
    ],
    "j_invariants": [
     [
@@ -82,11 +99,18 @@
    "n_a2": 1,
    "viol": 0,
    "match": "EXACT",
+   "match_signed": "EXACT",
    "max_imag": 0.0,
    "nontriv_evs": [
     0.0
    ],
+   "signed_evs": [
+    0.0
+   ],
    "hecke_a2_abs": [
+    0.0
+   ],
+   "hecke_a2_signed": [
     0.0
    ],
    "j_invariants": [
@@ -108,13 +132,22 @@
    "n_a2": 2,
    "viol": 0,
    "match": "EXACT",
+   "match_signed": "EXACT",
    "max_imag": 0.0,
    "nontriv_evs": [
     0.618034,
     1.618034
    ],
+   "signed_evs": [
+    -1.618034,
+    0.618034
+   ],
    "hecke_a2_abs": [
     1.618034,
+    0.618034
+   ],
+   "hecke_a2_signed": [
+    -1.618034,
     0.618034
    ],
    "j_invariants": [
@@ -140,13 +173,22 @@
    "n_a2": 2,
    "viol": 0,
    "match": "EXACT",
+   "match_signed": "EXACT",
    "max_imag": 0.0,
    "nontriv_evs": [
     0.414214,
     2.414214
    ],
+   "signed_evs": [
+    -2.414214,
+    0.414214
+   ],
    "hecke_a2_abs": [
     2.414214,
+    0.414214
+   ],
+   "hecke_a2_signed": [
+    -2.414214,
     0.414214
    ],
    "j_invariants": [
@@ -172,14 +214,23 @@
    "n_a2": 2,
    "viol": 0,
    "match": "EXACT",
+   "match_signed": "EXACT",
    "max_imag": 0.0,
    "nontriv_evs": [
     0.618034,
     1.618034
    ],
+   "signed_evs": [
+    -0.618034,
+    1.618034
+   ],
    "hecke_a2_abs": [
     1.618034,
     0.618034
+   ],
+   "hecke_a2_signed": [
+    1.618034,
+    -0.618034
    ],
    "j_invariants": [
     [
@@ -204,13 +255,22 @@
    "n_a2": 2,
    "viol": 0,
    "match": "EXACT",
+   "match_signed": "EXACT",
    "max_imag": 0.0,
    "nontriv_evs": [
     0.0,
     2.0
    ],
+   "signed_evs": [
+    -2.0,
+    -0.0
+   ],
    "hecke_a2_abs": [
     2.0,
+    0.0
+   ],
+   "hecke_a2_signed": [
+    -2.0,
     0.0
    ],
    "j_invariants": [
@@ -236,16 +296,27 @@
    "n_a2": 3,
    "viol": 0,
    "match": "EXACT",
+   "match_signed": "EXACT",
    "max_imag": 0.0,
    "nontriv_evs": [
     0.193937,
     1.903212,
     2.709275
    ],
+   "signed_evs": [
+    -2.709275,
+    -0.193937,
+    1.903212
+   ],
    "hecke_a2_abs": [
     2.709275,
     1.903212,
     0.193937
+   ],
+   "hecke_a2_signed": [
+    -2.709275,
+    1.903212,
+    -0.193937
    ],
    "j_invariants": [
     [
@@ -274,16 +345,27 @@
    "n_a2": 3,
    "viol": 0,
    "match": "EXACT",
+   "match_signed": "EXACT",
    "max_imag": 0.0,
    "nontriv_evs": [
     1.414214,
     1.414214,
     2.0
    ],
+   "signed_evs": [
+    -2.0,
+    -1.414214,
+    1.414214
+   ],
    "hecke_a2_abs": [
     2.0,
     1.414214,
     1.414214
+   ],
+   "hecke_a2_signed": [
+    -2.0,
+    1.414214,
+    -1.414214
    ],
    "j_invariants": [
     [
@@ -312,6 +394,7 @@
    "n_a2": 4,
    "viol": 0,
    "match": "EXACT",
+   "match_signed": "EXACT",
    "max_imag": 0.0,
    "nontriv_evs": [
     0.283841,
@@ -319,8 +402,20 @@
     2.266079,
     2.308875
    ],
+   "signed_evs": [
+    -2.266079,
+    0.283841,
+    0.673363,
+    2.308875
+   ],
    "hecke_a2_abs": [
     2.266079,
+    2.308875,
+    0.673363,
+    0.283841
+   ],
+   "hecke_a2_signed": [
+    -2.266079,
     2.308875,
     0.673363,
     0.283841

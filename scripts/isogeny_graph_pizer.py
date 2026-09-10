@@ -292,12 +292,14 @@ def main() -> int:
         max_imag = float(np.abs(ev.imag).max())
         evc = ev[np.abs(ev - 3) > 1e-9]   # drop Perron eigenvalue 3 only
         nontriv = np.sort(np.abs(evc))    # moduli (complex pairs share modulus)
+        g_sig = np.sort(evc.real)         # signed spectrum (eigenvalues are real)
         mx = float(nontriv.max()) if len(nontriv) else float("nan")
         hk = hecke_a2_at_level(recs, p)
         viol = -1 if not hk else int(
             sum(1 for v in hk if abs(v) > 2 * math.sqrt(2) + 1e-9))
         g = np.sort(nontriv)
         h = np.sort([abs(v) for v in hk]) if hk else np.array([])
+        h_sig = np.sort(hk) if hk else np.array([])
         if len(g) == len(h) and len(g) > 0:
             m = "EXACT" if np.allclose(g, h, atol=1e-6) else "DIFF"
             exact += m == "EXACT"
@@ -308,13 +310,21 @@ def main() -> int:
         else:
             m = f"{len(g)}v{len(h)}"
             diff += 1
+        if len(g_sig) == len(h_sig) and len(g_sig) > 0:
+            m_sig = "EXACT" if np.allclose(g_sig, h_sig, atol=1e-6) else "DIFF"
+        elif not hk:
+            m_sig = "no-LMFDB"
+        else:
+            m_sig = f"{len(g_sig)}v{len(h_sig)}"
         print(f"{p:4d} {n:4d} {str(reg):>4} {len(hk):5d} {mx:8.4f} "
-              f"{2*math.sqrt(2):6.3f} {viol:5d}  {m}")
+              f"{2*math.sqrt(2):6.3f} {viol:5d}  {m}  signed: {m_sig}")
         rows.append({"p": p, "n_ss": n, "regular": reg, "max_abs_ev": round(mx, 6),
-                     "n_a2": len(hk), "viol": viol, "match": m,
+                     "n_a2": len(hk), "viol": viol, "match": m, "match_signed": m_sig,
                      "max_imag": max_imag,
                      "nontriv_evs": [round(float(x), 6) for x in nontriv],
+                     "signed_evs": [round(float(x), 6) for x in g_sig],
                      "hecke_a2_abs": [round(abs(v), 6) for v in hk],
+                     "hecke_a2_signed": [round(float(v), 6) for v in hk],
                      "j_invariants": [[int(x) for x in z] for z in js]})
 
     print(f"\nEXACT: {exact}  DIFF/partial: {diff}  no-LMFDB: {no_data}  "
