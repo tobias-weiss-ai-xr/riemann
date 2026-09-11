@@ -39,6 +39,9 @@ import Mathlib.NumberTheory.LSeries.Nonvanishing
 
 namespace Riemann.TransferOperator
 
+open Complex hiding exp continuous_exp
+open scoped Topology Real
+
 open scoped Complex
 
 /-- **Functional-equation reflection** (proven): if ζ(ρ) = 0 in the critical strip
@@ -77,11 +80,105 @@ theorem riemannHypothesis_criticalStrip (ρ : ℂ) (hzero : riemannZeta ρ = 0)
   · exact heq
   · exact absurd hzero (fun hzero' => no_zeros_right_half_plane ρ hzero' ⟨hgt, h1⟩)
 
-/-- The trivial-zero exclusion for the full statement: ζ has no zeros with
-Re ρ ≤ 0 except the trivial zeros ρ = −2(n+1) (Fleet 6). -/
+/-- **Nonvanishing on the pole line** — the single remaining analytic input for
+the trivial-zero exclusion: ζ(s) ≠ 0 on the line Re s = 1, s ≠ 1
+(Hadamard–de la Vallée Poussin, 1896). -/
+theorem riemannZeta_ne_zero_of_re_eq_one (s : ℂ) (hre : s.re = 1) (hs : s ≠ 1) :
+    riemannZeta s ≠ 0 := by
+  sorry -- Fleet 6: Hadamard–de la Vallée Poussin
+
+/-- Reflection rewrite of ζ(ρ) across the line Re = 1/2 (proven, from Mathlib's
+functional equation at s := 1 − ρ). -/
+private theorem zeta_reflect (ρ : ℂ) (hne : ∀ m : ℕ, 1 - ρ ≠ -(m : ℂ))
+    (hρ0 : ρ ≠ 0) :
+    riemannZeta ρ =
+        2 * (2 * π) ^ (-(1 - ρ)) * Gamma (1 - ρ) * cos (π * (1 - ρ) / 2) *
+          riemannZeta (1 - ρ) := by
+  have h := riemannZeta_one_sub (s := 1 - ρ) hne (fun hc => hρ0 (by
+    calc ρ = 1 - (1 - ρ) := (sub_sub_cancel 1 ρ).symm
+      _ = 1 - 1 := by rw [hc]
+      _ = 0 := by ring))
+  rwa [sub_sub_cancel] at h
+
+/-- The FE side factors never vanish (proven): `2 · (2π)^(−(1−ρ)) · Γ(1−ρ) ≠ 0`. -/
+private theorem reflect_side_ne_zero (ρ : ℂ) (hρ1 : ρ ≠ 1)
+    (hne : ∀ m : ℕ, 1 - ρ ≠ -(m : ℂ)) :
+    (2 : ℂ) * (2 * π) ^ (-(1 - ρ)) * Gamma (1 - ρ) ≠ 0 := by
+  have hexp : (-(1 - ρ) : ℂ) ≠ 0 :=
+    fun hc => hρ1 (sub_eq_zero.mp (neg_eq_zero.mp hc)).symm
+  have hbase : (π : ℝ) ≠ 0 := by norm_num
+  have hcpow : (2 * π : ℂ) ^ (-(1 - ρ)) ≠ 0 :=
+    (Complex.cpow_ne_zero_iff_of_exponent_ne_zero hexp).2
+      (by exact_mod_cast mul_ne_zero (by norm_num : (2 : ℝ) ≠ 0) hbase)
+  exact mul_ne_zero (mul_ne_zero (by norm_num) hcpow) (Complex.Gamma_ne_zero hne)
+
+/-- A zero of `cos(π(1−ρ)/2)` forces `ρ = −2k` for some `k : ℤ` (proven). -/
+private theorem eq_neg_two_mul_of_cos_eq (ρ : ℂ) (h : cos (π * (1 - ρ) / 2) = 0) :
+    ∃ k : ℤ, ρ = -2 * (k : ℂ) := by
+  rw [Complex.cos_eq_zero_iff] at h
+  obtain ⟨k, hk⟩ := h
+  refine ⟨k, ?_⟩
+  have hπ : (Real.pi : ℂ) ≠ 0 := by norm_num
+  field_simp at hk
+  -- hk (post-simp): 1 − ρ = 2·k + 1  →  ρ = −2·k
+  calc ρ = 1 - (1 - ρ) := (sub_sub_cancel 1 ρ).symm
+    _ = 1 - (2 * (k : ℂ) + 1) := by rw [hk]
+    _ = -2 * (k : ℂ) := by ring
+
+/-- The trivial-zero exclusion: if ζ(ρ) = 0 with Re ρ ≤ 0, then ρ = −2(n+1).
+Fully proven except for the single Re s = 1 line theorem (Hadamard–dLVP). -/
 theorem riemannZeta_zero_of_re_nonpos (ρ : ℂ) (hzero : riemannZeta ρ = 0)
     (hre : ρ.re ≤ 0) : ∃ n : ℕ, ρ = -2 * ((n : ℂ) + 1) := by
-  sorry -- Fleet 6: Euler product + functional equation, standard
+  have hρ0 : ρ ≠ 0 := by
+    intro hc
+    rw [hc, riemannZeta_zero] at hzero
+    norm_num at hzero
+  have hρ1 : ρ ≠ 1 := by
+    intro hc
+    rw [hc] at hre
+    simp at hre
+    linarith
+  have hne : ∀ m : ℕ, 1 - ρ ≠ -(m : ℂ) := by
+    intro m hm
+    have hrm := congrArg Complex.re hm
+    rw [Complex.sub_re, Complex.one_re, Complex.neg_re] at hrm
+    have hmc : (m : ℂ).re = (m : ℝ) := by simp
+    rw [hmc] at hrm
+    have hm0 : (0 : ℝ) ≤ (m : ℝ) := by exact_mod_cast Nat.zero_le m
+    linarith
+  have hsub : 1 ≤ (1 - ρ).re := by
+    rw [Complex.sub_re, Complex.one_re]
+    linarith
+  rcases mul_eq_zero.1 ((zeta_reflect ρ hne hρ0).symm.trans hzero) with h | hzeta
+  · rcases mul_eq_zero.1 h with h | hcos
+    · exact absurd h (reflect_side_ne_zero ρ hρ1 hne)
+    · -- cos(π(1−ρ)/2) = 0 ⟹ ρ = −2k
+      obtain ⟨k, hk⟩ := eq_neg_two_mul_of_cos_eq ρ hcos
+      have hkre : ρ.re = -2 * (k : ℝ) := by
+        rw [hk]
+        simp
+      have hkneg0 : 0 ≤ (k : ℝ) := by linarith
+      have hk0 : (k : ℤ) ≠ 0 := by
+        intro hc
+        apply hρ0
+        rw [hk, hc]
+        norm_num
+      have hkz : 0 ≤ k := Int.cast_nonneg_iff.mp hkneg0
+      have hk1 : (1 : ℤ) ≤ k := by omega
+      obtain ⟨m, rfl⟩ : ∃ m : ℕ, (k : ℤ) = m := ⟨k.toNat, by omega⟩
+      refine ⟨m - 1, ?_⟩
+      rw [hk]
+      push_cast [Nat.cast_sub (by omega : 1 ≤ m)]
+      ring
+  · -- ζ(1−ρ) = 0: contradict either Euler-product nonvanishing (Re > 1)
+    -- or the line theorem (Re = 1)
+    rcases lt_or_eq_of_le hsub with hgt | heq
+    · exact absurd hzeta (riemannZeta_ne_zero_of_one_lt_re hgt)
+    · exact absurd hzeta
+        (riemannZeta_ne_zero_of_re_eq_one (1 - ρ) heq.symm (fun hc => hρ0 (by
+          calc ρ = 1 - (1 - ρ) := (sub_sub_cancel 1 ρ).symm
+            _ = 1 - 1 := by rw [hc]
+            _ = 0 := by ring)))
 
 /-- **The Riemann Hypothesis** (from the transfer-operator chain; Fleet 6 pending). -/
 theorem riemannHypothesis (s : ℂ) (hzero : riemannZeta s = 0)
@@ -93,7 +190,8 @@ theorem riemannHypothesis (s : ℂ) (hzero : riemannZeta s = 0)
       -- the line Re s = 1 needs Hadamard–de la Vallée Poussin (Fleet 6)
       rcases lt_or_eq_of_le (le_of_not_gt h1) with hgt | heq1
       · exact absurd hzero (riemannZeta_ne_zero_of_one_lt_re hgt)
-      · sorry -- Fleet 6: ζ(s) ≠ 0 on the line Re s = 1 (Hadamard–dLVP)
+      · -- Re s = 1: Hadamard–de la Vallée Poussin (the one Fleet-6 input)
+        exact absurd hzero (riemannZeta_ne_zero_of_re_eq_one s heq1.symm _hs1)
   · -- s.re ≤ 0: only trivial zeros there (Fleet 6 skeleton)
     obtain ⟨n, hn⟩ := riemannZeta_zero_of_re_nonpos s hzero (le_of_not_gt h0)
     exact (htriv ⟨n, hn⟩).elim
