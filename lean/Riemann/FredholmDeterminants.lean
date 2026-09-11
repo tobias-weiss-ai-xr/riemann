@@ -2,41 +2,45 @@
 Copyright (c) 2026 Tobias Weiss
 Fredholm Determinants
 
-This file defines Fredholm determinants for trace-class operators
-and proves their basic properties.
+Fredholm determinant theory for trace-class operators on Hilbert spaces.
+This is the operator-theoretic core for Mayer's theorem on the Gauss map:
+the Selberg zeta connection is stated once in `Riemann.TransferOperator.Complete`.
 
 Author: Tobias Weiss
 References:
 - Simon, B. (2005). "Trace Ideals and Their Applications"
 - Gohberg, I., Goldberg, S., Kaashoek, M. (1990). "Classes of Linear Operators Vol I"
+
+NOTE: Mathlib has no trace-class / Fredholm determinant theory yet (verified by
+grep — only finite-dimensional `singularValues` for `LinearMap.normDet`). This
+file is the blueprint for Mathlib PRs #3/#4 in MATHLIB_FORK_PLAN.md.
 -/
 
 import Mathlib.Analysis.Normed.Operator.Basic
 import Mathlib.Analysis.Normed.Operator.Compact.Basic
 import Mathlib.Analysis.Normed.Algebra.Spectrum
-import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 
 /-!
 # Fredholm Determinants
 
-This module defines Fredholm determinants for trace-class operators and their
-basic properties. For a trace-class operator T, the Fredholm determinant is:
-  det(1 + T) = ∏_n (1 + λ_n)
-where λ_n are the eigenvalues of T (counted with multiplicity).
+For a trace-class operator T on a Hilbert space, the Fredholm determinant is
+  det(1 + T) = ∏_n (1 + λ_n) = Σ_k tr(∧^k T) / k!,
+
+where λ_n are the eigenvalues of T counted with multiplicity.
 
 ## Main Definitions
 
-- `IsTraceClass`: The class of trace-class operators
-- `Trace`: The trace of a trace-class operator
-- `fredholmDet`: The Fredholm determinant
+- `singularValue`: the n-th singular value of a compact operator (Fleet: Mayer)
+- `IsTraceClass`: summable singular values
+- `traceClassTrace`: the operator trace (Fleet: Mayer)
+- `fredholmDet`: the Fredholm determinant (Fleet: Mayer)
 
-## Main Theorems
+## Main Theorems (all Fleet: Mayer)
 
-- `fredholmDet_one`: det(1) = 1
-- `fredholmDet_product`: det((1+T₁)(1+T₂)) = det(1+T₁)det(1+T₂)
-- `fredholmDet_ne_zero_iff_one_plus_T_invertible`: det(1+T) ≠ 0 iff 1+T is invertible
-- `spectralRadius_lt_one_iff_fredholmDet_ne_zero`: For trace-class T, ρ(T) < 1 ⇔ det(1-T) ≠ 0
-
+- `fredholmDet_zero`: det(1) = 1
+- `fredholmDet_product`: multiplicativity
+- `fredholmDet_ne_zero_iff`: det(1 − T) ≠ 0 ↔ 1 ∉ spectrum T
+- `spectralRadius_lt_one_iff_fredholmDet_ne_zero`
 -/
 
 namespace Riemann.Fredholm
@@ -45,105 +49,85 @@ open scoped BigOperators
 
 variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
 
-/-- A compact operator is trace-class if its singular values are summable.
+/-- The n-th singular value of a compact operator (Fleet: Mayer).
 
-  For a compact operator K with singular values s_n, K is trace-class if
-  Σ_n s_n < ∞. -/
-class IsTraceClass (T : E →L[ℂ] E) : Prop where
+(ponytail: sorry-valued placeholder; real def needs Hilbert-space structure
+`√‖T†T e_n‖` over eigenvalues of the positive operator T†T, plus the
+Hilbert-Schmidt API. Upgrade path: Mathlib PR #3.) -/
+noncomputable def singularValue {E : Type*} [NormedAddCommGroup E]
+    [NormedSpace ℂ E] (T : E →L[ℂ] E) (_n : ℕ) : ℝ :=
+  sorry -- Fleet Mayer: eigenvalues of (T†T)^{1/2} in decreasing order
+
+/-- A compact operator is **trace-class** if its singular values are summable. -/
+class IsTraceClass {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    (T : E →L[ℂ] E) : Prop where
   compact : IsCompactOperator T
   summableSingularValues : Summable (fun n => singularValue T n)
 
-/-- The trace of a trace-class operator.
+/-- Fredholm determinant closure: trace-class operators form a vector space
+(Fleet: Mayer; Mathlib PR #3 material). -/
+instance instNegIsTraceClass {T : E →L[ℂ] E} [hT : IsTraceClass T] : IsTraceClass (-T) where
+  compact := IsCompactOperator.neg hT.compact
+  summableSingularValues := by
+    sorry -- Fleet Mayer: s_n(−T) = s_n(T)
 
-  For a trace-class operator T, the trace is:
-    Tr(T) = ∑_n ⟨e_n, T e_n⟩
-  for any orthonormal basis {e_n}. -/
-noncomputable def Trace (T : E →L[ℂ] E) [IsTraceClass T] : ℂ := by
-  sorry
-  -- Need proper definition using Hilbert space structure
+instance instAddIsTraceClass {T₁ T₂ : E →L[ℂ] E} [h₁ : IsTraceClass T₁] [h₂ : IsTraceClass T₂] :
+    IsTraceClass (T₁ + T₂) where
+  compact := IsCompactOperator.add h₁.compact h₂.compact
+  summableSingularValues := by
+    sorry -- Fleet Mayer: s_n(T₁+T₂) ≤ s_n(T₁) + s_n(T₂)
 
-/-- Fredholm determinant of a trace-class operator.
+/-- The trace of a trace-class operator: tr(T) = Σ ⟨e_n, T e_n⟩
+for any orthonormal basis (Fleet: Mayer). -/
+noncomputable def traceClassTrace {E : Type*} [NormedAddCommGroup E]
+    [NormedSpace ℂ E] (T : E →L[ℂ] E) [IsTraceClass T] : ℂ :=
+  sorry -- Fleet Mayer: basis-independent sum over an ONB
 
-  For a trace-class operator T with eigenvalues {λ_n}, the Fredholm
-  determinant is:
-    det(1 + T) = Σ_{k=0}^∞ trace(∧^k T) / k!
-  where ∧^k T is the k-th exterior power. -/
-noncomputable def fredholmDet (T : E →L[ℂ] E) [IsTraceClass T] : ℂ := by
-  sorry
-
-/-- Fredholm determinant for compact operators via eigenvalues.
-  This is an alternative definition using the spectral theorem. -/
-noncomputable def fredholmDet_eigenvalues (T : E →L[ℂ] E)
-    [IsCompactOperator T] : ℂ := by
-  sorry
-  -- det(1 + T) = ∏_n (1 + λ_n) where λ_n are eigenvalues
+/-- The **Fredholm determinant** of a trace-class operator:
+det(1 + T) = Σ_{k≥0} tr(∧^k T) / k! (Fleet: Mayer). -/
+noncomputable def fredholmDet {E : Type*} [NormedAddCommGroup E]
+    [NormedSpace ℂ E] (T : E →L[ℂ] E) [IsTraceClass T] : ℂ :=
+  sorry -- Fleet Mayer: exterior-power trace expansion
 
 section BasicProperties
 
 variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
 
-theorem fredholmDet_one (E : Type*) [NormedAddCommGroup E] [NormedSpace ℂ E] :
-    fredholmDet (0 : E →L[ℂ] E) = 1 := by
-  sorry
+instance : IsTraceClass (0 : E →L[ℂ] E) where
+  compact := by
+    sorry -- Fleet Mayer: 0 is trivially compact
+  summableSingularValues := by
+    sorry -- Fleet Mayer: all singular values vanish
 
+/-- Trace-class closure under multiplication with a trace-class factor (Fleet: Mayer). -/
+instance instMulIsTraceClass {T₁ T₂ : E →L[ℂ] E} [h₁ : IsTraceClass T₁] [h₂ : IsTraceClass T₂] :
+    IsTraceClass (T₁ * T₂) where
+  compact := IsCompactOperator.clm_comp h₂.compact T₁
+  summableSingularValues := by
+    sorry -- Fleet Mayer: s_n(T₁T₂) ≤ ‖T₂‖ s_n(T₁)
+
+/-- det(1) = 1, i.e. the Fredholm determinant of the zero operator (Fleet: Mayer). -/
+theorem fredholmDet_zero : fredholmDet (0 : E →L[ℂ] E) = 1 := by
+  sorry -- Fleet Mayer: exterior powers of 0 vanish from k ≥ 1
+
+/-- Multiplicativity: det(1+T₁)·det(1+T₂) = det(1+T₁+T₂+T₁T₂) (Fleet: Mayer). -/
 theorem fredholmDet_product {T₁ T₂ : E →L[ℂ] E}
-    [IsTraceClass T₁] [IsTraceClass T₂] [IsTraceClass (T₁ + T₂)] :
-    fredholmDet ((1 : E →L[ℂ] E) + T₁) *
-    fredholmDet ((1 : E →L[ℂ] E) + T₂) =
-    fredholmDet ((1 : E →L[ℂ] E) + (T₁ + T₂) + T₁ ∘ T₂) := by
-  -- For operators that commute, this simplifies to det(1+T₁)det(1+T₂) = det(1+T₁+T₂+T₁T₂)
-  sorry
+    [IsTraceClass T₁] [IsTraceClass T₂] [IsTraceClass (T₁ * T₂)] :
+    fredholmDet T₁ * fredholmDet T₂ =
+    fredholmDet (T₁ + T₂ + T₁ * T₂) := by
+  sorry -- Fleet Mayer: standard composition identity
 
-theorem fredholmDet_ne_zero_iff_one_plus_T_invertible {T : E →L[ℂ] E}
-    [IsTraceClass T] :
-    fredholmDet ((1 : E →L[ℂ] E) + T) ≠ 0 ↔
-    Invertible ((1 : E →L[ℂ] E) + T) := by
-  sorry
+/-- det(1 + T) ≠ 0 ↔ −1 is not an eigenvalue of T (Fleet: Mayer). -/
+theorem fredholmDet_ne_zero_iff {T : E →L[ℂ] E} [IsTraceClass T] :
+    fredholmDet T ≠ 0 ↔ ∀ v : E, T v = -v → v = 0 := by
+  sorry -- Fleet Mayer: determinant vanishes iff −1 is an eigenvalue
 
-/-- For a trace-class operator T, ρ(T) < 1 iff det(1 - T) ≠ 0 -/
+/-- For a trace-class operator T: ρ(T) < 1 ↔ det(1 + T) ≠ 0 (Fleet: Mayer). -/
 theorem spectralRadius_lt_one_iff_fredholmDet_ne_zero {T : E →L[ℂ] E}
     [IsTraceClass T] :
-    (spectralRadius ℂ T < 1) ↔
-    (fredholmDet ((1 : E →L[ℂ] E) - T) ≠ 0) := by
-  sorry
+    ENNReal.toReal (spectralRadius ℂ T) < 1 ↔ fredholmDet T ≠ 0 := by
+  sorry -- Fleet Mayer: spectrum of trace-class operator is the eigenvalue multiset
 
 end BasicProperties
 
-section ForTransferOperator
-
-open Riemann.TransferOperator
-
-/-- The transfer operator is trace-class for all s with Re(s) > 1/2 -/
-theorem transferOperator_isTraceClass {s : ℂ} (hs : s.re > 1 / 2) :
-    IsTraceClass (transferOperatorBounded s hs) := by
-  sorry
-
-/-- Mayer's identity: ζ(2s) = C(s) · det(1 - L_s) -/
-theorem mayerIdentity (s : ℂ) (hs : s.re > 1 / 2) :
-    NumberTheory.LSeries.RiemannZeta.riemannZeta (2 * s) =
-    ((1 - Complex.exp ((1 - 2 * s) * Complex.log 2)) *
-     (1 - Complex.exp ((-2 * s) * Complex.log 2)))⁻¹ *
-    fredholmDet ((1 : (FunctionSpace) →L[ℂ] FunctionSpace) - transferOperatorBounded s hs) := by
-  sorry
-
-/-- Key inference: If ζ(ρ) = 0 with Re(ρ) > 1/2, then ζ(2ρ) = 0 -/
-theorem zeta_zero_implies_zeta_2rho_zero {ρ : ℂ}
-    (hzero : NumberTheory.LSeries.RiemannZeta.riemannZeta ρ = 0)
-    (hRe₁ : 1 / 2 < ρ.re) (hRe₂ : ρ.re < 1) :
-    NumberTheory.LSeries.RiemannZeta.riemannZeta (2 * ρ) = 0 := by
-  have h_transfer : spectralRadius ℂ (transferOperatorBounded ρ (by sorry)) < 1 := by
-    sorry  -- This is Theorem 3.3
-  have h_det_ne : fredholmDet ((1 : FunctionSpace →L[ℂ] FunctionSpace) -
-    transferOperatorBounded ρ (by sorry)) ≠ 0 := by
-    sorry  -- Uses mayerIdentity and nonvanishing of ζ(2ρ)
-  have h_2rho_re : (2 * ρ).re > 1 := by
-    linarith  -- ρ.re > 1/2, so 2*ρ.re > 1
-  have h_2rho_nonzero : NumberTheory.LSeries.RiemannZeta.riemannZeta (2 * ρ) ≠ 0 := by
-    sorry  -- Uses ζ(s) ≠ 0 for Re(s) ≥ 1
-  sorry
-
-end ForTransferOperator
-
-end Fredholm
-
-end Riemann
+end Riemann.Fredholm

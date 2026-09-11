@@ -4,12 +4,16 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Riemann Project Contributors
 -/
 import Mathlib.Analysis.Complex.Basic
-import Mathlib.Analysis.NormedSpace.Basic
-import Mathlib.Topology.Instances.Real
+import Mathlib.Analysis.Normed.Module.Basic
+import Mathlib.Topology.Algebra.Ring.Real
 import Mathlib.Data.Real.Basic
-import Mathlib.Algebra.Order.Floor.Basic
+import Mathlib.Algebra.Order.Floor.Ring
+import Mathlib.Analysis.Calculus.Deriv.Inv
+import Mathlib.Analysis.Calculus.Deriv.Add
+import Mathlib.Analysis.Calculus.ContDiff.Basic
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Riemann.GaussMapCompilable
 
 /-!
 # Basic Definitions for Transfer Operator Proof
@@ -19,14 +23,14 @@ transfer operator proof of the Riemann Hypothesis.
 
 ## Main Definitions
 
-* `Real.Interval.zeroOne`: The unit interval [0,1]
-* `gaussMap`: The Gauss map g: [0,1) → [0,1)
-* `inverseBranch`: The inverse branches of the Gauss map
-* `Potential`: The potential function φ_s(x) = -2s log|x|
+* `Interval.zeroOne`: The unit interval [0,1]
+* `gaussMap`: The Gauss map g: [0,1) → [0,1) (alias for `Riemann.GaussMapCompilable.gaussMap`)
+* `inverseBranch`: The inverse branches g_n(x) = 1/(n+x) for n ≥ 1
+* `potential`: The potential function φ_s(x) = -2s log|x|
+* `discretization`: The uniform grid of N+1 points in [0,1]
 -/
 
-open Set Filter Topology
-open scoped NNReal
+open Set
 
 namespace Riemann.TransferOperator
 
@@ -44,19 +48,14 @@ def Interval.zeroOne_open := Set.Ioo (0 : ℝ) 1
 def Interval.zeroOne_closed_open := Set.Ico (0 : ℝ) 1
 
 -- ============================================================================
--- SECTION 2: Gauss Map Definition
+-- SECTION 2: Gauss Map (alias to the verified `Riemann.GaussMap`)
 -- ============================================================================
 
 /-- The Gauss map g: [0,1) → [0,1).
--- 
--- For x ∈ (0,1), g(x) = 1/x - floor(1/x).
--- For x = 0, g(0) = 0 by convention.
--- 
--- The Gauss map is the canonical continued fraction map.
--- It is ergodic with respect to the Gauss measure.
--- -/
-noncomputable def gaussMap : ℝ → ℝ
-  | x => if x = 0 then 0 else (1 / x) - ⌊1 / x⌋
+
+For x ∈ (0,1), g(x) = 1/x - floor(1/x). For x = 0, g(0) = 0 by convention.
+This is an alias for the verified development in `Riemann.GaussMapCompilable`. -/
+noncomputable def gaussMap : ℝ → ℝ := Riemann.GaussMap.gaussMap
 
 -- ============================================================================
 -- SECTION 3: Properties of the Gauss Map
@@ -66,53 +65,25 @@ namespace GaussMap
 
 variable {x : ℝ}
 
--- The Gauss map at zero
+/-- The Gauss map at zero. -/
 theorem at_zero : gaussMap 0 = 0 := by
-  simp [gaussMap]
+  simp [gaussMap, Riemann.GaussMap.gaussMap]
 
--- The Gauss map for positive x < 1
+/-- The Gauss map for 0 < x < 1. -/
 theorem apply (hx₁ : 0 < x) (hx₂ : x < 1) :
     gaussMap x = (1 / x) - ⌊1 / x⌋ := by
-  simp [gaussMap, ne_of_gt hx₁]
+  rw [gaussMap]
+  exact Riemann.GaussMap.gaussMap_eq_of_pos_le_one ⟨hx₁, hx₂.le⟩
 
--- The Gauss map maps [0,1) to [0,1)
+/-- The Gauss map maps [0,1) into [0,1). -/
 theorem maps_to_zeroOne (hx₁ : 0 ≤ x) (hx₂ : x < 1) :
     gaussMap x ∈ Interval.zeroOne_closed_open := by
-  by_cases hx : x = 0
-  · simp [hx, gaussMap]
+  by_cases hx0 : x = 0
+  · rw [hx0, at_zero]
     exact ⟨le_refl 0, zero_lt_one⟩
-  · have hx' : 0 < x := lt_of_le_of_ne hx₁ (Ne.symm hx)
-    simp only [gaussMap, hx, ↓reduceite]
-    constructor
-    · -- Show 0 ≤ gaussMap x
-      have h1 : 1 / x > 1 := by
-        rw [div_lt_iff hx']
-        norm_num
-        linarith
-      have h2 : ⌊1 / x⌋ ≥ 1 := by
-        have : ⌊1 / x⌋ ≥ ⌊1⌋ := Int.floor_le_floor (by linarith : (1 : ℝ) ≤ 1 / x)
-        simp at this
-        exact this
-      linarith [Int.floor_le (1 / x), Int.lt_floor_add_one (1 / x)]
-    · -- Show gaussMap x < 1
-      have h1 : 1 / x > 1 := by
-        rw [div_lt_iff hx']
-        norm_num
-        linarith
-      have h2 : ⌊1 / x⌋ ≥ 1 := by
-        have : ⌊1 / x⌋ ≥ ⌊1⌋ := Int.floor_le_floor (by linarith : (1 : ℝ) ≤ 1 / x)
-        simp at this
-        exact this
-      have h3 : ⌊1 / x⌋ ≤ 1 / x := Int.floor_le (1 / x)
-      calc gaussMap x - 1 = (1 / x - ⌊1 / x⌋) - 1 := by simp [gaussMap, hx]
-        _ = (1 / x - 1) - ⌊1 / x⌋ := by ring
-        _ < 0 := by linarith
-      linarith
-
--- The inverse branches of the Gauss map
-theorem inverseBranch_def (n : ℕ) (x : ℝ) :
-    (fun y => 1 / (↑n + y)) x = 1 / (↑n + x) := by
-  rfl
+  · have hx' : 0 < x := lt_of_le_of_ne hx₁ (Ne.symm hx0)
+    rw [apply hx' hx₂]
+    exact ⟨Int.fract_nonneg _, Int.fract_lt_one _⟩
 
 end GaussMap
 
@@ -121,95 +92,64 @@ end GaussMap
 -- ============================================================================
 
 /-- The inverse branches of the Gauss map: g_n(x) = 1/(n + x) for n ≥ 1.
--- 
--- Each g_n is a contraction mapping from [0,1] to (0,1/n] ⊆ [0,1].
--- The union of the images of g_n for n ≥ 1 is dense in [0,1).
--- -/
-noncomputable def inverseBranch (n : ℕ+) : ℝ → ℝ
-  | x => 1 / (↑n + x)
+
+Each g_n is a contraction mapping from [0,1] to (0,1/n] ⊆ [0,1]. -/
+noncomputable def inverseBranch (n : ℕ+) : ℝ → ℝ :=
+  fun x => 1 / ((n : ℝ) + x)
 
 namespace InverseBranch
 
 variable {n : ℕ+} {x y : ℝ}
 
--- Basic property: inverseBranch maps to (0,1/n]
+/-- The inverse branch maps [0,1] into (0, 1/n]. -/
 theorem maps_to_Icc (hx : 0 ≤ x ∧ x ≤ 1) :
-    0 < inverseBranch n x ∧ inverseBranch n x ≤ 1 / ↑n := by
-  constructor
-  · -- positivity
-    apply div_pos
-    norm_num
-    linarith
-  · -- upper bound
-    have : ↑n + x ≥ ↑n := by linarith [hx.1]
-    have : 1 / (↑n + x) ≤ 1 / ↑n := by
-      apply one_div_le_one_div_of_le
-      linarith
-      linarith
-    exact this
+    0 < inverseBranch n x ∧ inverseBranch n x ≤ 1 / (n : ℝ) := by
+  have hn : (0 : ℝ) < (n : ℝ) := by exact_mod_cast n.pos
+  refine ⟨div_pos one_pos (by linarith), ?_⟩
+  rw [inverseBranch]
+  exact (div_le_div_iff₀ (by linarith) hn).2 (by linarith)
 
--- The derivative of inverseBranch
-theorem deriv (hx : x ≠ -↑n) :
-    deriv (inverseBranch n) x = -1 / (↑n + x) ^ 2 := by
-  have : inverseBranch n = fun y => (↑n + y)⁻¹ := by
-    ext y
+/-- The derivative of the inverse branch: g_n'(x) = -1/(n+x)². -/
+theorem deriv_eq (hx : x ≠ -↑n) :
+    deriv (inverseBranch n) x = -1 / ((n : ℝ) + x) ^ 2 := by
+  have hn : (0 : ℝ) < (n : ℝ) := by exact_mod_cast n.pos
+  have hne : ((n : ℝ) + x) ≠ 0 := by
+    intro h
+    apply hx
+    linarith
+  have hfun : inverseBranch n = fun y => ((n : ℝ) + y)⁻¹ := by
+    funext y
     simp [inverseBranch]
-  rw [this]
-  simp [deriv_inv, deriv_add, deriv_const, add_comm]
-  ring
+  have hd : DifferentiableAt ℝ (fun y : ℝ => (n : ℝ) + y) x :=
+    (differentiableAt_const _).add differentiableAt_id
+  rw [hfun, deriv_fun_inv'' hd hne, deriv_const_add_id]
 
--- The residue of the inverse branch: |(g_n)'(x)| = 1/(n + x)^2 < 1
-theorem abs_deriv_lt_one (hx : 0 ≤ x) :
+/-- The contraction estimate: |g_n'(x)| < 1 on the interior x > 0.
+(Corrected from the original `0 ≤ x`: at n = 1, x = 0 the derivative
+equals exactly 1, so strict inequality needs the interior.) -/
+theorem abs_deriv_lt_one (hx : 0 < x) :
     |deriv (inverseBranch n) x| < 1 := by
-  have h := deriv (by linarith : x ≠ -↑n)
-  simp only [h]
-  have : |(-1 / (↑n + x) ^ 2 : ℝ)| = |1 / (↑n + x) ^ 2| := by
-    simp [abs_neg]
-  rw [this]
-  have : 0 < ↑n + x := by linarith [hx]
-  have : 0 < (↑n + x) ^ 2 := by positivity
-  have : |1 / (↑n + x) ^ 2| = 1 / (↑n + x) ^ 2 := by
-    simp [abs_of_pos (by positivity)]
-  rw [this]
-  have h1 : (↑n + x) ^ 2 ≥ (↑n) ^ 2 := by
-    have : ↑n + x ≥ ↑n := by linarith [hx]
-    have : (↑n + x) ^ 2 ≥ (↑n) ^ 2 := by
-      nlinarith [sq_nonneg x]
-    exact this
-  have h2 : 1 / (↑n + x) ^ 2 ≤ 1 / (↑n) ^ 2 := by
-    apply one_div_le_one_div_of_le
+  have hx2 : x ≠ -↑n := by
+    intro h
     linarith
-    positivity
-  have h3 : 1 / (↑n) ^ 2 ≤ 1 := by
-    have : (↑n : ℝ) ^ 2 ≥ 1 := by
-      have hn : ↑n ≥ 1 := by exact_mod_cast n.property
-      nlinarith [sq_nonneg (↑n : ℝ)]
-    apply one_div_le_one_of_le _ (by norm_num)
+  rw [deriv_eq hx2]
+  -- -1/(n+x)² < 0, so |·| = 1/(n+x)²
+  have hpos : (0 : ℝ) < (n : ℝ) + x := by
+    have hn : (0 : ℝ) < (n : ℝ) := by exact_mod_cast n.pos
+    linarith
+  have hsquare : (0 : ℝ) < ((n : ℝ) + x) ^ 2 := sq_pos_of_pos hpos
+  have hpos1 : (0 : ℝ) < 1 / ((n : ℝ) + x) ^ 2 := div_pos one_pos hsquare
+  have habs : |-(1 : ℝ) / ((n : ℝ) + x) ^ 2| = 1 / ((n : ℝ) + x) ^ 2 := by
+    rw [neg_div, abs_neg, abs_of_pos hpos1]
+  rw [habs]
+  -- 1/(n+x)² < 1 since (n+x)² > 1
+  have hgt : (1 : ℝ) < ((n : ℝ) + x) ^ 2 := by
+    have hn1 : (1 : ℝ) ≤ (n : ℝ) := by
+      obtain ⟨k, hk⟩ := n
+      exact_mod_cast hk
+    have hsum : (1 : ℝ) < (n : ℝ) + x := by linarith
     nlinarith
-  -- Strict inequality: since n ≥ 1 and x ≥ 0, we have ↑n + x > ↑n ≥ 1
-  -- Actually we need to show < 1, not ≤ 1
-  have : (↑n + x) ^ 2 > 1 := by
-    have hn : ↑n ≥ 1 := by exact_mod_cast n.property
-    have hx' : x ≥ 0 := hx
-    calc (↑n + x) ^ 2 ≥ (↑n) ^ 2 := by nlinarith [sq_nonneg x]
-      _ ≥ 1 ^ 2 := by nlinarith [hn]
-      _ = 1 := by norm_num
-    -- For strict inequality, note that if n ≥ 1 and x ≥ 0, then ↑n + x ≥ 1
-    -- and if n > 1 or x > 0, then > 1
-    by_cases hn1 : n = 1
-    · simp [hn1] at *
-      have : (1 : ℝ) + x > 1 := by linarith [hx, hn1]
-      nlinarith [sq_pos_of_pos (by linarith : 0 < (1 : ℝ) + x)]
-    · have hn' : ↑n ≥ 2 := by
-        have : n.val ≥ 2 := by omega
-        exact_mod_cast this
-      nlinarith [sq_nonneg x]
-  have : 1 / (↑n + x) ^ 2 < 1 / 1 := by
-    apply one_div_lt_one_div_of_lt
-    linarith
-    positivity
-  simp at this
-  exact this
+  rwa [div_lt_one hsquare]
 
 end InverseBranch
 
@@ -218,50 +158,42 @@ end InverseBranch
 -- ============================================================================
 
 /-- The potential function φ_s: (0,1] → ℂ for the Gauss map.
--- 
--- For the Riemann zeta connection, we use:
---   φ_s(x) = -2s * log|x|
--- 
--- This potential arises from the connection to the zeta function via
--- the Euler product formula.
--- -/
+
+For the Riemann zeta connection, we use φ_s(x) = -2s · log|x|.
+This potential arises from the connection to the zeta function via
+the Euler product formula. -/
 noncomputable def potential (s : ℂ) (x : ℝ) : ℂ := -2 * s * Real.log |x|
 
 namespace Potential
 
 variable {s : ℂ} {x : ℝ}
 
--- The potential at x = 1
+/-- The potential vanishes at x = 1. -/
 theorem at_one : potential s 1 = 0 := by
-  simp [potential, Real.log_one]
-
--- The potential is real-valued for real s and positive x
-theorem real_valued (hs : s.im = 0) (hx : x > 0) :
-    (potential s x).im = 0 := by
   simp [potential]
-  ring_nf
-  simp [Complex.mul_im, Complex.ofReal_im, Real.log_abs, hs]
 
--- The potential is analytic in s for fixed x > 0
+/-- The potential is real-valued for real s and positive x. -/
+theorem real_valued (hs : s.im = 0) (_hx : x > 0) :
+    (potential s x).im = 0 := by
+  have hs' : s = ((s.re : ℝ) : ℂ) := by
+    rw [← Complex.re_add_im s, hs]
+    simp
+  rw [potential, hs']
+  simp [Complex.mul_im]
+
+/-- The potential is analytic in s for fixed x > 0. -/
 theorem analytic_in_s (hx : x > 0) :
-    ContDiff ℂ (↑) (fun s : ℂ => potential s x) := by
-  sorry -- Would need more topology machinery
+    ContDiff ℂ (⊤ : ℕ∞) (fun s : ℂ => potential s x) := by
+  sorry -- Fleet 4: differentiability of s ↦ -2s·log|x| in s (affine in s!)
 
 end Potential
 
 -- ============================================================================
--- SECTION 6: Transfer Operator (Finite-Dimensional Approximation)
+-- SECTION 6: Discretization of the Unit Interval
 -- ============================================================================
 
-/-- Finite-dimensional approximation of the transfer operator.
--- 
--- For numerical purposes and formalization, we use a finite truncation.
--- The full infinitesimal operator is defined on a suitable Banach space.
--- -/
-
-/-- Discrétization of the unit interval into N points. -/
-noncomputable def discretization (N : ℕ) : Finset ℝ := by
-  -- return Finset.image (fun k => (k : ℝ) / N) (Finset.range N)
-  sorry -- Need to use a different approach
+/-- Uniform discretization of [0,1] into N+1 points k/N. -/
+noncomputable def discretization (N : ℕ) : Finset ℝ :=
+  (Finset.range (N + 1)).image fun k : ℕ => (k : ℝ) / (N : ℝ)
 
 end Riemann.TransferOperator

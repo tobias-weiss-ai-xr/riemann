@@ -12,8 +12,9 @@ require mathlib from git
 -- require mathlib from "../path/to/local/mathlib4"
 
 lean_lib «Riemann» where
-  -- Only include core files that compile
+  -- Build every module under Riemann/ (recursive glob)
   roots := #[`Riemann]
+  globs := #[.andSubmodules `Riemann]
 
 @[default_target]
 lean_exe «riemann» where

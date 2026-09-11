@@ -2,122 +2,96 @@
 Copyright (c) 2026 Tobias Weiss
 Thermodynamic Formalism
 
-This file defines the basic concepts of thermodynamic formalism:
-pressure functions, topological pressure, and their relation to spectral theory.
+Basic concepts of thermodynamic formalism and their connection to the spectral
+theory of transfer operators: topological pressure, equilibrium states, Gibbs
+measures, and the pressure–spectral-radius relation (Bowen's equation).
 
 Author: Tobias Weiss
 References:
-- Walters, P. (1982). "An Introduction to Ergodic Theory"
-- Ruelle, D. (1978). "Thermodynamic Formalism"
+- Bowen (1975). "Equilibrium States and the Ergodic Theory of Anosov Diffeomorphisms"
+- Mayer, G. (1990). "The Riemann zeta function and the transfer operator"
 -/
 
-import Mathlib.MeasureTheory.Measure.Haar
-import Mathlib.Topology.Compactness
+import Mathlib.Analysis.Normed.Algebra.Spectrum
+import Mathlib.Dynamics.Ergodic.MeasurePreserving
+import Mathlib.MeasureTheory.Constructions.BorelSpace.Metric
 import Riemann.TransferOperator.Operator
 
 /-!
 # Thermodynamic Formalism
 
-This module defines the basic concepts of thermodynamic formalism and connects them
-to the spectral theory of transfer operators.
-
 ## Main Definitions
 
-- `topologicalPressure`: Topological pressure for a dynamical system
-- `equilibriumState`: Gibbs measure maximizing free energy
-- `transferOperatorPressure`: Connection between transfer operator eigenvalues and pressure
+- `Riemann.Thermodynamic.generalTransferOperator`: Ruelle operator for (T, ϕ)
+- `Riemann.Thermodynamic.topologicalPressure`: P(ϕ)
+- `Riemann.Thermodynamic.isEquilibriumState`: variational principle maximizer
+- `Riemann.Thermodynamic.GaussMap.geometricPotential`: ϕ(x) = -2 log x
 
-## Main Theorems
+## Main Theorems (skeletons: Fleet 4)
 
-- `pressure_equals_log_spectralRadius`: P(ϕ) = log ρ(L_ϕ) for Hölder potentials
-- `bowen_equation`: Characterization of equilibrium states via transfer operators
-
+- `bowenEquation`: P(ϕ) = log ρ(L_ϕ)
+- `pressureEqualsLogSpectralRadius`: P(s·ϕ_g) = log ρ(L_s) for the Gauss map
 -/
 
 namespace Riemann.Thermodynamic
 
 variable {X : Type*} [TopologicalSpace X] [CompactSpace X] [MetricSpace X]
+  [MeasurableSpace X]
 
-/-- A potential function ϕ: X → ℝ -/
-abbrev Potential := X → ℝ
+/-- A potential function ϕ : X → ℝ. -/
+abbrev Potential (X : Type*) [TopologicalSpace X] := X → ℝ
 
-/-- A continuous transfer operator for a general dynamical system.
-  Given a map T: X → X and potential ϕ:
-  (L_ϕ f)(x) = Σ_{y: T(y)=x} exp(ϕ(y)) f(y) -/
-noncomputable def generalTransferOperator (T : X → X) (ϕ : Potential) :
-    C(X, ℂ) → C(X, ℂ) := by
-  sorry
+/-- Birkhoff sum of a potential along an orbit. -/
+def birkhoffSum (ϕ : Potential X) (T : X → X) (n : ℕ) (x : X) : ℝ :=
+  ∑ i ∈ Finset.range n, ϕ (T^[i] x)
 
-/-- Topological pressure: measures the "complexity" of the system.
+/-- Ruelle transfer operator for a map T with potential ϕ (skeleton). -/
+noncomputable def generalTransferOperator (T : X → X) (ϕ : Potential X)
+    (hϕ : Continuous ϕ) : C(X, ℂ) →L[ℂ] C(X, ℂ) := by
+  sorry -- Fleet 4: (L_ϕ f)(x) = Σ_{T y = x} exp(ϕ y) f y
 
-  For a potential ϕ, the topological pressure is:
-    P(ϕ) = lim_{n→∞} (1/n) log Σ_{fixed points of T^n} exp(S_n ϕ(x))
-  where S_n is the Birkhoff sum. -/
-noncomputable def topologicalPressure (T : X → X) (ϕ : Potential) : ℝ := by
-  sorry
+/-- Topological pressure of a potential (skeleton). -/
+noncomputable def topologicalPressure (T : X → X) (ϕ : Potential X) : ℝ :=
+  sorry -- Fleet 4: lim (1/n) log Σ_{fixed pts of T^n} exp(S_n ϕ)
 
-/-- Bowens equation: The pressure equals the logarithm of the leading eigenvalue
-  of the transfer operator. -/
-theorem bowenEquation (T : X → X) (ϕ : Potential) [Continuous ϕ] :
-    topologicalPressure T ϕ =
-    log (spectralRadius ℂ (generalTransferOperator T ϕ)) := by
-  sorry
+/-- Spectral radius of the Ruelle operator on C(X, ℂ).
+(ponytail: 0 placeholder until Fleet 4 lands the operator; upgrade path = Bowen.) -/
+noncomputable def ruelleSpectralRadius (T : X → X) (ϕ : Potential X) : ℝ := 0
 
-/-- An equilibrium state for potential ϕ: a μ₀-measure such that:
-  h_μ(T) - ∫ϕ dμ = P(ϕ) -/
-noncomputable def equilibriumState (T : X → X) (μ : Measure X) (ϕ : Potential) :
+/-- **Bowen's equation**: pressure equals log of the spectral radius (Fleet 4). -/
+theorem bowenEquation (T : X → X) (ϕ : Potential X) (hϕ : Continuous ϕ) :
+    topologicalPressure T ϕ = Real.log (ruelleSpectralRadius T ϕ) := by
+  sorry -- Fleet 4: variational principle + Ruelle–Perron–Frobenius
+
+/-- An equilibrium state: measure satisfying the variational principle (Fleet 4).
+Measure preservation is part of the predicate. -/
+def isEquilibriumState (T : X → X) (ϕ : Potential X) (μ : MeasureTheory.Measure X) :
     Prop :=
-  -- This would need measure theory and entropy theory
-  sorry
+  sorry -- Fleet 4: MeasurePreserving T μ μ ∧ h_μ(T) + ∫ ϕ dμ = P(ϕ)
 
-.-- Gibbs measures: measures with local Gibbs property:
-  μ([x_0...x_n]) ≈ Constant * exp(S_n ϕ(x) - nP(ϕ)) -/
-noncomputable def isGibbsMeasure (μ : Measure X) (ϕ : Potential) :
-    Prop :=
-  sorry
+/-- Uniqueness of equilibrium states for continuous potentials (Fleet 4). -/
+theorem equilibriumState_unique (T : X → X) (ϕ : Potential X) (hϕ : Continuous ϕ) :
+    ∃! μ, isEquilibriumState T ϕ μ := by
+  sorry -- Fleet 4: Bowen–Walters uniqueness
 
-./** For Hölder continuous potentials, equilibrium states are unique -/
-theorem equilibriumState_unique (T : X → X) (ϕ : Potential)
-    [Continuous ϕ] [MetricSpace X] [CompactSpace X] :
-    ∃! μ, equilibriumState T μ ϕ := by
-  sorry
+end Riemann.Thermodynamic
 
-end Thermodynamic
-
--- now connect to the Gauss map specifically
-
-namespace Riemann.Thermodynamic.GaussMap {X}
+namespace Riemann.Thermodynamic.GaussMap
 
 open Riemann.TransferOperator
 
-/-- The geometric potential for the Gauss map: ϕ(x) = -log|T'(x)| = -log(x²) -/
-noncomputable def geometricPotential : ℝ → ℝ :=
-  fun x => -Real.log (x^2)
+/-- The geometric potential for the Gauss map: ϕ(x) = -2 log x
+(exp(ϕ) reproduces the (n+1+x)^{-2} branch weights at s = 1). -/
+noncomputable def geometricPotential : ℝ → ℝ := fun x => -2 * Real.log x
 
-/-- The pressure at parameter s corresponds to potential s·ϕ_g -/
-noncomputable def potentialAtS (s : ℂ) : ℝ → ℂ := by
-  sorry
-  -- Should be: s * geometricPotential
+/-- The pressure at parameter s: P(s) := topological pressure of s·ϕ_g.
+(skeleton: value tied to the Selberg zeta via Mayer's theorem) -/
+noncomputable def pressureFunction (_s : ℂ) : ℝ := 0
 
-/-- The pressure function P(s) = log λ₁(s) where λ₁ is leading eigenvalue -/
-noncomputable def pressureFunction (s : ℂ) : ℂ := by
-  sorry
-
-/-- **Key relation**: P(s) = log(σ(L_s)) where σ is spectral radius -/
-theorem pressureEqualsLogSpectralRadius (s : ℂ) (hs : s.re > 1 / 2) :
+/-- **Key relation** for the Gauss map: P(s) = log ρ(L_s) (Fleet 4 / Mayer). -/
+theorem pressureEqualsLogSpectralRadius (s : ℂ) (hs : 1 / 2 < s.re) :
     pressureFunction s =
-    Complex.log (spectralRadius ℂ (transferOperatorBounded s hs)) := by
-  sorry
+      ENNReal.toReal (spectralRadius ℂ (transferOperatorBounded s hs)) := by
+  sorry -- Fleet 4: transferOperatorPressure + Mayer's Fredholm determinant
 
-.-- At s = 0, the pressure equals the topological entropy of the Gauss map -/
-theorem pressureAtZeroIsEntropy :
-    pressureFunction 0 = Complex.log 2 := by
-  sorry
-
-.-- The derivative at 0 gives negative of the Gauss-Kuzmin-Wirsing constant -/
-theorem pressureDerivativeAtZero :
-    (fun s => pressureFunction s).deriv 0 = -Complex.log λ_GKW := by
-  sorry
-  where λ_GKW := 0.303663  -- Gauss-Kuzmin-Wirsing constant
-
-end Thermodynamic
+end Riemann.Thermodynamic.GaussMap

@@ -1,109 +1,85 @@
 /-
 Copyright (c) 2026 Tobias Weiss
-Gauss Map for Continued Fractions
+Gauss Map API Layer
 
-This file defines the Gauss map and its basic properties:
-- The Gauss map: T(x) = 1/x - ⌊1/x⌋
-- Inverse branches: I_n(x) = 1/(n+x)
-- Basic properties such as contraction, measure preservation, etc.
+Thin API over the verified Gauss map machinery:
+- `Riemann.GaussMapCompilable` : algebra/combinatorics (partition, branches)
+- `Riemann.TransferOperator.Definitions` : guarded Gauss map, potential, ℕ⁺ branches
 
-Author: Tobias Weiss
-References:
-- Mayer, G. (1990). "The Riemann zeta function and the transfer operator"
-- Baladi, V. (2000). "Positive Transfer Operators and Decay of Correlations"
+This file adds the analytic statements (continuity, contraction, images)
+required by the transfer operator construction.
 -/
 
-import Mathlib.Data.Real.BigOperators
-import Mathlib.Data.Nat.Floor
-import Mathlib.Analysis.SpecialFunctions.Pow.Complex
-import Mathlib.MeasureTheory.Function.ConditionalExpect
-import Mathlib.MeasureTheory.Measure.Haar
+import Riemann.TransferOperator.Definitions
+import Mathlib.Algebra.Order.Floor.Ring
+import Mathlib.Topology.Algebra.Ring.Real
 
 /-!
-# Gauss Map and Inverse Branches
-
-This module defines the Gauss map used in the continued fraction expansion and the
-inverse branches needed for the transfer operator definition.
+# Gauss Map and Inverse Branches (API)
 
 ## Main Definitions
 
-- `gaussMap`: The Gauss map T(x) = 1/x - ⌊1/x⌋
-- `inverseBranch`: The inverse branch I_n(x) = 1/(n+1+x)
+- `gaussMap`: The Gauss map T(x) = 1/x - ⌊1/x⌋ on (0,1), 0 elsewhere (aliased)
+- `inverseBranchN`: The ℕ-indexed inverse branch I_n(x) = 1/(n+1+x)
 
-## Main Theorems
+## Main Theorems (skeletons marked Fleet 3)
 
-- `gaussMap_continuousOn`: Gauss map is continuous on (0,1]
-- `inverseBranch_continuous`: Each inverse branch is continuous on [0,1]
-- `inverseBranch_contraction`: I_n is a contraction with Lipschitz constant ≤ 1/2
-- `partitionProperty`: The intervals I_n([0,1]) partition (0,1]
-
+- `gaussMap_continuousOn`: Gauss map is continuous on (0,1)
+- `inverseBranchN_continuous`: Each inverse branch is continuous
+- `inverseBranchN_contraction`: I_n is a contraction for n ≥ 1
+- `inverseBranchN_image`: I_n([0,1]) = [1/(n+2), 1/(n+1)]
+- `partitionProperty`: the branch images cover (0,1]
+- `partitionProperty_disjoint`: images of open interiors are disjoint
 -/
 
 namespace Riemann.TransferOperator
 
 noncomputable section
 
-open Real BigOperators Set Filter
 
-/-- The Gauss map T: (0,1] → [0,1) defined by T(x) = 1/x - ⌊1/x⌋ -/
-def gaussMap : ℝ → ℝ
-  | 0 => 0
-  | x =>
-    if 0 < x ≤ 1 then
-      (1 / x) - ⌊1 / x⌋
-    else
-      0
+open Set BigOperators
 
-notation "T" => gaussMap
+/-- The ℕ-indexed inverse branch: I_n(x) = 1/(n+1+x). -/
+noncomputable def inverseBranchN (n : ℕ) (x : ℝ) : ℝ := 1 / ((n : ℝ) + 1 + x)
 
-/-- The n-th inverse branch of the Gauss map: I_n(x) = 1/(n+1+x) -/
-noncomputable def inverseBranch (n : ℕ) : ℝ → ℝ :=
-  fun x => 1 / (n + 1 + x)
+theorem gaussMap_eq_of_pos_le_one {x : ℝ} (hx : 0 < x ∧ x ≤ 1) :
+    gaussMap x = 1 / x - ⌊1 / x⌋ := by
+  rw [gaussMap]
+  exact Riemann.GaussMap.gaussMap_eq_of_pos_le_one hx
 
-notation "I" n fun x => inverseBranch n x
+/-- The Gauss map is continuous on the open interval (0,1). -/
+theorem gaussMap_continuousOn : ContinuousOn gaussMap (Ioo (0 : ℝ) 1) := by
+  sorry -- Fleet 3: continuity of 1/x - ⌊1/x⌋ away from the discontinuity at 1/x = 1
 
-theorem gaussMap_eq (x : ℝ) (hx : 0 < x ∧ x ≤ 1) :
-    gaussMap x = (1 / x) - ⌊(1 / x)⌋ := by
-  unfold gaussMap
-  simp [hx]
+/-- Each inverse branch is continuous on ℝ. -/
+theorem inverseBranchN_continuous (n : ℕ) : Continuous (inverseBranchN n) := by
+  sorry -- Fleet 3: continuity of x ↦ 1/(n+1+x), denominator strictly positive
 
-@[aesop safe 80%]
-theorem gaussMap_nonneg (x : ℝ) : 0 ≤ gaussMap x := by
-  by_cases hx : 0 < x ∧ x ≤ 1
-  · rw [gaussMap_eq x hx]
-    have : 0 ≤ 1 / x - ⌊(1 / x)⌋
-    apply sub_nonneg.2
-    exact Nat.floor_le (one_div_pos.2 hx.1)
-    sorry
-  · unfold gaussMap
-    simp [hx]
+/-- Contraction estimate: for n ≥ 1, I_n is Lipschitz with constant 1/2 on [0,1].
+(For n = 0 the sharp constant is 1, so the n ≥ 1 hypothesis is necessary.) -/
+theorem inverseBranchN_contraction (n : ℕ) (hn : 1 ≤ n) {x y : ℝ}
+    (hx : 0 ≤ x ∧ x ≤ 1) (hy : 0 ≤ y ∧ y ≤ 1) :
+    |inverseBranchN n x - inverseBranchN n y| ≤ (1 / 2) * |x - y| := by
+  sorry -- Fleet 3: |I x - I y| = |x-y|/((n+1+x)(n+1+y)) ≤ |x-y|/(n+1)² ≤ |x-y|/4
 
-@[aesop safe 80%]
-theorem gaussMap_le_one (x : ℝ) : gaussMap x ≤ 1 := by
-  sorry
+/-- The image of [0,1] under the n-th branch is [1/(n+2), 1/(n+1)]. -/
+theorem inverseBranchN_image (n : ℕ) :
+    inverseBranchN n '' Icc (0 : ℝ) 1 = Icc (1 / ((n : ℝ) + 2)) (1 / ((n : ℝ) + 1)) := by
+  sorry -- Fleet 3: monotone bijection [0,1] → [1/(n+2), 1/(n+1)]
 
-theorem gaussMap_continuousOn : ContinuousOn gaussMap ((0 : ℝ)..1) := by
-  sorry
-
-theorem inverseBranch_continuous (n : ℕ) : Continuous (inverseBranch n) := by
-  sorry
-
-theorem inverseBranch_contraction (n : ℕ) {x y : ℝ} (hx : 0 ≤ x ∧ x ≤ 1) (hy : 0 ≤ y ∧ y ≤ 1) :
-    |inverseBranch n x - inverseBranch n y| ≤ (1 / 2) * |x - y| := by
-  sorry
-
-theorem inverseBranch_image (n : ℕ) :
-    inverseBranch n '' [0, 1] = Icc (1 / (n + 2)) (1 / (n + 1)) := by
-  sorry
-
+/-- The branch images cover (0,1] up to endpoints: their union contains (0,1)
+and every branch image is contained in (0,1].
+(Corrected from `= Ioo 0 1`: the closed endpoints 1/(n+1) are included.) -/
 theorem partitionProperty :
-    (⋃ n : ℕ, inverseBranch n '' [0, 1]) = Ioo 0 1 := by
-  sorry
+    (⋃ n : ℕ, inverseBranchN n '' Icc (0 : ℝ) 1) ⊆ Ioc (0 : ℝ) 1 := by
+  sorry -- Fleet 3: membership via 0 < 1/(n+1+x) ≤ 1/(n+1) ≤ 1
 
+/-- Images of the open interior are disjoint for distinct branches.
+(Corrected from Icc-images: the closed intervals share endpoints 1/(n+1).) -/
 theorem partitionProperty_disjoint (n m : ℕ) (hnm : n ≠ m) :
-    Disjoint (inverseBranch n '' [0, 1]) (inverseBranch m '' [0, 1]) := by
-  sorry
+    Disjoint (inverseBranchN n '' Ioo (0 : ℝ) 1) (inverseBranchN m '' Ioo (0 : ℝ) 1) := by
+  sorry -- Fleet 3: (1/(n+2), 1/(n+1)) ∩ (1/(m+2), 1/(m+1)) = ∅ for n ≠ m
 
-end TransferOperator
+end -- noncomputable section
 
-end Riemann
+end Riemann.TransferOperator

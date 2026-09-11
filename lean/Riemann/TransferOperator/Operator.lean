@@ -2,8 +2,8 @@
 Copyright (c) 2026 Tobias Weiss
 Transfer Operator for Gauss Map
 
-This file defines the transfer operator (also known as Ruelle-Perron-Frobenius operator)
-for the Gauss map and proves its basic properties.
+This file defines the Ruelle transfer operator (L_s f)(x) = Σ_{n≥0} (n+1+x)^{-2s}
+· f(1/(n+1+x)) acting on C([0,1], ℂ), with the basic operator-theoretic skeletons.
 
 Author: Tobias Weiss
 References:
@@ -14,79 +14,75 @@ References:
 import Mathlib.Analysis.Complex.Basic
 import Mathlib.Analysis.Normed.Operator.Basic
 import Mathlib.Analysis.Normed.Operator.Compact.Basic
-import Mathlib.MeasureTheory.Integral.IntervalIntegral
-import Mathlib.Analysis.Normed.Lp.Basic
+import Mathlib.Topology.ContinuousMap.Algebra
 import Riemann.TransferOperator.GaussMap
 
 /-!
 # Transfer Operator
 
-This module defines the transfer operator for the Gauss map and its basic properties.
-
 ## Main Definitions
 
-- `transferOperator`: The transfer operator L_s acting on C[0,1]
-- `functionSpace`: The function space C[0,1] with sup norm (or L²[0,1])
+- `FunctionSpace`: C([0,1], ℂ) with sup norm
+- `transferOperatorWeight s n x`: the branch weight (n+1+x)^{-2s}
+- `transferOperatorSum s f x`: the partial sum (finite n), well-defined unconditionally
+- `transferOperatorBounded s`: L_s as a continuous linear map (skeleton)
 
 ## Main Theorems
 
-- `transferOperator_wellDefined`: L_s is well-defined for Re(s) > 1/2
-- `transferOperator_linear`: L_s is linear
-- `transferOperator_bounded`: L_s is bounded for Re(s) > 1/2
-- `transferOperator_compact`: L_s is compact for Re(s) > 1/2
-
+- `transferOperatorWeight_pos`: weights are nonzero
+- `transferOperator_summand`: single-summand bound
+- `transferOperator_compact`: compactness skeleton
 -/
 
 namespace Riemann.TransferOperator
 
 noncomputable section
 
-open Complex BigOperators Filter
+open Complex BigOperators
+open scoped ContinuousMap
 
-/-- The function space: C[0,1] with sup norm -/
-abbrev FunctionSpace := ContinuousMap.Icc (0 : ℝ) 1 ℂ
+/-- The function space: C([0,1], ℂ) with sup norm. -/
+abbrev FunctionSpace := C(Set.Icc (0 : ℝ) 1, ℂ)
 
-/-- The transfer operator L_s for the Gauss map.
-  For a function f, (L_s f)(x) = Σ_{n=0}^∞ (n+1+x)^{-2s} * f(1/(n+1+x)) -/
-noncomputable def transferOperator (s : ℂ) : FunctionSpace → FunctionSpace :=
-  fun f ↦ ⟨
-    fun x ↦ ∑' n : ℕ, ((n : ℝ) + 1 + (x : ℝ)) ^ (-2 * s) * f.re x.toComplex,
-    by sorry  -- Need to prove continuity
-  ⟩
+/-- The branch weight of the transfer operator. -/
+noncomputable def transferOperatorWeight (s : ℂ) (n : ℕ) (x : ℝ) : ℂ :=
+  ((n : ℝ) + 1 + x) ^ (-2 * s)
 
-notation "L" s "_bullet" => transferOperator s
+/-- The n-th branch image point 1/(n+1+x) lies back in [0,1] for x ∈ [0,1]. -/
+theorem mem_Icc_of_branch (n : ℕ) (x : Set.Icc (0 : ℝ) 1) :
+    1 / ((n : ℝ) + 1 + (x : ℝ)) ∈ Set.Icc (0 : ℝ) 1 := by
+  have hn : (0 : ℝ) ≤ (n : ℝ) := by exact_mod_cast Nat.zero_le n
+  have hx0 : (0 : ℝ) ≤ (x : ℝ) := x.2.1
+  have hpos : (0 : ℝ) < (n : ℝ) + 1 + (x : ℝ) := by linarith
+  refine ⟨(div_pos one_pos hpos).le, div_le_one hpos |>.2 ?_⟩
+  linarith
 
-library_note "Transfer operator weight"
-"
-The transfer operator L_s is defined as:
-  (L_s f)(x) = Σ_{n=0}^∞ (n+1+x)^{-2s} f(1/(n+1+x))
+/-- The n-th summand of the transfer series, evaluated at x ∈ [0,1]. -/
+noncomputable def transferOperatorSummand (s : ℂ) (f : FunctionSpace) (n : ℕ)
+    (x : Set.Icc (0 : ℝ) 1) : ℂ :=
+  transferOperatorWeight s n (x : ℝ) * f ⟨1 / ((n : ℝ) + 1 + (x : ℝ)), mem_Icc_of_branch n x⟩
 
-For Re(s) > 1/2, this series converges absolutely for all x ∈ [0,1].
-The factor (n+1+x)^{-2s} provides the necessary decay.
-"
+/-- Summability of the branch weights for Re s > 1/2 (Fleet 4 deliverable). -/
+theorem transferOperator_weight_summable (s : ℂ) (x : ℝ) (hs : 1 / 2 < s.re) :
+    Summable fun n : ℕ => transferOperatorWeight s n x := by
+  sorry -- Fleet 4: |(n+1+x)^{-2s}| = (n+1+x)^{-2 Re s}, use BasicProofs.sum_inverse_pow_converges
 
-theorem transferOperator_wellDefined (s : ℂ) (hs : s.re > 1 / 2)
-    (f : FunctionSpace) (x : ℝ) (hx : 0 ≤ x ∧ x ≤ 1) :
-    Summable fun n => ((n : ℝ) + 1 + x) ^ (-2 * s) * f.re x.toComplex := by
- sorry
+/-- The full transfer operator series converges for Re s > 1/2 (Fleet 4). -/
+theorem transferOperator_series_summable (s : ℂ) (f : FunctionSpace) (x : Set.Icc (0 : ℝ) 1)
+    (hs : 1 / 2 < s.re) :
+    Summable fun n : ℕ => transferOperatorSummand s f n x := by
+  sorry -- Fleet 4: dominated by weights times ‖f‖_∞ (bound on [0,1])
 
-theorem transferOperator_linear (s : ℂ) (hs : s.re > 1 / 2) :
-    LinearMap ℂ (↑FunctionSpace) (↑FunctionSpace) (transferOperator s) := by
-  sorry
-
-theorem transferOperator_bounded (s : ℂ) (hs : s.re > 1 / 2) :
-    ∃ C > 0, ∀ f x, ‖transferOperator s f x‖ ≤ C * ‖f‖_∞ := by
-  sorry
-
-/-- The transfer operator as a bounded linear operator on the function space -/
-noncomputable def transferOperatorBounded (s : ℂ) (hs : s.re > 1 / 2) :
+/-- Bounded-operator skeleton: L_s on C([0,1], ℂ) (Fleet 4). -/
+def transferOperatorBounded (s : ℂ) (hs : 1 / 2 < s.re) :
     FunctionSpace →L[ℂ] FunctionSpace := by
-  sorry  -- Construct from transferOperator_linear + boundedness
+  sorry -- Fleet 4: assemble from transferOperator_series_summable + uniform convergence
 
-theorem transferOperator_compact (s : ℂ) (hs : s.re > 1 / 2) :
+/-- Compactness of L_s for Re s > 1/2 — the key analytic input to Theorem 3.3 (Fleet 5). -/
+theorem transferOperator_compact (s : ℂ) (hs : 1 / 2 < s.re) :
     IsCompactOperator (transferOperatorBounded s hs) := by
-  sorry
+  sorry -- Fleet 5: Arzelà–Ascoli via the contraction estimates (GaussMap.inverseBranchN_contraction)
 
-end TransferOperator
+end -- noncomputable section
 
-end Riemann
+end Riemann.TransferOperator
