@@ -887,6 +887,41 @@ only at σ* ≈ 0.4938 < ½. -/
 axiom eigenvalueOneFreeConjecture (s : ℂ) (hs : s.re > 1/2) :
     mayerDeterminant s ≠ 0
 
+/-- **Theorem**: The spectral radius conjecture (ρ(L_s) < 1) implies the
+eigenvalue-1 conjecture (det(I − L_s) ≠ 0).  This is the elementary
+pointwise bridge via `spectralRadius_lt_one_imp_detNonzero`: if ρ < 1
+then 1 is not an eigenvalue, hence the Fredholm determinant is nonzero.
+The converse is FALSE (the full operator has |λ₂| > 1 in the deep strip
+while never having an eigenvalue equal to 1), so
+`eigenvalueOneFreeConjecture` is strictly WEAKER than
+`spectralRadiusConjecture`.  Proved with no conjecture. -/
+theorem spectralRadiusConjecture_implies_eigenvalueOneFree :
+    (∀ (s : ℂ), s.re > 1/2 → spectralRadius s < 1) →
+    (∀ (s : ℂ), s.re > 1/2 → mayerDeterminant s ≠ 0) := by
+  intro h s hs
+  exact spectralRadius_lt_one_imp_detNonzero s hs (h s hs)
+
+/-- **Conjecture (converse)**: det(I − L_s) ≠ 0 for all Re(s) > 1/2 implies
+the Riemann Hypothesis.
+
+This is the other direction of the RH ⟺ det(I − L_s) ≠ 0 equivalence.
+Combined with `rhImpliesEigenvalueOneFree` (RH ⟹ det ≠ 0) it gives the
+full equivalence.  The proof requires the Mayer identity
+(det(I − L_s) = Z_S(s)/Z_S(s+1)) and the Selberg zeta → ζ(s) scattering
+connection (Z_S(s) ≠ 0 ⟺ ζ(s) ≠ 0 for Re(s) > 1/2), which are not yet
+formalized. -/
+theorem eigenvalueOneFreeImpliesRH :
+    (∀ (s : ℂ), s.re > 1/2 → mayerDeterminant s ≠ 0) →
+    RiemannHypothesis := by
+  intro h_det
+  -- Via the Mayer identity: det(I − L_s) = Z_S(s)/Z_S(s+1) ≠ 0 gives
+  -- Z_S(s) ≠ 0 for Re(s) > 1/2.  The Selberg zeta Z_S(s) encodes the
+  -- zeros of ζ(s) via the scattering matrix, so Z_S(s) ≠ 0 implies
+  -- ζ(s) ≠ 0 for Re(s) > 1/2.  By the functional equation, ζ(s) ≠ 0
+  -- for Re(s) < 1/2 as well.  Thus all non-trivial zeros have Re(s) = 1/2.
+  -- Requires the Z_S(s) ↔ ζ(s) scattering-matrix formalization (deep).
+  sorry
+
 /-! ### Numerical Evidence (Sprint 2)
 
 Sprint 2 computed the spectral radius of the boundary-corrected Mayer transfer
