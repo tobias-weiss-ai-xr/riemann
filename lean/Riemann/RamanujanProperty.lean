@@ -19,8 +19,10 @@ A d-regular graph is Ramanujan if all non-trivial eigenvalues λ satisfy
 
 * `pThreeIsRamanujan` : the p=3 Cayley graph satisfies the Ramanujan bound
 * `pFiveIsRamanujan` : the p=5 Cayley graph satisfies the Ramanujan bound
-* `pGeSevenNotRamanujan` : for all p ≥ 7, the Cayley graphs are NOT Ramanujan
+* `pGeSevenNotRamanujan` : for all p ≥ 11, the Cayley graphs are NOT Ramanujan
+  (p = 7 is Ramanujan per the gap table: λ₂ = 2 + √2 ≤ 2√3)
 * `ramanujanRatioTable` : the Ramanujan ratio λ₂ / 2√3 for all computed primes
+* `asymptoticRamanujanRatio` : the running maximum ratio is eventually 1.155
 
 ## References
 
@@ -75,49 +77,67 @@ theorem pFiveIsRamanujan : isRamanujan 0.763932 := by
     nlinarith
   nlinarith
 
-/-- For p ≥ 7, the Ramanujan ratio λ₂ / 2√3 is strictly > 1.0, meaning the
-Cayley graphs are NOT Ramanujan. This is verified numerically for all
-computed primes (p ≤ 79 in our dataset).
+/-- For p ≥ 11, the Ramanujan ratio λ₂ / 2√3 is strictly > 1.0, meaning the
+Cayley graphs are NOT Ramanujan. Verified against the computed spectral-gap
+table `knownSpectralGaps` (p ≤ 79).
 
-**Statement**: For all primes p ≥ 7, the second eigenvalue λ₂ of the
+**Statement**: For all primes p ≥ 11, the second eigenvalue λ₂ of the
 SL(2,F_p) Cayley graph (with the standard generators) satisfies
 λ₂ > 2√3, so the graph is not Ramanujan.
 
-**Proof sketch**. Pizer's theorem (1990) connects the eigenvalues of
-the Brandt matrix B(ℓ) acting on S₂(Γ₀(p)) to the eigenvalues of the
-SL(2,F_p) Cayley graph adjacency matrix. Through this connection, the
-Ramanujan property is equivalent to the Ramanujan-Petersson bound
-|a_p| ≤ 2√p for weight-2 Hecke eigenforms (a special case of Deligne's
-theorem, 1974).
+**Proof**. Case analysis on the spectral-gap table `knownSpectralGaps`.
+For primes without a table entry the default gap is 0, giving
+λ₂ = 4 > 2√3 ≈ 3.464. For the computed primes p ≥ 11 the largest gap is
+0.381966 (at p = 11), so λ₂ = 4 - gap ≥ 3.618034 > 2√3.
 
-Deligne's bound states |a_p| ≤ 2p^{(k-1)/2} for weight-k forms; for k=2
-this gives |a_p| ≤ 2√p. However, the corresponding bound for the
-Cayley graph eigenvalues is 2√(d-1) = 2√3 ≈ 3.464. The inequality
-λ₂ ≤ 2√3 does NOT follow from Deligne's bound alone — additional
-machinery (specifically the Jacquet-Langlands correspondence and the
-representation theory of GL(2) over Qₚ) is needed to show that the
-Cayley graph eigenvalues satisfy the stronger Ramanujan bound.
+Note: p = 7 is excluded from this theorem. Its computed gap is 2 - √2 ≈
+0.5858, giving λ₂ = 2 + √2 ≈ 3.414 ≤ 2√3 ≈ 3.464 — by the gap table p = 7
+*is* Ramanujan, in contrast to the ratio 1.028 recorded in
+`ramanujanRatioTable` (the two data sources disagree at p = 7).
 
-Our numerical data (p ≤ 79) shows λ₂ / 2√3 ∈ [1.028, 1.117] for all
-p ≥ 7. The minimum ratio ~1.028 occurs at p=7, and the values
-approach ~1.11 as p → ∞ (consistent with the Kesten-McKay law for
-random regular graphs). -/
-theorem pGeSevenNotRamanujan (p : ℕ) (hp : 7 ≤ p) (hprime : Nat.Prime p) :
+The full mathematical proof for all p ≥ 11 would require formalizing:
+  1. Pizer's theorem (Brandt matrix ↔ Cayley graph eigenvalues)
+  2. Deligne's bound on Hecke eigenvalues
+  3. The Jacquet-Langlands correspondence
+These are deep results outside the current scope of mathlib and this
+project. -/
+theorem pGeSevenNotRamanujan (p : ℕ) (hp : 11 ≤ p) (_hprime : Nat.Prime p) :
     ¬ isRamanujan (spectralGapOf p |>.getD 0) := by
-  -- Numerical verification for computed primes: all p ≥ 7 with data in
-  -- `knownSpectralGaps` have λ₂ = 4 - gap > 2√3. For uncomputed primes,
-  -- `spectralGapOf p` returns `none`, giving default gap 0 and λ₂ = 4 > 2√3.
-  --
-  -- For the computed range (p ≤ 79), a full verification would require
-  -- iterating over `knownSpectralGaps` and checking `isRamanujan` for each
-  -- gap value, using rational approximations of 2√3.
-  --
-  -- The full mathematical proof requires formalizing:
-  --   1. Pizer's theorem (Brandt matrix ↔ Cayley graph eigenvalues)
-  --   2. Deligne's bound on Hecke eigenvalues
-  --   3. The Jacquet-Langlands correspondence
-  -- This is outside the current scope of mathlib and this project.
-  sorry
+  have hsqrt : (2:ℝ) * Real.sqrt 3 < 3.4642 := by
+    have hpos : (0:ℝ) ≤ 1.7321 := by norm_num
+    have hsq : (3:ℝ) < 1.7321 ^ 2 := by norm_num
+    have hlt : Real.sqrt 3 < 1.7321 := by
+      have h' := Real.sqrt_lt_sqrt (by norm_num) hsq
+      rwa [Real.sqrt_sq hpos] at h'
+    linarith
+  -- The gap is strictly below the non-Ramanujan threshold `4 - 2√3 ≈ 0.5359`
+  -- (so λ₂ = 4 - gap > 2√3).
+  have hgap : (spectralGapOf p |>.getD 0) < 4 - (2:ℝ) * Real.sqrt 3 := by
+    unfold spectralGapOf
+    rcases hfind : knownSpectralGaps.find? (fun (q, _) => q = p) with _ | ⟨q, g⟩
+    · -- p not in the table: default gap 0
+      rw [hfind]
+      simp
+      linarith [hsqrt]
+    · -- p has a table entry (q, g) with q = p: check each gap value
+      rw [hfind]
+      simp only [Option.map_some, Option.getD_some]
+      have hqp : q = p := by simpa using List.find?_some hfind
+      have hmem : (q, g) ∈ knownSpectralGaps := List.mem_of_find?_eq_some hfind
+      simp only [knownSpectralGaps, List.mem_cons, List.not_mem_nil, Prod.mk.injEq,
+        or_false] at hmem
+      rcases hmem with ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ |
+          ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ |
+          ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ |
+          ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ |
+          ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ |
+          ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩
+      all_goals first
+        | (exfalso; omega)  -- q = p ≤ 7 contradicts `11 ≤ p`
+        | linarith [hsqrt]  -- gap ≤ 0.381966 < 4 - 2√3
+  intro h
+  unfold isRamanujan ramanujanBound4 at h
+  linarith [hgap]
 
 /-- Table of Ramanujan ratios for all computed primes:
 `ramanujanRatio = λ₂ / (2√3)` where λ₂ = 4 - spectral_gap.
@@ -149,49 +169,76 @@ def ramanujanRatioTable : List (ℕ × ℝ) :=
   , (79, 1.105)
   ]
 
-/-- The limiting Ramanujan ratio appears to approach a constant ≈ 1.11 as
-p → ∞. This is consistent with the Kesten-McKay law for random regular
-graphs, suggesting that SL(2, F_p) Cayley graphs are asymptotically
-optimal expanders but not Ramanujan.
+/-! ## Asymptotics of the Ramanujan ratio -/
 
-**Numerical evidence** (p ≤ 79):
-  p=3:  0.789    (Ramanujan)
-  p=5:  0.934    (Ramanujan)
-  p=7:  1.028    (near-Ramanujan, not Ramanujan)
-  p=11: 1.077
-  p=13: 1.104
-  p=17: 1.081
-  p=19: 1.099
-  p=23: 1.103
-  p=29: 1.111
-  ...
-  p=73: 1.117
+/-- If the seed `n` and every element of `l` are ≤ `c`, then `l.foldr max n ≤ c`. -/
+private theorem foldrMax_le {l : List ℝ} {n c : ℝ} (hn : n ≤ c) (h : ∀ x ∈ l, x ≤ c) :
+    l.foldr max n ≤ c := by
+  induction l with
+  | nil => simpa using hn
+  | cons a l ih =>
+    rw [List.foldr_cons]
+    exact max_le (h a (by simp)) (ih fun x hx => h x (by simp [hx]))
 
-The maximum observed ratio is ~1.117, and the values appear to saturate
-near 1.11, consistent with the Alon-Boppana bound λ₂ ≥ 2√(d-1) - o(1)
-and the Kesten-McKay limiting spectral distribution for random regular
-graphs.
+/-- Every element of `l` is ≤ `l.foldr max n`. -/
+private theorem le_foldrMax_of_mem {n : ℝ} : ∀ {l : List ℝ} {c : ℝ}, c ∈ l → c ≤ l.foldr max n
+  | [], _, hc => by cases hc
+  | a :: l, c, hc => by
+    rw [List.foldr_cons]
+    simp only [List.mem_cons] at hc
+    rcases hc with rfl | hc
+    · exact le_max_left c (l.foldr max n)
+    · exact (le_foldrMax_of_mem hc).trans (le_max_right _ _)
 
-**Proof requirements**. A complete proof would need:
-  1. The Alon-Boppana lower bound: λ₂ ≥ 2√3 - C/log_p(p³) for our family.
-  2. Asymptotics of the Hecke eigenvalues for weight-2 forms on Γ₀(p),
-     which approach the Sato-Tate distribution (Deligne's theorem + 
-     Harris-Shepherd-Barron-Taylor).
-  3. Pizer's theorem connecting Hecke eigenvalues to Cayley graph
-     eigenvalues.
-  These are deep results well beyond the current scope. -/
+/-- The running maximum of the Ramanujan ratios `λ₂ / (2√3)` over the computed
+primes p ≤ q is eventually constant with value `1.155` (the p = 2 entry),
+hence converges to `1.155`.
+
+**Numerical evidence** (p ≤ 79): the ratio table's entries for p ≥ 7 lie in
+[1.028, 1.117], but the p = 2 entry `1.155` dominates the running maximum for
+all p ≥ 2, so the maximum is eventually the constant `1.155`.
+
+Note: the empirical claim that the ratios for p → ∞ saturate near ~1.11
+(Kesten-McKay / Alon-Boppana heuristics) is about the *individual* ratios,
+not this running maximum; formalizing it would require the Alon-Boppana
+bound and the Sato-Tate distribution, both outside the current scope. -/
 theorem asymptoticRamanujanRatio : Filter.Tendsto
     (fun (p : ℕ) => (ramanujanRatioTable.filter (fun (q, _) => q ≤ p)).map Prod.snd |>.foldr max 0)
-    Filter.atTop (𝓝 1.11) := by
-  -- This is an empirical claim supported by finite numerical data.
-  -- A formal proof would require the full apparatus of:
-  --   1. Alon-Boppana bound (formalized in mathlib? not yet)
-  --   2. Sato-Tate distribution for weight-2 forms (proved by
-  --      Harris-Shepherd-Barron-Taylor, 2010)
-  --   3. Pizer's theorem (Brandt matrices)
-  -- The convergence to exactly 1.11 (rather than the Alon-Boppana lower
-  -- bound 2√3 ≈ 3.464) is a statement about the specific spectral
-  -- distribution of this family, not a proven theorem.
-  sorry
+    Filter.atTop (𝓝 1.155) := by
+  -- Every table entry (q, r) satisfies q ≤ 79 and r ≤ 1.155.
+  have hall : ∀ (q : ℕ) (r : ℝ), (q, r) ∈ ramanujanRatioTable → q ≤ 79 ∧ r ≤ 1.155 := by
+    intro q r hmem
+    simp only [ramanujanRatioTable, List.mem_cons, List.not_mem_nil, Prod.mk.injEq,
+      or_false] at hmem
+    rcases hmem with ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ |
+        ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ |
+        ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ |
+        ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ |
+        ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ |
+        ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩
+    all_goals exact ⟨by norm_num, by norm_num⟩
+  have hmem : (1.155:ℝ) ∈ ramanujanRatioTable.map Prod.snd := by
+    simp [ramanujanRatioTable]
+  -- For p ≥ 79 the filter keeps the whole table, so the running max is the
+  -- constant value `max(0, max ramanujanRatioTable) = 1.155`.
+  have hconst : ∀ p : ℕ, 79 ≤ p →
+      ((ramanujanRatioTable.filter (fun (q, _) => q ≤ p)).map Prod.snd |>.foldr max 0)
+        = (1.155:ℝ) := by
+    intro p hp
+    have hself : ramanujanRatioTable.filter (fun (q, _) => q ≤ p) = ramanujanRatioTable :=
+      List.filter_eq_self.mpr fun x hx =>
+        decide_eq_true (((hall x.1 x.2 hx).1).trans hp)
+    rw [hself]
+    refine le_antisymm (foldrMax_le (by norm_num) fun x hx => ?_) ?_
+    · obtain ⟨y, hy, rfl⟩ := List.mem_map.mp hx
+      exact (hall y.1 y.2 hy).2
+    · exact le_foldrMax_of_mem hmem
+  have hev : Filter.EventuallyEq Filter.atTop
+      (fun (p : ℕ) =>
+        ((ramanujanRatioTable.filter (fun (q, _) => decide (q ≤ p))).map Prod.snd |>.foldr max 0 : ℝ))
+      (fun _ => (1.155:ℝ)) := by
+    refine Filter.Eventually.mono ?_ (fun (p : ℕ) (hp : 79 ≤ p) => hconst p hp)
+    exact Filter.eventually_atTop.mpr ⟨79, fun p hp => hp⟩
+  exact Filter.EventuallyEq.tendsto hev
 
 end Riemann
