@@ -70,6 +70,30 @@
       "accept": "MAX_SORRY=2 GATE_TIMEOUT=2400 bash lean/fleet-gate.sh Riemann.FredholmDeterminants tobias-weiss.org lean/Riemann/FredholmDeterminants.lean",
       "acceptance_prose": "lake build Riemann.FredholmDeterminants exits 0 on host tobias-weiss.org AND FredholmDeterminants.lean has at most 2 remaining sorries.",
       "manual": false
+    },
+    {
+      "id": "RH-7",
+      "title": "Prove the 2 remaining sorries in lean/Riemann/TransferOperator/Operator.lean: transferOperatorBounded (the tsum-based ContinuousLinearMap) and transferOperator_compact (IsCompactOperator). Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify lean/lake-manifest.json, lean/lean-toolchain or lean/lakefile.lean. Strategy for bounded: uniform convergence via M-test with x-free bound; summand continuity via Complex.continuousAt_cpow; assemble with LinearMap.mkContinuous. Strategy for compact: the image of the unit ball is equi-Lipschitz (derivative estimate with summable bound sum_inverse_pow_converges applied to a larger exponent) + uniformly bounded, then Arzela-Ascoli (Mathlib: IsCompactOperator via Equicontinuous + bounded, or ContinuousMap space + ArzelaAscoli theorem CompactSpace Equicontinuous — grep .lake/packages/mathlib for IsCompactOperator and ArzelaAscoli).",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/TransferOperator/Operator.lean"
+      ],
+      "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.TransferOperator.Operator tobi-yoga lean/Riemann/TransferOperator/Operator.lean",
+      "acceptance_prose": "lake build Riemann.TransferOperator.Operator exits 0 on host tobi-yoga AND Operator.lean contains no sorry.",
+      "manual": false
+    },
+    {
+      "id": "RH-8",
+      "title": "Finish the remaining 3 sorries in lean/Riemann/TransferOperator/Theorem3_3.lean (a previous agent killed 5; remaining 3 are at the bottom, documented). Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify lean/lake-manifest.json, lean/lean-toolchain or lean/lakefile.lean. Work easiest-first. The remaining ones are likely: mixing rules out invariant subspaces (ergodicity), analyticity of lambda_1 + perturbation theory, and the final contradiction — these are research-level; if a sorry needs mathlib machinery that does not exist, leave it documented and explain precisely in a comment what is missing.",
+      "deps": [
+        "RH-5"
+      ],
+      "scope": [
+        "lean/Riemann/TransferOperator/Theorem3_3.lean"
+      ],
+      "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.TransferOperator.Theorem3_3 mac lean/Riemann/TransferOperator/Theorem3_3.lean",
+      "acceptance_prose": "lake build Riemann.TransferOperator.Theorem3_3 exits 0 on host mac AND Theorem3_3.lean has at most 1 remaining sorry.",
+      "manual": false
     }
   ]
 }
