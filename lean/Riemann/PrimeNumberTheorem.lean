@@ -85,7 +85,9 @@ the trivial-zero exclusion: ζ(s) ≠ 0 on the line Re s = 1, s ≠ 1
 (Hadamard–de la Vallée Poussin, 1896). -/
 theorem riemannZeta_ne_zero_of_re_eq_one (s : ℂ) (hre : s.re = 1) (hs : s ≠ 1) :
     riemannZeta s ≠ 0 := by
-  sorry -- Fleet 6: Hadamard–de la Vallée Poussin
+  -- Mathlib already proves nonvanishing on the closed half-plane Re s ≥ 1
+  -- (Hadamard–de la Vallée Poussin); the line Re s = 1 is an immediate instance.
+  exact riemannZeta_ne_zero_of_one_le_re (by rw [hre])
 
 /-- Reflection rewrite of ζ(ρ) across the line Re = 1/2 (proven, from Mathlib's
 functional equation at s := 1 − ρ). -/
