@@ -94,6 +94,61 @@
       "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.TransferOperator.Theorem3_3 mac lean/Riemann/TransferOperator/Theorem3_3.lean",
       "acceptance_prose": "lake build Riemann.TransferOperator.Theorem3_3 exits 0 on host mac AND Theorem3_3.lean has at most 1 remaining sorry.",
       "manual": false
+    },
+    {
+      "id": "RH-9",
+      "title": "Kill as many of the 6 sorries as possible in lean/Riemann/ThermodynamicFormalism.lean (Fleet 4: thermodynamic formalism for the Gauss map transfer operator). Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify lean/lake-manifest.json, lean/lean-toolchain or lean/lakefile.lean. Easiest-first; leave genuinely-missing mathlib machinery documented in comments.",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/ThermodynamicFormalism.lean"
+      ],
+      "accept": "MAX_SORRY=3 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.ThermodynamicFormalism contextual-intelligence.org lean/Riemann/ThermodynamicFormalism.lean",
+      "acceptance_prose": "lake build Riemann.ThermodynamicFormalism exits 0 on host contextual-intelligence.org AND at most 3 sorries remain.",
+      "manual": false
+    },
+    {
+      "id": "RH-10",
+      "title": "Kill as many of the 4 sorries as possible in lean/Riemann/TransferOperator/Complete.lean (Mayer identity chain completion). Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify build-infra files.",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/TransferOperator/Complete.lean"
+      ],
+      "accept": "MAX_SORRY=2 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.TransferOperator.Complete tobias-weiss.org lean/Riemann/TransferOperator/Complete.lean",
+      "acceptance_prose": "lake build Riemann.TransferOperator.Complete exits 0 on host tobias-weiss.org AND at most 2 sorries remain.",
+      "manual": false
+    },
+    {
+      "id": "RH-11",
+      "title": "Kill the 2 sorries in lean/Riemann/RamanujanProperty.lean. Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify build-infra files.",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/RamanujanProperty.lean"
+      ],
+      "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.RamanujanProperty chemie-lernen.org lean/Riemann/RamanujanProperty.lean",
+      "acceptance_prose": "lake build Riemann.RamanujanProperty exits 0 on host chemie-lernen.org AND at most 1 sorry remains.",
+      "manual": false
+    },
+    {
+      "id": "RH-12",
+      "title": "Kill the 1 sorry in lean/Riemann/TransferOperator/Definitions.lean. Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify build-infra files.",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/TransferOperator/Definitions.lean"
+      ],
+      "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.TransferOperator.Definitions mac lean/Riemann/TransferOperator/Definitions.lean",
+      "acceptance_prose": "lake build Riemann.TransferOperator.Definitions exits 0 on host mac AND zero sorries remain.",
+      "manual": false
+    },
+    {
+      "id": "RH-13",
+      "title": "Kill the last sorry in lean/Riemann/TransferOperator/Theorem3_3.lean (final: contradiction step of Theorem 3.3). A previous agent killed 7 of 8; the last one is documented at the bottom. Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify build-infra files.",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/TransferOperator/Theorem3_3.lean"
+      ],
+      "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.TransferOperator.Theorem3_3 tobi-yoga lean/Riemann/TransferOperator/Theorem3_3.lean",
+      "acceptance_prose": "lake build Riemann.TransferOperator.Theorem3_3 exits 0 on host tobi-yoga AND at most 1 sorry remains.",
+      "manual": false
     }
   ]
 }
