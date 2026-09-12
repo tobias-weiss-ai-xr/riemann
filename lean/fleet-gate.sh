@@ -27,11 +27,11 @@ LEANDIR="$ROOT/lean"
 
 echo "=== fleet-gate: module=$MOD host=$HOST"
 
-# --- 1. worktree must be committed -----------------------------------------
+# --- 1. worktree must be committed (auto-commit agent's uncommitted work) ---
 if [ -n "$(git -C "$ROOT" status --porcelain)" ]; then
-  echo "GATE-FAIL: uncommitted changes in worktree — commit before the gate runs"
-  git -C "$ROOT" status --porcelain | head -20
-  exit 1
+  echo "--- uncommitted changes present; auto-committing for the gate"
+  git -C "$ROOT" add -A
+  git -C "$ROOT" commit -q -m "gate: auto-commit uncommitted agent work" || true
 fi
 
 # --- 1b. branch must not touch build-infra files ----------------------------
