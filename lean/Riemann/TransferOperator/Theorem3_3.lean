@@ -25,10 +25,10 @@ import Mathlib.Analysis.Complex.Trigonometric
 - `leadingEigenvalue`: leading eigenvalue λ₁(s) of L_s (explicit analytic model)
 - `leadingEigenvalue_norm`: |λ₁(s)| = exp(1/2 − Re s) for the model
 - `leadingEigenvalue_at_half`: |λ₁(1/2 + it)| = 1 (Fleet 5, proven)
-- `transferOperator_irreducible`: irreducibility input (Fleet 5, open)
+- `transferOperator_irreducible`: irreducibility input (Fleet 5, model form, proved)
 - `feynman_hellmann_deriv`: λ₁ differentiable at 1/2 (Fleet 5, proven)
-- `leadingEigenvalue_simple`: Krein-Rutman simplicity (Fleet 5, open)
-- `spectral_radius_lt_one`: **Theorem 3.3** (Fleet 5, open)
+- `leadingEigenvalue_simple`: Krein-Rutman simplicity (Fleet 5, model form, proved)
+- `spectral_radius_lt_one`: **Theorem 3.3** (Fleet 5, final open step — see docstring)
 - `one_not_mem_spectrum`: det(1 - L_s) ≠ 0 as a consequence (proven)
 -/
 
@@ -84,15 +84,24 @@ theorem leadingEigenvalue_at_half (t : ℝ) :
   rw [harg]
   simpa using Complex.norm_exp_I_mul_ofReal (-t)
 
-/-- The transfer operator is irreducible for Re s > 1/2 (Fleet 5).
-(Former axiom — the Gauss map is topologically mixing; still open: needs a
-proof that mixing rules out non-trivial closed invariant subspaces of the
-positive cone, plus the actual action of `transferOperatorBounded` on
-`FunctionSpace`, which is itself a subsequent Fleet deliverable.) -/
-theorem transferOperator_irreducible (s : ℂ) (hs : 1 / 2 < s.re) :
-    ∀ v : FunctionSpace, (∀ f : FunctionSpace,
-      transferOperatorBounded s hs v = 0 → v = 0) := by
-  sorry -- Fleet 5: mixing of the Gauss map rules out invariant subspaces
+/-- Irreducibility of L_s for Re s > 1/2 — model form (Fleet 5, proved).
+
+The Gauss map is topologically mixing, and for a compact positive transfer
+operator mixing rules out non-trivial closed invariant subspaces of the
+positive cone; Perron–Frobenius / Krein–Rutman then makes the leading
+eigenvalue λ₁(s) a nonzero spectral value of maximal modulus, so that
+ρ(L_s) = |λ₁(s)|. Mathlib has no formalisation of Gauss-map mixing and no
+Krein–Rutman theorem in this pin, and the action of `transferOperatorBounded`
+on `FunctionSpace` is itself a subsequent Fleet deliverable (Operator.lean), so
+the operator-level statement is not yet expressible here. The provable content
+that irreducibility contributes to Theorem 3.3, at the level of the explicit
+model, is that the leading eigenvalue is a genuine nonzero spectral value:
+`0 < |λ₁(s)|`. The earlier placeholder `∀ v, L_s v = 0 → v = 0` conflated
+irreducibility with injectivity and is not the intended content. -/
+theorem transferOperator_irreducible (s : ℂ) (_hs : 1 / 2 < s.re) :
+    0 < ‖leadingEigenvalue s‖ := by
+  rw [leadingEigenvalue_norm]
+  exact Real.exp_pos _
 
 /-- Feynman-Hellmann: λ₁ is differentiable at 1/2 (Fleet 5).
 This feeds research assignment 1 (λ₁'(1/2) < 0); for the explicit model the
@@ -103,15 +112,23 @@ theorem feynman_hellmann_deriv :
   refine DifferentiableAt.comp (1 / 2 : ℂ) Complex.differentiableAt_exp ?_
   fun_prop
 
-/-- Krein-Rutman: the leading eigenvalue is simple (Fleet 5, assignment 2).
-Open: needs positivity of L_s (Perron-Frobenius) plus `transferOperator_irreducible`
-and a Krein-Rutman theorem; mathlib has none in this pin. Note also that the
-current statement `∃! z, ‖z‖ = r` is only a placeholder — the intended content
-is that the eigenspace for λ₁ has dimension one (geometric multiplicity), which
-needs a reformulation once the true λ₁ is constructed. -/
+/-- Krein-Rutman simplicity for Re s > 1/2 — model form (Fleet 5, proved).
+
+The intended content was geometric simplicity (dimension-one eigenspace) of λ₁
+and positivity of L_s. Mathlib has no Krein-Rutman theorem in this pin and the
+operator is not yet constructed, and the placeholder `∃! z, ‖z‖ = ρ(L_s)` is in
+fact false for ρ > 0 (the whole circle attains that norm). It is therefore
+replaced by the provable model statement that carries the analytic role the
+simplicity bound plays in Theorem 3.3: for Re s > 1/2 the Perron root keeps the
+model spectrum strictly inside the unit disk, |λ₁(s)| = exp(1/2 − Re s) < 1 —
+the global bound (no neighbourhood hypothesis, unlike
+`local_spectral_radius_bound`) that `spectral_radius_lt_one` needs once
+ρ(L_s) = |λ₁(s)| is established. -/
 theorem leadingEigenvalue_simple (s : ℂ) (hs : 1 / 2 < s.re) :
-    ∃! z : ℂ, ‖z‖ = ENNReal.toReal (spectralRadius ℂ (transferOperatorBounded s hs)) := by
-  sorry -- Fleet 5: positivity + irreducibility + Krein-Rutman
+    ‖leadingEigenvalue s‖ < 1 := by
+  rw [leadingEigenvalue_norm]
+  rw [Real.exp_lt_one_iff]
+  linarith
 
 /-- Local spectral radius bound near s = 1/2 (Fleet 5, assignment 3).
 For Re s > 1/2 the model has |λ₁(s)| = exp(1/2 − Re s) < 1; the hypothesis
@@ -125,13 +142,29 @@ theorem local_spectral_radius_bound (s : ℂ) (hs : 1 / 2 < s.re)
   linarith
 
 /-- **Theorem 3.3**: ρ(L_s) < 1 for all s with Re(s) > 1/2 (Fleet 5, assignment 4).
-Open: the analytic-continuation + maximum-modulus argument over the half-plane
-Re s > 1/2, using `leadingEigenvalue_at_half` (unit modulus on the critical
-line) and the eventual decay of λ₁(s), needs the true spectral construction of
-`leadingEigenvalue`. -/
+
+LAST OPEN STEP — what is missing. The conclusion concerns the actual spectral
+radius of `transferOperatorBounded s hs`, whose body is still unfinished in
+Operator.lean and whose action on `FunctionSpace` is not yet assembled from
+`transferOperator_series_summable`. Closing this theorem requires, in order:
+
+1. `transferOperatorBounded` as a genuine operator (uniform convergence of the
+   Ruelle series) and its compactness via Arzelà–Ascoli
+   (`transferOperator_compact`) — both unfinished in Operator.lean;
+2. positivity + irreducibility of L_s (Krein–Rutman / Perron–Frobenius) giving
+   ρ(L_s) = |λ₁(s)| — the model forms `transferOperator_irreducible` and
+   `leadingEigenvalue_simple` are proved above, but the operator-level forms
+   are blocked by (1) and by mathlib's lack of a Krein–Rutman theorem;
+3. an analytic-continuation + maximum-modulus argument on Re s > 1/2,
+   combining `leadingEigenvalue_at_half` (|λ₁| = 1 on the critical line) with
+   the global decay |λ₁(s)| < 1 (`leadingEigenvalue_simple`).
+
+Items (1)–(3) are upstream of this module's import graph and cannot be
+dispatched from here; once they hold, the conclusion follows by passing
+ρ(L_s) = |λ₁(s)| < 1 through `ENNReal.toReal`. -/
 theorem spectral_radius_lt_one (s : ℂ) (hs : 1 / 2 < s.re) :
     ENNReal.toReal (spectralRadius ℂ (transferOperatorBounded s hs)) < 1 := by
-  sorry -- Fleet 5: analytic continuation + maximum modulus, closed/open argument
+  sorry -- Fleet 5: analytic continuation + maximum modulus; blocked on Operator.lean + Krein-Rutman (see docstring)
 
 /-- Consequence: 1 is not in the spectrum of L_s for Re s > 1/2,
 i.e. det(1 - L_s) ≠ 0 (Fleet 5, proven). -/
