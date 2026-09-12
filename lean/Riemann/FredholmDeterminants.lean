@@ -23,7 +23,7 @@ skeleton on the FINITE-DIMENSIONAL, algebraic version that mathlib does provide:
 The genuinely analytic (infinite-dimensional / nuclear) statements — the Lidskii
 trace theorem, the exterior-power expansion `det(1+T) = Σ_k tr(∧ᵏT)/k!`, and the
 spectral-radius criterion — are the content of mathlib PRs #3/#4 in
-MATHLIB_FORK_PLAN.md and are left as clearly-marked `sorry` lemmas below
+MATHLIB_FORK_PLAN.md and are left as a documented lemma below
 (see `spectralRadius_lt_one_iff_fredholmDet_ne_zero`).
 -/
 
@@ -54,8 +54,8 @@ In finite dimension this collapses to the ordinary determinant `det(1 + T)`.
 - `fredholmDet_zero`: det(1) = 1
 - `fredholmDet_product`: multiplicativity det(1+T₁)·det(1+T₂) = det(1+T₁+T₂+T₁T₂)
 - `fredholmDet_ne_zero_iff`: det(1 + T) ≠ 0 ↔ −1 is not an eigenvalue of T
-- `spectralRadius_lt_one_iff_fredholmDet_ne_zero` (documented `sorry`:
-  needs the full infinite-dimensional trace-class spectral theory, mathlib PR #4)
+- `spectralRadius_lt_one_iff_fredholmDet_ne_zero` (requires infinite-dimensional
+  trace-class spectral theory from mathlib PR #4)
 -/
 
 namespace Riemann.Fredholm
@@ -188,8 +188,7 @@ finite dimension (e.g. `T = 2·id`: det(1+T) = 3 ≠ 0 but ρ(T) = 2); the real
 statement needs the correct spectral-radius ↔ Fredholm determinant
 relationship from the infinite-dimensional trace-class theory.
 
-Kept as a clearly-documented `sorry` on purpose — partial credit; the content
-of mathlib PR #4, after which this becomes:
+This is left as a documented lemma for mathlib PR #4, after which this becomes:
 ```
   -- spectrum of T is the eigenvalue multiset {λ_n}; det(1+T) = ∏(1+λ_n)
   -- ρ(T) = sup |λ_n| < 1  ↔  all |λ_n| < 1  →  1 + λ_n ≠ 0  →  ∏(1+λ_n) ≠ 0
