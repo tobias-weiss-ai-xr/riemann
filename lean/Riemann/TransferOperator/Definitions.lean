@@ -182,9 +182,19 @@ theorem real_valued (hs : s.im = 0) (_hx : x > 0) :
   simp [Complex.mul_im]
 
 /-- The potential is analytic in s for fixed x > 0. -/
-theorem analytic_in_s (hx : x > 0) :
+theorem analytic_in_s (_hx : x > 0) :
     ContDiff ℂ (⊤ : ℕ∞) (fun s : ℂ => potential s x) := by
-  sorry -- Fleet 4: differentiability of s ↦ -2s·log|x| in s (affine in s!)
+  unfold potential
+  -- s ↦ -2 * s * Real.log |x|
+  -- This is s ↦ (-2 * Real.log |x|) * s
+  -- Left multiplication by a constant in a normed ring is a continuous linear map
+  have : (fun s : ℂ => -2 * s * Real.log |x|) = 
+         fun s => (ContinuousLinearMap.mul ℂ ℂ (-2 * (Real.log |x| : ℂ))) s := by
+    ext s
+    simp only [ContinuousLinearMap.mul_apply']
+    ring
+  rw [this]
+  exact (ContinuousLinearMap.mul ℂ ℂ (-2 * (Real.log |x| : ℂ))).contDiff
 
 end Potential
 
