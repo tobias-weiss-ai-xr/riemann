@@ -34,6 +34,13 @@ if [ -n "$(git -C "$ROOT" status --porcelain)" ]; then
   exit 1
 fi
 
+# --- 1b. branch must not touch build-infra files ----------------------------
+INFRA=$(git -C "$ROOT" diff --name-only "master...HEAD" -- lean/lake-manifest.json lean/lean-toolchain lean/lakefile.lean 2>/dev/null)
+if [ -n "$INFRA" ]; then
+  echo "GATE-FAIL: branch modifies build-infra files (out of scope) — revert them: git checkout master -- $INFRA"
+  exit 1
+fi
+
 # --- helper: sorry-count check on the committed tree -------------------------
 check_nosorry() {
   local total=0 c f
