@@ -321,6 +321,51 @@ theorem transferOperator_uniform_convergence (s : ℂ) (hs : 1 / 2 < s.re)
   rw [← transferOperatorBounded_tsum s hs f]
   exact (transferOperatorSummandCm_summable s hs f).hasSum.tendsto_sum_nat
 
+/-- The tsum of the branch-weight norms at x = 0 equals the real p-series:
+`∑' n, ‖wₙ(0)‖ = ∑' n, (n+1)^(-2·Re s)` (finite for Re s > 1/2). -/
+theorem transferOperatorWeight_norm_zero_tsum (s : ℂ) :
+    (∑' n : ℕ, ‖transferOperatorWeight s n 0‖) =
+      ∑' n : ℕ, ((n : ℝ) + 1) ^ (-2 * s.re) := by
+  refine tsum_congr ?_
+  intro n
+  rw [transferOperatorWeight]
+  rw [Complex.norm_cpow_eq_rpow_re_of_pos]
+  · congr 1
+    · ring
+    · simp
+  · have hnn : (0 : ℝ) ≤ (n : ℝ) := Nat.cast_nonneg n
+    linarith
+
+/-- Operator-norm bound (tsum-based): `‖L_s‖ ≤ ∑' n, ‖wₙ(0)‖`, which is the
+`LinearMap.mkContinuous` bound made explicit as a theorem. -/
+theorem transferOperatorBounded_norm_le (s : ℂ) (hs : 1 / 2 < s.re) :
+    ‖transferOperatorBounded s hs‖ ≤ ∑' n : ℕ, ‖transferOperatorWeight s n 0‖ := by
+  refine ContinuousLinearMap.opNorm_le_bound _ ?_ ?_
+  · exact tsum_nonneg fun n => norm_nonneg _
+  · intro f
+    calc
+      ‖transferOperatorBounded s hs f‖ = ‖∑' n : ℕ, transferOperatorSummandCm s f n‖ := by
+          rw [transferOperatorBounded_tsum s hs f]
+      _ ≤ ∑' n : ℕ, ‖transferOperatorSummandCm s f n‖ := by
+          exact norm_tsum_le_tsum_norm (transferOperatorSummandCm_norm_summable s hs f)
+      _ ≤ ∑' n : ℕ, ‖transferOperatorWeight s n 0‖ * ‖f‖ := by
+          exact (transferOperatorSummandCm_norm_summable s hs f).tsum_le_tsum
+            (transferOperatorSummandCm_norm_le s hs f)
+            (Summable.mul_right ‖f‖
+              (transferOperator_weight_norm_summable s 0 (by norm_num) hs))
+      _ = (∑' n : ℕ, ‖transferOperatorWeight s n 0‖) * ‖f‖ := by
+          exact (transferOperator_weight_norm_summable s 0 (by norm_num) hs).tsum_mul_right ‖f‖
+
+/-- Operator-norm bound in the explicit p-series form of the strategy:
+`‖L_s‖ ≤ ∑' n, (n+1)^(-2·Re s)`. -/
+theorem transferOperatorBounded_norm_le_rpow (s : ℂ) (hs : 1 / 2 < s.re) :
+    ‖transferOperatorBounded s hs‖ ≤ ∑' n : ℕ, ((n : ℝ) + 1) ^ (-2 * s.re) := by
+  calc
+    ‖transferOperatorBounded s hs‖ ≤ ∑' n : ℕ, ‖transferOperatorWeight s n 0‖ :=
+        transferOperatorBounded_norm_le s hs
+    _ = ∑' n : ℕ, ((n : ℝ) + 1) ^ (-2 * s.re) :=
+        transferOperatorWeight_norm_zero_tsum s
+
 end -- noncomputable section
 
 end Riemann.TransferOperator
