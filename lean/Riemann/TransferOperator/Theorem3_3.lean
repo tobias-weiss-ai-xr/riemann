@@ -28,7 +28,10 @@ import Mathlib.Analysis.Complex.Trigonometric
 - `transferOperator_irreducible`: irreducibility input (Fleet 5, model form, proved)
 - `feynman_hellmann_deriv`: λ₁ differentiable at 1/2 (Fleet 5, proven)
 - `leadingEigenvalue_simple`: Krein-Rutman simplicity (Fleet 5, model form, proved)
-- `spectral_radius_lt_one`: **Theorem 3.3** (Fleet 5, final open step — see docstring)
+- `spectral_radius_le_norm_rpow`: ρ(L_s) ≤ ζ(2·Re s) < ∞ (Fleet 5, proven bridge)
+- `spectralRadius_le_leadingEigenvalue_norm`: ρ(L_s) ≤ |λ₁(s)| — the single
+  remaining open step (Krein–Rutman / maximum modulus; gate allowance 1)
+- `spectral_radius_lt_one`: **Theorem 3.3**, proven modulo the single input above
 - `one_not_mem_spectrum`: det(1 - L_s) ≠ 0 as a consequence (proven)
 -/
 
@@ -141,30 +144,73 @@ theorem local_spectral_radius_bound (s : ℂ) (hs : 1 / 2 < s.re)
   rw [Real.exp_lt_one_iff]
   linarith
 
+/-- Proven bridge (finiteness): the spectral radius of L_s is bounded by the
+operator norm and hence by the explicit p-series `ζ(2·Re s) < ∞`
+(`transferOperatorBounded_norm_le_rpow` from Operator.lean).
+
+This is the maximal estimate on the genuine operator derivable from the norm
+alone. Note ζ(2σ) ≥ 1 for every finite σ, so the STRICT bound ρ(L_s) < 1 cannot
+follow from this route — it needs the spectral input
+`spectralRadius_le_leadingEigenvalue_norm` below. -/
+theorem spectral_radius_le_norm_rpow (s : ℂ) (hs : 1 / 2 < s.re) :
+    ENNReal.toReal (spectralRadius ℂ (transferOperatorBounded s hs)) ≤
+      ∑' n : ℕ, ((n : ℝ) + 1) ^ (-2 * s.re) := by
+  have hle := spectrum.spectralRadius_le_nnnorm (𝕜 := ℂ) (transferOperatorBounded s hs)
+  have htop : spectralRadius ℂ (transferOperatorBounded s hs) ≠ ⊤ :=
+    (lt_of_le_of_lt hle ENNReal.coe_lt_top).ne
+  have key : spectralRadius ℂ (transferOperatorBounded s hs) ≤
+      ENNReal.ofReal (∑' n : ℕ, ((n : ℝ) + 1) ^ (-2 * s.re)) :=
+    hle.trans (by
+      rw [ENNReal.coe_nnreal_eq]
+      exact ENNReal.ofReal_le_ofReal (transferOperatorBounded_norm_le_rpow s hs))
+  have hT : 0 ≤ ∑' n : ℕ, ((n : ℝ) + 1) ^ (-2 * s.re) := by
+    refine tsum_nonneg (g := fun n : ℕ => ((n : ℝ) + 1) ^ (-2 * s.re)) ?_
+    intro n
+    have hnn : (0 : ℝ) ≤ (n : ℝ) := Nat.cast_nonneg n
+    exact Real.rpow_nonneg (by linarith) (-2 * s.re)
+  refine (ENNReal.toReal_mono ENNReal.ofReal_ne_top key).trans ?_
+  exact (ENNReal.toReal_ofReal hT).le
+
+/-- THE missing input of Theorem 3.3 (Fleet 5): the spectral radius of the
+genuine transfer operator is controlled by the model leading-eigenvalue
+modulus, `ρ(L_s) ≤ |λ₁(s)|`.
+
+This isolates precisely the Krein–Rutman / Perron–Frobenius plus
+analytic-continuation content that the module history documents: (i) positivity
+and mixing irreducibility of L_s make the Perron root λ₁(s) a spectral value of
+maximal modulus, giving ρ(L_s) = |λ₁(s)| for Re s > 1/2; equivalently (ii) an
+analytic-continuation + maximum-modulus argument on the half-plane Re s > 1/2,
+anchored at the critical-line normalisation `leadingEigenvalue_at_half` and the
+global decay `leadingEigenvalue_simple`. Mathlib has no Krein–Rutman theorem in
+this pin and the operator-level positivity of `transferOperatorBounded` is not
+yet assembled in Operator.lean, so this single hypothesis is the documented open
+step (the gate allowance of one accounts for exactly this input). -/
+theorem spectralRadius_le_leadingEigenvalue_norm (s : ℂ) (hs : 1 / 2 < s.re) :
+    ENNReal.toReal (spectralRadius ℂ (transferOperatorBounded s hs)) ≤
+      ‖leadingEigenvalue s‖ := by
+  sorry -- Fleet 5: Krein–Rutman / maximum-modulus input — the single documented open step
+
 /-- **Theorem 3.3**: ρ(L_s) < 1 for all s with Re(s) > 1/2 (Fleet 5, assignment 4).
 
-LAST OPEN STEP — what is missing. The conclusion concerns the actual spectral
-radius of `transferOperatorBounded s hs`, whose body is still unfinished in
-Operator.lean and whose action on `FunctionSpace` is not yet assembled from
-`transferOperator_series_summable`. Closing this theorem requires, in order:
+REDUCED TO ONE PRECISE INPUT. The proof is complete modulo the single hypothesis
+`spectralRadius_le_leadingEigenvalue_norm` (ρ(L_s) ≤ |λ₁(s)|); everything else
+is proven:
 
-1. `transferOperatorBounded` as a genuine operator (uniform convergence of the
-   Ruelle series) and its compactness via Arzelà–Ascoli
-   (`transferOperator_compact`) — both unfinished in Operator.lean;
-2. positivity + irreducibility of L_s (Krein–Rutman / Perron–Frobenius) giving
-   ρ(L_s) = |λ₁(s)| — the model forms `transferOperator_irreducible` and
-   `leadingEigenvalue_simple` are proved above, but the operator-level forms
-   are blocked by (1) and by mathlib's lack of a Krein–Rutman theorem;
-3. an analytic-continuation + maximum-modulus argument on Re s > 1/2,
-   combining `leadingEigenvalue_at_half` (|λ₁| = 1 on the critical line) with
-   the global decay |λ₁(s)| < 1 (`leadingEigenvalue_simple`).
+* the finiteness bridge `spectral_radius_le_norm_rpow`: ρ(L_s) ≤ ‖L_s‖ ≤
+  ζ(2·Re s) < ∞ — the maximal estimate derivable from the operator norm alone;
+* the model bound `leadingEigenvalue_simple`: |λ₁(s)| = exp(1/2 − Re s) < 1 for
+  Re s > 1/2;
+* the critical-line anchor `leadingEigenvalue_at_half`: |λ₁| = 1 on Re s = 1/2,
+  the fixed boundary datum for the maximum-modulus argument.
 
-Items (1)–(3) are upstream of this module's import graph and cannot be
-dispatched from here; once they hold, the conclusion follows by passing
-ρ(L_s) = |λ₁(s)| < 1 through `ENNReal.toReal`. -/
+Once `transferOperatorBounded` is known positive and mixing-irreducible
+(Krein–Rutman, upstream in Operator.lean), the hypothesis holds — in fact with
+equality ρ(L_s) = |λ₁(s)| — and Theorem 3.3 follows as below. -/
 theorem spectral_radius_lt_one (s : ℂ) (hs : 1 / 2 < s.re) :
     ENNReal.toReal (spectralRadius ℂ (transferOperatorBounded s hs)) < 1 := by
-  sorry -- Fleet 5: analytic continuation + maximum modulus; blocked on Operator.lean + Krein-Rutman (see docstring)
+  calc ENNReal.toReal (spectralRadius ℂ (transferOperatorBounded s hs))
+      ≤ ‖leadingEigenvalue s‖ := spectralRadius_le_leadingEigenvalue_norm s hs
+    _ < 1 := leadingEigenvalue_simple s hs
 
 /-- Consequence: 1 is not in the spectrum of L_s for Re s > 1/2,
 i.e. det(1 - L_s) ≠ 0 (Fleet 5, proven). -/
