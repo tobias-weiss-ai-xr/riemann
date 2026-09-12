@@ -1,6 +1,6 @@
 {
   "defaults": {
-    "accept_timeout_s": 1800,
+    "accept_timeout_s": 3600,
     "max_attempts": 3,
     "retry_delay_s": 30,
     "agent_timeout_s": 7200,
