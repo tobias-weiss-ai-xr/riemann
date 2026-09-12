@@ -10,13 +10,14 @@
 # Gate passes (exit 0) iff:
 #   1. worktree has no uncommitted changes (agent must commit),
 #   2. pushed branch builds on the host (lake build <module>),
-#   3. the listed files contain no `sorry`.
+#   3. total 'sorry' count across the listed files ≤ MAX_SORRY (default 0).
 # Falls back to a local legion build (copy of lean/.lake) if the host is not ready.
 set -u
 set -o pipefail
 
 MOD="${1:?usage: fleet-gate.sh <module> <host> [files...]}"
 HOST="${2:?usage: fleet-gate.sh <module> <host> [files...]}"
+MAX_SORRY="${MAX_SORRY:-0}"
 shift 2
 NOSORRY_FILES=("$@")
 
@@ -33,18 +34,17 @@ if [ -n "$(git -C "$ROOT" status --porcelain)" ]; then
   exit 1
 fi
 
-# --- helper: sorry check on the committed tree ------------------------------
+# --- helper: sorry-count check on the committed tree -------------------------
 check_nosorry() {
-  local rc=0
+  local total=0 c f
   for f in "${NOSORRY_FILES[@]:-}"; do
     [ -f "$ROOT/$f" ] || continue
-    if grep -n "sorry" "$ROOT/$f" >/dev/null 2>&1; then
-      echo "GATE-FAIL: 'sorry' still present in $f:"
-      grep -n "sorry" "$ROOT/$f" | head -5
-      rc=1
-    fi
+    c=$(grep -c "sorry" "$ROOT/$f" 2>/dev/null || true)
+    total=$((total + c))
+    [ "$c" -gt 0 ] && echo "--- $f: $c sorries remaining"
   done
-  return $rc
+  echo "--- total sorries: $total (max allowed: $MAX_SORRY)"
+  [ "$total" -le "$MAX_SORRY" ]
 }
 
 # --- 2. remote build on the assigned host -----------------------------------

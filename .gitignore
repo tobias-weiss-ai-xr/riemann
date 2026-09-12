@@ -167,3 +167,5 @@ lean/.lake/
 
 # ── Generated viz outputs ───────────────────────────
 data/rh_viz_data.js
+.tf-worktrees/
+.tf-state/

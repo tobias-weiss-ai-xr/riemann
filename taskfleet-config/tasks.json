@@ -1,0 +1,52 @@
+{
+  "_meta": {
+    "project": "riemann-rh"
+  },
+  "tasks": [
+    {
+      "id": "RH-1",
+      "title": "Prove transferOperatorBounded and transferOperator_series→CLM assembly in lean/Riemann/TransferOperator/Operator.lean (kill the 2 remaining sorries). Read lean/PROOF_TASKS_BRIEF.md first. Strategy: define (L_s f) x = tsum of transferOperatorSummand s f n x; each summand is continuous in x (Complex.continuousAt_cpow at nonzero base + composition), the series converges uniformly on Set.Icc 0 1 by Weierstrass M-test with x-free bound ‖f‖ * ((n:ℝ)+1)^(-2*s.re) (use inverse_pow_monotone_x and Real.summable_nat_rpow + summable_nat_add_iff, both already proven in BasicProofs.lean); tsum of continuous functions is continuous via Summable.of_norm in the Banach space C(Set.Icc 0 1, ℂ); linearity from tsum commutation with evaluation (ContinuousLinearMap.map_tsum or hasSum_apply); assemble the ContinuousLinearMap via LinearMap.mkContinuous with bound C = (∑' n, (n+1)^(-2*re s)) * ‖f‖ or via tsum-based operator norm. Grep .lake/packages/mathlib for exact names: continuousAt_cpow, M-test lemmas (tendstoUniformly, hasSum), LinearMap.mkContinuous.",
+      "deps": [],
+      "scope": ["lean/Riemann/TransferOperator/Operator.lean"],
+      "accept": "GATE_TIMEOUT=2400 bash lean/fleet-gate.sh Riemann.TransferOperator.Operator contextual-intelligence.org lean/Riemann/TransferOperator/Operator.lean",
+      "acceptance_prose": "lake build Riemann.TransferOperator.Operator exits 0 on host contextual-intelligence.org AND Operator.lean contains no 'sorry'. The def transferOperatorBounded must be the actual tsum-based operator (no placeholder).",
+      "manual": false
+    },
+    {
+      "id": "RH-2",
+      "title": "Prove the 6 elementary Fleet-3 sorries in lean/Riemann/TransferOperator/GaussMap.lean (continuity of the Gauss map and inverse branches, contraction estimate, monotone bijection). Read lean/PROOF_TASKS_BRIEF.md first. These are elementary real-analysis facts: continuity of x ↦ 1/(n+1+x) on x>0 (Continuous.inv_ones or Continuous.div with positivity), continuity of fract of 1/x minus floor away from discontinuities, contraction |I x - I y| = |x-y|/((n+1+x)(n+1+y)) ≤ |x-y|/4 (linarith/ring + div_le_div), monotone bijection [0,1] → [1/(n+2), 1/(n+1)] (Monotone + surjectivity via intermediate value or explicit inverse). Grep .lake/packages/mathlib for: Continuous.fract? Real.fract, ContinuousOn, div_le_div_iff, strictMono_incrOn, ContinuousOn.intermediate_value, homeomorph constructors.",
+      "deps": [],
+      "scope": ["lean/Riemann/TransferOperator/GaussMap.lean"],
+      "accept": "GATE_TIMEOUT=2400 bash lean/fleet-gate.sh Riemann.TransferOperator.GaussMap tobi-yoga lean/Riemann/TransferOperator/GaussMap.lean",
+      "acceptance_prose": "lake build Riemann.TransferOperator.GaussMap exits 0 on host tobi-yoga AND GaussMap.lean contains no 'sorry'.",
+      "manual": false
+    },
+    {
+      "id": "RH-3",
+      "title": "Prove riemannZeta_ne_zero_of_re_eq_one in lean/Riemann/PrimeNumberTheorem.lean (Fleet 6 line theorem: riemannZeta s ≠ 0 for Re s = 1, s ≠ 1). Read lean/PROOF_TASKS_BRIEF.md first. This is the classical Hadamard–de la Vallée Poussin consequence: ζ(s) ≠ 0 on Re s = 1 (s ≠ 1) follows from the non-vanishing of ζ on Re s > 1 and the functional equation / Hadamard product theory, OR from the classical 3-point argument via (1 - 2^{1-s}) ζ(s) = ζ Dirichlet eta relation. Mathlib may already have: grep for riemannZeta ne_zero, RiemannZeta.s_ne_zero, Analysis.RiemannZeta — Mathlib.Mathlib.NumberTheory.RiemannZeta has s_ne_zero_of_one_lt_re or similar; also check Mathlib.NumberTheory.LSeries. If Mathlib has the statement for Re s > 1 only, combine with zeta_reflect (already in the file) and continuity/analytic continuation (riemannZeta_analytic / DifferentiableOn) + identity theorem to push to the line Re s = 1. If truly missing in Mathlib, prove the line theorem via the eta-function limit argument. IMPORTANT: do not introduce axioms; if a substep is out of reach, split it into a documented sorry-lemma ONLY for that substep and explain in the commit message.",
+      "deps": [],
+      "scope": ["lean/Riemann/PrimeNumberTheorem.lean"],
+      "accept": "GATE_TIMEOUT=2400 bash lean/fleet-gate.sh Riemann.PrimeNumberTheorem chemie-lernen.org lean/Riemann/PrimeNumberTheorem.lean",
+      "acceptance_prose": "lake build Riemann.PrimeNumberTheorem exits 0 on host chemie-lernen.org AND PrimeNumberTheorem.lean contains no 'sorry'.",
+      "manual": false
+    },
+    {
+      "id": "RH-4",
+      "title": "Fill the trace-class / Fredholm determinant skeleton in lean/Riemann/FredholmDeterminants.lean (13 sorries). Read lean/PROOF_TASKS_BRIEF.md first. Work incrementally: kill the EASIEST sorries first (algebraic identities, norm estimates, finite-rank facts) and leave the genuinely hard analytic ones (nuclear trace theorem, infinite-determinant identities) as clearly-documented one-line sorry-lemmas with a comment explaining exactly what is missing — partial credit counts. Grep .lake/packages/mathlib for: traceClass (Mathlib.Analysis.TraceClass?), NuclearBanach?, Fredholm determinant (likely NOT in mathlib — you must build the finite-dimensional/algebraic version), ContinuousLinearMap.trace, traceExists, Matrix.det, sum of finite rank operators.",
+      "deps": [],
+      "scope": ["lean/Riemann/FredholmDeterminants.lean"],
+      "accept": "MAX_SORRY=9 GATE_TIMEOUT=2400 bash lean/fleet-gate.sh Riemann.FredholmDeterminants tobias-weiss.org lean/Riemann/FredholmDeterminants.lean",
+      "acceptance_prose": "lake build Riemann.FredholmDeterminants exits 0 on host tobias-weiss.org AND the number of 'sorry' occurrences in FredholmDeterminants.lean is strictly lower than 13 (target: 0).",
+      "manual": false
+    },
+    {
+      "id": "RH-5",
+      "title": "Attack the 8 Fleet-5 sorries in lean/Riemann/TransferOperator/Theorem3_3.lean (spectral theory of L_s: eigenvalue, positivity/Krein-Rutman, analytic perturbation). Read lean/PROOF_TASKS_BRIEF.md first. Work incrementally, easiest first: the constant-function eigenfunction statement (line 47) and the spectralRadius bound (line 84) are elementary given Definitions.lean helpers; Krein-Rutman needs Mathlib's version — grep for kreinRutman, compactOperator, spectralRadius, IsCompactOperator. The analyticity/perturbation sorries may need known mathlib theorems on analyticFredholm / analytic spectrum — grep AnalyticOn, spectrum analytic. If a sorry is genuinely research-level (mixing rules out invariant subspaces), document precisely what is missing as a one-line sorry-lemma and move on — partial credit counts.",
+      "deps": [],
+      "scope": ["lean/Riemann/TransferOperator/Theorem3_3.lean"],
+      "accept": "MAX_SORRY=5 GATE_TIMEOUT=2400 bash lean/fleet-gate.sh Riemann.TransferOperator.Theorem3_3 mac lean/Riemann/TransferOperator/Theorem3_3.lean",
+      "acceptance_prose": "lake build Riemann.TransferOperator.Theorem3_3 exits 0 on host mac AND the number of 'sorry' occurrences in Theorem3_3.lean is strictly lower than 8 (target: 0).",
+      "manual": false
+    }
+  ]
+}
