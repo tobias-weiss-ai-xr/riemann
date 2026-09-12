@@ -12,9 +12,11 @@ References:
 -/
 
 import Mathlib.Analysis.Complex.Basic
+import Mathlib.Analysis.Normed.Group.FunctionSeries
 import Mathlib.Analysis.Normed.Operator.Basic
 import Mathlib.Analysis.Normed.Operator.Compact.Basic
 import Mathlib.Analysis.SpecialFunctions.Pow.Continuity
+import Mathlib.LinearAlgebra.Complex.FiniteDimensional
 import Mathlib.Topology.ContinuousMap.Algebra
 import Mathlib.Topology.ContinuousMap.Compact
 import Riemann.TransferOperator.GaussMap
