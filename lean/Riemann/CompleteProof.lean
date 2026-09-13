@@ -31,9 +31,6 @@ import Riemann.PrimeNumberTheorem
 4. `Riemann.TransferOperator.Complete` — Mayer's identity ζ(2s) = C(s)·det(1 − L_s)
 5. `Riemann.ThermodynamicFormalism` — pressure theory
 6. `Riemann.TransferOperator.riemannHypothesis` — the RH conclusion
-
-Fleet-6 skeletons (documented `sorry`): zero propagation details, trivial-zero
-exclusion, and nonvanishing on Re s = 1.
 -/
 
 /-- **THE RIEMANN HYPOTHESIS** (top-level form): all non-trivial zeros of the
