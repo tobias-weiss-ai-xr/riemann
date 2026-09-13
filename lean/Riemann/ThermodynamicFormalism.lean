@@ -88,10 +88,6 @@ def isEquilibriumState (T : X → X) (ϕ : Potential X) (μ : MeasureTheory.Meas
   MeasureTheory.MeasurePreserving T μ μ ∧
     (∫ x, ϕ x ∂μ) + topologicalPressure T ϕ = topologicalPressure T ϕ
 
-/-- Uniqueness of equilibrium states for continuous potentials (Fleet 4). -/
-theorem equilibriumState_unique (T : X → X) (ϕ : Potential X) (hϕ : Continuous ϕ) :
-    ∃! μ, isEquilibriumState T ϕ μ := by
-  sorry -- Fleet 4: Bowen–Walters uniqueness
 
 end Riemann.Thermodynamic
 
