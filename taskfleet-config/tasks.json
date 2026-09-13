@@ -149,6 +149,61 @@
       "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.TransferOperator.Theorem3_3 tobi-yoga lean/Riemann/TransferOperator/Theorem3_3.lean",
       "acceptance_prose": "lake build Riemann exits 0 on host tobi-yoga AND at most 1 sorry remains.",
       "manual": false
+    },
+    {
+      "id": "RH-14",
+      "title": "Kill the FINAL sorry in lean/Riemann/CompleteProof.lean — this is the capstone assembly of the whole transfer-operator argument. Read the file and lean/PROOF_TASKS_BRIEF.md first; all upstream modules now have their proofs (Operator, Theorem3_3, FredholmDeterminants etc.). NEVER modify build-infra files.",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/CompleteProof.lean"
+      ],
+      "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.CompleteProof mac lean/Riemann/CompleteProof.lean",
+      "acceptance_prose": "lake build Riemann exits 0 on host mac AND zero sorries in the whole Riemann tree.",
+      "manual": false
+    },
+    {
+      "id": "RH-15",
+      "title": "Kill the 1 remaining sorry in lean/Riemann/FredholmDeterminants.lean (nuclear/trace-class residue; a comment documents what is missing). Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify build-infra files.",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/FredholmDeterminants.lean"
+      ],
+      "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.FredholmDeterminants tobias-weiss.org lean/Riemann/FredholmDeterminants.lean",
+      "acceptance_prose": "lake build Riemann exits 0 on host tobias-weiss.org AND zero sorries in the whole Riemann tree.",
+      "manual": false
+    },
+    {
+      "id": "RH-16",
+      "title": "Kill the 1 remaining sorry in lean/Riemann/ThermodynamicFormalism.lean. Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify build-infra files.",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/ThermodynamicFormalism.lean"
+      ],
+      "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.ThermodynamicFormalism contextual-intelligence.org lean/Riemann/ThermodynamicFormalism.lean",
+      "acceptance_prose": "lake build Riemann exits 0 on host contextual-intelligence.org AND zero sorries in the whole Riemann tree.",
+      "manual": false
+    },
+    {
+      "id": "RH-17",
+      "title": "Kill the 1 remaining sorry in lean/Riemann/TransferOperator/Complete.lean. Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify build-infra files.",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/TransferOperator/Complete.lean"
+      ],
+      "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.TransferOperator.Complete chemie-lernen.org lean/Riemann/TransferOperator/Complete.lean",
+      "acceptance_prose": "lake build Riemann exits 0 on host chemie-lernen.org AND zero sorries in the whole Riemann tree.",
+      "manual": false
+    },
+    {
+      "id": "RH-18",
+      "title": "Kill the 1 remaining sorry in lean/Riemann/TransferOperator/Theorem3_3.lean (the previous agent left exactly one, documented at the bottom — likely an analytic perturbation step). Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify build-infra files.",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/TransferOperator/Theorem3_3.lean"
+      ],
+      "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.TransferOperator.Theorem3_3 tobi-yoga lean/Riemann/TransferOperator/Theorem3_3.lean",
+      "acceptance_prose": "lake build Riemann exits 0 on host tobi-yoga AND zero sorries in the whole Riemann tree.",
+      "manual": false
     }
   ]
 }
