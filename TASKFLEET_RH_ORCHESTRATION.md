@@ -432,3 +432,33 @@ To be filled after project completion with:
 **ETR**: 6-8 weeks to 100% formal proof
 
 EOF
+
+---
+
+## Round RH-19..23 — CLOSED (2026-09-13)
+
+| Task | Result | Commit |
+|---|---|---|
+| RH-19 KreinRutman | done (2 gate-allowed sorries) | `a6f2c45` |
+| RH-20 DiskOperator | done, 0 sorries | `b55cf23` |
+| RH-21 FredholmFiniteRank | done via operator fallback | `6913214` |
+| RH-22 honesty pass | done | `b18012d` |
+| RH-23 paper | done | `8459383` |
+
+**RH-21 post-mortem**: qwen-coder-a burned all 3 attempts with zero artifacts
+(recurring failure mode: workers emit ~300 lines without compiling once). The
+assistant wrote the file personally on legion (`rh21-manual` branch), gate-passed
+it on tobias-weiss.org (`MAX_SORRY=1`, got 0), and merged. Orchestrator6 had an
+off-by-one on `max_attempts` and kept re-dispatching past 3/3; it was stopped
+(SIGINT→TERM) and RH-21 flagged done manually. **Lesson: when the artifact is
+already gate-passed on master, stop the churn instead of waiting out retries.**
+
+**Master state** (`6913214`, pushed): full build 3618 jobs OK. FredholmFiniteRank:
+0 sorries, all theorems gold (`[propext, Classical.choice, Quot.sound]`).
+Remaining sorries: KreinRutman 2 (gate-allowed), TransferOperator/Complete.lean 1
+(the strip lemma — equivalent to RH's hard half, not closeable).
+
+**Mathlib upstream**: PR #43744 (Gauss map) CI-green, awaiting review.
+PR #43776 (`LinearMap.det_one_sub_smulRight`, rank-1 determinant formula) opened;
+rebased onto current master after the old base tripped the cache storage-layout
+migration (`Invalid argument: non-existing path Wanted.lean`).
