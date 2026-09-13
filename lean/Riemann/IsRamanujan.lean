@@ -47,10 +47,10 @@ example : isRamanujan 1.267949 := pThreeIsRamanujan
 /-- p = 5 is Ramanujan: `λ₂ = 4 - 0.763932 = 3.236068 ≤ 2√3 ≈ 3.464`. -/
 example : isRamanujan 0.763932 := pFiveIsRamanujan
 
-/-- For every prime `p ≥ 7` in the dataset, the Cayley graph is *not*
+/-- For every prime `p ≥ 11`, the Cayley graph is *not*
 Ramanujan (`λ₂ > 2√3`). This re-states `pGeSevenNotRamanujan` from the
-data perspective. -/
-example (p : ℕ) (hp : 7 ≤ p) (hprime : Nat.Prime p) :
+data perspective (bound proven for p ≥ 11). -/
+example (p : ℕ) (hp : 11 ≤ p) (hprime : Nat.Prime p) :
     ¬ isRamanujan (spectralGapOf p |>.getD 0) :=
   pGeSevenNotRamanujan p hp hprime
 
