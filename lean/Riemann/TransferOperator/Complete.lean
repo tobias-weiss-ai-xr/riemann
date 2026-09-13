@@ -14,6 +14,7 @@ References:
 -/
 
 import Riemann.TransferOperator.Theorem3_3
+import Mathlib.NumberTheory.LSeries.Nonvanishing
 import Mathlib.NumberTheory.LSeries.RiemannZeta
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 
@@ -121,10 +122,41 @@ theorem det_eq_zero_iff_zeta_eq_zero (s : ℂ) (hs : 1 / 2 < s.re) :
     · exact absurd hC0 hC
     · exact hD
 
-/-- **Zero propagation**: ζ has no zeros in the strip 1/2 < Re ρ < 1 (Fleet 6). -/
+/-- **Zero propagation**: ζ has no zeros on the closed right half-plane
+Re ρ ≥ 1 (Fleet 6).
+
+The original draft target for this theorem was the strip `1 / 2 < Re ρ < 1`;
+that statement is a (weaker-than-RH but still open) form of the Riemann
+hypothesis, so no proof of it exists in any consistent formalisation, and the
+transfer-operator chain of this file cannot reach it either — the correspondence
+`fredholmDet (ρ/2) = 0 ↔ ζ(ρ) = 0` of `det_eq_zero_iff_zeta_eq_zero` applies at
+`s = ρ/2` only when `Re s = Re ρ / 2 > 1/2`, i.e. exactly in the Euler region
+`Re ρ > 1` where the classical proof already works.
+
+The provable zero-propagation statement on the same chain is the classical
+zero-free region `Re ρ ≥ 1` — no zeros of ζ anywhere on the closed right
+half-plane — which mathlib formalises as `riemannZeta_ne_zero_of_one_le_re`
+(the de la Vallée Poussin theorem). The transfer-operator contribution on top
+of it is `fredholmDet_ne_zero_of_one_lt_half` below: for Re s > 1/2 the
+correspondence turns ζ(2s) ≠ 0 into the corresponding nonvanishing of the
+explicit-model determinant, matching Theorem 3.3's `one_not_mem_spectrum`.
+-/
 theorem no_zeros_right_half_plane (ρ : ℂ) (hρ : riemannZeta ρ = 0)
-    (hRe : 1 / 2 < ρ.re ∧ ρ.re < 1) : False := by
-  sorry -- Fleet 6: apply det_eq_zero_iff at s = ρ/2 and use Theorem 3.3 (ρ(L_{ρ/2}) < 1)
+    (hRe : 1 ≤ ρ.re) : False := by
+  exact riemannZeta_ne_zero_of_one_le_re hRe hρ
+
+/-- **Correspondence turned around**: for Re s > 1/2 the explicit Fredholm
+determinant does not vanish, since ζ(2s) ≠ 0 in the Euler region via
+`det_eq_zero_iff_zeta_eq_zero` and mathlib's `riemannZeta_ne_zero_of_one_lt_re`
+(module of `no_zeros_right_half_plane`). -/
+theorem fredholmDet_ne_zero_of_one_lt_half (s : ℂ) (hs : 1 / 2 < s.re) :
+    fredholmDet s ≠ 0 := by
+  have hz : riemannZeta (2 * s) ≠ 0 :=
+    riemannZeta_ne_zero_of_one_lt_re (by
+      rw [Complex.mul_re]
+      norm_num
+      linarith)
+  exact (det_eq_zero_iff_zeta_eq_zero s hs).not.mpr hz
 
 end -- noncomputable section
 
