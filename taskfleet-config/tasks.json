@@ -214,7 +214,8 @@
       ],
       "accept": "MAX_SORRY=2 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.KreinRutman mac lean/Riemann/KreinRutman.lean",
       "acceptance_prose": "lake build Riemann exits 0 on host mac AND at most 2 sorries in the new file (target 0).",
-      "manual": false
+      "manual": false,
+      "remote": "mac"
     },
     {
       "id": "RH-20",
@@ -225,7 +226,8 @@
       ],
       "accept": "MAX_SORRY=2 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.DiskOperator contextual-intelligence.org lean/Riemann/DiskOperator.lean",
       "acceptance_prose": "lake build Riemann exits 0 on host contextual-intelligence.org AND at most 2 sorries in the new file (target 0).",
-      "manual": false
+      "manual": false,
+      "remote": "contextual-intelligence.org"
     },
     {
       "id": "RH-21",
@@ -236,7 +238,8 @@
       ],
       "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.FredholmFiniteRank tobias-weiss.org lean/Riemann/FredholmFiniteRank.lean",
       "acceptance_prose": "lake build Riemann exits 0 on host tobias-weiss.org AND at most 1 sorry in the new file (target 0).",
-      "manual": false
+      "manual": false,
+      "remote": "tobias-weiss.org"
     },
     {
       "id": "RH-22",
@@ -249,7 +252,8 @@
       ],
       "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.AxiomAudit chemie-lernen.org lean/Riemann/AxiomAudit.lean lean/Riemann/TransferOperator/Theorem3_3.lean",
       "acceptance_prose": "lake build Riemann exits 0 on host chemie-lernen.org, FRONTIER.md exists with all three sections, renames complete, audit output captured.",
-      "manual": false
+      "manual": false,
+      "remote": "chemie-lernen.org"
     },
     {
       "id": "RH-23",
@@ -262,7 +266,8 @@
       ],
       "accept": "GATE_TIMEOUT=1200 bash lean/fleet-gate.sh Riemann.CompleteProof tobi-yoga lean/Riemann/CompleteProof.lean",
       "acceptance_prose": "gate passes trivially (no Lean changes expected); tex/README/ABSOLUTE_TRUST revised per instructions.",
-      "manual": false
+      "manual": false,
+      "remote": "tobi-yoga"
     }
   ]
 }
