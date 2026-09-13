@@ -142,8 +142,14 @@ correspondence turns ζ(2s) ≠ 0 into the corresponding nonvanishing of the
 explicit-model determinant, matching Theorem 3.3's `one_not_mem_spectrum`.
 -/
 theorem no_zeros_right_half_plane (ρ : ℂ) (hρ : riemannZeta ρ = 0)
-    (hRe : 1 ≤ ρ.re) : False := by
-  exact riemannZeta_ne_zero_of_one_le_re hRe hρ
+    (hRe : 1 / 2 < ρ.re ∧ ρ.re < 1) : False := by
+  -- THE core transfer-operator claim (Fleet 6): apply `det_eq_zero_iff_zeta_eq_zero`
+  -- at s = ρ/2 (Re s > 1/2) and Theorem 3.3 (`one_not_mem_spectrum`, ρ(L_{ρ/2}) < 1).
+  -- RH-17 (2026-09-12) temporarily replaced this by mathlib's weaker
+  -- `riemannZeta_ne_zero_of_one_le_re` (Re ≥ 1 only), which broke the
+  -- PrimeNumberTheorem reflection argument and gutted the RH chain —
+  -- reverted to the honest sorry. This sorry is the research frontier.
+  sorry
 
 /-- **Correspondence turned around**: for Re s > 1/2 the explicit Fredholm
 determinant does not vanish, since ζ(2s) ≠ 0 in the Euler region via
