@@ -24,15 +24,18 @@ The genuinely analytic (infinite-dimensional / nuclear) statements — the Lidsk
 trace theorem, the exterior-power expansion `det(1+T) = Σ_k tr(∧ᵏT)/k!`, and the
 spectral-radius criterion — are the content of mathlib PRs #3/#4 in
 MATHLIB_FORK_PLAN.md and are left as a documented lemma below
-(see `spectralRadius_lt_one_iff_fredholmDet_ne_zero`).
+(see `fredholmDet_ne_zero_of_spectralRadius_lt_one`).
 -/
 
 import Mathlib.Analysis.Normed.Operator.Compact.FiniteDimension
+import Mathlib.Analysis.Normed.Operator.Banach
 import Mathlib.Analysis.Normed.Algebra.Spectrum
 import Mathlib.Analysis.InnerProductSpace.SingularValues
 import Mathlib.LinearAlgebra.Determinant
 import Mathlib.LinearAlgebra.Trace
 import Mathlib.LinearAlgebra.Basis.VectorSpace
+import Mathlib.LinearAlgebra.Eigenspace.Basic
+import Mathlib.Data.ENNReal.Real
 
 /-!
 # Fredholm Determinants (finite-dimensional model)
@@ -54,13 +57,14 @@ In finite dimension this collapses to the ordinary determinant `det(1 + T)`.
 - `fredholmDet_zero`: det(1) = 1
 - `fredholmDet_product`: multiplicativity det(1+T₁)·det(1+T₂) = det(1+T₁+T₂+T₁T₂)
 - `fredholmDet_ne_zero_iff`: det(1 + T) ≠ 0 ↔ −1 is not an eigenvalue of T
-- `spectralRadius_lt_one_iff_fredholmDet_ne_zero` (requires infinite-dimensional
+- `fredholmDet_ne_zero_of_spectralRadius_lt_one` (finite-dimensional form of
+  the spectral-radius criterion; the full iff requires infinite-dimensional
   trace-class spectral theory from mathlib PR #4)
 -/
 
 namespace Riemann.Fredholm
 
-open scoped BigOperators
+open scoped BigOperators ENNReal
 
 section FiniteDimensionalFredholm
 
@@ -177,26 +181,65 @@ theorem fredholmDet_ne_zero_iff {T : E →L[ℂ] E} [IsTraceClass T] :
       simpa [add_comm] using h'
   · rfl
 
-/-- For a trace-class operator T: ρ(T) < 1 ↔ det(1 + T) ≠ 0 (Fleet: Mayer).
+/-- For a trace-class operator T: ρ(T) < 1 entails det(1 + T) ≠ 0 (Fleet: Mayer).
 
-NOTE: proving this is the genuinely analytic step — it needs the theorem that
-the spectrum of a trace-class operator is the closure of its eigenvalue
-multiset (Lidskii/spectral theory), which is NOT in mathlib yet. The finite-
-dimensional model above makes det(1+T) ≠ 0 equivalent to `1 ∉ spectrum (−T)`,
-but the implication `det(1+T) ≠ 0 → ρ(T) < 1` is FALSE as stated even in
-finite dimension (e.g. `T = 2·id`: det(1+T) = 3 ≠ 0 but ρ(T) = 2); the real
-statement needs the correct spectral-radius ↔ Fredholm determinant
-relationship from the infinite-dimensional trace-class theory.
+This is the genuinely valid direction of the intended infinite-dimensional
+statement `ρ(T) < 1 ↔ det(1+T) ≠ 0`. In this finite-dimensional model it holds
+because `det(1+T) ≠ 0` is exactly "-1 is not an eigenvalue of T"
+(`fredholmDet_ne_zero_iff`), the eigenvalues of T are precisely the points of
+`spectrum ℂ T` (`Module.End.hasEigenvalue_iff_mem_spectrum`), and `ρ(T)` is the
+supremum of the norms `‖λ‖` over `λ ∈ spectrum ℂ T` — so `ρ(T) < 1` rules out
+every spectral point of modulus `1`, in particular `-1`.
 
-This is left as a documented lemma for mathlib PR #4, after which this becomes:
+NOTE: the converse `det(1+T) ≠ 0 → ρ(T) < 1` is FALSE even in finite dimension
+(e.g. `T = 2·id`: det(1+T) = 3 ≠ 0 but ρ(T) = 2). The full iff is the genuinely
+analytic statement of the infinite-dimensional trace-class theory (the spectrum
+of a trace-class operator is the closure of its eigenvalue multiset —
+Lidskii/spectral theory, mathlib PR #4), after which it becomes:
 ```
   -- spectrum of T is the eigenvalue multiset {λ_n}; det(1+T) = ∏(1+λ_n)
-  -- ρ(T) = sup |λ_n| < 1  ↔  all |λ_n| < 1  →  1 + λ_n ≠ 0  →  ∏(1+λ_n) ≠ 0
+  -- ρ(T) = sup |λ_n| < 1  →  all |λ_n| < 1  →  1 + λ_n ≠ 0  →  ∏(1+λ_n) ≠ 0
 ``` -/
-theorem spectralRadius_lt_one_iff_fredholmDet_ne_zero {T : E →L[ℂ] E}
+theorem fredholmDet_ne_zero_of_spectralRadius_lt_one {T : E →L[ℂ] E}
     [IsTraceClass T] :
-    ENNReal.toReal (spectralRadius ℂ T) < 1 ↔ fredholmDet T ≠ 0 := by
-  sorry -- Fleet Mayer, mathlib PR #4: spectrum of a trace-class operator is the eigenvalue multiset
+    ENNReal.toReal (spectralRadius ℂ T) < 1 → fredholmDet T ≠ 0 := by
+  intro h h0
+  -- h0 : det(1 + T) = 0; det(1 + T) ≠ 0 is -1-not-an-eigenvalue, so -1 is an
+  -- eigenvalue of T
+  have hne : ¬ (fredholmDet T ≠ 0) := fun hn => hn h0
+  rw [fredholmDet_ne_zero_iff] at hne
+  push Not at hne
+  rcases hne with ⟨v, hv, hv0⟩
+  -- the spectral theory used below needs ``E`` complete (finite dimension over `ℂ`)
+  haveI : CompleteSpace E := FiniteDimensional.complete ℂ E
+  have hev : Module.End.HasEigenvalue (T : Module.End ℂ E) (-1) := by
+    rw [Module.End.hasEigenvalue_iff]
+    exact (Submodule.ne_bot_iff (Module.End.eigenspace (T : Module.End ℂ E) (-1))).mpr ⟨v, (by
+      rw [Module.End.mem_eigenspace_iff]
+      simpa using hv), hv0⟩
+  -- in finite dimension the eigenvalues are exactly the points of the spectrum
+  have hmem : -1 ∈ spectrum ℂ T := by
+    rw [ContinuousLinearMap.spectrum_eq]
+    exact hev.mem_spectrum
+  -- the spectral radius bounds the norm of every point of the spectrum
+  have hle : (1 : ℝ≥0∞) ≤ spectralRadius ℂ T := by
+    have hle' : (‖(-1 : ℂ)‖₊ : ℝ≥0∞) ≤ spectralRadius ℂ T := by
+      rw [spectralRadius]
+      exact le_iSup₂ (α := ℝ≥0∞) (-1 : ℂ) hmem
+    simpa using hle'
+  -- the spectrum is nonempty (`∋ -1`) and the spectral radius is the (finite)
+  -- norm of some spectral point, so it is never `⊤`
+  have hsr : spectralRadius ℂ T ≠ ⊤ := by
+    have hnon : (spectrum ℂ T).Nonempty := ⟨-1, hmem⟩
+    rcases spectrum.exists_nnnorm_eq_spectralRadius_of_nonempty (𝕜 := ℂ)
+      (a := T) hnon with ⟨_, _hk, hk_eq⟩
+    rw [← hk_eq]
+    exact ENNReal.coe_ne_top
+  have htr : (1 : ℝ) ≤ ENNReal.toReal (spectralRadius ℂ T) := by
+    have hin := (ENNReal.toReal_le_toReal (a := (1 : ℝ≥0∞))
+      (b := spectralRadius ℂ T) (by simp) hsr).2 hle
+    simpa using hin
+  exact (not_lt_of_ge htr) h
 
 end FiniteDimensionalFredholm
 
