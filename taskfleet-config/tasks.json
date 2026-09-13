@@ -204,6 +204,65 @@
       "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.TransferOperator.Theorem3_3 tobi-yoga lean/Riemann/TransferOperator/Theorem3_3.lean",
       "acceptance_prose": "lake build Riemann exits 0 on host tobi-yoga AND zero sorries in the whole Riemann tree.",
       "manual": false
+    },
+    {
+      "id": "RH-19",
+      "title": "Formalize the Krein-Rutman theorem in a NEW file lean/Riemann/KreinRutman.lean: a compact, positive (maps the cone {f | ∀ x, 0 ≤ f x} into itself) operator T on C(X, ℝ) (X compact Hausdorff, e.g. Set.Icc (0:ℝ) 1) with 0 < spectralRadius T has the spectral radius as a POSITIVE eigenvalue: ∃ f ≠ 0, (∀ x, 0 ≤ f x) ∧ T f = spectralRadius T • f. Strong form optional: eigenvalue is geometrically simple if T is strongly positive. Mathlib has NO KreinRutman (grep to confirm) — build from: spectralRadius exists (Mathlib SpectralRadius), compactness via IsCompactOperator (already used in Operator.lean), cone as convex closed set + applying the Schauder fixed-point / Edelstein route OR the positive-minimum argument on the eigenspace equation. Keep it generic (mathlib-PR-ready, Riemann namespace only for the application remark). Grep mathlib for: IsCompactOperator, spectralRadius, ContinuousMap.apply_pos, cone machinery. NEVER modify build-infra files.",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/KreinRutman.lean"
+      ],
+      "accept": "MAX_SORRY=2 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.KreinRutman mac lean/Riemann/KreinRutman.lean",
+      "acceptance_prose": "lake build Riemann exits 0 on host mac AND at most 2 sorries in the new file (target 0).",
+      "manual": false
+    },
+    {
+      "id": "RH-20",
+      "title": "Move the Gauss-map transfer operator onto the DISK (Ruelle space), new file lean/Riemann/DiskOperator.lean. Define E := C(Metric.closedBall (0:ℂ) 2, ℂ) (sup norm — reuse FunctionSpace-style CLM pattern from Operator.lean). For fixed s : ℂ with 1/2 < s.re, define L_s f (z) = ∑ (n:ℕ)+1 ≤ N partial, then tsum: L_s f z = tsum fun n => (transferOperatorWeightCm-like weight) * f (1/(n+1+z)) — i.e. weight (n+1+z)^(-s) = cpow, branch OK since |n+1+z| ≥ n ≥ 1 for |z| ≤ 2, n ≥ 1 (NEVER n=0: start the sum at n=1 or shift; check Operator.lean conventions). Prove: (1) each summand is continuous in z (Complex.continuousAt_cpow with n+1+z nonzero — positivity via abs), (2) uniform convergence on the ball by M-test with x-free bound ‖f‖ * (n)^(-s.re) (reuse BasicProofs summability lemmas), (3) hence transferOperatorDisk s : E →L[ℂ] E via LinearMap.mkContinuous, (4) compactness via Arzela-Ascoli exactly as transferOperator_compact in Operator.lean (equi-Lipschitz from weight derivative with s.re shifted, uniformly bounded). This is the Ruelle space where the eventual determinant theory lives. Grep .lake/packages/mathlib for cpow lemmas and reuse Operator.lean verbatim patterns where possible. NEVER modify build-infra files.",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/DiskOperator.lean"
+      ],
+      "accept": "MAX_SORRY=2 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.DiskOperator contextual-intelligence.org lean/Riemann/DiskOperator.lean",
+      "acceptance_prose": "lake build Riemann exits 0 on host contextual-intelligence.org AND at most 2 sorries in the new file (target 0).",
+      "manual": false
+    },
+    {
+      "id": "RH-21",
+      "title": "Build finite-rank Fredholm determinant infrastructure, new file lean/Riemann/FredholmFiniteRank.lean. Mathlib has NO nuclear/Fredholm-determinant theory (verified). Target: for a finite-rank A : E →L[ℂ] E on a normed space E, and using a basis of the finite-dimensional range, define det(1 - A) as the Matrix.det of (id + matrix of A) on the range. Practical route: work on FiniteDimensional ℂ E directly first — for A : E →L[ℂ] E with [FiniteDimensional ℂ E], det(1-A) := LinearMap.det (1 - A) (mathlib HAS LinearMap.det for finite-dim: grep LinearMap.det). Prove: (1) multiplicativity det((1-A)(1-B)) = det(1-A) * det(1-B) (from LinearMap.det_mul), (2) det(1-A) ≠ 0 ↔ (1-A) is bijective (LinearMap.det_eq_zero_iff / ker=0+surj), (3) for rank-1 A = fun x => c • (φ x) with φ : E →L[ℂ] ℂ: det(1 - A) = 1 - φ c (compute via matrix in a basis adapting to φ), (4) if 1 is NOT an eigenvalue (IsCompactOperator setting) then det ≠ 0. This is the seed of the eventual infinite-dim determinant. Grep mathlib for LinearMap.det, Matrix.charpoly, LinearMap.det_eq_zero_iff. NEVER modify build-infra files.",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/FredholmFiniteRank.lean"
+      ],
+      "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.FredholmFiniteRank tobias-weiss.org lean/Riemann/FredholmFiniteRank.lean",
+      "acceptance_prose": "lake build Riemann exits 0 on host tobias-weiss.org AND at most 1 sorry in the new file (target 0).",
+      "manual": false
+    },
+    {
+      "id": "RH-22",
+      "title": "HONESTY PASS on the formalization (no new math): (1) Create research/FRONTIER.md documenting: the chain circularity (fredholmDet s := C(s)⁻¹ * ζ(2s) in Complete.lean is definitional; leadingEigenvalue := exp(1/2 - s) in Theorem3_3.lean is a model, not a spectrum — cite file:line), the PROVEN real results (Gauss-map operator on C([0,1]) bounded+compact, BasicProofs summability, Euler-region nonvanishing, PNT line theorem modulo the strip lemma, functional-equation reflection), and the FRONTIER equivalence: no_zeros_right_half_plane (1/2 < Re < 1) is EQUIVALENT to the RH hard half — ρ(L_s) < 1 for Re s > 1/4 would imply RH, and is exactly as hard. (2) Rename in Theorem3_3.lean: leadingEigenvalue -> modelLeadingEigenvalue (update all references in that file only). (3) Add lean/Riemann/AxiomAudit.lean with #print axioms statements for: riemannZeta_ne_zero_of_re_eq_one, functionalEquation_reflection, riemannHypothesis_criticalStrip, transferOperatorBounded, transferOperator_compact, mayer_identity, fredholmDet_ne_zero_of_one_lt_half — then run `lake env lean lean/Riemann/AxiomAudit.lean` locally to capture output into the file as a comment block. NEVER modify build-infra files. NEVER weaken or delete any theorem statement.",
+      "deps": [],
+      "scope": [
+        "research/FRONTIER.md",
+        "lean/Riemann/TransferOperator/Theorem3_3.lean",
+        "lean/Riemann/AxiomAudit.lean"
+      ],
+      "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.AxiomAudit chemie-lernen.org lean/Riemann/AxiomAudit.lean lean/Riemann/TransferOperator/Theorem3_3.lean",
+      "acceptance_prose": "lake build Riemann exits 0 on host chemie-lernen.org, FRONTIER.md exists with all three sections, renames complete, audit output captured.",
+      "manual": false
+    },
+    {
+      "id": "RH-23",
+      "title": "PAPER HONESTY PASS: revise paper/transfer-operator-rh.tex + paper/README.md + ABSOLUTE_TRUST.md to the conditional architecture: (1) present the Mayer-operator framework as a CONDITIONAL reduction: RH (strip half) follows from the operator-side spectral bound rho(L_s)<1 for Re s > 1/4 on the Ruelle space — state clearly this bound is exactly as hard as RH and currently unproven; (2) keep and highlight the honest results: PNT line theorem (modulo Hadamard-de la Vallee Poussin), functional-equation reflection, Euler-region nonvanishing via the correspondence, compactness of the C([0,1]) Gauss-map operator, GaussMap mathlib PR #43744; (3) remove/soften any claim that RH is proven or that the current Lean development proves RH — it proves the reduction architecture plus the Euler-region corollaries. German-language root markdown files: do NOT touch. NEVER modify build-infra files.",
+      "deps": [],
+      "scope": [
+        "paper/transfer-operator-rh.tex",
+        "paper/README.md",
+        "ABSOLUTE_TRUST.md"
+      ],
+      "accept": "GATE_TIMEOUT=1200 bash lean/fleet-gate.sh Riemann.CompleteProof tobi-yoga lean/Riemann/CompleteProof.lean",
+      "acceptance_prose": "gate passes trivially (no Lean changes expected); tex/README/ABSOLUTE_TRUST revised per instructions.",
+      "manual": false
     }
   ]
 }
