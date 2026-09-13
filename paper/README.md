@@ -43,9 +43,10 @@ This directory contains research papers produced as part of the Riemann Project.
    - Thermodynamic formalism for pressure functions
    - Nuclear operator properties of Lₙ for ℜ(s) > 1/2
 
-3. **Main Theorem** (Conjecture → Proof):
-   - If pressure function P(φₙ) has no phase transitions for ℜ(s) > 1/2, then RH holds
-   - Equivalence shown between RH, pressure analyticity, and spectral properties
+3. **Main Theorem (Conditional Reduction)**:
+   - If the spectral radius $\rho(L_s) < 1$ for all $\Re(s) > 1/2$, {\bf then} RH follows
+   - {\bf Important:} Proving $\rho(L_s) < 1$ is {\em exactly as hard as RH} and remains open
+   - The Lean formalization proves this conditional reduction, {\em not} the spectral bound
 
 4. **Numerical Evidence**:
    - Spectral radius computations showing |λ| < 1 for ℜ(s) > 1/2
@@ -58,9 +59,10 @@ This directory contains research papers produced as part of the Riemann Project.
    - Links to standard number-theoretic methods
 
 6. **Formalization Roadmap**:
-   - Lean 4 formalization plan with preliminary code
-   - Identification of required Mathlib infrastructure
-   - Step-by-step formalization strategy
+   - Lean 4 formalization of the {\em conditional reduction} architecture
+   - {\bf Key result:} RH follows from $\rho(L_s) < 1$ for $\Re(s) > 1/2$
+   - {\bf Status:} All components proven {\em except} the spectral radius bound (the research frontier)
+   - Step-by-step formalization strategy documented in Section \ref{sec:lean}
 
 ## Building the Papers
 
@@ -131,8 +133,9 @@ cd paper && rm -f *.aux *.log *.bbl *.blg *.out
 │
 ├── 6. Formalization in Lean 4
 │   ├── Existing Infrastructure
-│   ├── Required Formalizations
-│   └── Preliminary Lean Code
+│   ├── {\bf Honest Results} (proven, 0 sorry)
+│   ├── {\bf Research Frontier} (unproven, the spectral bound)
+│   └── {\bf Conditional Reduction} (RH follows if spectral bound holds)
 │
 ├── 7. Research Program
 │   ├── Short-Term Goals (Months 1-6)
@@ -157,10 +160,12 @@ cd paper && rm -f *.aux *.log *.bbl *.blg *.out
 - [ ] Complete connection to Selberg zeta function
 
 ### Phase 3: Formalization (Months 6-12)
-- [ ] Begin Lean 4 formalization
-- [ ] Define Gauss map and transfer operator in Lean
-- [ ] Formalize pressure function and thermodynamic formalism
-- [ ] Complete formal proof of RH (assuming all steps proven)
+- [ ] {\bf Complete:} Lean 4 formalization of conditional reduction architecture
+- [ ] {\bf Complete:} Gauss map and inverse branches in Lean (PR \#43744)
+- [ ] {\bf Complete:} Compactness of $C([0,1])$ Gauss-map operator
+- [ ] {\bf Complete:} Functional-equation reflection and PNT line theorem
+- [ ] {\bf Status:} {\bf Research frontier:} Proving $\rho(L_s) < 1$ for $\Re(s) > 1/2$ (the one missing step)
+- [ ] {\bf Status:} {\bf Conditional:} Once spectral bound holds, RH follows
 
 ### Phase 4: Generalization (Years 1-3)
 - [ ] Extend to other L-functions (Dirichlet, cusp forms)

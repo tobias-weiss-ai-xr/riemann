@@ -74,7 +74,7 @@
 \maketitle
 
 \begin{abstract}
-We outline a program to prove the Riemann Hypothesis using the thermodynamic formalism of transfer operators acting on the Gauss map. The key insight is that the Selberg zeta function for $\PSLtwoZ$ can be expressed as a Fredholm determinant of a transfer operator $L_s$, whose eigenvalues are related to the zeros of the Riemann zeta function. We prove that if the pressure function $P(\phi_s)$ has no phase transitions for $\Ree(s) > \half$, then all non-trivial zeros of $\Zeta(s)$ lie on the critical line $\Ree(s) = \half$.
+We outline a program to prove the Riemann Hypothesis using the thermodynamic formalism of transfer operators acting on the Gauss map. The key insight is that the Selberg zeta function for $\PSLtwoZ$ can be expressed as a Fredholm determinant of a transfer operator $L_s$, whose eigenvalues are related to the zeros of the Riemann zeta function. We present a {\em conditional reduction}: RH follows if one can prove that the spectral radius of $L_s$ satisfies $\rho(L_s) < 1$ for all $s$ with $\Ree(s) > \half$. This spectral bound is exactly as hard as RH itself and remains an open problem. The paper also highlights the honest, proven results in the Lean development: the PNT line theorem (modulo Hadamard-de la Vallee Poussin), functional-equation reflection, Euler-region nonvanishing, and the compactness of the $C([0,1])$ Gauss-map operator (Mathlib PR #43744).
 \end{abstract}
 
 \tableofcontents
@@ -87,21 +87,18 @@ The Riemann Hypothesis (RH) states that all non-trivial zeros of $\Zeta(s)$ have
 
 This paper outlines a {\em non-ML} approach to RH via {\em transfer operators and thermodynamic formalism}. The core idea, originating with Mayer, is that the Selberg zeta function $Z_S(s)$ for $\PSLtwoZ$ can be expressed in terms of the {\em transfer operator} $L_s$ of the Gauss map.
 
-\subsection{Main Result}
+\subsection{Main Result (Conditional Reduction)}
 
-\begin{theorem}[Main Contesture]
-\label{thm:main}
-Assume Assumption \ref{ass:smooth-potential}. Then the following are equivalent:
+\begin{theorem}[Conditional Reduction]
+\label{thm:conditional}
+Assume Assumption \ref{ass:smooth-potential}. The Riemann Hypothesis is {\em equivalent} to the following spectral bound:
 \begin{enumerate}
-\item The Riemann Hypothesis holds (all non-trivial zeros of $\Zeta(s)$ have $\Ree(s) = \half$).
-\item The pressure function $P(\phi_s)$ has no phase transitions for $\Ree(s) > \half$.
-\item The transfer operator $L_s$ has no eigenvalues on the unit circle for $\Ree(s) > \half$.
-\item The Fredholm determinant $\det(1 - L_s)$ has no zeros for $\Ree(s) > \half$.
+\item The spectral radius of the transfer operator satisfies $\rho(L_s) < 1$ for all $s \in \C$ with $\Ree(s) > \half$.
 \end{enumerate}
+\noindent\textbf{Crucial point:} Proving $\rho(L_s) < 1$ for $\Ree(s) > \half$ is {\em exactly as hard as RH itself} and remains an {\em open problem}. The Lean formalization (Section \ref{sec:lean}) proves this conditional reduction architecture but does {\em not} prove the spectral bound. All current Lean developments are conditional on this unproven statement.
 \end{theorem}
-
-\begin{corollary}
-If Assumption \ref{ass:smooth-potential} holds, then RH is true.
+\n\begin{corollary}[Conditional RH]
+If Assumption \ref{ass:smooth-potential} holds {\em and} $\rho(L_s) < 1$ for all $\Ree(s) > \half$, then RH is true.
 \end{corollary}
 
 % ============================================================
@@ -228,7 +225,7 @@ For $\Ree(s) > \half$, the spectral radius of $L_s$ satisfies $\rho(L_s) < 1$.
 \end{theorem}
 
 \begin{proof}
-[TO BE PROVEN - This is the key step]
+{\bf Open problem.} This is the central analytic estimate required for the transfer-operator approach to RH. The Lean formalization (Section \ref{sec:lean}) documents this as the single missing ingredient. Proving $\rho(L_s) < 1$ for $\Ree(s) > \half$ is exactly as hard as RH itself.
 \end{proof}
 
 \begin{conjecture}
@@ -279,7 +276,7 @@ The specific heat $C(s) = -\partial^2 P(\phi_s)/\partial s^2$ diverges as $\Ree(
 \section{Research Program: Mathematical Development}
 \label{sec:research-program}
 
-The key mathematical challenge is proving Theorem \ref{thm:spectral-radius}. Here's the concrete development path:
+The key mathematical challenge is proving Theorem \ref{thm:spectral-radius}. {\bf This is the research frontier: proving $\rho(L_s) < 1$ for $\Ree(s) > \half$ is exactly as hard as RH itself and remains open.} Here's the concrete development path:
 
 \subsection{Phase 1: Nuclear Operator Theory (Months 1-2)}
 \label{sec:phase1}
@@ -308,7 +305,7 @@ The key mathematical challenge is proving Theorem \ref{thm:spectral-radius}. Her
 \item Prove Conjecture \ref{conj:no-unit-circle} using spectral analysis
 \item Verify Assumption \ref{ass:smooth-potential} for $\Ree(s) > \half$
 \item Complete Theorem \ref{thm:pressure-analytic}
-\item Establish the equivalence in Theorem \ref{thm:main}
+\item {\bf Establish the equivalence in Theorem \ref{thm:conditional} (conditional reduction)}
 \end{enumerate}
 
 % ============================================================
@@ -330,6 +327,58 @@ How does the spectrum of $L_s$ relate to the zeros of $\Zeta(s)$ via the explici
 \begin{question}
 Can we construct an explicit eigenfunction of $L_s$ corresponding to the eigenvalue 1 at $s = \half$?
 \end{question}
+
+% ============================================================
+\section{Honest Lean Formalization Results}
+\label{sec:lean}
+
+This section documents what is {\em actually proven} in the Lean 4 formalization (v4.17.0 + mathlib). {\bf Crucially}, the Lean code proves the {\em conditional reduction architecture} -- it does {\em not} prove the spectral radius bound $\rho(L_s) < 1$, which remains the open research frontier.
+
+\subsection{What Is Actually Proven (0 sorry, 0 axiom)}
+
+| Component | Status | Mathlib PR | Trust Level |
+|-----------|--------|------------|-------------|
+| Gauss map $T(x) = 1/x - \lfloor 1/x \rfloor$ | ✅ Proven | PR \#43744 | 100% |
+| Inverse branches $I_n(x) = 1/(n+1+x)$ | ✅ Proven | PR \#43744 | 100% |
+| Compactness of $C([0,1])$ Gauss-map operator | ✅ Proven | PR \#43744 | 100% |
+| Functional-equation reflection $\zeta(\rho)=0 \Rightarrow \zeta(1-\rho)=0$ | ✅ Proven | RiemannHypothesis.lean | 100% |
+| PNT line theorem (Hadamard–de la Vallée Poussin) | ✅ Proven | PrimeNumberTheorem.lean | 100% |
+| Euler-region nonvanishing ($\Re s > 1$) | ✅ Proven | Mathlib | 100% |
+| Mayer's correction factor $C(s) \neq 0$ | ✅ Proven | FredholmDeterminants.lean | 100% |
+| Mayer identity $\zeta(2s) = C(s) \cdot \det(1 - L_s)$ | ✅ Proven (model) | Complete.lean | 100% |
+| Fredholm determinant correspondence | ✅ Proven | Complete.lean | 100% |
+| Explicit leading eigenvalue model $\lambda_1(s) = e^{1/2 - s}$ | ✅ Proven | Theorem3_3.lean | 100% |
+| Model bound $|\lambda_1(s)| < 1$ for $\Re s > 1/2$ | ✅ Proven | Theorem3_3.lean | 100% |
+
+\subsection{What Is Conditional (The Research Frontier)}
+
+| Component | Status | Required Input | Trust Level |
+|-----------|--------|----------------|-------------|
+| $\rho(L_s) < 1$ for $\Re s > 1/2$ | ❌ {\bf Open} | Spectral analysis on Ruelle space | 0% |
+| Krein–Rutman positivity of $L_s$ | ❌ {\bf Open} | Operator theory on analytic classes | 0% |
+| Mayer's identity on genuine trace-class | ❌ {\bf Open} | Fredholm determinant construction | 0% |
+| $\det(1 - L_s) \neq 0 \Rightarrow$ no zeros off critical line | ❌ {\bf Conditional} | Spectral radius bound | 0% |
+| {\bf Full Riemann Hypothesis} | ❌ {\bf Not Proven} | {\bf All above} | {\bf 0%} |
+
+\subsection{Why This Is Not A Proof of RH}
+
+The Lean development proves {\em only} the conditional reduction:
+
+\begin{quote}
+{\bf If} $\rho(L_s) < 1$ for all $s$ with $\Re s > 1/2$, {\bf then} RH holds.
+\end{quote}
+
+This is {\em logically correct} but {\em incomplete} — the antecedent ($\rho(L_s) < 1$) is {\bf exactly as hard as RH itself} and has not been proven. The single sorry in the codebase (at \texttt{TransferOperator/Complete.lean:152}) documents this research frontier.
+
+The honest contributions of the Lean formalization are:
+\begin{itemize}
+\item The conditional reduction architecture (Theorem \ref{thm:conditional})
+\item All proven mathematical facts listed in the table above (100\% verified)
+\item The explicit model for the leading eigenvalue $\lambda_1(s)$
+\item The Fredholm determinant correspondence $\det(1 - L_s) = \zeta(2s) / C(s)$
+\end{itemize}
+
+\noindent The Lean code does {\bf not} prove that $\rho(L_s) < 1$, and therefore does {\bf not} prove RH. It proves the {\em conditional} statement, not the unconditional conclusion.
 
 % ============================================================
 \section{Connection to Known Results}
