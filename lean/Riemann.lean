@@ -6,6 +6,7 @@ Root module: imports every research module so `lake build` covers the full chain
 import Riemann.CayleyGraphs
 import Riemann.CompleteProof
 import Riemann.FredholmDeterminants
+import Riemann.FredholmFiniteRank
 import Riemann.FriedliRatio
 import Riemann.GaussMapCompilable
 import Riemann.GoldbachBridge
