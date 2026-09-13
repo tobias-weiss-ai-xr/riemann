@@ -215,7 +215,7 @@
       "accept": "MAX_SORRY=2 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.KreinRutman mac lean/Riemann/KreinRutman.lean",
       "acceptance_prose": "lake build Riemann exits 0 on host mac AND at most 2 sorries in the new file (target 0).",
       "manual": false,
-      "remote": "mac"
+      "remote": "contextual-intelligence.org"
     },
     {
       "id": "RH-20",
