@@ -268,6 +268,30 @@
       "acceptance_prose": "gate passes trivially (no Lean changes expected); tex/README/ABSOLUTE_TRUST revised per instructions.",
       "manual": false,
       "remote": "tobi-yoga"
+    },
+    {
+      "id": "RH-26",
+      "title": "CLOSE OR ADVANCE the single documented frontier in lean/Riemann/KreinRutman.lean: kreinRutman_core (a compact positive operator T on C(X,R) with 0 < spectralRadius R T has a nonzero positive eigenvector f at the spectral radius: exists f in positiveCone, f != 0, T f = (spectralRadius R T).toReal smul f). CRITICAL CONTEXT — the base is the REPAIRED master a722878: an earlier sharper 'collapse' lemma ('rho*f <= T f on the cone forces equality') was **REMOVED** because it is FALSE (counterexample documented in the docstring: X a two-point space, T = [[2,1],[0,2]], f=(0,1) has rho*f = (0,2) < (1,2) = Tf strictly while Tf != rho*f). DO NOT re-admit that collapse lemma or anything equivalent (this is the repo's false-lemma trap; re-admitting it fails the round). DO NOT weaken the statement of kreinRutman_core, kreinRutman, kreinRutman_strong, or any existing theorem. DO NOT introduce axioms. The file currently compiles with exactly ONE sorry (kreinRutman_core); all other theorems are proved. Three routes to close it, all absent from mathlib over the real field: (1) Gelfand's formula over R — prove Tendsto (fun n => ||T^n||^(1/n)) atTop (nhds (spectralRadius R T).toReal) (mathlib's limit formula spectrum.pow_nnnorm_pow_one_div_tendsto_nhds_spectralRadius is complex-only), then for e in positiveCone nonzero with tight orbit, normalize T^n e / ||T^n e|| and extract a positive cluster-point eigenvector from compactness of T (IsCompactOperator); (2) Neumann/resolvent positivity on (rho(T), infty): represent (lambda - T)^-1 = sum_n T^n / lambda^(n+1) with a convergence-radius argument at the spectral radius (not just at ||T||), deduce the resolvent is positive, then run the classical two-sided domination contradiction; (3) complexification spectral-radius transfer (see RH-27's file lean/Riemann/ComplexificationSpectrum.lean). IDEAL OUTCOME: kreinRutman_core genuinely proved (1 sorry -> 0; gate MAX_SORRY=1 lets you land with the sorry still in place). MINIMUM ACCEPTABLE: prove new unambiguous TRUE infrastructure in this same file — e.g. the real Gelfand formula for (not necessarily positive) bounded operators, or resolvent-invertibility/positivity facts — each as its own fully checked lemma, LEAVE the single core sorry in place, and keep total sorries in the file <= 1. A 'close' that merely replaces the sorry with another sorry, weakens a statement, or hides the collapse lemma anywhere will FAIL review. Respect the documented computation quirk: obtain/rcases on an ENNReal-coerced exists times out at default heartbeats — raise set_option maxHeartbeats 5000000 for that declaration; use DFunLike.congr_fun (not congr_fun) on C(X,R) hypotheses. NEVER modify lean/lake-manifest.json, lean/lean-toolchain, lean/lakefile.lean. Run the acceptance gate inside your worktree before committing; commit with message prefix feat(RH-26): or infra(RH-26): .",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/KreinRutman.lean"
+      ],
+      "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.KreinRutman tobi-yoga lean/Riemann/KreinRutman.lean",
+      "acceptance_prose": "lake build Riemann.KreinRutman exits 0 on tobi-yoga; total sorries in KreinRutman.lean <= 1 (0 if the core was genuinely closed); no statement weakened, no axiom, no collapse-lemma resurrection; only scope file touched.",
+      "manual": false,
+      "remote": "tobi-yoga"
+    },
+    {
+      "id": "RH-27",
+      "title": "PROBE the complexification route to the Krein-Rutman frontier: write a NEW file lean/Riemann/ComplexificationSpectrum.lean proving spectral-radius/spectrum transfer lemmas between a real continuous linear map and its complexification, as mathlib-PR-ready infrastructure (Riemann namespace only where unavoidable, generic statements preferred). Context: lean/Riemann/KreinRutman.lean now reduces the Krein-Rutman theorem on C(X,R) to ONE admitted existence lemma (kreinRutman_core); closing it over R needs either a real Gelfand formula, resolvent positivity, or the spectrum/spectralRadius identity between a real operator T : E ->L[R] E and its complexification T_C : E_C ->L[C] E_C. First grep mathlib in .lake/packages/mathlib for existing API: complexification (LinearMap.complexification, ContinuousLinearMap.complexification, Complex.complexification), spectrum + algebra maps, spectralRadius, IsCompactOperator, and check whether C(X,R) complexifies to C(X,C) (ContinuousMap complexification). Prove what is TRUE and machine-checked: e.g. spectrum membership transfer sigma(T) subset sigma(T_C), spectralRadius R T = spectralRadius C T_C (or one-way inequality if that is all that is true), positivity preservation under complexification. Conclude the file with a precise documented 'next-step' comment stating which identity remains open and exactly why (e.g. missing realification lemma in mathlib). DO NOT weaken anything, DO NOT introduce axioms, DO NOT touch any file other than the new one (total sorries in THIS file <= 1 allowed, each must be a documented one-line sorry-lemma with a name and a comment naming the missing mathlib fact). NEVER modify lean/lake-manifest.json, lean/lean-toolchain, lean/lakefile.lean. Run the acceptance gate inside your worktree before committing; commit with message prefix feat(RH-27): or infra(RH-27): .",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/ComplexificationSpectrum.lean"
+      ],
+      "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.ComplexificationSpectrum chemie-lernen.org lean/Riemann/ComplexificationSpectrum.lean",
+      "acceptance_prose": "lake build Riemann.ComplexificationSpectrum exits 0 on chemie-lernen.org; total sorries in ComplexificationSpectrum.lean <= 1 and documented; no axiom, no weakening; only the new file touched.",
+      "manual": false,
+      "remote": "chemie-lernen.org"
     }
   ]
 }
