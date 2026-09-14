@@ -519,9 +519,10 @@ The Neumann series and positivity results of `resolvent_neumann_series` and
 `resolvent_positivity_at_norm` hold not just for `lam > ‖T‖` but for every
 `lam` strictly above the spectral radius `(spectralRadius ℝ T).toReal`.  The
 bounded-orbit estimate `eventually_pow_norm_le` below upgrades the operator-norm
-hypothesis to the spectral-radius one; it is a corollary of the real Gelfand
-formula `realGelfandFormula` (`Riemann.RealGelfand`), which pins down the
-tendsto `‖T^n‖₊ ^ (1/n) → ρ(T)`. -/
+hypothesis to the spectral-radius one; it is stated in hypothesis form because the
+general-real Gelfand formula `lim ‖T^n‖^(1/n) = ρ(T)` is FALSE over `ℝ` (see
+`Riemann.RealGelfand.counterexampleRotation`; it holds over `ℂ` via mathlib's own
+Gelfand formula). -/
 
 /-- **Bounded orbit estimate** (practical form of Gelfand's formula over `ℝ`):
 assuming the real Gelfand formula (hypothesis `hg`), for every `eps > 0` there is a
@@ -653,28 +654,32 @@ theorem eventually_pow_norm_le_of_gelfand {T : C(X, ℝ) →L[ℝ] C(X, ℝ)}
         simpa using (mul_le_mul_of_nonneg_right hM1 (pow_nonneg hb.le n))
       exact le_trans hlate hCle
 
-/-- **Bounded orbit estimate**: by the real Gelfand formula
-(`realGelfandFormula`), for every `eps > 0` there is a constant
-`C > 0` such that `‖T^n‖ ≤ C * ((spectralRadius ℝ T).toReal + eps) ^ n` for all `n`.
-This is the bounded-orbit estimate on which the whole resolvent-positivity route at the
-spectral radius rests. -/
-theorem eventually_pow_norm_le {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} (eps : ℝ) (heps : 0 < eps) :
+/-- **Bounded orbit estimate** (hypothesis form): assuming the real Gelfand formula
+(hypothesis `hg`, i.e. `‖T^n‖₊ ^ (1/n) → ρ(T)`), for every `eps > 0` there is a
+constant `C > 0` such that `‖T^n‖ ≤ C * ((spectralRadius ℝ T).toReal + eps) ^ n` for
+all `n`.  This is the bounded-orbit estimate on which the whole resolvent-positivity
+route at the spectral radius rests; the hypothesis `hg` is necessary because the
+general-real Gelfand upper bound is false (see `RealGelfand.counterexampleRotation`). -/
+theorem eventually_pow_norm_le {T : C(X, ℝ) →L[ℝ] C(X, ℝ)}
+    (hg : Tendsto (fun n : ℕ => (‖T ^ n‖₊ : ℝ≥0∞) ^ (1 / (n : ℝ))) atTop
+      (𝓝 (spectralRadius ℝ T)))
+    (eps : ℝ) (heps : 0 < eps) :
     ∃ C : ℝ, 0 < C ∧ ∀ n : ℕ, ‖T ^ n‖ ≤ C * ((spectralRadius ℝ T).toReal + eps) ^ n := by
-  have hg : Tendsto (fun n : ℕ => (‖T ^ n‖₊ : ℝ≥0∞) ^ (1 / (n : ℝ))) atTop
-      (𝓝 (spectralRadius ℝ T)) := by
-    simpa using (realGelfandFormula (a := T))
   exact eventually_pow_norm_le_of_gelfand hg heps
 
 
 
 /-- **Neumann (geometric) series identity for the resolvent at the spectral
-radius**: whenever `0 < lam` and the spectral radius satisfies
+radius**: assuming the real Gelfand formula (hypothesis `hg`), whenever `0 < lam` and
+the spectral radius satisfies
 `(spectralRadius ℝ T).toReal < lam`, the resolvent `(lam • 1 - T)⁻¹` equals the
 convergent geometric series `Σₙ (lam⁻¹)ⁿ⁺¹ · Tⁿ`, i.e. `Tⁿ / lamⁿ⁺¹` in the scalar
 sense.  The convergence (at `lam` strictly above `ρ(T)`, not just above `‖T‖`) rests
-on the bounded-orbit estimate `eventually_pow_norm_le` (a corollary of the real
-Gelfand formula `realGelfandFormula`). -/
-theorem resolvent_neumann_series_at_radius {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} {lam : ℝ}
+on the bounded-orbit estimate `eventually_pow_norm_le`. -/
+theorem resolvent_neumann_series_at_radius {T : C(X, ℝ) →L[ℝ] C(X, ℝ)}
+    (hg : Tendsto (fun n : ℕ => (‖T ^ n‖₊ : ℝ≥0∞) ^ (1 / (n : ℝ))) atTop
+      (𝓝 (spectralRadius ℝ T)))
+    {lam : ℝ}
     (hlam : 0 < lam) (hrho : (spectralRadius ℝ T).toReal < lam) :
     HasSum (fun n : ℕ => (lam⁻¹ : ℝ) ^ (n + 1) • T ^ n)
       (Ring.inverse (lam • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) - T)) := by
@@ -686,7 +691,7 @@ theorem resolvent_neumann_series_at_radius {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} {
     dsimp [eps]
     ring
   obtain ⟨C, hC, hCbound⟩ :=
-    eventually_pow_norm_le (T := T) eps (by simpa [eps] using heps)
+    eventually_pow_norm_le (T := T) hg eps (by simpa [eps] using heps)
   have hCbound' : ∀ n : ℕ, ‖T ^ n‖ ≤ C * g ^ n := by
     intro n
     simpa [hg_eq] using hCbound n
@@ -846,7 +851,8 @@ theorem resolvent_neumann_series_at_radius {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} {
   rw [hres, hRinv]
   exact hsumA
 
-/-- **Resolvent positivity at the spectral radius**: if `T` is a positive operator,
+/-- **Resolvent positivity at the spectral radius**: assuming the real Gelfand formula
+(hypothesis `hg`), if `T` is a positive operator,
 `0 < lam` and `(spectralRadius ℝ T).toReal < lam`, then the resolvent
 `Ring.inverse (lam • 1 - T)` is well-defined (its Neumann series
 `resolvent_neumann_series_at_radius` converges above `ρ(T)`, not just above `‖T‖`)
@@ -854,13 +860,15 @@ and is itself a positive operator.  This is the positivity half of the
 Krein–Rutman strategy beyond the operator norm: resolvents of positive operators at
 positive levels outside the spectrum are positive. -/
 theorem resolvent_positivity_at_radius {T : C(X, ℝ) →L[ℝ] C(X, ℝ)}
+    (hg : Tendsto (fun n : ℕ => (‖T ^ n‖₊ : ℝ≥0∞) ^ (1 / (n : ℝ))) atTop
+      (𝓝 (spectralRadius ℝ T)))
     (hTpos : IsPositive T) {lam : ℝ} (hlam : 0 < lam)
     (hrho : (spectralRadius ℝ T).toReal < lam) :
     IsPositive (Ring.inverse (lam • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) - T)) := by
   -- the Neumann series converges at the radius and equals the inverse
   have hsum : HasSum (fun n : ℕ => (lam⁻¹ : ℝ) ^ (n + 1) • T ^ n)
       (Ring.inverse (lam • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) - T)) :=
-    resolvent_neumann_series_at_radius (T := T) hlam hrho
+    resolvent_neumann_series_at_radius (T := T) hg hlam hrho
   let a : ℕ → C(X, ℝ) →L[ℝ] C(X, ℝ) :=
     fun n => (lam⁻¹ : ℝ) ^ (n + 1) • T ^ n
   have htsum : Ring.inverse (lam • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) - T) =
