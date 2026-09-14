@@ -39,6 +39,8 @@ import Mathlib.Topology.ContinuousMap.Ordered
 import Mathlib.Topology.CompactOpen
 import Mathlib.Analysis.Normed.Algebra.Spectrum
 import Mathlib.Topology.Order.Compact
+import Mathlib.Analysis.SpecificLimits.Normed
+import Mathlib.Analysis.Normed.Ring.Units
 
 open scoped ContinuousMap ENNReal NNReal
 open Set
@@ -288,6 +290,227 @@ theorem positive_abs_ge {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} (hT : IsPositive T)
     _ = |(T f) x| := hμf
     _ ≤ (T |f|) x := habs
 
+/-! ## Resolvent (Neumann series) and resolvent positivity -/
+
+-- The operator ring `C(X, ℝ) →L[ℝ] C(X, ℝ)` is a normed ring with respect to
+-- the operator norm.  mathlib ships the `NormedRing`/`NormedAddCommGroup`
+-- instances for continuous-linear endomorphism spaces in an `@[expose]`
+-- section that instance search does not pick up here, so we assemble them
+-- (locally) from the always-available `SeminormedRing` / separation data.
+local instance normedAddCommGroup_end :
+    NormedAddCommGroup (C(X, ℝ) →L[ℝ] C(X, ℝ)) :=
+  NormedAddCommGroup.ofSeparation (fun f => (ContinuousLinearMap.opNorm_zero_iff (f := f)).mp)
+
+local instance normedRing_end : NormedRing (C(X, ℝ) →L[ℝ] C(X, ℝ)) :=
+  { (inferInstance : SeminormedRing (C(X, ℝ) →L[ℝ] C(X, ℝ))) with
+    toMetricSpace := (inferInstance : NormedAddCommGroup (C(X, ℝ) →L[ℝ] C(X, ℝ))).toMetricSpace }
+
+/-- Point evaluation at `x : X` as a continuous linear functional on
+`C(X, ℝ)`. -/
+def resolvent_eval (x : X) : C(X, ℝ) →L[ℝ] ℝ :=
+  { toFun := fun g => g x
+    map_add' := by intro g h; rfl
+    map_smul' := by intro c g; rfl
+    cont := continuous_eval_const x }
+
+/-- Scalar multiplication commutes with composition on the left:
+`(a • A) * B = a • (A * B)`. -/
+lemma resolvent_smul_mul_assoc (a : ℝ) (A B : C(X, ℝ) →L[ℝ] C(X, ℝ)) :
+    (a • A) * B = a • (A * B) := by
+  ext f x
+  rfl
+
+/-- Scalar multiplication commutes with composition on the right:
+`A * (a • B) = a • (A * B)`. -/
+lemma resolvent_mul_smul_assoc (a : ℝ) (A B : C(X, ℝ) →L[ℝ] C(X, ℝ)) :
+    A * (a • B) = a • (A * B) := by
+  ext f x
+  change (A (a • (B f))) x = (a • (A (B f))) x
+  rw [map_smul]
+
+/-- Scalar powers in the operator ring: `(a • A)^n = a^n • A^n`. -/
+lemma resolvent_smul_pow (a : ℝ) (A : C(X, ℝ) →L[ℝ] C(X, ℝ)) (n : ℕ) :
+    (a • A) ^ n = a ^ n • A ^ n := by
+  induction n with
+  | zero => simp
+  | succ k ih =>
+    rw [pow_succ, ih, pow_succ]
+    calc
+      (a ^ k • A ^ k) * (a • A) = a ^ k • (A ^ k * (a • A)) :=
+        resolvent_smul_mul_assoc (a ^ k) (A ^ k) (a • A)
+      _ = a ^ k • (a • (A ^ k * A)) := by rw [resolvent_mul_smul_assoc]
+      _ = (a ^ k * a) • (A ^ k * A) := by rw [smul_smul]
+      _ = a ^ (k + 1) • A ^ (k + 1) := by
+        rw [← pow_succ (a := a) (n := k)]
+        rw [← pow_succ (a := A) (n := k)]
+
+/-- `Ring.inverse` rescaling: for a nonzero scalar `a` and a unit `x`,
+`Ring.inverse (a • x) = a⁻¹ • Ring.inverse x`. -/
+lemma resolvent_inverse_smul (a : ℝ) (ha : a ≠ 0)
+    (x : C(X, ℝ) →L[ℝ] C(X, ℝ)) (hx : IsUnit x) :
+    Ring.inverse (a • x) = (a⁻¹ : ℝ) • Ring.inverse x := by
+  let u : (C(X, ℝ) →L[ℝ] C(X, ℝ))ˣ :=
+    ⟨a • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)), (a⁻¹ : ℝ) • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)),
+      by
+        calc
+          (a • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ))) * ((a⁻¹ : ℝ) • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)))
+              = (a⁻¹ : ℝ) • ((a • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ))) * (1 : C(X, ℝ) →L[ℝ] C(X, ℝ))) :=
+                  by rw [resolvent_mul_smul_assoc]
+          _ = (a⁻¹ : ℝ) • (a • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ))) := by rw [mul_one]
+          _ = (a⁻¹ * a) • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) := smul_smul _ _ _
+          _ = (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) := by rw [inv_mul_cancel₀ ha, one_smul],
+      by
+        calc
+          ((a⁻¹ : ℝ) • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ))) * (a • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)))
+              = (a⁻¹ : ℝ) • ((1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) * (a • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)))) :=
+                  by rw [resolvent_smul_mul_assoc]
+          _ = (a⁻¹ : ℝ) • (a • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ))) := by rw [one_mul]
+          _ = (a⁻¹ * a) • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) := smul_smul _ _ _
+          _ = (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) := by rw [inv_mul_cancel₀ ha, one_smul]⟩
+  have hu : IsUnit (a • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ))) := ⟨u, rfl⟩
+  have hainv : Ring.inverse (a • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ))) =
+      (a⁻¹ : ℝ) • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) := by
+    rw [Ring.inverse_unit (u := u)]
+    rfl
+  calc
+    Ring.inverse (a • x) = Ring.inverse ((a • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ))) * x) := by
+      have hstep : a • x = (a • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ))) * x := by
+        rw [resolvent_smul_mul_assoc a (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) x]
+        rw [one_mul]
+      rw [hstep]
+    _ = Ring.inverse x * Ring.inverse (a • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ))) := by
+      exact Ring.inverse_mul (a := a • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ))) (b := x) (Or.inl hu)
+    _ = (a⁻¹ : ℝ) • Ring.inverse x := by
+      rw [hainv]
+      simpa [resolvent_mul_smul_assoc]
+
+/-- The scaled operator `rT = a⁻¹ • T` has norm `< 1` whenever `‖T‖ < a` and
+`0 < a`. -/
+lemma resolvent_scaled_norm_lt_one {a : ℝ} (ha : 0 < a)
+    (T : C(X, ℝ) →L[ℝ] C(X, ℝ)) (hT : ‖T‖ < a) :
+    ‖(a⁻¹ : ℝ) • T‖ < 1 := by
+  have hle : ‖(a⁻¹ : ℝ) • T‖ ≤ ‖(a⁻¹ : ℝ)‖ * ‖T‖ :=
+    ContinuousLinearMap.opNorm_smul_le (a⁻¹) T
+  have hlt : ‖(a⁻¹ : ℝ)‖ * ‖T‖ < 1 := by
+    rw [Real.norm_eq_abs, abs_inv, abs_of_pos ha]
+    calc
+      a⁻¹ * ‖T‖ < a⁻¹ * a := mul_lt_mul_of_pos_left hT (inv_pos.mpr ha)
+      _ = 1 := by rw [inv_mul_cancel₀ (ne_of_gt ha)]
+  exact lt_of_le_of_lt hle hlt
+
+/-- The resolvent at `lam` rescales onto the resolvent at `1` for the scaled
+operator `rT = lam⁻¹ • T`:
+`Ring.inverse (lam • 1 - T) = lam⁻¹ • Ring.inverse (1 - rT)`. -/
+lemma resolvent_scaling {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} {lam : ℝ} (hlam : lam ≠ 0)
+    (rT : C(X, ℝ) →L[ℝ] C(X, ℝ)) (hrT : rT = (lam⁻¹ : ℝ) • T)
+    (hrT1 : ‖rT‖ < 1) :
+    Ring.inverse (lam • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) - T) =
+      (lam⁻¹ : ℝ) • Ring.inverse (1 - rT) := by
+  have huRT : IsUnit (1 - rT) := isUnit_one_sub_of_norm_lt_one hrT1
+  have hM : lam • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) - T = lam • (1 - rT) := by
+    have hsmul : lam • ((lam⁻¹ : ℝ) • T) = T := by
+      rw [smul_smul]
+      rw [mul_inv_cancel₀ hlam, one_smul]
+    rw [← hsmul]
+    rw [← smul_sub]
+    rw [hrT]
+  calc
+    Ring.inverse (lam • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) - T) =
+        Ring.inverse (lam • (1 - rT)) := by rw [hM]
+    _ = (lam⁻¹ : ℝ) • Ring.inverse (1 - rT) :=
+      resolvent_inverse_smul lam hlam (1 - rT) huRT
+
+/-- **Neumann (geometric) series identity for the resolvent**: whenever
+`0 < lam` and `‖T‖ < lam`, the resolvent `(lam • 1 - T)⁻¹` (in `C(X, ℝ) →L[ℝ] C(X, ℝ)`
+with `Ring.inverse`) equals the convergent geometric series
+`Σₙ (lam⁻¹)ⁿ⁺¹ · Tⁿ`, i.e. `Tⁿ / lamⁿ⁺¹` in the scalar sense. -/
+theorem resolvent_neumann_series {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} {lam : ℝ}
+    (hlam : 0 < lam) (hT : ‖T‖ < lam) :
+    HasSum (fun n : ℕ => (lam⁻¹ : ℝ) ^ (n + 1) • T ^ n)
+      (Ring.inverse (lam • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) - T)) := by
+  let rT : C(X, ℝ) →L[ℝ] C(X, ℝ) := (lam⁻¹ : ℝ) • T
+  have hrT1 : ‖rT‖ < 1 := by
+    simpa [rT] using resolvent_scaled_norm_lt_one hlam T hT
+  have hgeom : HasSum (fun n : ℕ => rT ^ n) (Ring.inverse (1 - rT)) :=
+    hasSum_geom_series_inverse rT hrT1
+  have hsum : HasSum (fun n : ℕ => (lam⁻¹ : ℝ) • rT ^ n)
+      ((lam⁻¹ : ℝ) • Ring.inverse (1 - rT)) :=
+    HasSum.const_smul (lam⁻¹ : ℝ) hgeom
+  -- the summands agree: (lam⁻¹)ⁿ⁺¹ • Tⁿ = (lam⁻¹) • rTⁿ
+  have hflat : (fun n : ℕ => (lam⁻¹ : ℝ) ^ (n + 1) • T ^ n) =
+      fun n : ℕ => (lam⁻¹ : ℝ) • rT ^ n := by
+    funext n
+    calc
+      (lam⁻¹ : ℝ) ^ (n + 1) • T ^ n = ((lam⁻¹ : ℝ) * (lam⁻¹ : ℝ) ^ n) • T ^ n := by
+        rw [pow_succ']
+      _ = (lam⁻¹ : ℝ) • ((lam⁻¹ : ℝ) ^ n • T ^ n) :=
+        (smul_smul (lam⁻¹ : ℝ) ((lam⁻¹ : ℝ) ^ n) (T ^ n)).symm
+      _ = (lam⁻¹ : ℝ) • (rT ^ n) := by rw [resolvent_smul_pow]
+  have hsum' : HasSum (fun n : ℕ => (lam⁻¹ : ℝ) ^ (n + 1) • T ^ n)
+      ((lam⁻¹ : ℝ) • Ring.inverse (1 - rT)) := by
+    rw [hflat]
+    exact hsum
+  have hres : Ring.inverse (lam • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) - T) =
+      (lam⁻¹ : ℝ) • Ring.inverse (1 - rT) :=
+    resolvent_scaling (ne_of_gt hlam) rT (by simp [rT]) hrT1
+  simpa [hres] using hsum'
+
+/-- **Resolvent positivity at the norm**: if `T` is a positive operator,
+`0 < lam` and `‖T‖ < lam`, then the resolvent `Ring.inverse (lam • 1 - T)` is
+well-defined (the Neumann series of `resolvent_neumann_series` converges) and
+is itself a positive operator.  This is the positivity half of the
+Krein–Rutman strategy: resolvents of positive operators at positive levels
+outside the spectrum are positive. -/
+theorem resolvent_positivity_at_norm {T : C(X, ℝ) →L[ℝ] C(X, ℝ)}
+    (hTpos : IsPositive T) {lam : ℝ} (hlam : 0 < lam) (hT : ‖T‖ < lam) :
+    IsPositive (Ring.inverse (lam • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) - T)) := by
+  let rT : C(X, ℝ) →L[ℝ] C(X, ℝ) := (lam⁻¹ : ℝ) • T
+  have hrT1 : ‖rT‖ < 1 := by
+    simpa [rT] using resolvent_scaled_norm_lt_one hlam T hT
+  have hgeom : HasSum (fun n : ℕ => rT ^ n) (Ring.inverse (1 - rT)) :=
+    hasSum_geom_series_inverse rT hrT1
+  -- scaled powers are positive: rTⁿ = (lam⁻¹)ⁿ • Tⁿ with lam⁻¹ ≥ 0
+  have hpos : ∀ n : ℕ, IsPositive (rT ^ n) := by
+    intro n
+    rw [resolvent_smul_pow]
+    exact IsPositive.smul (pow_nonneg (inv_nonneg.mpr (le_of_lt hlam)) n) (hTpos.pow n)
+  -- the (Neumann) infinite sum of positive operators is positive
+  have hinvpos : IsPositive (Ring.inverse (1 - rT)) := by
+    intro g hg
+    rw [mem_positiveCone]
+    intro x
+    have htsum : Ring.inverse (1 - rT) = ∑' n : ℕ, rT ^ n := hgeom.tsum_eq.symm
+    have hs : Summable (fun n : ℕ => rT ^ n) := hgeom.summable
+    have hs_app : Summable (fun n : ℕ => (rT ^ n) g) := by
+      let φ : (C(X, ℝ) →L[ℝ] C(X, ℝ)) →L[ℝ] C(X, ℝ) :=
+        ContinuousLinearMap.apply ℝ (C(X, ℝ)) g
+      simpa [φ] using (ContinuousLinearMap.summable φ hs)
+    have happ : (Ring.inverse (1 - rT)) g = ∑' n : ℕ, (rT ^ n) g := by
+      calc
+        (Ring.inverse (1 - rT)) g = (∑' n : ℕ, rT ^ n) g := by rw [htsum]
+        _ = ∑' n : ℕ, (rT ^ n) g := by
+          let φ : (C(X, ℝ) →L[ℝ] C(X, ℝ)) →L[ℝ] C(X, ℝ) :=
+            ContinuousLinearMap.apply ℝ (C(X, ℝ)) g
+          have hmap := ContinuousLinearMap.map_tsum (φ := φ) hs
+          simpa [φ] using hmap
+    have hx : ((Ring.inverse (1 - rT)) g) x = ∑' n : ℕ, (((rT ^ n) g) x) := by
+      calc
+        ((Ring.inverse (1 - rT)) g) x = (∑' n : ℕ, (rT ^ n) g) x := by rw [happ]
+        _ = ∑' n : ℕ, (((rT ^ n) g) x) := by
+          have hmap := ContinuousLinearMap.map_tsum (φ := resolvent_eval x) hs_app
+          simpa [resolvent_eval] using hmap
+    have hterm : ∀ n : ℕ, 0 ≤ (((rT ^ n) g) x) := by
+      intro n
+      exact (IsPositive.apply_nonneg (hpos n) hg) x
+    rw [hx]
+    exact tsum_nonneg hterm
+  -- rescale back by lam⁻¹ ≥ 0
+  have hres : Ring.inverse (lam • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) - T) =
+      (lam⁻¹ : ℝ) • Ring.inverse (1 - rT) := by
+    exact resolvent_scaling (ne_of_gt hlam) rT (by simp [rT]) hrT1
+  rw [hres]
+  exact IsPositive.smul (inv_nonneg.mpr (le_of_lt hlam)) hinvpos
+
 /-! ## The Krein–Rutman core (the true, single documented frontier) -/
 
 /-- **Krein–Rutman core (admitted — the single documented frontier)**:
@@ -319,8 +542,8 @@ mathlib over the real field:
    formula `spectrum.pow_nnnorm_pow_one_div_tendsto_nhds_spectralRadius`
    exists only over `ℂ`), then normalize `Tⁿ e` along a cone vector and
    extract a positive cluster-point eigenvector from compactness of `T`.
-2. *Resolvent (Neumann) positivity at the radius*: for `λ > ρ(T)` represent
-   `(λ − T)⁻¹ = Σₙ Tⁿ / λⁿ⁺¹` (needs the convergence-radius argument at the
+2. *Resolvent (Neumann) positivity at the radius*: for `lam > ρ(T)` represent
+   `(lam − T)⁻¹ = Σₙ Tⁿ / lamⁿ⁺¹` (needs the convergence-radius argument at the
    spectral radius, not just at `‖T‖`), get the resolvent positive, then run
    the classical two-sided domination argument.
 3. *Complexification*: extend `T` to `C(X, ℂ) →L[ℂ] C(X, ℂ)`, transfer the
