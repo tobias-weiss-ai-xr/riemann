@@ -46,7 +46,7 @@ a nonzero eigenvector `f` in the positive cone at eigenvalue `rho`.
 orbit-closure theorem `bounded_orbit_yields_positive_eigenvector` applies
 directly (its hypothesis `T w ≥ rho • w` is the same inequality).
 
-*Unbounded branch (the analytic frontier, one admitted).*  The
+*Unbounded branch (the analytic frontier, one open gap).*  The
 classical normalized-orbit cluster argument: set `orb n := orbit n` and
 `u n := orb n / ‖orb n‖` (well-defined since `superharmonicOrbit_nonzero`).
 The navigation identity gives `T (orb n) = rho • orb (n + 1)`, hence —
