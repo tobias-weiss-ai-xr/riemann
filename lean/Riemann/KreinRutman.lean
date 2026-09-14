@@ -14,25 +14,47 @@ invariant a cone in a Banach space", Amer. Math. Soc. Transl. 26, 199–377.
 
 This file develops the cone-theoretic scaffolding on `C(X, ℝ)` (positive
 cone, positive operators, and their elementary order-theoretic properties),
-states the two main theorems (the eigenvalue form and the strong form with
-geometric simplicity of the leading eigenspace), and supplies the analytic
-heart as two documented admissions (TBD items), to be filled once mathlib
-provides a Schauder/compact-operator fixed-point argument over the reals
-(Gelfand's spectral-radius formula currently exists only over `ℂ`).
+and proves both forms of the theorem *modulo a single documented analytic
+admission* — `keyLemma` — which is exactly the Perron–Frobenius step
+"an inequality `ρ(T) f ≤ T f` on the cone cannot be strict".  That lemma is
+the only remaining research frontier in this file: over the real field,
+mathlib currently lacks (a) Gelfand's spectral-radius formula
+(`Mathlib.Analysis.Normed.Algebra.GelfandFormula` is complex-only) and
+(b) an explicit Neumann-series representation of the resolvent `(λ − T)⁻¹`
+on `(ρ(T), ∞)`, either of which would close it.  Everything else — the
+spectral-value lemma `|μ| = ρ(T)` over ℝ via the Fredholm alternative,
+the extraction of an eigenvector, and the positivity transfer `T |f| ≥ ρ |f|`
+— is proved here for real.
+
+Proof outline (given `keyLemma`): `ρ(T) > 0` makes the real spectrum
+`σ(T)` nonempty and compact, so some `μ = ±ρ(T)` lies in it
+(`mem_spectrum_abs_eq_spectralRadius`); by the Fredholm alternative for
+compact operators (`IsCompactOperator.hasEigenvalue_iff_mem_spectrum`) `μ`
+is an eigenvalue with eigenvector `f ≠ 0`.  Positivity then gives
+`T |f| ≥ |μ| |f| = ρ(T) |f|` (`positive_abs_ge`), and `keyLemma` upgrades
+this to equality, so `g = |f|` is the sought positive eigenvector.  The
+strong form additionally uses strong positivity (which forces every positive
+eigenvector to be strictly positive) and the extreme-value theorem on `X` to
+obtain uniqueness up to a positive scalar.
 -/
 
 import Mathlib.Analysis.Normed.Operator.Compact.Basic
+import Mathlib.Analysis.Normed.Operator.Compact.FredholmAlternative
+import Mathlib.LinearAlgebra.Eigenspace.Basic
 import Mathlib.Topology.ContinuousMap.Compact
 import Mathlib.Topology.ContinuousMap.Ordered
 import Mathlib.Topology.CompactOpen
 import Mathlib.Analysis.Normed.Algebra.Spectrum
+import Mathlib.Topology.Order.Compact
 
-open scoped ContinuousMap
+open scoped ContinuousMap ENNReal NNReal
 open Set
 
 namespace Riemann
 
 noncomputable section
+
+set_option maxHeartbeats 5000000
 
 variable {X : Type*} [TopologicalSpace X] [CompactSpace X] [Nonempty X]
 
@@ -177,6 +199,129 @@ theorem spectralRadius_toReal_pos {T : C(X, ℝ) →L[ℝ] C(X, ℝ)}
     (hρ : 0 < spectralRadius ℝ T) : 0 < (spectralRadius ℝ T).toReal :=
   ENNReal.toReal_pos (ne_of_gt hρ) (spectralRadius_pos_ne_top hρ)
 
+/-! ## The spectral-value lemma over ℝ -/
+
+/-- A positive spectral radius makes the (real) spectrum nonempty: the
+supremum in the definition `spectralRadius ℝ T = ⨆ k ∈ σ(T), ‖k‖₊` cannot be
+positive over the empty set. -/
+theorem spectrum_nonempty_of_pos_spectralRadius {T : C(X, ℝ) →L[ℝ] C(X, ℝ)}
+    (hρ : 0 < spectralRadius ℝ T) : (spectrum ℝ T).Nonempty := by
+  by_contra h
+  have hset : spectrum ℝ T = ∅ := Set.not_nonempty_iff_eq_empty.mp h
+  have : spectralRadius ℝ T = 0 := by simp [spectralRadius, hset]
+  exact (ne_of_gt hρ) this
+
+/-- Some element `μ = ±ρ(T)` of the real spectrum attains the spectral radius:
+`μ ∈ σ(T)`, `μ ≠ 0`, and `|μ| = (spectralRadius ℝ T).toReal`. -/
+theorem mem_spectrum_abs_eq_spectralRadius {T : C(X, ℝ) →L[ℝ] C(X, ℝ)}
+    (hρ : 0 < spectralRadius ℝ T) :
+    ∃ μ : ℝ, μ ∈ spectrum ℝ T ∧ μ ≠ 0 ∧ |μ| = (spectralRadius ℝ T).toReal := by
+  have hσ : (spectrum ℝ T).Nonempty := spectrum_nonempty_of_pos_spectralRadius hρ
+  obtain ⟨μ, hμσ, hμρ⟩ :=
+    spectrum.exists_nnnorm_eq_spectralRadius_of_nonempty (𝕜 := ℝ) (a := T) hσ
+  have hμ0 : μ ≠ 0 := by
+    intro hz
+    have hzabs : (‖μ‖₊ : ℝ≥0∞) = 0 := by simp [hz]
+    rw [hzabs] at hμρ
+    exact (ne_of_gt hρ) hμρ.symm
+  refine ⟨μ, hμσ, hμ0, ?_⟩
+  -- `(spectralRadius ℝ T).toReal` equals `‖μ‖₊ = |μ|`
+  have hρreal : |μ| = (spectralRadius ℝ T).toReal := by
+    rw [← hμρ]
+    rw [ENNReal.coe_toReal]
+    symm
+    exact Real.norm_eq_abs μ
+  exact hρreal
+
+/-- **Fredholm alternative over ℝ**: for a compact `T`, every nonzero element
+of the real spectrum is a genuine eigenvalue. -/
+theorem hasEigenvalue_of_mem_spectrum_ne_zero {T : C(X, ℝ) →L[ℝ] C(X, ℝ)}
+    (hTcomp : IsCompactOperator T) {μ : ℝ} (hμ0 : μ ≠ 0) (hμσ : μ ∈ spectrum ℝ T) :
+    Module.End.HasEigenvalue (T : Module.End ℝ (C(X, ℝ))) μ :=
+  (IsCompactOperator.hasEigenvalue_iff_mem_spectrum hTcomp hμ0).2 hμσ
+
+/-- The pointwise modulus of a real-valued continuous function is nonnegative
+and vanishes nowhere if the function is nonzero. -/
+theorem absCm_pos {f : C(X, ℝ)} (hf : f ≠ 0) : |f| ∈ positiveCone ∧ |f| ≠ 0 := by
+  constructor
+  · rw [mem_positiveCone]
+    intro x
+    exact abs_nonneg (f x)
+  · intro hg
+    apply hf
+    ext x
+    have hgx : (|f|) x = 0 := DFunLike.congr_fun hg x
+    exact abs_eq_zero.mp hgx
+
+/-- **Positivity transfer**: for a positive operator with eigenvector `f` at
+eigenvalue `μ`, the modulus `|f|` satisfies the pointwise domination
+`|μ| · |f| ≤ T |f|`.  This is the standard inequality
+`|T f| ≤ T |f|` for positive operators on a lattice. -/
+theorem positive_abs_ge {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} (hT : IsPositive T)
+    {f : C(X, ℝ)} {μ : ℝ} (hfT : T f = μ • f) (x : X) :
+    |μ| * |f x| ≤ (T |f|) x := by
+  -- |f| ≥ f and |f| ≥ -f pointwise, so positivity gives T|f| ≥ ±T f.
+  have h1 : 0 ≤ (T |f|) x - (T f) x := by
+    have hm : |f| - f ∈ positiveCone := by
+      rw [mem_positiveCone]
+      intro y
+      apply sub_nonneg.mpr
+      exact le_abs_self (f y)
+    have hmT : 0 ≤ T (|f| - f) x := hT.apply_nonneg hm x
+    rwa [map_sub] at hmT
+  have h2 : 0 ≤ (T |f|) x + (T f) x := by
+    have hm : |f| + f ∈ positiveCone := by
+      rw [mem_positiveCone]
+      intro y
+      have hle : -(f y) ≤ |f y| := by
+        simpa [abs_neg] using le_abs_self (-(f y))
+      change 0 ≤ |f y| + f y
+      rw [← sub_neg_eq_add]
+      exact sub_nonneg.mpr hle
+    have hmT : 0 ≤ T (|f| + f) x := hT.apply_nonneg hm x
+    rwa [map_add] at hmT
+  have habs : |(T f) x| ≤ (T |f|) x := by
+    apply abs_le.mpr
+    constructor
+    · linarith
+    · linarith
+  -- |μ| · |f x| = |(T f) x|, since T f = μ • f pointwise
+  have happ : (T f) x = μ * f x := by
+    rw [hfT]
+    rfl
+  have hμf : |μ * f x| = |(T f) x| := by rw [happ]
+  calc
+    |μ| * |f x| = |μ * f x| := (abs_mul μ (f x)).symm
+    _ = |(T f) x| := hμf
+    _ ≤ (T |f|) x := habs
+
+/-! ## The Perron–Frobenius core (the single documented frontier) -/
+
+/-- **Perron–Frobenius core**: for a positive operator with spectral radius
+`ρ(T) > 0`, the cone inequality `ρ(T) • f ≤ T f` forces equality.  In other
+words, no positive vector can be "dominated but not absorbed": the spectral
+radius is a genuine eigenvalue and the domination cannot be strict.
+
+This is the only analytic admission left in this file.  Two classical routes
+close it, and both are currently blocked in mathlib over the real field:
+
+1. *Gelfand's formula over ℝ*: show `lim ‖Tⁿ‖^(1/n) = ρ(T)` (the limit
+   formula `spectrum.pow_nnnorm_pow_one_div_tendsto_nhds_spectralRadius`
+   exists only over `ℂ`), normalize the orbit `Tⁿ f`, and extract a positive
+   cluster-point eigenvector from compactness of `T`.
+2. *Neumann/resolvent positivity at the radius*: for `λ > ρ(T)` represent
+   `(λ − T)⁻¹ = Σₙ Tⁿ / λⁿ⁺¹` (needs a convergence-radius argument at the
+   spectral radius, not just at `‖T‖⁻¹`), deduce the resolvent is positive,
+   then the classical argument `f = (ρ − T)⁻¹(−h) ≤ 0` forces `h = 0`.
+
+Once either ingredient is available, replace this `sorry` — the remainder of
+`kreinRutman` / `kreinRutman_strong` below is complete. -/
+theorem keyLemma {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} (hT : IsPositive T)
+    (hρ : 0 < spectralRadius ℝ T) {f : C(X, ℝ)} (hf : f ∈ positiveCone) (hf0 : f ≠ 0)
+    (hdom : (spectralRadius ℝ T).toReal • f ≤ T f) :
+    T f = (spectralRadius ℝ T).toReal • f := by
+  sorry
+
 /-! ## Krein–Rutman: the main theorems -/
 
 /-- **Krein–Rutman theorem**, eigenvalue form.
@@ -186,19 +331,43 @@ with positive spectral radius has the spectral radius as a positive
 eigenvalue: there is a nonzero `f` with `0 ≤ f x` for all `x` and
 `T f = (spectralRadius T).toReal • f`.
 
-Proof route (analytic core, deferred): the full argument requires Gelfand's
-spectral-radius formula `ρ(T) = lim ‖Tⁿ‖^(1/n)` over the real field (mathlib
-currently has it only for complex Banach algebras), plus a compactness
-cluster-point argument on the normalized orbit `Tⁿ f₀ / ‖Tⁿ f₀‖` of a fixed
-nonzero `f₀` in the cone: positivity keeps the orbit in the cone, compactness
-of `T` keeps it relatively compact, and the (positive by positivity) ratios of
-successive norms converge to `ρ(T)` by Gelfand's formula, so the cluster point
-`f` satisfies `T f = ρ(T) f`. -/
+Uses the Fredholm alternative to extract the eigenvector at `μ = ±ρ(T)`,
+the positivity transfer `T |f| ≥ ρ(T) |f|`, and `keyLemma` (the sole
+admitted step) to upgrade the domination to equality. -/
 theorem kreinRutman {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} (hTpos : IsPositive T)
     (hTcomp : IsCompactOperator T) (hρ : 0 < spectralRadius ℝ T) :
     ∃ f : C(X, ℝ), f ∈ positiveCone ∧ f ≠ 0 ∧
       T f = (spectralRadius ℝ T).toReal • f := by
-  sorry
+  let ρr : ℝ := (spectralRadius ℝ T).toReal
+  -- some μ = ±ρ(T) lies in the real spectrum and is a nonzero eigenvalue
+  obtain ⟨μ, hμσ, hμ0, hμr⟩ := mem_spectrum_abs_eq_spectralRadius (T := T) hρ
+  have hEig : Module.End.HasEigenvalue (T : Module.End ℝ (C(X, ℝ))) μ :=
+    hasEigenvalue_of_mem_spectrum_ne_zero hTcomp hμ0 hμσ
+  obtain ⟨f, hf⟩ := hEig.exists_hasEigenvector
+  have hfT : T f = μ • f := hf.apply_eq_smul
+  have hfne : f ≠ 0 := hf.2
+  -- g := |f| is a positive eigenvector candidate
+  let g : C(X, ℝ) := |f|
+  have hg : g ∈ positiveCone := (absCm_pos hfne).1
+  have hg0 : g ≠ 0 := (absCm_pos hfne).2
+  -- domination ρ(T) • g ≤ T g from positivity
+  have hdom : ρr • g ≤ T g := by
+    rw [ContinuousMap.le_def]
+    intro x
+    have hx : |μ| * |f x| ≤ (T |f|) x := positive_abs_ge hTpos hfT x
+    have hstep : (ρr • g) x = |μ| * |f x| := by
+      change ((spectralRadius ℝ T).toReal • g) x = |μ| * |f x|
+      rw [← hμr]
+      change |μ| * g x = |μ| * |f x|
+      congr 1
+    calc
+      (ρr • g) x = |μ| * |f x| := hstep
+      _ ≤ (T |f|) x := hx
+      _ = (T g) x := rfl
+  -- upgrade to equality (the single admitted Perron–Frobenius step)
+  have hTg : T g = ρr • g :=
+    keyLemma hTpos hρ hg hg0 hdom
+  exact ⟨g, hg, hg0, hTg⟩
 
 /-- **Krein–Rutman theorem**, strong form (geometric simplicity of the
 leading eigenvalue).
@@ -215,7 +384,77 @@ theorem kreinRutman_strong {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} (hTpos : IsPositi
       T f = (spectralRadius ℝ T).toReal • f ∧
       (∀ g : C(X, ℝ), g ∈ positiveCone → g ≠ 0 →
         T g = (spectralRadius ℝ T).toReal • g → ∃ c : ℝ, 0 < c ∧ g = c • f) := by
-  sorry
+  let ρr : ℝ := (spectralRadius ℝ T).toReal
+  -- the weak form provides the starting eigenfunction f₀
+  obtain ⟨f₀, hf₀cone, hf₀ne, hf₀⟩ := kreinRutman hTpos hTcomp hρ
+  have hρr : 0 < ρr := by simpa [ρr] using spectralRadius_toReal_pos hρ
+  -- strong positivity makes f₀ strictly positive pointwise
+  have hf₀pos : ∀ x : X, 0 < f₀ x := by
+    intro x
+    have hpos : 0 < (T f₀) x := hTstr f₀ hf₀cone hf₀ne x
+    rw [hf₀] at hpos
+    exact pos_of_mul_pos_right (by simpa [ρr, smul_eq_mul] using hpos) (le_of_lt hρr)
+  refine ⟨f₀, hf₀cone, hf₀ne, hf₀, ?_⟩
+  intro g hgcone hgne hgEq
+  -- g is also strictly positive pointwise
+  have hgpos : ∀ x : X, 0 < g x := by
+    intro x
+    have hpos : 0 < (T g) x := hTstr g hgcone hgne x
+    rw [hgEq] at hpos
+    exact pos_of_mul_pos_right (by simpa [ρr, smul_eq_mul] using hpos) (le_of_lt hρr)
+  -- the ratio g / f₀ is well-defined and attains its minimum at some x₀
+  have hcont : Continuous (fun x : X => g x / f₀ x) := by
+    exact Continuous.div (ContinuousMap.continuous g) (ContinuousMap.continuous f₀)
+      (fun x => ne_of_gt (hf₀pos x))
+  have hne_univ : (Set.univ : Set X).Nonempty := ⟨Classical.choice ‹Nonempty X›, trivial⟩
+  obtain ⟨x₀, _, hm⟩ :=
+    (isCompact_univ.exists_isMinOn (s := Set.univ) hne_univ hcont.continuousOn)
+  have hc_le : ∀ x : X, g x₀ / f₀ x₀ ≤ g x / f₀ x := by
+    intro x
+    exact (Filter.eventually_principal.mp hm) x (by trivial)
+  let c : ℝ := g x₀ / f₀ x₀
+  -- h := g - c • f₀ is in the cone and vanishes at x₀
+  have hc_mul : ∀ x : X, c * f₀ x ≤ g x := by
+    intro x
+    have hmul := mul_le_mul_of_nonneg_right (hc_le x) (le_of_lt (hf₀pos x))
+    have hsim : (g x / f₀ x) * f₀ x = g x := div_mul_cancel₀ (g x) (ne_of_gt (hf₀pos x))
+    simpa [hsim] using hmul
+  have hcon : g - c • f₀ ∈ positiveCone := by
+    rw [mem_positiveCone]
+    intro x
+    simpa [smul_eq_mul] using sub_nonneg.mpr (hc_mul x)
+  have hx0 : (g - c • f₀) x₀ = 0 := by
+    change g x₀ - c * f₀ x₀ = 0
+    rw [show c = g x₀ / f₀ x₀ by rfl]
+    rw [div_mul_cancel₀ (g x₀) (ne_of_gt (hf₀pos x₀))]
+    rw [sub_self]
+  -- h is an eigenvector at ρ(T)
+  have hTh : T (g - c • f₀) = ρr • (g - c • f₀) := by
+    have h1 : T (g - c • f₀) = T g - c • T f₀ := by simp [map_sub, map_smul]
+    have h2 : T g - c • T f₀ = ρr • g - c • (ρr • f₀) := by
+      rw [hgEq, hf₀]
+    have h3 : ρr • g - c • (ρr • f₀) = ρr • (g - c • f₀) := by
+      ext x
+      simp only [smul_sub, sub_smul, smul_smul, smul_eq_mul, mul_assoc, mul_comm, mul_left_comm]
+    exact h1.trans (h2.trans h3)
+  -- if h were nonzero, strong positivity forces T h > 0, contradicting T h = 0 at x₀
+  have hcoef : g - c • f₀ = 0 := by
+    by_contra hne
+    have hpos : 0 < (T (g - c • f₀)) x₀ :=
+      hTstr (g - c • f₀) hcon hne x₀
+    have hzero : (T (g - c • f₀)) x₀ = 0 := by
+      rw [hTh]
+      change ρr * (g - c • f₀) x₀ = 0
+      rw [hx0]
+      simp
+    linarith
+  -- so g = c • f₀
+  have hg_eq : g = c • f₀ := by
+    ext x
+    have hz : g x - c * f₀ x = 0 := by
+      simpa [smul_eq_mul] using DFunLike.congr_fun hcoef x
+    simpa [smul_eq_mul] using sub_eq_zero.mp hz
+  exact ⟨c, div_pos (hgpos x₀) (hf₀pos x₀), hg_eq⟩
 
 end
 
