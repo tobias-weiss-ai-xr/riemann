@@ -337,6 +337,47 @@ theorem kreinRutman_core {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} (hTpos : IsPositive
       T f = (spectralRadius ℝ T).toReal • f := by
   sorry
 
+/-- **Spectral-radius eigenvector with domination**:
+For a compact, positive operator `T` with `0 < ρ(T)`, there exists a
+nonzero vector `v` (real, not necessarily positive) and a real eigenvalue
+`μ` with `|μ| = ρ(T)` such that `T v = μ • v` and the pointwise domination
+`ρ(T) · |v(x)| ≤ (T |v|)(x)` holds for all `x`.
+
+This lemma combines `mem_spectrum_abs_eq_spectralRadius`,
+`hasEigenvalue_of_mem_spectrum_ne_zero`, and `positive_abs_ge` into a
+single statement that is the starting point of the Gelfand orbit proof
+strategy for Krein–Rutman.  It provides a nonzero `|v|` on the cone with
+`T |v| ≥ ρ(T) |v|`, which can then be normalized and passed to the limit
+along the orbit `Tⁿ e` for any cone vector `e`.
+
+The lemma does not claim `v` itself is positive — that's exactly what
+`kreinRutman_core` aims to prove.  This intermediate result is a true,
+fully verified lemma and serves as infrastructure for the frontier.
+-/
+theorem exists_eigenvector_with_domination {T : C(X, ℝ) →L[ℝ] C(X, ℝ)}
+    (hTpos : IsPositive T) (hTcomp : IsCompactOperator T)
+    (hρ : 0 < spectralRadius ℝ T) :
+    ∃ v : C(X, ℝ), v ≠ 0 ∧ ∃ μ : ℝ,
+      |μ| = (spectralRadius ℝ T).toReal ∧ T v = μ • v ∧
+      ∀ x : X, (spectralRadius ℝ T).toReal * |v x| ≤ (T |v|) x := by
+  -- spectral value lemma gives μ with |μ| = ρ(T) in spectrum
+  obtain ⟨μ, hμσ, hμ0, hμρ⟩ := mem_spectrum_abs_eq_spectralRadius (T := T) hρ
+  -- Fredholm alternative gives eigenvector v for μ ≠ 0
+  have hμ0' : μ ≠ 0 := by simpa [hμρ] using hμ0
+  have hμeig : Module.End.HasEigenvalue (T : Module.End ℝ (C(X, ℝ))) μ :=
+    hasEigenvalue_of_mem_spectrum_ne_zero hTcomp hμ0' hμσ
+  -- Use the eigenvector given by HasEigenvalue
+  obtain ⟨v, hv⟩ := hμeig.exists_hasEigenvector
+  -- hv : f.HasEigenvector μ v is a conjunction: v ∈ eigenspace ∧ v ≠ 0
+  have hvT : T v = μ • v := by
+    exact Module.End.HasEigenvector.apply_eq_smul (f := (T : Module.End ℝ (C(X, ℝ)))) (μ := μ)
+      (x := v) hv
+  have hv0 : v ≠ 0 := hv.2
+  -- positivity transfer gives the domination
+  refine ⟨v, hv0, μ, hμρ, hvT, fun x => ?_⟩
+  rw [← hμρ]
+  exact positive_abs_ge hTpos hvT x
+
 /-! ## Krein–Rutman: the main theorems -/
 
 /-- **Krein–Rutman theorem**, eigenvalue form.
