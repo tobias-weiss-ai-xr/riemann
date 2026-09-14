@@ -290,7 +290,7 @@
       ],
       "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.ComplexificationSpectrum chemie-lernen.org lean/Riemann/ComplexificationSpectrum.lean",
       "acceptance_prose": "lake build Riemann.ComplexificationSpectrum exits 0 on chemie-lernen.org; total sorries in ComplexificationSpectrum.lean <= 1 and documented; no axiom, no weakening; only the new file touched.",
-      "manual": false,
+      "manual": true,
       "remote": "chemie-lernen.org"
     },
     {
