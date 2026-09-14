@@ -263,7 +263,46 @@ has only the complex upper bound (complex-analytic power-series radius); the
 docstring names the two PR paths (generalize to `NontriviallyNormedField`, or
 an intrinsic real Beurling–Gelfand argument).  Once that one bound exists,
 `kreinRutman_core` closes by the Gelfand-orbit/cluster-point argument built on
-RH-26's domination + RH-28's resolvent positivity.  **Route 3 was probed by a
+RH-26's domination + RH-28's resolvent positivity.
+
+**RH-30 (merged) closed route 2 all the way to the spectral radius**: for
+`IsPositive T`, `0 < λ`, `(spectralRadius ℝ T).toReal < λ`, the resolvent
+`Ring.inverse (λ • 1 - T)` is provably positive
+(`resolvent_positivity_at_radius`).  The bridge is the bounded-orbit estimate
+`eventually_pow_norm_le` (`‖Tⁿ‖ ≤ C · ((ρ.toReal) + ε)ⁿ` from
+`realGelfandFormula`, converted through ENNReal to an eventual power bound,
+the finitely many early terms absorbed into `C`) and the Neumann series at the
+radius `resolvent_neumann_series_at_radius` (geometric summability with ratio
+`(ρ + ε)/λ < 1`; telescoping + continuity of left/right multiplication in the
+`NormedRing` `E →L[ℝ] E` give the two-sided inverse).  KreinRutman.lean
+remains at exactly one sorry (`kreinRutman_core`); zero new sorries added.
+
+**RH-31 (merged) proved the whole orbit-closure half** in new file
+`lean/Riemann/OrbitClosure.lean` (zero sorries, zero admits):
+`superharmonicOrbit T ρ w n := (ρ⁻¹)ⁿ • Tⁿ w` with proved `_mem` (stays on
+the cone), `_nonzero`, `_mono` (pointwise increasing), `_navigation`
+(`T orbitₙ = ρ • orbitₙ₊₁`), a generic `norm_le_of_nonneg_le`, AND (beyond
+the hypothesis-form contract) a **proved** `orbit_bounded` — but only under
+the extra hypothesis that a dominating eigenvector `v` (`w ≤ v`, `T v = ρ•v`)
+already exists (`0 ≤ orbitₙ ≤ v`).  The main theorem
+`bounded_orbit_yields_positive_eigenvector` then closes: a norm-bounded orbit
+plus compact `T` gives a converging subsequence via
+`IsCompact.tendsto_subseq`, the monotone orbit is pointwise majorised by the
+limit `f` (closed-`Ici` argument), and continuity of `T` passes the
+navigation identity through the limit to give `T f = ρ • f` with `f ∈ cone`,
+`f ≠ 0`.  The orbit is increasing from `w` and converges **in norm** (all
+terms between `w` and `f` squeeze), which is the classical cluster-point
+machine.
+
+So the *internal* Krein–Rutman reduction is complete: given a norm-bounded
+orbit, everything else is proved.  Two steps remain to close
+`kreinRutman_core` itself: (a) `realGelfandUpperBound`
+(the single documented sorry — a mathlib gap, not ours), and (b) turning
+`exists_eigenvector_with_domination`'s `w = |v|` with `T w ≥ ρ w` into actual
+orbit boundedness — the deep strictness step, where a strict domination
+`T w > ρ w` combined with resolvent positivity at the radius
+(`resolvent_positivity_at_radius`, now proved) gives the `C`; the residual
+non-strict case is the classical Krein–Rutman dichotomy.  **Route 3 was probed by a
 fleet round (RH-27) and is now
 confirmed blocked at the definition level**: mathlib has no
 `Continuous.re`/`Continuous.im` for `C(X, ℂ)`, so the complexification
@@ -293,7 +332,10 @@ remains the most promising near-term attack.
   one admitted existence statement `kreinRutman_core` (the classical theorem);
   strong form (geometric simplicity) fully proved; a previously admitted false
   "collapse" lemma was detected and removed (RH-25); route-1 scaffold extended
-  with the proved `exists_eigenvector_with_domination` (RH-26) and route-2
-  resolvent positivity + Neumann series (RH-28); the frontier is now exactly
-  `realGelfandUpperBound` (RH-29, one documented sorry in RealGelfand.lean);
+  with the proved `exists_eigenvector_with_domination` (RH-26); route-2
+  resolvent positivity closed all the way to `λ > ρ(T)` (bounded-orbit
+  estimate + Neumann series at the radius, RH-30); the Gelfand-orbit closure
+  half proved in OrbitClosure.lean (RH-31, 0 sorries); the frontier is now
+  exactly `realGelfandUpperBound` (RH-29, one documented sorry in
+  RealGelfand.lean) plus the strictness turn into orbit boundedness;
   complexification route (RH-27) rejected as un-definable in current mathlib.
