@@ -155,6 +155,245 @@ theorem eventually_pow_norm_le {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} (eps : ℝ) (
     simpa using (realGelfandFormula (a := T))
   exact eventually_pow_norm_le_of_gelfand hg heps
 
+
+
+/-- **Neumann (geometric) series identity for the resolvent at the spectral
+radius**: whenever `0 < lam` and the spectral radius satisfies
+`(spectralRadius ℝ T).toReal < lam`, the resolvent `(lam • 1 - T)⁻¹` equals the
+convergent geometric series `Σₙ (lam⁻¹)ⁿ⁺¹ · Tⁿ`, i.e. `Tⁿ / lamⁿ⁺¹` in the scalar
+sense.  The convergence (at `lam` strictly above `ρ(T)`, not just above `‖T‖`) rests
+on the bounded-orbit estimate `eventually_pow_norm_le` (a corollary of the real
+Gelfand formula `Riemann.RealGelfand.realGelfandFormula`). -/
+theorem resolvent_neumann_series_at_radius {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} {lam : ℝ}
+    (hlam : 0 < lam) (hrho : (spectralRadius ℝ T).toReal < lam) :
+    HasSum (fun n : ℕ => (lam⁻¹ : ℝ) ^ (n + 1) • T ^ n)
+      (Ring.inverse (lam • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) - T)) := by
+  obtain ⟨g, hg_ρ, hg_lam : g < lam⟩ := exists_between hrho
+  have hg0 : 0 < g := lt_of_le_of_lt ENNReal.toReal_nonneg hg_ρ
+  let eps : ℝ := g - (spectralRadius ℝ T).toReal
+  have heps : 0 < eps := sub_pos.mpr hg_ρ
+  have hg_eq : (spectralRadius ℝ T).toReal + eps = g := by
+    dsimp [eps]
+    ring
+  obtain ⟨C, hC, hCbound⟩ :=
+    eventually_pow_norm_le (T := T) eps (by simpa [eps] using heps)
+  have hCbound' : ∀ n : ℕ, ‖T ^ n‖ ≤ C * g ^ n := by
+    intro n
+    simpa [hg_eq] using hCbound n
+  let q : ℝ := g / lam
+  have hq0 : 0 ≤ q := by
+    dsimp [q]
+    exact div_nonneg hg0.le hlam.le
+  have hq1 : q < 1 := by
+    dsimp [q]
+    exact (div_lt_one hlam).2 hg_lam
+  let a : ℕ → C(X, ℝ) →L[ℝ] C(X, ℝ) :=
+    fun n => (lam⁻¹ : ℝ) ^ (n + 1) • T ^ n
+  -- termwise norm bound: ‖a n‖ ≤ (C / lam) * q^n (geometric tail)
+  have hterm : ∀ n : ℕ, ‖a n‖ ≤ (C / lam) * q ^ n := by
+    intro n
+    have hlamnn : 0 ≤ (lam⁻¹ : ℝ) ^ (n + 1) :=
+      pow_nonneg (inv_nonneg.mpr hlam.le) (n + 1)
+    calc
+      ‖a n‖ ≤ ‖(lam⁻¹ : ℝ) ^ (n + 1)‖ * ‖T ^ n‖ := by
+        dsimp [a]
+        exact ContinuousLinearMap.opNorm_smul_le ((lam⁻¹ : ℝ) ^ (n + 1)) (T ^ n)
+      _ = (lam⁻¹ : ℝ) ^ (n + 1) * ‖T ^ n‖ := by
+        rw [Real.norm_eq_abs, abs_of_nonneg hlamnn]
+      _ ≤ (lam⁻¹ : ℝ) ^ (n + 1) * (C * g ^ n) := by
+        exact mul_le_mul_of_nonneg_left (hCbound' n) hlamnn
+      _ = (C / lam) * q ^ n := by
+        dsimp [q]
+        field_simp [show lam ≠ 0 by exact ne_of_gt hlam]
+        ring_nf
+        rw [mul_inv_cancel₀ (ne_of_gt hlam), one_mul]
+  -- the bounding geometric series is summable (q < 1)
+  have hgeo : Summable (fun n : ℕ => q ^ n) :=
+    summable_geometric_of_norm_lt_one (x := q)
+      (by simpa [Real.norm_eq_abs, abs_of_nonneg hq0] using hq1)
+  have hnorm : Summable (fun n : ℕ => (C / lam) * q ^ n) := by
+    simpa [smul_eq_mul] using (Summable.const_smul (C / lam) hgeo)
+  have hsum_a : Summable a :=
+    Summable.of_norm_bounded (f := a)
+      (g := fun n : ℕ => (C / lam) * q ^ n) hnorm hterm
+  -- rescale to rT := lam⁻¹ • T: a n = (lam⁻¹) • rT^n
+  let rT : C(X, ℝ) →L[ℝ] C(X, ℝ) := (lam⁻¹ : ℝ) • T
+  let R : C(X, ℝ) →L[ℝ] C(X, ℝ) := ∑' n : ℕ, rT ^ n
+  have hflat : (fun n : ℕ => (lam⁻¹ : ℝ) • rT ^ n) =
+      fun n : ℕ => (lam⁻¹ : ℝ) ^ (n + 1) • T ^ n := by
+    funext n
+    calc
+      (lam⁻¹ : ℝ) • rT ^ n = (lam⁻¹ : ℝ) • ((lam⁻¹ : ℝ) ^ n • T ^ n) := by
+        rw [resolvent_smul_pow]
+      _ = ((lam⁻¹ : ℝ) * (lam⁻¹ : ℝ) ^ n) • T ^ n :=
+        smul_smul (lam⁻¹ : ℝ) ((lam⁻¹ : ℝ) ^ n) (T ^ n)
+      _ = (lam⁻¹ : ℝ) ^ (n + 1) • T ^ n := by rw [pow_succ']
+  have hsum_rT : Summable (fun n : ℕ => rT ^ n) := by
+    have hs : Summable (fun n : ℕ => (lam⁻¹ : ℝ) • rT ^ n) :=
+      hsum_a.congr (fun n => (congr_fun hflat n).symm)
+    simpa [smul_smul, mul_inv_cancel₀ (ne_of_gt hlam)]
+      using (Summable.const_smul lam hs)
+  have hR_sum : HasSum (fun n : ℕ => rT ^ n) R := hsum_rT.hasSum
+  -- the geometric identity (1 - rT) * Σ rT^n = 1 via limits of partial sums
+  let s : ℕ → C(X, ℝ) →L[ℝ] C(X, ℝ) :=
+    fun n => (Finset.range n).sum (fun k : ℕ => rT ^ k)
+  have hS : Tendsto s atTop (𝓝 R) := hR_sum.tendsto_sum_nat
+  have htel : ∀ n : ℕ, (1 - rT) * s n = 1 - rT ^ n := by
+    intro n
+    exact mul_neg_geom_sum rT n
+  have htel' : ∀ n : ℕ, s n * (1 - rT) = 1 - rT ^ n := by
+    intro n
+    exact geom_sum_mul_neg rT n
+  -- rT^n → 0 geometrically (rate q < 1) via the bounded-orbit estimate
+  have hpow0 : Tendsto (fun n : ℕ => rT ^ n) atTop (𝓝 0) := by
+    have hqt : Tendsto (fun n : ℕ => C * q ^ n) atTop (𝓝 0) := by
+      simpa using (tendsto_pow_atTop_nhds_zero_of_lt_one hq0 hq1).const_mul C
+    have hsq : Tendsto (fun n : ℕ => ‖rT ^ n‖) atTop (𝓝 0) :=
+      squeeze_zero (fun n => norm_nonneg (rT ^ n)) (fun n => by
+        calc
+          ‖rT ^ n‖ = ‖(lam⁻¹ : ℝ) ^ n • T ^ n‖ := by rw [resolvent_smul_pow]
+          _ ≤ ‖(lam⁻¹ : ℝ) ^ n‖ * ‖T ^ n‖ := by
+            exact ContinuousLinearMap.opNorm_smul_le ((lam⁻¹ : ℝ) ^ n) (T ^ n)
+          _ = (lam⁻¹ : ℝ) ^ n * ‖T ^ n‖ := by
+            rw [Real.norm_eq_abs, abs_of_nonneg (pow_nonneg (inv_nonneg.mpr hlam.le) n)]
+          _ ≤ (lam⁻¹ : ℝ) ^ n * (C * g ^ n) := by
+            exact mul_le_mul_of_nonneg_left (hCbound' n)
+              (pow_nonneg (inv_nonneg.mpr hlam.le) n)
+          _ = C * q ^ n := by
+            dsimp [q]
+            field_simp [show lam ≠ 0 by exact ne_of_gt hlam]
+            ring_nf) hqt
+    exact (tendsto_zero_iff_norm_tendsto_zero
+      (E := C(X, ℝ) →L[ℝ] C(X, ℝ)) (f := fun n : ℕ => rT ^ n) (a := atTop)).2
+        (by simpa using hsq)
+  -- left-multiplication by (1 - rT) is continuous (norm transfer)
+  have hL : Tendsto (fun n : ℕ => (1 - rT) * s n) atTop (𝓝 ((1 - rT) * R)) := by
+    have hS0 : Tendsto (fun n : ℕ => ‖s n - R‖) atTop (𝓝 0) :=
+      (tendsto_iff_norm_sub_tendsto_zero
+        (E := C(X, ℝ) →L[ℝ] C(X, ℝ)) (f := fun n : ℕ => s n) (a := atTop) (b := R)).1 hS
+    have hcnst : Tendsto (fun n : ℕ => ‖1 - rT‖ * ‖s n - R‖) atTop (𝓝 0) := by
+      simpa using (hS0.const_mul (‖1 - rT‖ : ℝ))
+    have hsq : Tendsto (fun n : ℕ => ‖(1 - rT) * s n - (1 - rT) * R‖) atTop (𝓝 0) :=
+      squeeze_zero (fun n => norm_nonneg ((1 - rT) * s n - (1 - rT) * R)) (fun n => by
+        calc
+          ‖(1 - rT) * s n - (1 - rT) * R‖ = ‖(1 - rT) * (s n - R)‖ := by rw [mul_sub]
+          _ ≤ ‖1 - rT‖ * ‖s n - R‖ := norm_mul_le (1 - rT) (s n - R)) hcnst
+    exact (tendsto_iff_norm_sub_tendsto_zero
+      (E := C(X, ℝ) →L[ℝ] C(X, ℝ)) (f := fun n : ℕ => (1 - rT) * s n) (a := atTop)
+        (b := (1 - rT) * R)).2 hsq
+  -- right-multiplication by (1 - rT) is continuous
+  have hR' : Tendsto (fun n : ℕ => s n * (1 - rT)) atTop (𝓝 (R * (1 - rT))) := by
+    have hS0 : Tendsto (fun n : ℕ => ‖s n - R‖) atTop (𝓝 0) :=
+      (tendsto_iff_norm_sub_tendsto_zero
+        (E := C(X, ℝ) →L[ℝ] C(X, ℝ)) (f := fun n : ℕ => s n) (a := atTop) (b := R)).1 hS
+    have hcnst : Tendsto (fun n : ℕ => ‖s n - R‖ * ‖1 - rT‖) atTop (𝓝 0) := by
+      simpa using (hS0.mul_const (‖1 - rT‖ : ℝ))
+    have hsq : Tendsto (fun n : ℕ => ‖s n * (1 - rT) - R * (1 - rT)‖) atTop (𝓝 0) :=
+      squeeze_zero (fun n => norm_nonneg (s n * (1 - rT) - R * (1 - rT))) (fun n => by
+        calc
+          ‖s n * (1 - rT) - R * (1 - rT)‖ = ‖(s n - R) * (1 - rT)‖ := by rw [sub_mul]
+          _ ≤ ‖s n - R‖ * ‖1 - rT‖ := norm_mul_le (s n - R) (1 - rT)) hcnst
+    exact (tendsto_iff_norm_sub_tendsto_zero
+      (E := C(X, ℝ) →L[ℝ] C(X, ℝ)) (f := fun n : ℕ => s n * (1 - rT)) (a := atTop)
+        (b := R * (1 - rT))).2 hsq
+  -- pass to the limit in the telescoping identities
+  have hL1 : Tendsto (fun n : ℕ => (1 - rT) * s n) atTop (𝓝 1) := by
+    have h1 : Tendsto (fun n : ℕ => 1 - rT ^ n) atTop (𝓝 (1 - 0)) :=
+      tendsto_const_nhds.sub hpow0
+    simpa [htel] using h1
+  have hR2 : Tendsto (fun n : ℕ => s n * (1 - rT)) atTop (𝓝 1) := by
+    have h1 : Tendsto (fun n : ℕ => 1 - rT ^ n) atTop (𝓝 (1 - 0)) :=
+      tendsto_const_nhds.sub hpow0
+    simpa [htel'] using h1
+  have hLR : (1 - rT) * R = 1 := tendsto_nhds_unique hL hL1
+  have hRL : R * (1 - rT) = 1 := tendsto_nhds_unique hR' hR2
+  -- Ring.inverse (1 - rT) = R by the two-sided-inverse characterization
+  let u : (C(X, ℝ) →L[ℝ] C(X, ℝ))ˣ := ⟨1 - rT, R, hLR, hRL⟩
+  have hu : IsUnit (1 - rT) := ⟨u, rfl⟩
+  have hRinv : Ring.inverse (1 - rT) = R := by
+    rw [Ring.inverse_unit (u := u)]
+    rfl
+  -- scale back to lam: Ring.inverse (lam • 1 - T) = lam⁻¹ • R
+  have hM : lam • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) - T = lam • (1 - rT) := by
+    have hsmul : lam • ((lam⁻¹ : ℝ) • T) = T := by
+      rw [smul_smul]
+      rw [mul_inv_cancel₀ (ne_of_gt hlam), one_smul]
+    rw [smul_sub]
+    simp [rT, hsmul]
+  have hres : Ring.inverse (lam • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) - T) =
+      (lam⁻¹ : ℝ) • Ring.inverse (1 - rT) := by
+    calc
+      Ring.inverse (lam • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) - T) =
+          Ring.inverse (lam • (1 - rT)) := by rw [hM]
+      _ = (lam⁻¹ : ℝ) • Ring.inverse (1 - rT) :=
+        resolvent_inverse_smul lam (ne_of_gt hlam) (1 - rT) hu
+  -- the a-series sums to lam⁻¹ • R
+  have hsumA : HasSum a ((lam⁻¹ : ℝ) • R) := by
+    have hsc : HasSum (fun n : ℕ => (lam⁻¹ : ℝ) • rT ^ n) ((lam⁻¹ : ℝ) • R) :=
+      HasSum.const_smul (lam⁻¹ : ℝ) hR_sum
+    convert hsc using 1
+    exact hflat.symm
+  rw [hres, hRinv]
+  exact hsumA
+
+/-- **Resolvent positivity at the spectral radius**: if `T` is a positive operator,
+`0 < lam` and `(spectralRadius ℝ T).toReal < lam`, then the resolvent
+`Ring.inverse (lam • 1 - T)` is well-defined (its Neumann series
+`resolvent_neumann_series_at_radius` converges above `ρ(T)`, not just above `‖T‖`)
+and is itself a positive operator.  This is the positivity half of the
+Krein–Rutman strategy beyond the operator norm: resolvents of positive operators at
+positive levels outside the spectrum are positive. -/
+theorem resolvent_positivity_at_radius {T : C(X, ℝ) →L[ℝ] C(X, ℝ)}
+    (hTpos : IsPositive T) {lam : ℝ} (hlam : 0 < lam)
+    (hrho : (spectralRadius ℝ T).toReal < lam) :
+    IsPositive (Ring.inverse (lam • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) - T)) := by
+  -- the Neumann series converges at the radius and equals the inverse
+  have hsum : HasSum (fun n : ℕ => (lam⁻¹ : ℝ) ^ (n + 1) • T ^ n)
+      (Ring.inverse (lam • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) - T)) :=
+    resolvent_neumann_series_at_radius (T := T) hlam hrho
+  let a : ℕ → C(X, ℝ) →L[ℝ] C(X, ℝ) :=
+    fun n => (lam⁻¹ : ℝ) ^ (n + 1) • T ^ n
+  have htsum : Ring.inverse (lam • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) - T) =
+      ∑' n : ℕ, a n := hsum.tsum_eq.symm
+  have hs : Summable a := hsum.summable
+  -- each summand is a positive operator: (lam⁻¹)ⁿ⁺¹ ≥ 0 and Tⁿ positive
+  have hpos : ∀ n : ℕ, IsPositive (a n) := by
+    intro n
+    dsimp [a]
+    exact IsPositive.smul
+      (pow_nonneg (inv_nonneg.mpr (le_of_lt hlam)) (n + 1)) (hTpos.pow n)
+  -- the infinite sum of positive operators is positive
+  intro g hg
+  rw [mem_positiveCone]
+  intro x
+  have hs_app : Summable (fun n : ℕ => (a n) g) := by
+    let φ : (C(X, ℝ) →L[ℝ] C(X, ℝ)) →L[ℝ] C(X, ℝ) :=
+      ContinuousLinearMap.apply ℝ (C(X, ℝ)) g
+    simpa [φ] using (ContinuousLinearMap.summable φ hs)
+  have happ : (Ring.inverse (lam • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) - T)) g =
+      ∑' n : ℕ, (a n) g := by
+    calc
+      (Ring.inverse (lam • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) - T)) g =
+          (∑' n : ℕ, a n) g := by rw [htsum]
+      _ = ∑' n : ℕ, (a n) g := by
+        let φ : (C(X, ℝ) →L[ℝ] C(X, ℝ)) →L[ℝ] C(X, ℝ) :=
+          ContinuousLinearMap.apply ℝ (C(X, ℝ)) g
+        have hmap := ContinuousLinearMap.map_tsum (φ := φ) hs
+        simpa [φ] using hmap
+  have hx : ((Ring.inverse (lam • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) - T)) g) x =
+      ∑' n : ℕ, (((a n) g) x) := by
+    calc
+      ((Ring.inverse (lam • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) - T)) g) x =
+          (∑' n : ℕ, (a n) g) x := by rw [happ]
+      _ = ∑' n : ℕ, (((a n) g) x) := by
+        have hmap := ContinuousLinearMap.map_tsum (φ := resolvent_eval x) hs_app
+        simpa [resolvent_eval] using hmap
+  have hterm : ∀ n : ℕ, 0 ≤ (((a n) g) x) := by
+    intro n
+    exact (IsPositive.apply_nonneg (hpos n) hg) x
+  rw [hx]
+  exact tsum_nonneg hterm
+
 end
 
 end Riemann
