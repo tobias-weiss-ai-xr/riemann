@@ -243,8 +243,28 @@ over the real field: (1) Gelfand's spectral-radius formula over ℝ (complex
 only), (2) Neumann/resolvent positivity on `(ρ(T), ∞)`, (3) the
 spectral-radius identity between a real operator and its complexification.
 The proved scaffold (`mem_spectrum_abs_eq_spectralRadius`,
-`positive_abs_ge`, `exists_eigenvector_with_domination`) lies on route 1
-and is retained.  **Route 3 was probed by a fleet round (RH-27) and is now
+`positive_abs_ge`, `exists_eigenvector_with_domination`,
+`resolvent_neumann_series`, `resolvent_positivity_at_norm`) lies on routes 1
+and 2 and is retained.  **RH-28 (merged) proved the hard free half of route
+2**: for `IsPositive T`, `0 < λ`, `‖T‖ < λ`, the resolvent
+`Ring.inverse (λ • 1 - T)` is itself positive, via the Neumann series
+`HasSum (fun n => (λ⁻¹)ⁿ⁺¹ • Tⁿ) (Ring.inverse (λ • 1 - T))`
+(`HasSummableGeomSeries` + `NormedRing.inverse_one_sub`; `E →L[ℝ] E` is a
+`NormedRing`).  Extending positivity from `λ > ‖T‖` down to `λ > ρ(T)` is
+the remaining route-2 step.
+
+**RH-29 (merged) reduced the whole frontier to ONE razor-thin admission** in
+new file `lean/Riemann/RealGelfand.lean` (generic, mathlib-PR-ready):
+`realSpectralRadius_le_liminf_pow_nnnorm_pow_one_div` is **proved** (mathlib's
+field-general lower bound at 𝕜 = ℝ), `realGelfandFormula` is **proved** from
+the two bounds, and the single documented sorry is exactly
+`realGelfandUpperBound`: `limsup ‖aⁿ‖₊^(1/n) ≤ spectralRadius ℝ a`.  Mathlib
+has only the complex upper bound (complex-analytic power-series radius); the
+docstring names the two PR paths (generalize to `NontriviallyNormedField`, or
+an intrinsic real Beurling–Gelfand argument).  Once that one bound exists,
+`kreinRutman_core` closes by the Gelfand-orbit/cluster-point argument built on
+RH-26's domination + RH-28's resolvent positivity.  **Route 3 was probed by a
+fleet round (RH-27) and is now
 confirmed blocked at the definition level**: mathlib has no
 `Continuous.re`/`Continuous.im` for `C(X, ℂ)`, so the complexification
 `T_C` of an operator cannot even be defined; the agent's output was a pure
@@ -269,9 +289,11 @@ remains the most promising near-term attack.
 - **Open frontier**: `no_zeros_right_half_plane` (Complete.lean:152) —
   equivalent to RH; a spectral `ρ(L_s) < 1` for Re s > 1/4 would imply it and
   is exactly as hard; the current formalization stops at Re s > 1/2.
-- **Krein–Rutman (KreinRutman.lean)**: weak form reduces to one admitted
-  existence statement `kreinRutman_core` (the classical theorem); strong form
-  (geometric simplicity) fully proved; a previously admitted false "collapse"
-  lemma was detected and removed (RH-25); route-1 scaffold extended with the
-  proved `exists_eigenvector_with_domination` (RH-26); complexification route
-  (RH-27) rejected as un-definable in current mathlib.
+- **Krein–Rutman (KreinRutman.lean + RealGelfand.lean)**: weak form reduces to
+  one admitted existence statement `kreinRutman_core` (the classical theorem);
+  strong form (geometric simplicity) fully proved; a previously admitted false
+  "collapse" lemma was detected and removed (RH-25); route-1 scaffold extended
+  with the proved `exists_eigenvector_with_domination` (RH-26) and route-2
+  resolvent positivity + Neumann series (RH-28); the frontier is now exactly
+  `realGelfandUpperBound` (RH-29, one documented sorry in RealGelfand.lean);
+  complexification route (RH-27) rejected as un-definable in current mathlib.
