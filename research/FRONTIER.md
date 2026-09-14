@@ -225,12 +225,35 @@ classical existence theorem, and the strict-domination collapse is **proved**
 only under strong positivity (inside `kreinRutman_strong`).  Any future code
 must not re-admit the collapse version.
 
+**RH-26 progress (route 1 advanced):** the proved scaffold now includes
+`exists_eigenvector_with_domination`: for compact positive `T` with
+`0 < ρ(T)` there is a nonzero real `v`, a real eigenvalue `μ` with
+`|μ| = (spectralRadius ℝ T).toReal`, `T v = μ • v`, and pointwise
+domination `(spectralRadius ℝ T).toReal • |v(x)| ≤ (T |v|)(x)` for all `x`.
+This is precisely the starting point of the Gelfand-orbit strategy: it
+produces a nonzero `|v|` on the positive cone with `T |v| ≥ ρ(T) |v|`,
+ready to normalize and pass to a cluster point via compactness.  Gate
+passed with `MAX_SORRY=1` (KreinRutman.lean has exactly one sorry =
+`kreinRutman_core`; no admits; no weakened statements).  It was discovered
+mid-round that a worker-agent can smuggle `admit` past a `sorry`-only gate
+— all merges must also grep for `admit`.
+
 Three routes would close `kreinRutman_core`; all are absent from mathlib
 over the real field: (1) Gelfand's spectral-radius formula over ℝ (complex
 only), (2) Neumann/resolvent positivity on `(ρ(T), ∞)`, (3) the
 spectral-radius identity between a real operator and its complexification.
 The proved scaffold (`mem_spectrum_abs_eq_spectralRadius`,
-`positive_abs_ge`) lies on route 1 and is retained.
+`positive_abs_ge`, `exists_eigenvector_with_domination`) lies on route 1
+and is retained.  **Route 3 was probed by a fleet round (RH-27) and is now
+confirmed blocked at the definition level**: mathlib has no
+`Continuous.re`/`Continuous.im` for `C(X, ℂ)`, so the complexification
+`T_C` of an operator cannot even be defined; the agent's output was a pure
+skeleton (every def/theorem a `sorry`, including `def complexificationOp := sorry`)
+and was **rejected** — merging it would reproduce the §1b
+placeholder-model pattern.  Route 3 is dropped until mathlib grows
+`Continuous.re/im` on `C(X, ℂ)`.  Route 2 (Neumann resolvent at λ > ‖T‖ as
+a warm-up, using `NormedRing.inverse_one_sub` / `HasSummableGeomSeries`)
+remains the most promising near-term attack.
 
 ---
 
@@ -249,4 +272,6 @@ The proved scaffold (`mem_spectrum_abs_eq_spectralRadius`,
 - **Krein–Rutman (KreinRutman.lean)**: weak form reduces to one admitted
   existence statement `kreinRutman_core` (the classical theorem); strong form
   (geometric simplicity) fully proved; a previously admitted false "collapse"
-  lemma was detected and removed (RH-25).
+  lemma was detected and removed (RH-25); route-1 scaffold extended with the
+  proved `exists_eigenvector_with_domination` (RH-26); complexification route
+  (RH-27) rejected as un-definable in current mathlib.
