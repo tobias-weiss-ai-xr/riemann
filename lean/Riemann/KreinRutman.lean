@@ -14,28 +14,21 @@ invariant a cone in a Banach space", Amer. Math. Soc. Transl. 26, 199–377.
 
 This file develops the cone-theoretic scaffolding on `C(X, ℝ)` (positive
 cone, positive operators, and their elementary order-theoretic properties),
-and proves both forms of the theorem *modulo a single documented analytic
-admission* — `keyLemma` — which is exactly the Perron–Frobenius step
-"an inequality `ρ(T) f ≤ T f` on the cone cannot be strict".  That lemma is
-the only remaining research frontier in this file: over the real field,
-mathlib currently lacks (a) Gelfand's spectral-radius formula
-(`Mathlib.Analysis.Normed.Algebra.GelfandFormula` is complex-only) and
-(b) an explicit Neumann-series representation of the resolvent `(λ − T)⁻¹`
-on `(ρ(T), ∞)`, either of which would close it.  Everything else — the
-spectral-value lemma `|μ| = ρ(T)` over ℝ via the Fredholm alternative,
-the extraction of an eigenvector, and the positivity transfer `T |f| ≥ ρ |f|`
-— is proved here for real.
+proves a batch of genuine infrastructure over the real field (the spectral
+value lemma `|μ| = ρ(T)`, the Fredholm alternative over ℝ, the positivity
+transfer `T |f| ≥ ρ |f|`), and then proves both forms of the Krein–Rutman
+theorem *modulo a single documented analytic admission* —
+`kreinRutman_core`, the classical existence of a positive spectral-radius
+eigenvector.  That existence statement is the true frontier; see its
+docstring for the counterexample that rules out the sharper "collapse"
+version, and for the three routes that would close it.
 
-Proof outline (given `keyLemma`): `ρ(T) > 0` makes the real spectrum
-`σ(T)` nonempty and compact, so some `μ = ±ρ(T)` lies in it
-(`mem_spectrum_abs_eq_spectralRadius`); by the Fredholm alternative for
-compact operators (`IsCompactOperator.hasEigenvalue_iff_mem_spectrum`) `μ`
-is an eigenvalue with eigenvector `f ≠ 0`.  Positivity then gives
-`T |f| ≥ |μ| |f| = ρ(T) |f|` (`positive_abs_ge`), and `keyLemma` upgrades
-this to equality, so `g = |f|` is the sought positive eigenvector.  The
-strong form additionally uses strong positivity (which forces every positive
-eigenvector to be strictly positive) and the extreme-value theorem on `X` to
-obtain uniqueness up to a positive scalar.
+The weak theorem (`kreinRutman`) is exactly `kreinRutman_core`.  The strong
+theorem (`kreinRutman_strong`, geometric simplicity) is *fully proved* from
+`kreinRutman` plus strong positivity: strong positivity forces every positive
+spectral-radius eigenvector to be strictly positive, and the extreme-value
+theorem on the compact space `X` yields the uniqueness up to a positive
+scalar (the ratio `g / f₀` attains its minimum).
 -/
 
 import Mathlib.Analysis.Normed.Operator.Compact.Basic
@@ -295,31 +288,53 @@ theorem positive_abs_ge {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} (hT : IsPositive T)
     _ = |(T f) x| := hμf
     _ ≤ (T |f|) x := habs
 
-/-! ## The Perron–Frobenius core (the single documented frontier) -/
+/-! ## The Krein–Rutman core (the true, single documented frontier) -/
 
-/-- **Perron–Frobenius core**: for a positive operator with spectral radius
-`ρ(T) > 0`, the cone inequality `ρ(T) • f ≤ T f` forces equality.  In other
-words, no positive vector can be "dominated but not absorbed": the spectral
-radius is a genuine eigenvalue and the domination cannot be strict.
+/-- **Krein–Rutman core (admitted — the single documented frontier)**:
 
-This is the only analytic admission left in this file.  Two classical routes
-close it, and both are currently blocked in mathlib over the real field:
+> A compact, positive operator `T` on `C(X, ℝ)` with positive spectral radius
+> has a nonzero positive eigenfunction at the spectral radius:
+> `∃ f ∈ positiveCone, f ≠ 0, T f = ρ(T) • f`.
+
+This existence statement *is* the classical Krein–Rutman theorem and the
+honest frontier of this file.  Nothing weaker is enough, and nothing
+stronger is true in general.  In particular, earlier drafts admitted the
+sharper **collapse lemma**
+
+  `ρ(T) • f ≤ T f  on the cone  ⟹  T f = ρ(T) • f`
+
+which is **FALSE as stated**.  Counterexample inside `C(X, ℝ)`: take `X` a
+two-point space, so `C(X, ℝ) ≅ ℝ²`, and `T` the matrix `[[2, 1], [0, 2]]`
+(positive, finite-rank hence compact, `ρ(T) = 2 > 0`).  For `f = (0, 1)`
+(nonzero, in the cone) we have `T f = (1, 2) ≥ 2 • (0, 1) = ρ(T) • f`
+strictly, yet `T f ≠ ρ(T) • f`.  So strict domination cannot be ruled out
+from positivity and compactness alone — which is exactly why the strong
+positivity hypothesis in `kreinRutman_strong` is load-bearing (there the
+collapse is *proved*, not admitted).
+
+Three routes would close `kreinRutman_core`; all are currently blocked in
+mathlib over the real field:
 
 1. *Gelfand's formula over ℝ*: show `lim ‖Tⁿ‖^(1/n) = ρ(T)` (the limit
    formula `spectrum.pow_nnnorm_pow_one_div_tendsto_nhds_spectralRadius`
-   exists only over `ℂ`), normalize the orbit `Tⁿ f`, and extract a positive
-   cluster-point eigenvector from compactness of `T`.
-2. *Neumann/resolvent positivity at the radius*: for `λ > ρ(T)` represent
-   `(λ − T)⁻¹ = Σₙ Tⁿ / λⁿ⁺¹` (needs a convergence-radius argument at the
-   spectral radius, not just at `‖T‖⁻¹`), deduce the resolvent is positive,
-   then the classical argument `f = (ρ − T)⁻¹(−h) ≤ 0` forces `h = 0`.
+   exists only over `ℂ`), then normalize `Tⁿ e` along a cone vector and
+   extract a positive cluster-point eigenvector from compactness of `T`.
+2. *Resolvent (Neumann) positivity at the radius*: for `λ > ρ(T)` represent
+   `(λ − T)⁻¹ = Σₙ Tⁿ / λⁿ⁺¹` (needs the convergence-radius argument at the
+   spectral radius, not just at `‖T‖`), get the resolvent positive, then run
+   the classical two-sided domination argument.
+3. *Complexification*: extend `T` to `C(X, ℂ) →L[ℂ] C(X, ℂ)`, transfer the
+   spectral radius, and descend the resulting eigenvector; needs the
+   spectral-radius/spectrum identity between a real operator and its
+   complexification, which mathlib has not yet assembled.
 
-Once either ingredient is available, replace this `sorry` — the remainder of
-`kreinRutman` / `kreinRutman_strong` below is complete. -/
-theorem keyLemma {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} (hT : IsPositive T)
-    (hρ : 0 < spectralRadius ℝ T) {f : C(X, ℝ)} (hf : f ∈ positiveCone) (hf0 : f ≠ 0)
-    (hdom : (spectralRadius ℝ T).toReal • f ≤ T f) :
-    T f = (spectralRadius ℝ T).toReal • f := by
+Until then: `kreinRutman` below is exactly `kreinRutman_core` (one
+admission), and `kreinRutman_strong` is proved from `kreinRutman` plus the
+strong-positivity machinery with *no further admissions*. -/
+theorem kreinRutman_core {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} (hTpos : IsPositive T)
+    (hTcomp : IsCompactOperator T) (hρ : 0 < spectralRadius ℝ T) :
+    ∃ f : C(X, ℝ), f ∈ positiveCone ∧ f ≠ 0 ∧
+      T f = (spectralRadius ℝ T).toReal • f := by
   sorry
 
 /-! ## Krein–Rutman: the main theorems -/
@@ -331,43 +346,16 @@ with positive spectral radius has the spectral radius as a positive
 eigenvalue: there is a nonzero `f` with `0 ≤ f x` for all `x` and
 `T f = (spectralRadius T).toReal • f`.
 
-Uses the Fredholm alternative to extract the eigenvector at `μ = ±ρ(T)`,
-the positivity transfer `T |f| ≥ ρ(T) |f|`, and `keyLemma` (the sole
-admitted step) to upgrade the domination to equality. -/
+This is exactly `kreinRutman_core` — the single documented admission above;
+the scaffold already proved in this file (real spectral value `|μ| = ρ(T)`
+via the Fredholm alternative, the positivity transfer `T |f| ≥ ρ(T) |f|`)
+lies on the direct road to closing that admission and is retained as
+infrastructure for the next step. -/
 theorem kreinRutman {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} (hTpos : IsPositive T)
     (hTcomp : IsCompactOperator T) (hρ : 0 < spectralRadius ℝ T) :
     ∃ f : C(X, ℝ), f ∈ positiveCone ∧ f ≠ 0 ∧
-      T f = (spectralRadius ℝ T).toReal • f := by
-  let ρr : ℝ := (spectralRadius ℝ T).toReal
-  -- some μ = ±ρ(T) lies in the real spectrum and is a nonzero eigenvalue
-  obtain ⟨μ, hμσ, hμ0, hμr⟩ := mem_spectrum_abs_eq_spectralRadius (T := T) hρ
-  have hEig : Module.End.HasEigenvalue (T : Module.End ℝ (C(X, ℝ))) μ :=
-    hasEigenvalue_of_mem_spectrum_ne_zero hTcomp hμ0 hμσ
-  obtain ⟨f, hf⟩ := hEig.exists_hasEigenvector
-  have hfT : T f = μ • f := hf.apply_eq_smul
-  have hfne : f ≠ 0 := hf.2
-  -- g := |f| is a positive eigenvector candidate
-  let g : C(X, ℝ) := |f|
-  have hg : g ∈ positiveCone := (absCm_pos hfne).1
-  have hg0 : g ≠ 0 := (absCm_pos hfne).2
-  -- domination ρ(T) • g ≤ T g from positivity
-  have hdom : ρr • g ≤ T g := by
-    rw [ContinuousMap.le_def]
-    intro x
-    have hx : |μ| * |f x| ≤ (T |f|) x := positive_abs_ge hTpos hfT x
-    have hstep : (ρr • g) x = |μ| * |f x| := by
-      change ((spectralRadius ℝ T).toReal • g) x = |μ| * |f x|
-      rw [← hμr]
-      change |μ| * g x = |μ| * |f x|
-      congr 1
-    calc
-      (ρr • g) x = |μ| * |f x| := hstep
-      _ ≤ (T |f|) x := hx
-      _ = (T g) x := rfl
-  -- upgrade to equality (the single admitted Perron–Frobenius step)
-  have hTg : T g = ρr • g :=
-    keyLemma hTpos hρ hg hg0 hdom
-  exact ⟨g, hg, hg0, hTg⟩
+      T f = (spectralRadius ℝ T).toReal • f :=
+  kreinRutman_core hTpos hTcomp hρ
 
 /-- **Krein–Rutman theorem**, strong form (geometric simplicity of the
 leading eigenvalue).

@@ -196,6 +196,44 @@ and this document says so instead of claiming a completed proof.
 
 ---
 
+### 3c. Krein–Rutman on C(X, ℝ) — existence is the honest frontier
+
+(`lean/Riemann/KreinRutman.lean`, RH-24/25 state)
+
+The file proves the cone scaffolding, the real spectral-value lemma
+`|μ| = ρ(T)` (Fredholm alternative over ℝ), the positivity transfer
+`T |f| ≥ ρ(T) |f|`, the full strong form `kreinRutman_strong` (geometric
+simplicity — uniqueness up to positive scalar under strong positivity), and
+reduces the weak theorem `kreinRutman` to a **single admitted existence
+statement**
+
+```lean
+theorem kreinRutman_core {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} (hTpos : IsPositive T)
+    (hTcomp : IsCompactOperator T) (hρ : 0 < spectralRadius ℝ T) :
+    ∃ f : C(X, ℝ), f ∈ positiveCone ∧ f ≠ 0 ∧
+      T f = (spectralRadius ℝ T).toReal • f := by
+  sorry
+```
+
+**False-lemma trap (corrected RH-25):** an earlier commit admitted a sharper
+"collapse" lemma — `ρ(T) • f ≤ T f` on the cone forces equality.  That
+statement is **false**: on a two-point `X` (`C(X,ℝ) ≅ ℝ²`), `T = [[2,1],[0,2]]`
+is positive and compact with `ρ(T) = 2`, and `f = (0,1)` satisfies
+`2f = (0,2) < (1,2) = T f` strictly without being an eigenvector.  The
+stronger false lemma has been **removed**; the honest frontier is exactly the
+classical existence theorem, and the strict-domination collapse is **proved**
+only under strong positivity (inside `kreinRutman_strong`).  Any future code
+must not re-admit the collapse version.
+
+Three routes would close `kreinRutman_core`; all are absent from mathlib
+over the real field: (1) Gelfand's spectral-radius formula over ℝ (complex
+only), (2) Neumann/resolvent positivity on `(ρ(T), ∞)`, (3) the
+spectral-radius identity between a real operator and its complexification.
+The proved scaffold (`mem_spectrum_abs_eq_spectralRadius`,
+`positive_abs_ge`) lies on route 1 and is retained.
+
+---
+
 ## 4. One-line summary
 
 - **Proven for real**: bounded Gauss-map operator on C([0,1],ℂ) (§2a), uniform
@@ -208,3 +246,7 @@ and this document says so instead of claiming a completed proof.
 - **Open frontier**: `no_zeros_right_half_plane` (Complete.lean:152) —
   equivalent to RH; a spectral `ρ(L_s) < 1` for Re s > 1/4 would imply it and
   is exactly as hard; the current formalization stops at Re s > 1/2.
+- **Krein–Rutman (KreinRutman.lean)**: weak form reduces to one admitted
+  existence statement `kreinRutman_core` (the classical theorem); strong form
+  (geometric simplicity) fully proved; a previously admitted false "collapse"
+  lemma was detected and removed (RH-25).
