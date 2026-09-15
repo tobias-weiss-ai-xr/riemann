@@ -328,16 +328,40 @@ On top of it **`kreinRutman_core'` is FULLY PROVED** (no sorry): the seed
 `ρ • |v| ≤ T |v|` pointwise, and the dichotomy finishes the job.
 
 So the frontier has collapsed to **exactly one analytic lemma**: the
-unbounded branch of the dichotomy (the normalized-orbit cluster argument).
+β-stabilization gap `cluster_chain_stabilizes` in the unbounded branch.
+
+**RH-35 (merged `bdd5445`) closed the compactness half.** The dispatch agent
+finished but shipped broken work (never committed; unit-ball compactness used —
+false in infinite dimension; `hw0` missing from two lemma signatures — proofs
+false without it). Manual repair salvaged it fully:
+
+* `normalized_orbit_cluster` — **CLOSED, no sorry**. Two-layer
+  `IsCompact.tendsto_subseq` extraction on the *T-images* (`T '' closedBall 0
+  (max ‖T‖ 1)` via `IsCompactOperator.isCompact_closure_image_closedBall`);
+  the scalar limits `b₁, b₂ := ‖h‖/ρ` come for free from norm convergence of
+  the T-images (`continuous_norm` + `ge_of_tendsto`), no compact-interval
+  argument needed. Conclusion: ∃ strictly increasing φ, cluster points
+  `u*, u** ∈ cone` with `‖·‖ = 1` and `T u* = (ρ·β) • u**`, `β ≥ 1`.
+* Soundness repairs: `uNorm_mem`/`superharmonicBeta_ge_one` gained the
+  necessary `hw0`; `cluster_chain_stabilizes` gained `hr : ρ = spectralRadius`
+  (the sorried statement was **false** without it — the RH-34 sub-radius
+  counterexample applies; 4th false-lemma catch of the project, this time
+  pre-merge).
+* Remaining sorry (the analytic gap): the β-stabilization mechanism must
+  force `β = 1` at `ρ = ρ(T)` — the same one admission as before, now with
+  both branches' *bookkeeping* fully proved around it.
+
 `kreinRutman_core` (KreinRutman.lean, still admitted — closing it inside that
 file would need the OrbitClosure import, which is circular) and
 `kreinRutman_core'` (KreinDichotomy.lean, proved modulo the one gap) share
-one conclusion: proving the unbounded branch turns *both* into theorems.
+one conclusion: proving β-stabilization turns *both* into theorems.
 The remaining mechanical step is retiring the KreinRutman.lean sorry by
 relocating `kreinRutman`/`kreinRutman_strong` above the dichotomy (import
 direction flip).  A previously-admitted false "collapse" lemma was detected
 and removed (RH-25); a previously-admitted false Gelfand upper bound was
-detected, formally counterexampled, and removed (RH-32).  **Route 3 was probed by a
+detected, formally counterexampled, and removed (RH-32); a sorried frontier
+statement lacking the spectral-radius hypothesis was caught and fixed
+pre-merge (RH-35).  **Route 3 was probed by a
 fleet round (RH-27) and is now
 confirmed blocked at the definition level**: mathlib has no
 `Continuous.re`/`Continuous.im` for `C(X, ℂ)`, so the complexification
