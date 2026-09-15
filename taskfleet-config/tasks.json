@@ -386,6 +386,17 @@
       "status": "completed",
       "completed_commit": "bdd5445",
       "completed_note": "Manual repair of agent salvage: normalized_orbit_cluster CLOSED (2-layer tendsto_subseq on T-images), cluster_chain_stabilizes gains hr (was false without it). Gate-pass, 1 sorry. Commit bdd5445."
+    },
+    {
+      "id": "RH-36",
+      "title": "Retire kreinRutman_core sorry (import flip)",
+      "status": "completed",
+      "manual": true,
+      "completed_commit": "f939037",
+      "completed_note": "kreinRutman/kreinRutman_strong relocated to KreinDichotomy.lean; kreinRutman := kreinRutman_core'. KreinRutman.lean sorry-free. Repo sorries 2->1 (cluster_chain_stabilizes). Gate-pass.",
+      "scope": [
+        "Done manually in-session 2026-09-15; no dispatch needed."
+      ]
     }
   ]
 }
