@@ -356,6 +356,30 @@ file would need the OrbitClosure import, which is circular) and
 `kreinRutman_core'` (KreinDichotomy.lean, proved modulo the one gap) share
 one conclusion: proving β-stabilization turns *both* into theorems.
 
+**RH-37 (commits `0e7cd2e`, `703146f`, `1c37af9`) built the unconditional
+resolvent-positivity layer (`GelfandPositive.lean`, sorry-free).**  Three
+landed results: (1) the **open-step lemma** `resolvent_positivity_open_step`
+— from a good level `lam` (resolvent exists + positive) the good set contains
+an interval `(lam − δ, lam]` with `δ := 1/‖(lam−T)⁻¹‖`; (2) the **sInf walk**
+`resolvent_positivity_of_gt_spectralRadius` — for positive `T`, EVERY real
+level `lam > spectralRadius` has positive resolvent, unconditionally (no
+`hg` hypothesis): `W` := good levels whose upward ray to `lam₀` is good,
+`sInf W = r` by a closed-step/open-step walk, and `W`'s upward-propagation
+then covers `(r, lam₀]`; (3) the **Gelfand liminf bridge**
+`spectralRadius_le_liminf_pow` (mathlib general-𝕜, valid over ℝ).
+Consequence: `KreinRutman.resolvent_positivity_at_radius` (hypothesis-form,
+RH-30) is now superseded in the regime `lam > ρ(T)` — its `hg` consumers can
+switch to the walk.  **What deliberately did NOT land**: the full real
+Gelfand formula (Tendsto to `spectralRadius ℝ T`).  The limsup ≤ r half is
+false over ℝ in general (rotation `T(x,y) = (−y,x)`: empty real spectrum,
+`‖Tⁿ‖^(1/n) → 1`); positivity must enter essentially.  The two viable
+routes: complexify `T` and apply mathlib's ℂ-Gelfand — needs `‖T_ℂ^n‖ = ‖Tⁿ‖`
+for positive `T` (mathlib has no `C(X, ℂ)` ℝ/ℂ-decomposition, cf. RH-27
+blocking) — or a Kreĭn–Rutman-adjoint argument.  The β-stabilization
+endgame (`cluster_chain_stabilizes`, the repo's single remaining sorry)
+consumes the Gelfand UPPER bound to kill β > 1; that remains the next
+milestone.
+
 **RH-36 (merged `f939037`) retired the duplicate admission.**  The import
 direction flip was executed: `kreinRutman` and `kreinRutman_strong` moved
 from `KreinRutman.lean` into `KreinDichotomy.lean`, and `kreinRutman` is now
