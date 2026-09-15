@@ -341,4 +341,120 @@ theorem resolvent_positivity_closed {T : C(X, ℝ) →L[ℝ] C(X, ℝ)}
   exact (isClosed_positiveCone (X := X)).mem_of_tendsto hconv
     (Filter.Eventually.of_forall fun n => (hpos n).2 hg)
 
+/-- **sInf walk**: for positive `T`, every real level above the spectral radius
+lies in the resolvent set, with positive resolvent. This removes the
+`hg` hypothesis from `resolvent_positivity_at_radius` in the regime
+`spectralRadius < lam`. -/
+theorem resolvent_positivity_of_gt_spectralRadius {T : C(X, ℝ) →L[ℝ] C(X, ℝ)}
+    (hTpos : IsPositive T) {lam : ℝ}
+    (hlam : (spectralRadius ℝ T).toReal < lam) :
+    lam ∈ resolventSet ℝ T ∧
+      IsPositive (Ring.inverse ((lam : ℝ) • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) - T)) := by
+  set r := (spectralRadius ℝ T).toReal with hrdef
+  have hlam₀norm : ‖T‖ < max lam (max ‖T‖ (r + 1) + 1) := by
+    refine lt_of_lt_of_le ?_ (le_max_right lam (max ‖T‖ (r + 1) + 1))
+    calc ‖T‖ ≤ max ‖T‖ (r + 1) := le_max_left _ _
+      _ < max ‖T‖ (r + 1) + 1 := by linarith
+  set lam₀ := max lam (max ‖T‖ (r + 1) + 1) with hlam₀def
+  set W : Set ℝ := {ν : ℝ | r ≤ ν ∧ ν ≤ lam₀ ∧ ∀ μ : ℝ, ν ≤ μ → μ ≤ lam₀ →
+    μ ∈ resolventSet ℝ T ∧
+      IsPositive (Ring.inverse ((μ : ℝ) • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) - T))} with hWdef
+  have hlamle : lam ≤ lam₀ := le_max_left _ _
+  have hW0 : lam₀ ∈ W := by
+    have hlm₀ : max ‖T‖ (r + 1) + 1 ≤ lam₀ := by
+      rw [hlam₀def]; exact le_max_right lam (max ‖T‖ (r + 1) + 1)
+    refine ⟨le_trans (le_add_of_nonneg_right zero_le_one : r ≤ r + 1)
+      (le_trans (le_max_right ‖T‖ (r + 1))
+        (le_trans (le_add_of_nonneg_right zero_le_one) hlm₀)), le_refl _,
+      fun μ hμ₁ hμ₂ => ?_⟩
+    have hμ0 : μ = lam₀ := le_antisymm hμ₂ hμ₁
+    subst hμ0
+    exact resolvent_positivity_above_norm hTpos hlam₀norm
+  have hbdd : BddBelow W := ⟨r, fun _ hν => hν.1⟩
+  set θ := sInf W with hθdef
+  have hθle : θ ≤ lam₀ := csInf_le hbdd hW0
+  have hθr : r ≤ θ := le_csInf ⟨lam₀, hW0⟩ fun ν hν => hν.1
+  -- the levels of `W` accumulate at `θ`
+  obtain ⟨ν, hνW⟩ : ∃ ν : ℕ → ℝ, ∀ k, ν k ∈ W ∧ ν k < θ + 1 / ((k : ℝ) + 1) := by
+    have hgen : ∀ k : ℕ, ∃ a ∈ W, a < θ + 1 / (((k : ℕ) : ℝ) + 1) := fun k =>
+      (csInf_lt_iff hbdd ⟨lam₀, hW0⟩).mp
+        (by rw [hθdef]; exact lt_add_of_le_of_pos (le_refl _) (by positivity))
+    refine ⟨fun k => Classical.choose (hgen k), fun k => Classical.choose_spec (hgen k)⟩
+  have hwk : ∀ k, θ ≤ ν k ∧ ν k < θ + 1 / ((k : ℝ) + 1) := fun k =>
+    ⟨csInf_le hbdd ((hνW k).1), (hνW k).2⟩
+  have hνtend : Filter.Tendsto ν Filter.atTop (𝓝 θ) := by
+    rw [Metric.tendsto_atTop]
+    intro ε hε
+    obtain ⟨N, hN⟩ := exists_nat_gt ((1 : ℝ) / ε)
+    rw [div_lt_iff₀ hε] at hN
+    have h1 : (1 : ℝ) / ((N : ℕ) + 1) < ε := by
+      rw [div_lt_iff₀ (by positivity : (0:ℝ) < ((N : ℕ) : ℝ) + 1)]
+      have hring : ε * (((N : ℕ) : ℝ) + 1) = (N : ℝ) * ε + ε := by ring
+      linarith [hring, hN]
+    refine ⟨N, fun k hk => ?_⟩
+    have hge : N ≤ k := hk
+    have hθleν : θ ≤ ν k := (hwk k).1
+    have hlt2 : ν k - θ < 1 / ((k : ℝ) + 1) := by linarith [hwk k]
+    calc dist (ν k) θ = |ν k - θ| := Real.dist_eq _ _
+      _ = ν k - θ := abs_of_nonneg (by linarith)
+      _ < 1 / ((k : ℝ) + 1) := hlt2
+      _ ≤ 1 / ((N : ℝ) + 1) :=
+        one_div_le_one_div_of_le (by positivity)
+          (by exact_mod_cast (by omega : (N:ℕ) + 1 ≤ k + 1))
+      _ < ε := h1
+  -- the walk: `θ ≤ r` by contradiction; if `r < θ` then `θ` is a positive resolvent
+  -- level, and the open step at `θ` reaches strictly below `θ` — contradicting minimality
+  have hθle_r : θ ≤ r := by
+    by_contra hcon
+    have hlt : r < θ := lt_of_not_ge hcon
+    have hθpos : 0 < θ := lt_of_le_of_lt ENNReal.toReal_nonneg hlt
+    have htop : spectralRadius ℝ T ≠ ⊤ :=
+      ne_of_lt (lt_of_le_of_lt (@spectrum.spectralRadius_le_nnnorm ℝ _ _ _ _ _ _ T)
+        ENNReal.coe_lt_top)
+    have hcoe : (spectralRadius ℝ T).toNNReal
+        = Real.toNNReal (spectralRadius ℝ T).toReal := by
+      ext; exact (ENNReal.coe_toNNReal_eq_toReal _).trans
+        (Real.coe_toNNReal _ ENNReal.toReal_nonneg).symm
+    have hθres : θ ∈ resolventSet ℝ T := by
+      refine spectrum.mem_resolventSet_of_spectralRadius_lt (k := θ) ?_
+      rw [← ENNReal.coe_toNNReal htop, ENNReal.coe_lt_coe, hcoe,
+        ← Real.toNNReal_eq_nnnorm_of_nonneg hθpos.le]
+      exact (Real.toNNReal_lt_toNNReal_iff (r := (spectralRadius ℝ T).toReal) hθpos).mpr
+        (show (spectralRadius ℝ T).toReal < θ from by rw [← hrdef]; exact hlt)
+    have hθP : IsPositive (Ring.inverse ((θ : ℝ) • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) - T)) :=
+      resolvent_positivity_closed hνtend (fun n =>
+        ((hνW n).1).2.2 (ν n) (le_refl _) ((hνW n).1).2.1) hθres
+    -- the open step at `θ` reaches strictly below `θ`
+    obtain ⟨δ, hδ, hstep⟩ := resolvent_positivity_open_step hθres hθP
+    set μ' := (max r (θ - δ) + θ) / 2 with hμ'def
+    have h2 : (0:ℝ) < 2 := by norm_num
+    have hSlt : max r (θ - δ) < θ := max_lt hlt (by linarith)
+    have hμ'lt : μ' < θ := by
+      rw [div_lt_iff₀ h2, mul_two]; linarith
+    have hμ'gt : max r (θ - δ) < μ' := by
+      rw [lt_div_iff₀ h2, mul_two]; linarith
+    have hμ'r : r < μ' := lt_of_le_of_lt (le_max_left r (θ - δ)) hμ'gt
+    have hθδlt : θ - δ < μ' := lt_of_le_of_lt (le_max_right r (θ - δ)) hμ'gt
+    have hμ'W : μ' ∈ W := by
+      refine ⟨le_of_lt hμ'r, le_of_lt (lt_of_lt_of_le hμ'lt hθle), ?_⟩
+      intro a hale hale₀
+      rcases le_or_gt a θ with ha | ha
+      · exact hstep a (lt_of_lt_of_le hθδlt hale) ha
+      · obtain ⟨b, hbW, hblt⟩ := (csInf_lt_iff hbdd ⟨lam₀, hW0⟩).mp
+          (lt_of_le_of_lt hθdef.symm.le ha)
+        exact hbW.2.2 a (le_of_lt hblt) hale₀
+    exact absurd (lt_of_le_of_lt (csInf_le hbdd hμ'W) hμ'lt) (by linarith)
+  -- `W`'s third component propagates `P` upward: since `sInf W = r`, every level
+  -- above `r` sits above some `ν' ∈ W`, hence has positive resolvent
+  have hθeqr : θ = r := le_antisymm hθle_r hθr
+  have hmain : ∀ μ : ℝ, r < μ → μ ≤ lam₀ →
+      μ ∈ resolventSet ℝ T ∧
+        IsPositive (Ring.inverse ((μ : ℝ) • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) - T)) := by
+    intro μ hμr hμl₀
+    obtain ⟨ν', hν'W, hν'lt⟩ :=
+      (csInf_lt_iff (a := μ) hbdd ⟨lam₀, hW0⟩).mp
+        (by rw [← hθdef, hθeqr]; exact hμr)
+    exact hν'W.2.2 μ (le_of_lt hν'lt) hμl₀
+  exact hmain lam hlam hlamle
+
 end Riemann
