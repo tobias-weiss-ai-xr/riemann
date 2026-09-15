@@ -355,9 +355,15 @@ false without it). Manual repair salvaged it fully:
 file would need the OrbitClosure import, which is circular) and
 `kreinRutman_core'` (KreinDichotomy.lean, proved modulo the one gap) share
 one conclusion: proving β-stabilization turns *both* into theorems.
-The remaining mechanical step is retiring the KreinRutman.lean sorry by
-relocating `kreinRutman`/`kreinRutman_strong` above the dichotomy (import
-direction flip).  A previously-admitted false "collapse" lemma was detected
+
+**RH-36 (merged `f939037`) retired the duplicate admission.**  The import
+direction flip was executed: `kreinRutman` and `kreinRutman_strong` moved
+from `KreinRutman.lean` into `KreinDichotomy.lean`, and `kreinRutman` is now
+literally `kreinRutman_core'` — the weak Krein–Rutman theorem holds modulo
+the single β-stabilization gap, with the strong form (geometric simplicity)
+riding on it unchanged.  `KreinRutman.lean` is **sorry-free**; **the repo
+now carries exactly ONE admission** (`cluster_chain_stabilizes`).
+A previously-admitted false "collapse" lemma was detected
 and removed (RH-25); a previously-admitted false Gelfand upper bound was
 detected, formally counterexampled, and removed (RH-32); a sorried frontier
 statement lacking the spectral-radius hypothesis was caught and fixed
