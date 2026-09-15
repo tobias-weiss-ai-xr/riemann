@@ -294,15 +294,50 @@ navigation identity through the limit to give `T f = ρ • f` with `f ∈ cone`
 terms between `w` and `f` squeeze), which is the classical cluster-point
 machine.
 
-So the *internal* Krein–Rutman reduction is complete: given a norm-bounded
-orbit, everything else is proved.  Two steps remain to close
-`kreinRutman_core` itself: (a) `realGelfandUpperBound`
-(the single documented sorry — a mathlib gap, not ours), and (b) turning
-`exists_eigenvector_with_domination`'s `w = |v|` with `T w ≥ ρ w` into actual
-orbit boundedness — the deep strictness step, where a strict domination
-`T w > ρ w` combined with resolvent positivity at the radius
-(`resolvent_positivity_at_radius`, now proved) gives the `C`; the residual
-non-strict case is the classical Krein–Rutman dichotomy.  **Route 3 was probed by a
+**RH-32 (merged) — the RH-29 "mathlib gap" turned out to be a FALSE lemma, not a
+gap**: pre-round auditing showed `realGelfandUpperBound`
+(`limsup ‖aⁿ‖₊^(1/n) ≤ spectralRadius ℝ a` for a general real normed algebra)
+is refuted by `A := ℂ`, `a := Complex.I`: the real spectrum of `I` is *empty*
+(every `s − I` is a unit with inverse `(s+I)/(s²+1)`), so
+`spectralRadius ℝ I = 0`, while `‖Iⁿ‖ = 1` forces the limsup to be `1`.
+RH-32 formalized this as the proved theorem `counterexampleRotation`
+(RealGelfand.lean now **zero sorries**, zero admits), deleted the false
+`realGelfandUpperBound` together with the derived `realGelfandFormula`, and
+converted the RH-30 chain to honest hypothesis form:
+`eventually_pow_norm_le`, `resolvent_neumann_series_at_radius`,
+`resolvent_positivity_at_radius` now take the Gelfand tendsto
+`hg : ‖Tⁿ‖₊^(1/n) → ρ(T)` as an explicit hypothesis — exactly what their
+proofs consume, and a hypothesis the *positive* operator must still earn
+(over ℂ mathlib's own Gelfand formula supplies it).  Nothing downstream
+depends on the removed falsehood; the second false-admission escape of the
+project (after RH-25's collapse lemma), caught by pre-merge auditing.
+
+**RH-33 (merged) assembled the full dichotomy** in new file
+`lean/Riemann/KreinDichotomy.lean` (imports KreinRutman + OrbitClosure; no
+existing file touched):
+`exists_positive_eigenvector_of_superharmonic` — a nonzero cone seed `w` with
+`ρ • w ≤ T w` (`ρ > 0`) forces a positive exact eigenvector at `ρ`.  The
+**bounded branch is fully proved** (delegation to
+`bounded_orbit_yields_positive_eigenvector`); the **unbounded branch is the
+file's single documented sorry** — the classical normalized-orbit cluster
+argument, sketched in the docstring (`uₙ = orbitₙ/‖orbitₙ‖`; compactness
+gives a cluster chain `u*, u**, …` with `T u* = ρ·ρ* • u**`; the monotone
+orbit must force the scalar ratios to stabilize at an eigenvector).
+On top of it **`kreinRutman_core'` is FULLY PROVED** (no sorry): the seed
+`w := |v|` from RH-26's `exists_eigenvector_with_domination` satisfies
+`ρ • |v| ≤ T |v|` pointwise, and the dichotomy finishes the job.
+
+So the frontier has collapsed to **exactly one analytic lemma**: the
+unbounded branch of the dichotomy (the normalized-orbit cluster argument).
+`kreinRutman_core` (KreinRutman.lean, still admitted — closing it inside that
+file would need the OrbitClosure import, which is circular) and
+`kreinRutman_core'` (KreinDichotomy.lean, proved modulo the one gap) share
+one conclusion: proving the unbounded branch turns *both* into theorems.
+The remaining mechanical step is retiring the KreinRutman.lean sorry by
+relocating `kreinRutman`/`kreinRutman_strong` above the dichotomy (import
+direction flip).  A previously-admitted false "collapse" lemma was detected
+and removed (RH-25); a previously-admitted false Gelfand upper bound was
+detected, formally counterexampled, and removed (RH-32).  **Route 3 was probed by a
 fleet round (RH-27) and is now
 confirmed blocked at the definition level**: mathlib has no
 `Continuous.re`/`Continuous.im` for `C(X, ℂ)`, so the complexification
@@ -328,14 +363,16 @@ remains the most promising near-term attack.
 - **Open frontier**: `no_zeros_right_half_plane` (Complete.lean:152) —
   equivalent to RH; a spectral `ρ(L_s) < 1` for Re s > 1/4 would imply it and
   is exactly as hard; the current formalization stops at Re s > 1/2.
-- **Krein–Rutman (KreinRutman.lean + RealGelfand.lean)**: weak form reduces to
-  one admitted existence statement `kreinRutman_core` (the classical theorem);
-  strong form (geometric simplicity) fully proved; a previously admitted false
-  "collapse" lemma was detected and removed (RH-25); route-1 scaffold extended
-  with the proved `exists_eigenvector_with_domination` (RH-26); route-2
-  resolvent positivity closed all the way to `λ > ρ(T)` (bounded-orbit
-  estimate + Neumann series at the radius, RH-30); the Gelfand-orbit closure
-  half proved in OrbitClosure.lean (RH-31, 0 sorries); the frontier is now
-  exactly `realGelfandUpperBound` (RH-29, one documented sorry in
-  RealGelfand.lean) plus the strictness turn into orbit boundedness;
-  complexification route (RH-27) rejected as un-definable in current mathlib.
+- **Krein–Rutman (KreinRutman.lean + RealGelfand.lean + OrbitClosure.lean +
+  KreinDichotomy.lean)**: weak form reduces to ONE analytic lemma — the
+  unbounded normalized-orbit branch of the superharmonic-seed dichotomy
+  (single documented sorry in KreinDichotomy.lean); strong form (geometric
+  simplicity) fully proved; two previously admitted FALSE lemmas were caught
+  by auditing and removed with formal counterexamples (RH-25 collapse lemma;
+  RH-32 `realGelfandUpperBound` refuted by `Complex.I` — RealGelfand.lean now
+  0 sorries, the RH-30 resolvent chain is honest hypothesis-form);
+  route-1 scaffold proved (`exists_eigenvector_with_domination`, RH-26);
+  route-2 resolvent positivity at `λ > ρ(T)` proved hypothesis-form (RH-30);
+  orbit-closure machine proved (RH-31); bounded-branch dichotomy +
+  `kreinRutman_core'` fully proved (RH-33); complexification route (RH-27)
+  rejected as un-definable in current mathlib.
