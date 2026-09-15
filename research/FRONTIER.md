@@ -429,4 +429,9 @@ remains the most promising near-term attack.
   route-2 resolvent positivity at `λ > ρ(T)` proved hypothesis-form (RH-30);
   orbit-closure machine proved (RH-31); bounded-branch dichotomy +
   `kreinRutman_core'` fully proved (RH-33); complexification route (RH-27)
-  rejected as un-definable in current mathlib.
+  rejected as un-definable in current mathlib; **real Gelfand formula for
+  positive operators fully proved, 0 sorry** (RH-38, GelfandPositive.lean:
+  `gelfand_formula_of_isPositive` via the positivity telescope
+  `‖Tⁿ‖ = ‖Tⁿ1‖` + pointwise domination `‖Tⁿ‖ ≤ μ^{n+1}‖(μ−T)⁻¹1‖` +
+  density-contradiction limsup bound — the upper bound that unblocks
+  `resolvent_positivity_of_gt_spectralRadius`-driven endgame).
