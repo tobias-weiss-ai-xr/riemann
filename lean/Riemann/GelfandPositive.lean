@@ -21,14 +21,17 @@ by an elementary argument that avoids the complexification:
 2. *Partial-sum domination* — with `(λ - T)⁻¹ ≥ 0`, expanding
    `(λ - T)(Σ_{n ≤ M} λ^{-n-1} • Tⁿ) = 1 - λ^{-M-1} • T^{M+1}` shows each
    Neumann partial sum is pointwise dominated by the resolvent.
-3. *Fixed-pair growth* — for `L := limsup ‖Tⁿ‖^{1/n} > ρ` we build ONE fixed
-   pair `x₀ ∈ positiveCone`, `φ₀ ≥ 0` with `limsup φ₀(Tⁿx₀)^{1/n} ≥ L - ε`
-   (thin a near-sup-norm subsequence with `nₖ ≥ k²`, then average with
-   `x₀ = Σ 2⁻ᵏ xₖ`, `φ₀ = Σ 2⁻ᵏ δ_{tₖ}` — positivity makes both averages see
-   every term).
-4. *Contradiction* — by (2) the scalar series `Σ φ₀(Tⁿx₀) λ'⁻ⁿ⁻¹` converges at
-   any `λ' ∈ (ρ, L)`, so its terms tend to 0, forcing
-   `limsup φ₀(Tⁿx₀)^{1/n} ≤ λ' < L`.  Hence `limsup ‖Tⁿ‖^{1/n} ≤ ρ`.
+3. *Upper bound via the positivity telescope* — `‖Tⁿ‖ = ‖Tⁿ1‖`
+   (`norm_eq_apply_one_of_isPositive`), and the telescope identity
+   `μᵏ • w1 = (Tᵏ)(w1) + Σ_{i<k} μ^{k-1-i} • Tⁱ1` with `w = (μ - T)⁻¹ ≥ 0`
+   pointwise-dominates `‖Tᵏ‖ ≤ μ^{k+1} ‖w1‖` for every `μ > ρ`
+   (`pow_norm_le_of_posresolvent`).  Hence
+   `limsup (‖Tⁿ‖₊^{1/n}) ≤ μ` for all `μ > ρ`
+   (`limsup_pow_nnnorm_le`), so `limsup ≤ ρ`
+   (`gelfand_limsup_le_of_isPositive`).
+4. *Assembly* — `gelfand_formula_of_isPositive` combines this upper bound
+   with `spectralRadius_le_liminf_pow` via
+   `tendsto_of_le_liminf_of_limsup_le`.
 5. *Lower bound* — `ρ = sup{|μ| : μ ∈ σ_ℝ(T)}` is attained (the spectrum of a
    bounded operator is compact; if `σ_ℝ(T) = ∅` then `ρ = 0`), every nonzero
    spectral value of a compact operator is an eigenvalue, and an eigenvector
@@ -469,5 +472,286 @@ theorem spectralRadius_le_liminf_pow (T : C(X, ℝ) →L[ℝ] C(X, ℝ)) :
     spectralRadius ℝ T ≤
       Filter.atTop.liminf fun n : ℕ => (‖T ^ n‖₊ : ℝ≥0∞) ^ (1 / n : ℝ) :=
   spectrum.spectralRadius_le_liminf_pow_nnnorm_pow_one_div ℝ T
+
+/-! ## Gelfand's formula over ℝ, the upper bound -/
+
+/-- `(x / n) → 0` along `atTop` in `ℝ`. -/
+theorem tendsto_div_cast_atTop (x : ℝ) :
+    Tendsto (fun n : ℕ => x / (n : ℝ)) atTop (nhds 0) := by
+  have hinv : Tendsto (fun n : ℕ => ((n : ℝ)⁻¹)) atTop (nhds 0) :=
+    tendsto_inv_atTop_zero (𝕜 := ℝ) |>.comp tendsto_natCast_atTop_atTop
+  have h : (fun n : ℕ => x / (n : ℝ)) = fun n : ℕ => x * ((n : ℝ)⁻¹) := by
+    funext n; field_simp
+  rw [h]
+  simpa [mul_zero] using hinv.const_mul x
+
+/-- `(c^(1/n)) → 1` for `c > 0`. -/
+theorem tendsto_rpow_one_div_atTop (c : ℝ) (hc : 0 < c) :
+    Tendsto (fun n : ℕ => c ^ (1 / (n : ℝ))) atTop (nhds 1) := by
+  have hz : Tendsto (fun n : ℕ => Real.log c / (n : ℝ)) atTop (nhds 0) :=
+    tendsto_div_cast_atTop _
+  have hexp : Tendsto (fun n : ℕ => Real.exp (Real.log c / (n : ℝ))) atTop
+      (nhds (Real.exp 0)) := Real.continuous_exp.continuousAt.tendsto.comp hz
+  have hform : (fun n : ℕ => c ^ (1 / (n : ℝ))) =ᶠ[atTop]
+      (fun n : ℕ => Real.exp (Real.log c / (n : ℝ))) := by
+    filter_upwards [Filter.eventually_gt_atTop 0] with n hn
+    rw [Real.rpow_def_of_pos hc]
+    congr 1
+    field_simp
+  simpa using Tendsto.congr' hform.symm hexp
+
+/-- A positive operator on `C(X, ℝ)` attains its operator norm at `1`:
+`‖A‖ = ‖A 1‖`. -/
+theorem norm_eq_apply_one_of_isPositive {A : C(X, ℝ) →L[ℝ] C(X, ℝ)} (hA : IsPositive A) :
+    ‖A‖ = ‖A (1 : C(X, ℝ))‖ := by
+  have h1 : ‖A (1 : C(X, ℝ))‖ ≤ ‖A‖ := by
+    calc ‖A (1 : C(X, ℝ))‖ ≤ ‖A‖ * ‖(1 : C(X, ℝ))‖ :=
+        ContinuousLinearMap.le_opNorm A _
+      _ = ‖A‖ := by simp
+  -- Pointwise domination: `|A f| ≤ A 1` for `‖f‖ ≤ 1`.
+  have hbound : ∀ f : C(X, ℝ), ‖f‖ ≤ 1 → ‖A f‖ ≤ ‖A (1 : C(X, ℝ))‖ := by
+    intro f hf
+    have hfp : f ≤ 1 := by
+      rw [ContinuousMap.le_def]
+      intro x
+      have hx := ((ContinuousMap.norm_le (f := f) (C := (1 : ℝ)) (C0 := zero_le_one)).mp hf) x
+      rw [Real.norm_eq_abs, abs_le] at hx
+      simp only [ContinuousMap.one_apply]
+      linarith
+    have hfn : -1 ≤ f := by
+      rw [ContinuousMap.le_def]
+      intro x
+      have hx := ((ContinuousMap.norm_le (f := f) (C := (1 : ℝ)) (C0 := zero_le_one)).mp hf) x
+      rw [Real.norm_eq_abs, abs_le] at hx
+      show (-1 : ℝ) ≤ f x
+      linarith
+    have hAle : A f ≤ A 1 := hA.monotone hfp
+    have hAge : A (-1) ≤ A f := hA.monotone hfn
+    have habs : ∀ x : X, |A f x| ≤ A (1 : C(X, ℝ)) x :=
+      fun x => abs_le.mpr ⟨by simpa using hAge x, hAle x⟩
+    exact (ContinuousMap.norm_le (f := A f) (C := ‖A (1 : C(X, ℝ))‖)
+      (C0 := norm_nonneg (A (1 : C(X, ℝ))))).mpr fun x => by
+      rw [Real.norm_eq_abs]
+      exact le_trans (habs x) (le_trans (le_abs_self (A (1 : C(X, ℝ)) x))
+        ((A (1 : C(X, ℝ))).norm_coe_le_norm x))
+  -- Rescale to unit norm and back.
+  have hscale : ∀ f : C(X, ℝ), ‖A f‖ ≤ ‖A (1 : C(X, ℝ))‖ * ‖f‖ := by
+    intro f
+    by_cases hf0 : ‖f‖ = 0
+    · have hfz : f = 0 := norm_eq_zero.mp hf0
+      simp [hfz]
+    · have hunit : ‖(‖f‖⁻¹ • f : C(X, ℝ))‖ ≤ 1 := by
+        rw [norm_smul, Real.norm_eq_abs, abs_of_nonneg (by positivity : 0 ≤ ‖f‖⁻¹),
+          inv_mul_cancel₀ hf0]
+      have hposf : 0 < ‖f‖ := lt_of_le_of_ne (norm_nonneg f) (Ne.symm hf0)
+      have hdom := hbound (‖f‖⁻¹ • f) hunit
+      rw [map_smul, norm_smul, Real.norm_eq_abs,
+        abs_of_nonneg (by positivity : 0 ≤ ‖f‖⁻¹)] at hdom
+      have hstep := mul_le_mul_of_nonneg_left hdom (le_of_lt hposf)
+      rw [← mul_assoc, mul_inv_cancel₀ (ne_of_gt hposf), one_mul,
+        mul_comm ‖f‖ ‖A (1 : C(X, ℝ))‖] at hstep
+      exact hstep
+  exact le_antisymm
+    (ContinuousLinearMap.opNorm_le_bound A (norm_nonneg (A (1 : C(X, ℝ)))) hscale) h1
+
+/-- Powers commute with scalar multiplication: `Tⁿ (c • f) = c • Tⁿ f`. -/
+theorem pow_map_smul {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} (c : ℝ) (f : C(X, ℝ)) (k : ℕ) :
+    (T ^ k) (c • f) = c • (T ^ k) f := by
+  induction k generalizing f with
+  | zero => simp
+  | succ k ih =>
+    rw [pow_succ, ContinuousLinearMap.mul_apply, map_smul, ih (T f),
+      ← ContinuousLinearMap.mul_apply, ← pow_succ]
+
+/-- The resolvent telescope: if `w` is a right inverse of `μ • 1 - T` with
+`μ > 0`, then `μ^k • w 1` splits into the `k`-th orbit term plus the scaled
+partial sums of the constant-one orbit. -/
+theorem resolvent_telescope {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} {μ : ℝ} (hμ : 0 < μ)
+    (w : C(X, ℝ) →L[ℝ] C(X, ℝ)) (hw : (μ • 1 - T) * w = 1) (k : ℕ) :
+    (μ ^ k) • w (1 : C(X, ℝ))
+        = (T ^ k) (w (1 : C(X, ℝ)))
+          + ∑ i ∈ Finset.range k, (μ ^ (k - 1 - i)) • (T ^ i) (1 : C(X, ℝ)) := by
+  have hbasic : μ • w (1 : C(X, ℝ)) = T (w (1 : C(X, ℝ))) + 1 := by
+    have h1 : ((μ • 1 - T) * w) (1 : C(X, ℝ)) = (1 : C(X, ℝ)) := by rw [hw]; rfl
+    have h2 := eq_add_of_sub_eq h1
+    rw [add_comm] at h2
+    exact h2
+  induction k with
+  | zero => simp
+  | succ k ih =>
+    have hscale : ∀ i : ℕ, i ∈ Finset.range k →
+        μ • (μ ^ (k - 1 - i)) • (T ^ i) (1 : C(X, ℝ))
+          = (μ ^ (k - i)) • (T ^ i) (1 : C(X, ℝ)) := by
+      intro i hi
+      have hlt : i < k := Finset.mem_range.mp hi
+      have hexp : k - i = (k - 1 - i) + 1 := by omega
+      rw [hexp, smul_smul, ← pow_succ']
+    have hTk : (T ^ k) (T (w (1 : C(X, ℝ)))) = (T ^ (k + 1)) (w (1 : C(X, ℝ))) := by
+      rw [pow_succ, ContinuousLinearMap.mul_apply]
+    rw [Nat.add_sub_cancel, pow_succ, ← smul_smul, smul_comm, ih, smul_add,
+      Finset.smul_sum,
+      Finset.sum_congr rfl (fun i hi => hscale i hi),
+      ← pow_map_smul μ (w (1 : C(X, ℝ))) k, hbasic, map_add, hTk,
+      Finset.sum_range_succ, Nat.sub_self, pow_zero, one_smul]
+    abel
+
+/-- Partial-sum domination: if `w` is a positive right inverse of `μ • 1 - T`
+(`μ > 0`), then the scaled partial orbit sums of `1` are pointwise dominated by
+`μ^k • w 1`. -/
+theorem partial_sum_le_of_posresolvent {T : C(X, ℝ) →L[ℝ] C(X, ℝ)}
+    (hTpos : IsPositive T) {μ : ℝ} (hμ : 0 < μ) {w : C(X, ℝ) →L[ℝ] C(X, ℝ)}
+    (hw : (μ • 1 - T) * w = 1) (hwpos : IsPositive w) (k : ℕ) :
+    ∑ i ∈ Finset.range k, (μ ^ (k - 1 - i)) • (T ^ i) (1 : C(X, ℝ))
+      ≤ (μ ^ k) • w (1 : C(X, ℝ)) := by
+  have hident := resolvent_telescope hμ w hw k
+  have hw1c : w (1 : C(X, ℝ)) ∈ positiveCone := hwpos (fun _ => by exact zero_le_one)
+  have hTk1c : (T ^ k) (w (1 : C(X, ℝ))) ∈ positiveCone := (hTpos.pow' k) hw1c
+  have hTk1pt : ∀ x : X, 0 ≤ ((T ^ k) (w (1 : C(X, ℝ)))) x := hTk1c
+  have hpt : ∀ x : X, (∑ i ∈ Finset.range k, (μ ^ (k - 1 - i)) • (T ^ i) (1 : C(X, ℝ))) x
+      ≤ ((μ ^ k) • w (1 : C(X, ℝ))) x := by
+    intro x
+    have hpt := DFunLike.congr_fun hident x
+    simp only [smul_eq_mul, ContinuousMap.add_apply, ContinuousMap.smul_apply,
+      Finset.sum_apply] at hpt
+    simp only [smul_eq_mul, ContinuousMap.smul_apply, Finset.sum_apply]
+    linarith [hTk1pt x]
+  exact hpt
+
+/-- The Gelfand-type norm bound for positive operators: if `μ > 0` admits a
+positive right inverse `w` of `μ • 1 - T`, then `‖Tⁿ‖ ≤ μ^(n+1) * ‖w 1‖` for
+every `n`. -/
+theorem pow_norm_le_of_posresolvent {T : C(X, ℝ) →L[ℝ] C(X, ℝ)}
+    (hTpos : IsPositive T) {μ : ℝ} (hμ : 0 < μ) {w : C(X, ℝ) →L[ℝ] C(X, ℝ)}
+    (hw : (μ • 1 - T) * w = 1) (hwpos : IsPositive w) (n : ℕ) :
+    ‖T ^ n‖ ≤ μ ^ (n + 1) * ‖w (1 : C(X, ℝ))‖ := by
+  have hsum := partial_sum_le_of_posresolvent hTpos hμ hw hwpos (n + 1)
+  have hsingle : (μ ^ (n + 1 - 1 - n)) • (T ^ n) (1 : C(X, ℝ))
+      ≤ ∑ i ∈ Finset.range (n + 1), (μ ^ (n + 1 - 1 - i)) • (T ^ i) (1 : C(X, ℝ)) := by
+    intro x
+    show ((μ ^ (n + 1 - 1 - n)) • (T ^ n) (1 : C(X, ℝ))) x
+      ≤ (∑ i ∈ Finset.range (n + 1), (μ ^ (n + 1 - 1 - i)) • (T ^ i) (1 : C(X, ℝ))) x
+    have hge : ∀ i ∈ Finset.range (n + 1),
+        0 ≤ ((μ ^ (n + 1 - 1 - i)) • (T ^ i) (1 : C(X, ℝ))) x := fun i _ =>
+      smul_nonneg (pow_nonneg hμ.le _)
+        (((hTpos.pow' i) (fun _ => by exact zero_le_one)) x)
+    have hflat : (∑ i ∈ Finset.range (n + 1),
+          (μ ^ (n + 1 - 1 - i)) • (T ^ i) (1 : C(X, ℝ))) x
+        = ∑ i ∈ Finset.range (n + 1), ((μ ^ (n + 1 - 1 - i)) • (T ^ i) (1 : C(X, ℝ))) x :=
+      map_sum (resolvent_eval x) _ _
+    rw [hflat]
+    calc ((μ ^ (n + 1 - 1 - n)) • (T ^ n) (1 : C(X, ℝ))) x
+        ≤ ((μ ^ (n + 1 - 1 - n)) • (T ^ n) (1 : C(X, ℝ))) x := le_refl _
+      _ ≤ ∑ i ∈ Finset.range (n + 1), ((μ ^ (n + 1 - 1 - i)) • (T ^ i) (1 : C(X, ℝ))) x :=
+        Finset.single_le_sum (f := fun i => ((μ ^ (n + 1 - 1 - i)) • (T ^ i) (1 : C(X, ℝ))) x)
+          hge (Finset.mem_range.mpr (Nat.lt_succ_self n))
+  have hexp : n + 1 - 1 - n = 0 := by omega
+  rw [hexp, pow_zero, one_smul] at hsingle
+  have hw1c : w (1 : C(X, ℝ)) ∈ positiveCone := hwpos (fun _ => by exact zero_le_one)
+  have hcone : (T ^ n) (1 : C(X, ℝ)) ∈ positiveCone :=
+    (hTpos.pow' n) (fun _ => by exact zero_le_one)
+  calc ‖T ^ n‖ = ‖(T ^ n) (1 : C(X, ℝ))‖ :=
+      norm_eq_apply_one_of_isPositive (hTpos.pow' n)
+    _ ≤ ‖(μ ^ (n + 1)) • w (1 : C(X, ℝ))‖ := norm_mono_of_cone hcone (hsingle.trans hsum)
+    _ = μ ^ (n + 1) * ‖w (1 : C(X, ℝ))‖ := by
+      rw [norm_smul, Real.norm_eq_abs, abs_of_nonneg (pow_nonneg hμ.le _)]
+
+/-- The per-`μ` limsup bound: if `μ > 0` exceeds the real spectral radius, then
+positivity of `T` forces `limsup ‖Tⁿ‖₊^(1/n) ≤ μ`. -/
+theorem limsup_pow_nnnorm_le {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} (hTpos : IsPositive T)
+    {μ : ℝ} (hμ : 0 < μ) (hμr : (spectralRadius ℝ T).toReal < μ) :
+    Filter.limsup (fun n : ℕ => (‖T ^ n‖₊ : ℝ≥0∞) ^ (1 / n : ℝ)) Filter.atTop
+      ≤ ENNReal.ofReal μ := by
+  obtain ⟨hmem, hwpos⟩ := resolvent_positivity_of_gt_spectralRadius hTpos hμr
+  have hunit : IsUnit (μ • 1 - T) := hmem
+  have hw : (μ • 1 - T) * Ring.inverse (μ • 1 - T) = 1 := Ring.mul_inverse_cancel _ hunit
+  have hbnd : ∀ n : ℕ,
+      ‖T ^ n‖ ≤ μ ^ (n + 1) * ‖(Ring.inverse (μ • 1 - T)) (1 : C(X, ℝ))‖ :=
+    pow_norm_le_of_posresolvent hTpos hμ hw hwpos
+  by_cases hC : ‖(Ring.inverse (μ • 1 - T)) (1 : C(X, ℝ))‖ = 0
+  · exfalso
+    have h0 := hbnd 0
+    rw [hC, mul_zero] at h0
+    have h1z : ‖T ^ 0‖ = 0 := le_antisymm h0 (norm_nonneg (T ^ 0))
+    have hT0 : T ^ 0 = 0 := (norm_eq_zero (a := T ^ 0)).mp h1z
+    rw [pow_zero] at hT0
+    exact one_ne_zero hT0
+  · have hCpos : 0 < ‖(Ring.inverse (μ • 1 - T)) (1 : C(X, ℝ))‖ :=
+      lt_of_le_of_ne (norm_nonneg _) (Ne.symm hC)
+    have hμt : Tendsto (fun n : ℕ => μ ^ ((n + 1 : ℝ) / n)) Filter.atTop (𝓝 μ) := by
+      have hbase := (tendsto_rpow_one_div_atTop μ hμ).const_mul μ
+      rw [mul_one] at hbase
+      have hexp : (fun n : ℕ => μ ^ ((n + 1 : ℝ) / n))
+          =ᶠ[Filter.atTop] fun n : ℕ => μ * μ ^ (1 / n : ℝ) := by
+        filter_upwards [Filter.eventually_ne_atTop 0] with n hn
+        have hrw : (n + 1 : ℝ) / n = 1 + (1 / (n : ℝ)) := by field_simp
+        rw [hrw, Real.rpow_add hμ, Real.rpow_one]
+      exact Filter.Tendsto.congr' hexp.symm hbase
+    have hCt : Tendsto (fun n : ℕ =>
+        (‖(Ring.inverse (μ • 1 - T)) (1 : C(X, ℝ))‖ ^ (1 / n : ℝ))) Filter.atTop (𝓝 1) :=
+      tendsto_rpow_one_div_atTop _ hCpos
+    have hg : Tendsto
+        (fun n : ℕ => ((μ ^ ((n + 1 : ℕ) : ℝ) * ‖(Ring.inverse (μ • 1 - T)) (1 : C(X, ℝ))‖)
+          ^ (1 / (n : ℝ)))) Filter.atTop (𝓝 μ) := by
+      have hsplit : ∀ n : ℕ,
+          ((μ ^ ((n + 1 : ℕ) : ℝ) * ‖(Ring.inverse (μ • 1 - T)) (1 : C(X, ℝ))‖)
+            ^ (1 / (n : ℝ)))
+            = μ ^ ((n + 1 : ℝ) / n)
+              * (‖(Ring.inverse (μ • 1 - T)) (1 : C(X, ℝ))‖ ^ (1 / (n : ℝ))) := by
+        intro n
+        rw [Real.mul_rpow (Real.rpow_nonneg hμ.le ((n + 1 : ℕ) : ℝ)) (norm_nonneg _)]
+        congr 1
+        rw [← Real.rpow_mul (le_of_lt hμ) ((n + 1 : ℕ) : ℝ) (1 / (n : ℝ))]
+        congr 1
+        cases n with
+        | zero => norm_num
+        | succ m => push_cast; field_simp
+      have h2 := hμt.mul hCt
+      rw [mul_one] at h2
+      exact Tendsto.congr' (Eventually.of_forall fun n => (hsplit n).symm) h2
+    have hpw : ∀ n : ℕ, (‖T ^ n‖₊ : ℝ≥0∞) ^ (1 / (n : ℝ))
+        ≤ ENNReal.ofReal ((μ ^ ((n + 1 : ℕ) : ℝ)
+          * ‖(Ring.inverse (μ • 1 - T)) (1 : C(X, ℝ))‖) ^ (1 / (n : ℝ))) := by
+      intro n
+      have hcast : ((‖T ^ n‖₊ : ℝ≥0) : ℝ≥0∞) = ENNReal.ofReal ‖T ^ n‖ :=
+        ENNReal.coe_nnreal_eq _
+      have hfirst := hbnd n
+      rw [← Real.rpow_natCast] at hfirst
+      rw [hcast, ENNReal.ofReal_rpow_of_nonneg (norm_nonneg (T ^ n)) (by positivity)]
+      exact ENNReal.ofReal_le_ofReal
+        (Real.rpow_le_rpow (norm_nonneg (T ^ n)) hfirst (by positivity))
+    have hvo : Tendsto (fun n : ℕ => ENNReal.ofReal
+        (((μ ^ ((n + 1 : ℕ) : ℝ) * ‖(Ring.inverse (μ • 1 - T)) (1 : C(X, ℝ))‖)
+          ^ (1 / (n : ℝ))))) Filter.atTop (𝓝 (ENNReal.ofReal μ)) :=
+      ((ENNReal.continuous_ofReal).tendsto μ).comp hg
+    refine le_trans (limsup_le_limsup (Filter.Eventually.of_forall hpw)) ?_
+    rw [Filter.Tendsto.limsup_eq hvo]
+
+/-- Gelfand's formula, upper bound over `ℝ` for positive operators: the `limsup`
+half of the real Gelfand formula. -/
+theorem gelfand_limsup_le_of_isPositive {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} (hTpos : IsPositive T) :
+    Filter.limsup (fun n : ℕ => (‖T ^ n‖₊ : ℝ≥0∞) ^ (1 / n : ℝ)) Filter.atTop
+      ≤ spectralRadius ℝ T := by
+  by_cases hr_top : spectralRadius ℝ T = ⊤
+  · rw [hr_top]; exact le_top
+  · by_contra hcon
+    rw [← ENNReal.ofReal_toReal hr_top] at hcon
+    obtain ⟨y, hyc, hyl⟩ := exists_between (not_le.mp hcon)
+    have hyfin : y ≠ ⊤ := fun h1 => absurd (h1 ▸ hyl) (not_lt.2 le_top)
+    have hyr : (spectralRadius ℝ T).toReal < y.toReal :=
+      (ENNReal.toReal_lt_toReal hr_top hyfin).mpr (by
+        rw [← ENNReal.ofReal_toReal hr_top]
+        exact hyc)
+    have hbound := limsup_pow_nnnorm_le hTpos
+      (lt_of_le_of_lt (b := (spectralRadius ℝ T).toReal) (c := y.toReal)
+        ENNReal.toReal_nonneg hyr) hyr
+    exact absurd (le_trans hbound (ENNReal.ofReal_toReal hyfin).le)
+      (not_le.mpr hyl)
+
+/-- **Gelfand's formula over `ℝ` for positive operators.** -/
+theorem gelfand_formula_of_isPositive {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} (hTpos : IsPositive T) :
+    Tendsto (fun n : ℕ => ((‖T ^ n‖₊ : ℝ≥0∞) ^ (1 / n : ℝ))) Filter.atTop
+      (𝓝 (spectralRadius ℝ T)) :=
+  tendsto_of_le_liminf_of_limsup_le (spectralRadius_le_liminf_pow T)
+    (gelfand_limsup_le_of_isPositive hTpos)
 
 end Riemann
