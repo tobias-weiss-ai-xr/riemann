@@ -1,388 +1,391 @@
 {
- "_meta": {
-  "project": "riemann-rh"
- },
- "tasks": [
-  {
-   "id": "RH-1",
-   "title": "Prove transferOperatorBounded and transferOperator_series→CLM assembly in lean/Riemann/TransferOperator/Operator.lean (kill the 2 remaining sorries). Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify lean/lake-manifest.json, lean/lean-toolchain or lean/lakefile.lean — the build environment is pre-seeded; if lake build is slow, just wait. Strategy: define (L_s f) x = tsum of transferOperatorSummand s f n x; each summand is continuous in x (Complex.continuousAt_cpow at nonzero base + composition), the series converges uniformly on Set.Icc 0 1 by Weierstrass M-test with x-free bound ‖f‖ * ((n:ℝ)+1)^(-2*s.re) (use inverse_pow_monotone_x and Real.summable_nat_rpow + summable_nat_add_iff, both already proven in BasicProofs.lean); tsum of continuous functions is continuous via Summable.of_norm in the Banach space C(Set.Icc 0 1, ℂ); linearity from tsum commutation with evaluation (ContinuousLinearMap.map_tsum or hasSum_apply); assemble the ContinuousLinearMap via LinearMap.mkContinuous with bound C = (∑' n, (n+1)^(-2*re s)) * ‖f‖ or via tsum-based operator norm. Grep .lake/packages/mathlib for exact names: continuousAt_cpow, M-test lemmas (tendstoUniformly, hasSum), LinearMap.mkContinuous.",
-   "deps": [],
-   "scope": [
-    "lean/Riemann/TransferOperator/Operator.lean"
-   ],
-   "accept": "GATE_TIMEOUT=2400 bash lean/fleet-gate.sh Riemann.TransferOperator.Operator contextual-intelligence.org lean/Riemann/TransferOperator/Operator.lean",
-   "acceptance_prose": "lake build Riemann exits 0 on host contextual-intelligence.org AND Operator.lean contains no 'sorry'. The def transferOperatorBounded must be the actual tsum-based operator (no placeholder).",
-   "manual": true
+  "_meta": {
+    "project": "riemann-rh"
   },
-  {
-   "id": "RH-2",
-   "title": "Prove the 6 elementary Fleet-3 sorries in lean/Riemann/TransferOperator/GaussMap.lean (continuity of the Gauss map and inverse branches, contraction estimate, monotone bijection). Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify lean/lake-manifest.json, lean/lean-toolchain or lean/lakefile.lean — the build environment is pre-seeded; if lake build is slow, just wait. These are elementary real-analysis facts: continuity of x ↦ 1/(n+1+x) on x>0 (Continuous.inv_ones or Continuous.div with positivity), continuity of fract of 1/x minus floor away from discontinuities, contraction |I x - I y| = |x-y|/((n+1+x)(n+1+y)) ≤ |x-y|/4 (linarith/ring + div_le_div), monotone bijection [0,1] → [1/(n+2), 1/(n+1)] (Monotone + surjectivity via intermediate value or explicit inverse). Grep .lake/packages/mathlib for: Continuous.fract? Real.fract, ContinuousOn, div_le_div_iff, strictMono_incrOn, ContinuousOn.intermediate_value, homeomorph constructors.",
-   "deps": [],
-   "scope": [
-    "lean/Riemann/TransferOperator/GaussMap.lean"
-   ],
-   "accept": "GATE_TIMEOUT=2400 bash lean/fleet-gate.sh Riemann.TransferOperator.GaussMap tobi-yoga lean/Riemann/TransferOperator/GaussMap.lean",
-   "acceptance_prose": "lake build Riemann exits 0 on host tobi-yoga AND GaussMap.lean contains no 'sorry'.",
-   "manual": true
-  },
-  {
-   "id": "RH-3",
-   "title": "Prove riemannZeta_ne_zero_of_re_eq_one in lean/Riemann/PrimeNumberTheorem.lean (Fleet 6 line theorem: riemannZeta s ≠ 0 for Re s = 1, s ≠ 1). Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify lean/lake-manifest.json, lean/lean-toolchain or lean/lakefile.lean — the build environment is pre-seeded; if lake build is slow, just wait. This is the classical Hadamard–de la Vallée Poussin consequence: ζ(s) ≠ 0 on Re s = 1 (s ≠ 1) follows from the non-vanishing of ζ on Re s > 1 and the functional equation / Hadamard product theory, OR from the classical 3-point argument via (1 - 2^{1-s}) ζ(s) = ζ Dirichlet eta relation. Mathlib may already have: grep for riemannZeta ne_zero, RiemannZeta.s_ne_zero, Analysis.RiemannZeta — Mathlib.Mathlib.NumberTheory.RiemannZeta has s_ne_zero_of_one_lt_re or similar; also check Mathlib.NumberTheory.LSeries. If Mathlib has the statement for Re s > 1 only, combine with zeta_reflect (already in the file) and continuity/analytic continuation (riemannZeta_analytic / DifferentiableOn) + identity theorem to push to the line Re s = 1. If truly missing in Mathlib, prove the line theorem via the eta-function limit argument. IMPORTANT: do not introduce axioms; if a substep is out of reach, split it into a documented sorry-lemma ONLY for that substep and explain in the commit message.",
-   "deps": [],
-   "scope": [
-    "lean/Riemann/PrimeNumberTheorem.lean"
-   ],
-   "accept": "GATE_TIMEOUT=2400 bash lean/fleet-gate.sh Riemann.PrimeNumberTheorem chemie-lernen.org lean/Riemann/PrimeNumberTheorem.lean",
-   "acceptance_prose": "lake build Riemann exits 0 on host chemie-lernen.org AND PrimeNumberTheorem.lean contains no 'sorry'.",
-   "manual": true
-  },
-  {
-   "id": "RH-4",
-   "title": "Fill the trace-class / Fredholm determinant skeleton in lean/Riemann/FredholmDeterminants.lean (13 sorries). Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify lean/lake-manifest.json, lean/lean-toolchain or lean/lakefile.lean — the build environment is pre-seeded; if lake build is slow, just wait. Work incrementally: kill the EASIEST sorries first (algebraic identities, norm estimates, finite-rank facts) and leave the genuinely hard analytic ones (nuclear trace theorem, infinite-determinant identities) as clearly-documented one-line sorry-lemmas with a comment explaining exactly what is missing — partial credit counts. Grep .lake/packages/mathlib for: traceClass (Mathlib.Analysis.TraceClass?), NuclearBanach?, Fredholm determinant (likely NOT in mathlib — you must build the finite-dimensional/algebraic version), ContinuousLinearMap.trace, traceExists, Matrix.det, sum of finite rank operators.",
-   "deps": [],
-   "scope": [
-    "lean/Riemann/FredholmDeterminants.lean"
-   ],
-   "accept": "MAX_SORRY=9 GATE_TIMEOUT=2400 bash lean/fleet-gate.sh Riemann.FredholmDeterminants tobias-weiss.org lean/Riemann/FredholmDeterminants.lean",
-   "acceptance_prose": "lake build Riemann exits 0 on host tobias-weiss.org AND the number of 'sorry' occurrences in FredholmDeterminants.lean is strictly lower than 13 (target: 0).",
-   "manual": true
-  },
-  {
-   "id": "RH-5",
-   "title": "Attack the 8 Fleet-5 sorries in lean/Riemann/TransferOperator/Theorem3_3.lean (spectral theory of L_s: eigenvalue, positivity/Krein-Rutman, analytic perturbation). Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify lean/lake-manifest.json, lean/lean-toolchain or lean/lakefile.lean — the build environment is pre-seeded; if lake build is slow, just wait. Work incrementally, easiest first: the constant-function eigenfunction statement (line 47) and the spectralRadius bound (line 84) are elementary given Definitions.lean helpers; Krein-Rutman needs Mathlib's version — grep for kreinRutman, compactOperator, spectralRadius, IsCompactOperator. The analyticity/perturbation sorries may need known mathlib theorems on analyticFredholm / analytic spectrum — grep AnalyticOn, spectrum analytic. If a sorry is genuinely research-level (mixing rules out invariant subspaces), document precisely what is missing as a one-line sorry-lemma and move on — partial credit counts.",
-   "deps": [],
-   "scope": [
-    "lean/Riemann/TransferOperator/Theorem3_3.lean"
-   ],
-   "accept": "MAX_SORRY=5 GATE_TIMEOUT=2400 bash lean/fleet-gate.sh Riemann.TransferOperator.Theorem3_3 mac lean/Riemann/TransferOperator/Theorem3_3.lean",
-   "acceptance_prose": "lake build Riemann exits 0 on host mac AND the number of 'sorry' occurrences in Theorem3_3.lean is strictly lower than 8 (target: 0).",
-   "manual": true
-  },
-  {
-   "id": "RH-6",
-   "title": "Finish the remaining 4 sorries in lean/Riemann/FredholmDeterminants.lean (a previous agent already killed 9; the remaining 4 are documented at the bottom of the file with comments explaining what is missing). Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify lean/lake-manifest.json, lean/lean-toolchain or lean/lakefile.lean. Work easiest-first; if a remaining sorry is genuinely hard (nuclear/trace-class analysis absent from mathlib), leave it documented and kill any other accessible one. Grep .lake/packages/mathlib for trace-class and determinant lemmas before assuming they are missing.",
-   "deps": [
-    "RH-4"
-   ],
-   "scope": [
-    "lean/Riemann/FredholmDeterminants.lean"
-   ],
-   "accept": "MAX_SORRY=2 GATE_TIMEOUT=2400 bash lean/fleet-gate.sh Riemann.FredholmDeterminants tobias-weiss.org lean/Riemann/FredholmDeterminants.lean",
-   "acceptance_prose": "lake build Riemann exits 0 on host tobias-weiss.org AND FredholmDeterminants.lean has at most 2 remaining sorries.",
-   "manual": true
-  },
-  {
-   "id": "RH-7",
-   "title": "Prove the 2 remaining sorries in lean/Riemann/TransferOperator/Operator.lean: transferOperatorBounded (the tsum-based ContinuousLinearMap) and transferOperator_compact (IsCompactOperator). Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify lean/lake-manifest.json, lean/lean-toolchain or lean/lakefile.lean. Strategy for bounded: uniform convergence via M-test with x-free bound; summand continuity via Complex.continuousAt_cpow; assemble with LinearMap.mkContinuous. Strategy for compact: the image of the unit ball is equi-Lipschitz (derivative estimate with summable bound sum_inverse_pow_converges applied to a larger exponent) + uniformly bounded, then Arzela-Ascoli (Mathlib: IsCompactOperator via Equicontinuous + bounded, or ContinuousMap space + ArzelaAscoli theorem CompactSpace Equicontinuous — grep .lake/packages/mathlib for IsCompactOperator and ArzelaAscoli).",
-   "deps": [],
-   "scope": [
-    "lean/Riemann/TransferOperator/Operator.lean"
-   ],
-   "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.TransferOperator.Operator tobi-yoga lean/Riemann/TransferOperator/Operator.lean",
-   "acceptance_prose": "lake build Riemann exits 0 on host tobi-yoga AND Operator.lean contains no sorry.",
-   "manual": true
-  },
-  {
-   "id": "RH-8",
-   "title": "Finish the remaining 3 sorries in lean/Riemann/TransferOperator/Theorem3_3.lean (a previous agent killed 5; remaining 3 are at the bottom, documented). Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify lean/lake-manifest.json, lean/lean-toolchain or lean/lakefile.lean. Work easiest-first. The remaining ones are likely: mixing rules out invariant subspaces (ergodicity), analyticity of lambda_1 + perturbation theory, and the final contradiction — these are research-level; if a sorry needs mathlib machinery that does not exist, leave it documented and explain precisely in a comment what is missing.",
-   "deps": [
-    "RH-5"
-   ],
-   "scope": [
-    "lean/Riemann/TransferOperator/Theorem3_3.lean"
-   ],
-   "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.TransferOperator.Theorem3_3 mac lean/Riemann/TransferOperator/Theorem3_3.lean",
-   "acceptance_prose": "lake build Riemann exits 0 on host mac AND Theorem3_3.lean has at most 1 remaining sorry.",
-   "manual": true
-  },
-  {
-   "id": "RH-9",
-   "title": "Kill as many of the 6 sorries as possible in lean/Riemann/ThermodynamicFormalism.lean (Fleet 4: thermodynamic formalism for the Gauss map transfer operator). Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify lean/lake-manifest.json, lean/lean-toolchain or lean/lakefile.lean. Easiest-first; leave genuinely-missing mathlib machinery documented in comments.",
-   "deps": [],
-   "scope": [
-    "lean/Riemann/ThermodynamicFormalism.lean"
-   ],
-   "accept": "MAX_SORRY=3 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.ThermodynamicFormalism contextual-intelligence.org lean/Riemann/ThermodynamicFormalism.lean",
-   "acceptance_prose": "lake build Riemann exits 0 on host contextual-intelligence.org AND at most 3 sorries remain.",
-   "manual": true
-  },
-  {
-   "id": "RH-10",
-   "title": "Kill as many of the 4 sorries as possible in lean/Riemann/TransferOperator/Complete.lean (Mayer identity chain completion). Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify build-infra files.",
-   "deps": [],
-   "scope": [
-    "lean/Riemann/TransferOperator/Complete.lean"
-   ],
-   "accept": "MAX_SORRY=2 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.TransferOperator.Complete tobias-weiss.org lean/Riemann/TransferOperator/Complete.lean",
-   "acceptance_prose": "lake build Riemann exits 0 on host tobias-weiss.org AND at most 2 sorries remain.",
-   "manual": true
-  },
-  {
-   "id": "RH-11",
-   "title": "Kill the 2 sorries in lean/Riemann/RamanujanProperty.lean. Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify build-infra files.",
-   "deps": [],
-   "scope": [
-    "lean/Riemann/RamanujanProperty.lean"
-   ],
-   "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.RamanujanProperty chemie-lernen.org lean/Riemann/RamanujanProperty.lean",
-   "acceptance_prose": "lake build Riemann exits 0 on host chemie-lernen.org AND at most 1 sorry remains.",
-   "manual": true
-  },
-  {
-   "id": "RH-12",
-   "title": "Kill the 1 sorry in lean/Riemann/TransferOperator/Definitions.lean. Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify build-infra files.",
-   "deps": [],
-   "scope": [
-    "lean/Riemann/TransferOperator/Definitions.lean"
-   ],
-   "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.TransferOperator.Definitions mac lean/Riemann/TransferOperator/Definitions.lean",
-   "acceptance_prose": "lake build Riemann exits 0 on host mac AND zero sorries remain.",
-   "manual": true
-  },
-  {
-   "id": "RH-13",
-   "title": "Kill the last sorry in lean/Riemann/TransferOperator/Theorem3_3.lean (final: contradiction step of Theorem 3.3). A previous agent killed 7 of 8; the last one is documented at the bottom. Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify build-infra files.",
-   "deps": [],
-   "scope": [
-    "lean/Riemann/TransferOperator/Theorem3_3.lean"
-   ],
-   "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.TransferOperator.Theorem3_3 tobi-yoga lean/Riemann/TransferOperator/Theorem3_3.lean",
-   "acceptance_prose": "lake build Riemann exits 0 on host tobi-yoga AND at most 1 sorry remains.",
-   "manual": true
-  },
-  {
-   "id": "RH-14",
-   "title": "Kill the FINAL sorry in lean/Riemann/CompleteProof.lean — this is the capstone assembly of the whole transfer-operator argument. Read the file and lean/PROOF_TASKS_BRIEF.md first; all upstream modules now have their proofs (Operator, Theorem3_3, FredholmDeterminants etc.). NEVER modify build-infra files.",
-   "deps": [],
-   "scope": [
-    "lean/Riemann/CompleteProof.lean"
-   ],
-   "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.CompleteProof mac lean/Riemann/CompleteProof.lean",
-   "acceptance_prose": "lake build Riemann exits 0 on host mac AND zero sorries in the whole Riemann tree.",
-   "manual": true
-  },
-  {
-   "id": "RH-15",
-   "title": "Kill the 1 remaining sorry in lean/Riemann/FredholmDeterminants.lean (nuclear/trace-class residue; a comment documents what is missing). Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify build-infra files.",
-   "deps": [],
-   "scope": [
-    "lean/Riemann/FredholmDeterminants.lean"
-   ],
-   "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.FredholmDeterminants tobias-weiss.org lean/Riemann/FredholmDeterminants.lean",
-   "acceptance_prose": "lake build Riemann exits 0 on host tobias-weiss.org AND zero sorries in the whole Riemann tree.",
-   "manual": true
-  },
-  {
-   "id": "RH-16",
-   "title": "Kill the 1 remaining sorry in lean/Riemann/ThermodynamicFormalism.lean. Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify build-infra files.",
-   "deps": [],
-   "scope": [
-    "lean/Riemann/ThermodynamicFormalism.lean"
-   ],
-   "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.ThermodynamicFormalism contextual-intelligence.org lean/Riemann/ThermodynamicFormalism.lean",
-   "acceptance_prose": "lake build Riemann exits 0 on host contextual-intelligence.org AND zero sorries in the whole Riemann tree.",
-   "manual": true
-  },
-  {
-   "id": "RH-17",
-   "title": "Kill the 1 remaining sorry in lean/Riemann/TransferOperator/Complete.lean. Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify build-infra files.",
-   "deps": [],
-   "scope": [
-    "lean/Riemann/TransferOperator/Complete.lean"
-   ],
-   "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.TransferOperator.Complete chemie-lernen.org lean/Riemann/TransferOperator/Complete.lean",
-   "acceptance_prose": "lake build Riemann exits 0 on host chemie-lernen.org AND zero sorries in the whole Riemann tree.",
-   "manual": true
-  },
-  {
-   "id": "RH-18",
-   "title": "Kill the 1 remaining sorry in lean/Riemann/TransferOperator/Theorem3_3.lean (the previous agent left exactly one, documented at the bottom — likely an analytic perturbation step). Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify build-infra files.",
-   "deps": [],
-   "scope": [
-    "lean/Riemann/TransferOperator/Theorem3_3.lean"
-   ],
-   "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.TransferOperator.Theorem3_3 tobi-yoga lean/Riemann/TransferOperator/Theorem3_3.lean",
-   "acceptance_prose": "lake build Riemann exits 0 on host tobi-yoga AND zero sorries in the whole Riemann tree.",
-   "manual": true
-  },
-  {
-   "id": "RH-19",
-   "title": "Formalize the Krein-Rutman theorem in a NEW file lean/Riemann/KreinRutman.lean: a compact, positive (maps the cone {f | ∀ x, 0 ≤ f x} into itself) operator T on C(X, ℝ) (X compact Hausdorff, e.g. Set.Icc (0:ℝ) 1) with 0 < spectralRadius T has the spectral radius as a POSITIVE eigenvalue: ∃ f ≠ 0, (∀ x, 0 ≤ f x) ∧ T f = spectralRadius T • f. Strong form optional: eigenvalue is geometrically simple if T is strongly positive. Mathlib has NO KreinRutman (grep to confirm) — build from: spectralRadius exists (Mathlib SpectralRadius), compactness via IsCompactOperator (already used in Operator.lean), cone as convex closed set + applying the Schauder fixed-point / Edelstein route OR the positive-minimum argument on the eigenspace equation. Keep it generic (mathlib-PR-ready, Riemann namespace only for the application remark). Grep mathlib for: IsCompactOperator, spectralRadius, ContinuousMap.apply_pos, cone machinery. NEVER modify build-infra files.",
-   "deps": [],
-   "scope": [
-    "lean/Riemann/KreinRutman.lean"
-   ],
-   "accept": "MAX_SORRY=2 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.KreinRutman mac lean/Riemann/KreinRutman.lean",
-   "acceptance_prose": "lake build Riemann exits 0 on host mac AND at most 2 sorries in the new file (target 0).",
-   "manual": true,
-   "remote": "contextual-intelligence.org"
-  },
-  {
-   "id": "RH-20",
-   "title": "Move the Gauss-map transfer operator onto the DISK (Ruelle space), new file lean/Riemann/DiskOperator.lean. Define E := C(Metric.closedBall (0:ℂ) 2, ℂ) (sup norm — reuse FunctionSpace-style CLM pattern from Operator.lean). For fixed s : ℂ with 1/2 < s.re, define L_s f (z) = ∑ (n:ℕ)+1 ≤ N partial, then tsum: L_s f z = tsum fun n => (transferOperatorWeightCm-like weight) * f (1/(n+1+z)) — i.e. weight (n+1+z)^(-s) = cpow, branch OK since |n+1+z| ≥ n ≥ 1 for |z| ≤ 2, n ≥ 1 (NEVER n=0: start the sum at n=1 or shift; check Operator.lean conventions). Prove: (1) each summand is continuous in z (Complex.continuousAt_cpow with n+1+z nonzero — positivity via abs), (2) uniform convergence on the ball by M-test with x-free bound ‖f‖ * (n)^(-s.re) (reuse BasicProofs summability lemmas), (3) hence transferOperatorDisk s : E →L[ℂ] E via LinearMap.mkContinuous, (4) compactness via Arzela-Ascoli exactly as transferOperator_compact in Operator.lean (equi-Lipschitz from weight derivative with s.re shifted, uniformly bounded). This is the Ruelle space where the eventual determinant theory lives. Grep .lake/packages/mathlib for cpow lemmas and reuse Operator.lean verbatim patterns where possible. NEVER modify build-infra files.",
-   "deps": [],
-   "scope": [
-    "lean/Riemann/DiskOperator.lean"
-   ],
-   "accept": "MAX_SORRY=2 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.DiskOperator contextual-intelligence.org lean/Riemann/DiskOperator.lean",
-   "acceptance_prose": "lake build Riemann exits 0 on host contextual-intelligence.org AND at most 2 sorries in the new file (target 0).",
-   "manual": true,
-   "remote": "contextual-intelligence.org"
-  },
-  {
-   "id": "RH-21",
-   "title": "Build finite-rank Fredholm determinant infrastructure, new file lean/Riemann/FredholmFiniteRank.lean. Mathlib has NO nuclear/Fredholm-determinant theory (verified). Target: for a finite-rank A : E →L[ℂ] E on a normed space E, and using a basis of the finite-dimensional range, define det(1 - A) as the Matrix.det of (id + matrix of A) on the range. Practical route: work on FiniteDimensional ℂ E directly first — for A : E →L[ℂ] E with [FiniteDimensional ℂ E], det(1-A) := LinearMap.det (1 - A) (mathlib HAS LinearMap.det for finite-dim: grep LinearMap.det). Prove: (1) multiplicativity det((1-A)(1-B)) = det(1-A) * det(1-B) (from LinearMap.det_mul), (2) det(1-A) ≠ 0 ↔ (1-A) is bijective (LinearMap.det_eq_zero_iff / ker=0+surj), (3) for rank-1 A = fun x => c • (φ x) with φ : E →L[ℂ] ℂ: det(1 - A) = 1 - φ c (compute via matrix in a basis adapting to φ), (4) if 1 is NOT an eigenvalue (IsCompactOperator setting) then det ≠ 0. This is the seed of the eventual infinite-dim determinant. Grep mathlib for LinearMap.det, Matrix.charpoly, LinearMap.det_eq_zero_iff. NEVER modify build-infra files.",
-   "deps": [],
-   "scope": [
-    "lean/Riemann/FredholmFiniteRank.lean"
-   ],
-   "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.FredholmFiniteRank tobias-weiss.org lean/Riemann/FredholmFiniteRank.lean",
-   "acceptance_prose": "lake build Riemann exits 0 on host tobias-weiss.org AND at most 1 sorry in the new file (target 0).",
-   "manual": true,
-   "remote": "tobias-weiss.org"
-  },
-  {
-   "id": "RH-22",
-   "title": "HONESTY PASS on the formalization (no new math): (1) Create research/FRONTIER.md documenting: the chain circularity (fredholmDet s := C(s)⁻¹ * ζ(2s) in Complete.lean is definitional; leadingEigenvalue := exp(1/2 - s) in Theorem3_3.lean is a model, not a spectrum — cite file:line), the PROVEN real results (Gauss-map operator on C([0,1]) bounded+compact, BasicProofs summability, Euler-region nonvanishing, PNT line theorem modulo the strip lemma, functional-equation reflection), and the FRONTIER equivalence: no_zeros_right_half_plane (1/2 < Re < 1) is EQUIVALENT to the RH hard half — ρ(L_s) < 1 for Re s > 1/4 would imply RH, and is exactly as hard. (2) Rename in Theorem3_3.lean: leadingEigenvalue -> modelLeadingEigenvalue (update all references in that file only). (3) Add lean/Riemann/AxiomAudit.lean with #print axioms statements for: riemannZeta_ne_zero_of_re_eq_one, functionalEquation_reflection, riemannHypothesis_criticalStrip, transferOperatorBounded, transferOperator_compact, mayer_identity, fredholmDet_ne_zero_of_one_lt_half — then run `lake env lean lean/Riemann/AxiomAudit.lean` locally to capture output into the file as a comment block. NEVER modify build-infra files. NEVER weaken or delete any theorem statement.",
-   "deps": [],
-   "scope": [
-    "research/FRONTIER.md",
-    "lean/Riemann/TransferOperator/Theorem3_3.lean",
-    "lean/Riemann/AxiomAudit.lean"
-   ],
-   "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.AxiomAudit chemie-lernen.org lean/Riemann/AxiomAudit.lean lean/Riemann/TransferOperator/Theorem3_3.lean",
-   "acceptance_prose": "lake build Riemann exits 0 on host chemie-lernen.org, FRONTIER.md exists with all three sections, renames complete, audit output captured.",
-   "manual": true,
-   "remote": "chemie-lernen.org"
-  },
-  {
-   "id": "RH-23",
-   "title": "PAPER HONESTY PASS: revise paper/transfer-operator-rh.tex + paper/README.md + ABSOLUTE_TRUST.md to the conditional architecture: (1) present the Mayer-operator framework as a CONDITIONAL reduction: RH (strip half) follows from the operator-side spectral bound rho(L_s)<1 for Re s > 1/4 on the Ruelle space — state clearly this bound is exactly as hard as RH and currently unproven; (2) keep and highlight the honest results: PNT line theorem (modulo Hadamard-de la Vallee Poussin), functional-equation reflection, Euler-region nonvanishing via the correspondence, compactness of the C([0,1]) Gauss-map operator, GaussMap mathlib PR #43744; (3) remove/soften any claim that RH is proven or that the current Lean development proves RH — it proves the reduction architecture plus the Euler-region corollaries. German-language root markdown files: do NOT touch. NEVER modify build-infra files.",
-   "deps": [],
-   "scope": [
-    "paper/transfer-operator-rh.tex",
-    "paper/README.md",
-    "ABSOLUTE_TRUST.md"
-   ],
-   "accept": "GATE_TIMEOUT=1200 bash lean/fleet-gate.sh Riemann.CompleteProof tobi-yoga lean/Riemann/CompleteProof.lean",
-   "acceptance_prose": "gate passes trivially (no Lean changes expected); tex/README/ABSOLUTE_TRUST revised per instructions.",
-   "manual": true,
-   "remote": "tobi-yoga"
-  },
-  {
-   "id": "RH-26",
-   "title": "CLOSE OR ADVANCE the single documented frontier in lean/Riemann/KreinRutman.lean: kreinRutman_core (a compact positive operator T on C(X,R) with 0 < spectralRadius R T has a nonzero positive eigenvector f at the spectral radius: exists f in positiveCone, f != 0, T f = (spectralRadius R T).toReal smul f). CRITICAL CONTEXT — the base is the REPAIRED master a722878: an earlier sharper 'collapse' lemma ('rho*f <= T f on the cone forces equality') was **REMOVED** because it is FALSE (counterexample documented in the docstring: X a two-point space, T = [[2,1],[0,2]], f=(0,1) has rho*f = (0,2) < (1,2) = Tf strictly while Tf != rho*f). DO NOT re-admit that collapse lemma or anything equivalent (this is the repo's false-lemma trap; re-admitting it fails the round). DO NOT weaken the statement of kreinRutman_core, kreinRutman, kreinRutman_strong, or any existing theorem. DO NOT introduce axioms. The file currently compiles with exactly ONE sorry (kreinRutman_core); all other theorems are proved. Three routes to close it, all absent from mathlib over the real field: (1) Gelfand's formula over R — prove Tendsto (fun n => ||T^n||^(1/n)) atTop (nhds (spectralRadius R T).toReal) (mathlib's limit formula spectrum.pow_nnnorm_pow_one_div_tendsto_nhds_spectralRadius is complex-only), then for e in positiveCone nonzero with tight orbit, normalize T^n e / ||T^n e|| and extract a positive cluster-point eigenvector from compactness of T (IsCompactOperator); (2) Neumann/resolvent positivity on (rho(T), infty): represent (lambda - T)^-1 = sum_n T^n / lambda^(n+1) with a convergence-radius argument at the spectral radius (not just at ||T||), deduce the resolvent is positive, then run the classical two-sided domination contradiction; (3) complexification spectral-radius transfer (see RH-27's file lean/Riemann/ComplexificationSpectrum.lean). IDEAL OUTCOME: kreinRutman_core genuinely proved (1 sorry -> 0; gate MAX_SORRY=1 lets you land with the sorry still in place). MINIMUM ACCEPTABLE: prove new unambiguous TRUE infrastructure in this same file — e.g. the real Gelfand formula for (not necessarily positive) bounded operators, or resolvent-invertibility/positivity facts — each as its own fully checked lemma, LEAVE the single core sorry in place, and keep total sorries in the file <= 1. A 'close' that merely replaces the sorry with another sorry, weakens a statement, or hides the collapse lemma anywhere will FAIL review. Respect the documented computation quirk: obtain/rcases on an ENNReal-coerced exists times out at default heartbeats — raise set_option maxHeartbeats 5000000 for that declaration; use DFunLike.congr_fun (not congr_fun) on C(X,R) hypotheses. NEVER modify lean/lake-manifest.json, lean/lean-toolchain, lean/lakefile.lean. Run the acceptance gate inside your worktree before committing; commit with message prefix feat(RH-26): or infra(RH-26): .",
-   "deps": [],
-   "scope": [
-    "lean/Riemann/KreinRutman.lean"
-   ],
-   "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.KreinRutman tobi-yoga lean/Riemann/KreinRutman.lean",
-   "acceptance_prose": "lake build Riemann.KreinRutman exits 0 on tobi-yoga; total sorries in KreinRutman.lean <= 1 (0 if the core was genuinely closed); no statement weakened, no axiom, no collapse-lemma resurrection; only scope file touched.",
-   "manual": true,
-   "remote": "tobi-yoga"
-  },
-  {
-   "id": "RH-27",
-   "title": "PROBE the complexification route to the Krein-Rutman frontier: write a NEW file lean/Riemann/ComplexificationSpectrum.lean proving spectral-radius/spectrum transfer lemmas between a real continuous linear map and its complexification, as mathlib-PR-ready infrastructure (Riemann namespace only where unavoidable, generic statements preferred). Context: lean/Riemann/KreinRutman.lean now reduces the Krein-Rutman theorem on C(X,R) to ONE admitted existence lemma (kreinRutman_core); closing it over R needs either a real Gelfand formula, resolvent positivity, or the spectrum/spectralRadius identity between a real operator T : E ->L[R] E and its complexification T_C : E_C ->L[C] E_C. First grep mathlib in .lake/packages/mathlib for existing API: complexification (LinearMap.complexification, ContinuousLinearMap.complexification, Complex.complexification), spectrum + algebra maps, spectralRadius, IsCompactOperator, and check whether C(X,R) complexifies to C(X,C) (ContinuousMap complexification). Prove what is TRUE and machine-checked: e.g. spectrum membership transfer sigma(T) subset sigma(T_C), spectralRadius R T = spectralRadius C T_C (or one-way inequality if that is all that is true), positivity preservation under complexification. Conclude the file with a precise documented 'next-step' comment stating which identity remains open and exactly why (e.g. missing realification lemma in mathlib). DO NOT weaken anything, DO NOT introduce axioms, DO NOT touch any file other than the new one (total sorries in THIS file <= 1 allowed, each must be a documented one-line sorry-lemma with a name and a comment naming the missing mathlib fact). NEVER modify lean/lake-manifest.json, lean/lean-toolchain, lean/lakefile.lean. Run the acceptance gate inside your worktree before committing; commit with message prefix feat(RH-27): or infra(RH-27): .",
-   "deps": [],
-   "scope": [
-    "lean/Riemann/ComplexificationSpectrum.lean"
-   ],
-   "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.ComplexificationSpectrum chemie-lernen.org lean/Riemann/ComplexificationSpectrum.lean",
-   "acceptance_prose": "lake build Riemann.ComplexificationSpectrum exits 0 on chemie-lernen.org; total sorries in ComplexificationSpectrum.lean <= 1 and documented; no axiom, no weakening; only the new file touched.",
-   "manual": true,
-   "remote": "chemie-lernen.org"
-  },
-  {
-   "id": "RH-28",
-   "title": "PROVE the resolvent-positivity warm-up for the Krein-Rutman frontier in lean/Riemann/KreinRutman.lean (Route 2: Neumann/resolvent positivity on (rho(T), infty)). This round is FULLY PROVABLE with NO new sorries — do not admit anything. Deliver, as checked theorems in this file: (1) IsPositive.pow: hT : IsPositive T -> IsPositive (T ^ n) for all n (closed under powers; iterate composition and use the existing IsPositive.monotone / IsPositive.add / IsPositive.smul / isPositive_id in this file). (2) The Neumann series identity at lambda > ||T||: for 0 < lambda and ||T|| < lambda, HasSum (fun n : N => T ^ n / lambda ^ (n + 1)) (Ring.inverse (lambda * 1 - T)) — or equivalently with the scaled operator rT = lambda^-1 * T, HasSum (fun n => rT ^ n) (Ring.inverse (1 - rT)) — using mathlib API: CLM endomorphisms (C(X,R) ->L[R] C(X,R)) ARE a NormedRing (instance toNormedRing in Mathlib/Analysis/Normed/Operator/NormedSpace.lean), C(X,R) is complete so HasSummableGeomSeries applies (instance in Mathlib/Analysis/SpecificLimits/Normed.lean:279, lemma summable_geometric_of_norm_lt_one), and NormedRing.inverse_one_sub (Mathlib/Analysis/Normed/Ring/Units.lean:98) gives inverse (1 - t) = (Units.oneSub t h)^-1 for ||t|| < 1; Ring.inverse of a unit is the true inverse. Rescale carefully to express the resolvent Ring.inverse (lambda * 1 - T). (3) resolvent_positivity_at_norm: for IsPositive T, 0 < lambda, ||T|| < lambda: IsPositive (Ring.inverse (lambda * 1 - T)) — via the Neumann series: every term (rT)^n with rT = lambda^-1 * T is positive (combine IsPositive.pow with IsPositive.smul), and a summable series of positive operators is positive on the cone (for f in positiveCone, show 0 <= (((sum of terms) f) x) termwise via tsum_nonneg / Real.tsum_nonneg on the nonnegative real sequence, since each term maps the cone into itself), then identify the series with the inverse. IMPORTANT: the file already has exactly ONE sorry (kreinRutman_core) which is the documented frontier — the total sorry count in the file must STAY <= 1, i.e. you may add ZERO new sorries/admits. If an intermediate step resists a clean proof, do NOT admit: prove the partial genuinely-true lemmas you can (e.g. IsPositive.pow alone already advances the route), document in the file header exactly what blocked the rest, and leave total sorries at 1. CRITICAL HONESTY RULES: do not weaken any statement; do not re-add the FALSE collapse lemma (rho*f <= T f on the cone forces equality — counterexample documented in the docstring, re-adding it fails review); hidden 'admit' commands compile as axioms and bypass the sorry count — they FAIL review, grep will catch them; no 'def ... := by sorry' placeholders. Computation quirk: obtain/rcases on an ENNReal-coerced exists may blow the heartbeat budget — raise 'set_option maxHeartbeats 5000000' for that declaration; on C(X,R) use DFunLike.congr_fun rather than congr_fun. NEVER modify lean/lake-manifest.json, lean/lean-toolchain, lean/lakefile.lean. You may add imports if needed. Run the acceptance gate inside your worktree before committing (cd lean && lake env lean Riemann/KreinRutman.lean must compile with exactly 1 sorry before you commit); commit with message prefix feat(RH-28): or infra(RH-28): .",
-   "deps": [],
-   "scope": [
-    "lean/Riemann/KreinRutman.lean"
-   ],
-   "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.KreinRutman tobi-yoga lean/Riemann/KreinRutman.lean",
-   "acceptance_prose": "lake build Riemann.KreinRutman exits 0 on tobi-yoga; total sorries in KreinRutman.lean stays <= 1 (the pre-existing kreinRutman_core); no NEW sorry/admit; no weakened statement; no collapse-lemma resurrection; only scope file touched.",
-   "manual": true,
-   "remote": "tobi-yoga"
-  },
-  {
-   "id": "RH-29",
-   "title": "BUILD the real Gelfand spectral-radius module in a NEW file lean/Riemann/RealGelfand.lean — reducing the Krein-Rutman frontier to exactly ONE documented admission (the real Gelfand UPPER bound), with everything else proved. Context: master's lean/Riemann/KreinRutman.lean proves Krein-Rutman modulo one sorry kreinRutman_core (compact positive T on C(X,R), 0 < spectralRadius R T, has a nonzero positive eigenvector at the spectral radius). The single mathematical fact that blocks every attack route is the real version of Gelfand's formula (mathlib's is complex-only: pow_nnnorm_pow_one_div_tendsto_nhds_spectralRadius in Mathlib/Analysis/Normed/Algebra/GelfandFormula.lean requires [NormedAlgebra C A]; its upper-bound half limsup_pow_nnnorm_pow_one_div_le_spectralRadius uses complex analytic power-series radius arguments). Work GENERICALLY (mathlib-PR-ready), like mathlib: variable {A : Type*} [NormedRing A] [NormedAlgebra R A] [CompleteSpace A] (a : A), lemma spectralRadius R a. Deliver, as checked theorems in the new file: (1) realSpectralRadius_le_liminf_pow_nnnorm_pow_one_div: spectralRadius R a <= atTop.liminf (fun n => (‖a ^ n‖₊ : ℝ≥0∞) ^ (1 / n : ℝ)) — the LOWER bound is already field-general in mathlib (spectralRadius_le_liminf_pow_nnnorm_pow_one_div in Mathlib/Analysis/Normed/Algebra/Spectrum.lean, 'variable (K)' — instantiate at K = R, should be a one-liner; if it needs hypotheses add exactly what mathlib's statement needs). (2) realGelfandUpperBound: atTop.limsup (fun n => ‖a ^ n‖₊ ^ (1 / n : ℝ)) <= spectralRadius R a — THE single documented sorry. Give it a docstring that: states this is the frontier; explains mathlib has only the complex version (cite limsup_pow_nnnorm_pow_one_div_le_spectralRadius); names the two viable mathlib-PR paths — (a) generalizing the upper bound to any NontriviallyNormedField K where the running norm/spectralRadius behaves well, or (b) an intrinsic real argument (subharmonicity / series radius / Beurling-Gelfand); and notes that once this bound is closed in mathlib, kreinRutman_core closes. EXACTLY ONE sorry, nothing else admitted. (3) realGelfandFormula: Tendsto (fun n => (‖a ^ n‖₊ : ℝ≥0∞) ^ (1 / n : ℝ)) atTop (nhds (spectralRadius R a)) — PROVED from (1)+(2) via tendsto_of_le_liminf_of_limsup_le (mirror mathlib's own two-line assembly). (4) eventually_pow_norm_le (the practical boundedness the orbit argument needs): for any eps > 0 there is C with ∀ n, ‖a ^ n‖ ≤ C * (spectralRadius R a + eps) ^ n — PROVED from (3): convert the ENNReal tendsto to a norm bound with the ratio (‖a^n‖ / (rho+eps)^n) eventually <= 1 + something (mind the frontier sorry's hypotheses; state it for arbitrary nonzero real spectralRadius — make the statement robust to spectralRadius = 0 by allowing any eps>0 threshold; if the 0 case is awkward, require 0 < spectralRadius R a and note it). Do NOT add tetration or false statements 'for fun' — every theorem must be true, proved, and used. CRITICAL HONESTY RULES: exactly one sorry total in the file; no hidden 'admit' (bypasses the sorry count, fails review); no weakened statements; no 'def ... := by sorry'; nothing speculative. Open ENNReal and NNReal scopes; import Mathlib.Analysis.Normed.Algebra.Spectrum and Mathlib.Analysis.Normed.Algebra.GelfandFormula (open scoped NNReal Topology Ring, open Filter ENNReal — copy mathlib's GelfandFormula.lean style). This file must NOT import KreinRutman.lean — keep it generic. NEVER modify lean/lake-manifest.json, lean/lean-toolchain, lean/lakefile.lean. Run the acceptance gate inside your worktree before committing (cd lean && lake env lean Riemann/RealGelfand.lean must compile with exactly 1 sorry = realGelfandUpperBound before you commit); commit with message prefix feat(RH-29): or infra(RH-29): .",
-   "deps": [],
-   "scope": [
-    "lean/Riemann/RealGelfand.lean"
-   ],
-   "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.RealGelfand chemie-lernen.org lean/Riemann/RealGelfand.lean",
-   "acceptance_prose": "lake build Riemann.RealGelfand exits 0 on chemie-lernen.org; exactly 1 sorry in RealGelfand.lean (realGelfandUpperBound, documented); other theorems proved; no admit; no weakening; only scope file touched.",
-   "manual": true,
-   "remote": "chemie-lernen.org"
-  },
-  {
-   "id": "RH-30",
-   "title": "RH-30: extend the resolvent-positivity infrastructure of lean/Riemann/KreinRutman.lean (Scope: ONLY lean/Riemann/KreinRutman.lean) from its current norm-level form (lam > ||T||) to the FULL interval (lambda > rho(T)) using the real Gelfand formula (Riemann.RealGelfand.realGelfandFormula). Everything in this task is PROVABLE: you add ZERO new sorries (the file keeps its single existing kreinRutman_core sorry). Deliver these as checked declarations in the file: (1) import Riemann.RealGelfand (add to imports). (2) `theorem eventually_pow_norm_le {T : C(X, R) ->L[R] C(X, R)} (eps : R) (heps : 0 < eps) : exists C > 0, forall n : N, ||T ^ n|| <= C * ((spectralRadius R T).toReal + eps) ^ n` — from realGelfandFormula (a := T): the ENNReal tendsto of (||T^n||_+)^(1/n) to spectralRadius R T gives, for specifically-chosen n0 and delta < eps, ||T^n|| <= (rho.toReal + eps)^n eventually (raise to the n-th power of the ENNReal bound, mind the conversion RNNatInf <-> R and that spectralRadius R T is always < oo because spectralRadius_le_nnnorm), and the finitely many early terms are absorbed into C (max over a finite iSup / Finset.max of ||T^i|| / bound^i). This is the bounded-orbit estimate the whole route needs. (3) `theorem resolvent_neumann_series_at_radius {T : C(X, R) ->L[R] C(X, R)} {lam : R} (hlam : 0 < lam) (hrho : (spectralRadius R T).toReal < lam) : HasSum (fun n : N => (lam^-1 : R) ^ (n + 1) s T ^ n) (Ring.inverse (lam s (1 : C(X, R) ->L[R] C(X, R)) - T))`. Proceed thus: pick eps>0 with (rho.toReal + eps) < lam; from eventually_pow_norm_le the terms of the series satisfy ||(lam^-1)^(n+1) s T^n|| <= C*((rho.toReal+eps)/lam)^(n+1) hence the series is summable (geometric, ratio<1; Summable.of_norm / NormedSpace summable_criterion), and with rT := lam^-1 s T you get ||rT^n|| -> 0. Show it HASSUM the Ring.inverse by the telescoping product identity (1 - rT) * (sum_{k<n} rT^k) = 1 - rT^n and its mirror, pass to the limit using that left and right CLM multiplication by a fixed operator is continuous (it is a topological ring: use the normed-ring continuity / ContinuousLinearMap.mulLeft / mulRight or `simpa using tendsto...`) to get (lam s 1 - T) * tsum = 1 and tsum * (lam s 1 - T) = 1, then conclude tsum = Ring.inverse (lam s 1 - T) via the ring.inverse characterization (Ring.inverse_unit / Ring.inverse_eq if IsUnit; or use `Ring.inverse` is the two-sided inverse of units: isUnit_one_sub_of_norm_lt_one-style lemmas exist in Mathlib/Analysis/Normed/Ring/Units.lean). Honest fallback if the HasSum form resists: deliver `theorem resolvent_tsum_at_radius` stating the same sum equality with ∑' (tsum) and prove that, plus (2) and (4), documenting in a comment the one step that resisted. (4) `theorem resolvent_positivity_at_radius {T : C(X, R) ->L[R] C(X, R)} (hTpos : IsPositive T) {lam : R} (hlam : 0 < lam) (hrho : (spectralRadius R T).toReal < lam) : IsPositive (Ring.inverse (lam s (1 : C(X, R) ->L[R] C(X, R)) - T))` — copy the series-positivity method of resolvent_positivity_at_norm VERBATIM in structure: each summand (lam^-1)^(n+1) s T^n is positive (IsPositive.pow + IsPositive.smul with 0 <= (lam^-1)^(n+1)), a summable series of positive operators is positive termwise on the cone (tsum_nonneg pointwise), and the tsum equals the inverse by (3). Gate: the acceptance gate counts sorries ONLY in KreinRutman.lean (MAX_SORRY=1), and a remote `lake build Riemann.KreinRutman` must exit 0 on the gate host.\nCONTEXT. Repo 'riemann', Lean 4 / mathlib. Module dir lean/Riemann/. The Krein-Rutman\nformalization is in lean/Riemann/KreinRutman.lean (namespace Riemann, noncomputable\nsection, variable {X : Type*} [TopologicalSpace X] [CompactSpace X] [Nonempty X]). The\nfile currently has EXACTLY ONE sorry: kreinRutman_core. It also contains (all PROVED):\n  def positiveCone : Set C(X, R) := { f | forall x, 0 <= f x }\n  def IsPositive (T : C(X,R) ->L[R] C(X,R)) : Prop := MapsTo T positiveCone positiveCone\n  theorem IsPositive.monotone (hT : IsPositive T) {f g} (hfg : f <= g) : T f <= T g\n  theorem IsPositive.smul (hT : IsPositive T) (hc : 0 <= c) : IsPositive (c s T)\n  theorem IsPositive.add / IsPositive.pow (hT : IsPositive T) (n : N) : IsPositive (T ^ n)\n  theorem exists_eigenvector_with_domination {T} (hTpos : IsPositive T)\n    (hTcomp : IsCompactOperator T) (hRho : 0 < spectralRadius R T) :\n    exists v : C(X,R), v != 0 / exists mu : R,\n      |mu| = (spectralRadius R T).toReal / T v = mu s v /      forall x, (spectralRadius R T).toReal * |v x| <= (T |v|) x\n  lemma resolvent_scaled_norm_lt_one, resolvent_scaling, resolvent_neumann_series,\n  theorem resolvent_positivity_at_norm: {T} (hTpos : IsPositive T) {lam : R}\n    (hlam : 0 < lam) (hT : ||T|| < lam) : IsPositive (Ring.inverse (lam s 1 - T))\nThe normed-ring facts used there: (C(X,R) ->L[R] C(X,R)) is a NormedRing\n(Mathlib/Analysis/Normed/Operator/NormedSpace.lean toNormedRing instance) and complete,\nso HasSummableGeomSeries + NormedRing.inverse_one_sub (Mathlib/Analysis/Normed/Ring/Units.lean\nlean:98) hold; HasSum (fun n => rT^n) (Ring.inverse (1 - rT)) for ||rT|| < 1.\n\nNEW: lean/Riemann/RealGelfand.lean (namespace Riemann, already merged on master) is GENERIC:\nvariable {A : Type*} [NormedRing A] [NormedAlgebra R A] [CompleteSpace A] (a : A), and has:\n  theorem realSpectralRadius_le_liminf_pow_nnnorm_pow_one_div  (PROVED)\n  theorem realGelfandUpperBound (THE single documented sorry: limsup of (||a^n||_+)^(1/n)\n    <= spectralRadius R a; mathlib has only the complex version)\n  theorem realGelfandFormula (PROVED): Tendsto (fun n => (||a^n||_+ : RNNatInf)^(1/n : R))\n    atTop (nhds (spectralRadius R a))\nImport it with `import Riemann.RealGelfand` (works: same Lean project, mathlib is built).\nSpecialize realGelfandFormula to a = T as the CLM (all three typeclasses exist for it).\n\nGUARDRAILS (violations = automatic rejection, applied to your FINAL committed head):\n* NO new `sorry` beyond the allowed budget stated in YOUR task. `admit` compiles as an\n  axiom AND bypasses the sorry count — the reviewer greps for `admit`; docstring prose like\n  \"admitted\" is fine (verify with `grep -n admit FILE | grep -v admitted` mentally).\n* Do NOT weaken any existing theorem's statement. Do NOT delete or alter existing proved\n  theorems. Do NOT resurrect the FALSE \"collapse lemma\" (rho*f <= T f => equality).\n* Do NOT use the lowercase Greek letter 'lambda' as an identifier (it is the reserved\n  lambda-binder token in Lean and is unparsable). If you need a scalar parameter, name it\n  `lam`. 'rho' / 'rho0' are fine.\n* `set_option maxHeartbeats 5000000` at top of declarations when reflection/closures blow\n  the budget. Use `open scoped NNReal` / `open Filter ENNReal` / `open ENNReal` for\n  RNNatInf arithmetic; on C(X,R) prefer `DFunLike.congr_fun` / ext over congr_fun.\n* Commit early and often with message prefix from YOUR task id (the orchestrator\n  auto-commits your worktree at the end; the FINAL head is what gets reviewed, so make sure\n  your last commit is your best honest state — do not delete proved lemmas near the end).\n* If a step resists a clean proof after honest effort: DO NOT admit it. Prove every lemma\n  you genuinely can (partial honest progress is a valid deliverable), and document exactly\n  what blocked the rest in a file-header comment. Leave total sorries within budget.\n* NEVER modify lean/lake-manifest.json, lean/lean-toolchain, lean/lakefile.lean.\n  Only the scope file(s) listed for YOUR task may be touched.\n* Verify before your final commit: cd lean && lake env lean <your file> MUST compile with\n  no errors and the allowed sorry count. Then commit. The acceptance gate will rebuild on a\n  gate host; a 'gate failed, retry' result usually means the build is slow or a transient\n  infra issue, it does NOT mean make more edits blindly.\n",
-   "deps": [],
-   "scope": [
-    "lean/Riemann/KreinRutman.lean"
-   ],
-   "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.KreinRutman tobi-yoga lean/Riemann/KreinRutman.lean",
-   "acceptance_prose": "lake build Riemann.KreinRutman exits 0 on tobi-yoga; KreinRutman.lean has exactly 1 sorry (kreinRutman_core); 0 new sorries/admits; resolvent positivity proved on (rho(T), oo); no weakening; only scope file touched.",
-   "manual": true,
-   "remote": "tobi-yoga"
-  },
-  {
-   "id": "RH-31",
-   "title": "RH-31: build the Gelfand-orbit closure structure in a NEW file lean/Riemann/OrbitClosure.lean (Scope: ONLY that new file; KreinRutman.lean and RealGelfand.lean are READ-ONLY dependencies — import `import Riemann.KreinRutman` and reuse its positiveCone / IsPositive / IsPositive.monotone / IsPositive.pow / exists_eigenvector_with_domination in namespace Riemann). This is the functional-analysis step of the classical proof: from a dominating subsolution on the positive cone, the normalized orbit T^n w / rho^n is an increasing sequence whose boundedness (a cluster-point argument) yields the positive eigenvector. Context of use: exists_eigenvector_with_domination produces w = |v| with T w >= rho*w pointwise, rho := (spectralRadius R T).toReal > 0. Define `noncomputable def superharmonicOrbit (T : C(X,R) ->L[R] C(X,R)) (rho : R) (w : C(X,R)) (n : N) : C(X,R) := (rho^-1 : R) ^ n s (T ^ n) w`. Deliver as checked theorems (all PROVABLE; 0 sorries unless you choose the optional frontier below): (1) superharmonicOrbit_mem: {T} (hT : IsPositive T) {rho} (hrho : 0 < rho) {w} (hw : w in positiveCone) (hdom : T w >= rho s w) : forall n, superharmonicOrbit T rho w n in positiveCone (induction: membership follows from IsPositive.apply_nonneg at each step since T w >= rho*w and 0 <= (rho^-1)^n). (2) superharmonicOrbit_nonzero: w != 0, hT : IsPositive T, 0 < rho, w in cone, hdom : T w >= rho s w => forall n, superharmonicOrbit T rho w n != 0 (iterated: each factor is >= and w != 0 stays nonzero; note forall-nonzero functions and rho^-1 != 0). (3) superharmonicOrbit_mono: same hypotheses => forall n, superharmonicOrbit T rho w n <= superharmonicOrbit T rho w (n + 1) pointwise (use IsPositive.monotone on hdom and the hypothesis T w >= rho s w, plus that multiplying a nonneg inequality by (rho^-1)^n preserves order: have T^(n+1) w >= rho * T^n w by monotone iteration, then normalize). (4) superharmonicOrbit_navigation: {T} {rho} {w} : T (superharmonicOrbit T rho w n) = rho s superharmonicOrbit T rho w (n+1) — pure algebra (map_smul / ring, CLM linearity). (5) THE MAIN THEOREM — hypothesis form (PROVABLE, this is the compactness hand-off): `theorem bounded_orbit_yields_positive_eigenvector {T : C(X,R) ->L[R] C(X,R)} (hTpos : IsPositive T) (hTcomp : IsCompactOperator T) {rho : R} (hrho : 0 < rho) {w : C(X,R)} (hw0 : w != 0) (hw : w in positiveCone) (hdom : T w >= rho s w) (hbound : exists C, forall n, ||superharmonicOrbit T rho w n|| <= C) : exists f : C(X,R), f in positiveCone / f != 0 / T f = rho s f`. Outline: the sequence A n := T (superharmonicOrbit T rho w n) = rho * orbit(n+1) is bounded in norm (from hbound via (4)) and since T is compact its image set { A n } lies in a compact set, so by the Bolzano-Weierstrass property (choose the mathlib lemma that a sequence in a compact set has a converging subsequence, e.g. isCompact.tendsto_subseq / seq_of for `Metric`/TopologicalSpace; complete the details) obtain a subsequence phi with (orbit (phi k + 1)) converging in norm to f. Then f in positiveCone (cone is closed), f != 0 (each ||orbit n|| >= ||w|| > 0 because the monotone increasing orbit starts at w, both nonneg — argue via the pointwise order and ContinuousMap norm), and T f = rho f by continuity of T passing (4) through the limit (T (orbit phi k) = rho * orbit (phi k + 1) and both sides converge). This is the exact statement that, given the boundedness, closes kreinRutman_core of KreinRutman.lean (apply it with w = |v| from exists_eigenvector_with_domination, rho = (spectralRadius R T).toReal). OPTIONAL (ONLY if you want): state `theorem orbit_bounded` — the single allowed sorry and the true frontier ('rho*w <= T w and 0 < rho is the spectral radius forces ||T^n w||/rho^n bounded') — with a thorough docstring noting it is exactly the deep Krein-Rutman step and that resolvent positivity at the radius (merged future) plus the strict-domination contradiction are the planned route. If you leave it out entirely, the round is still complete: (1)-(5) with 0 sorries. MAX total sorries in OrbitClosure.lean: 1. Do NOT edit KreinRutman.lean (its kreinRutman_core stays; closing it is a later manual step).\nCONTEXT. Repo 'riemann', Lean 4 / mathlib. Module dir lean/Riemann/. The Krein-Rutman\nformalization is in lean/Riemann/KreinRutman.lean (namespace Riemann, noncomputable\nsection, variable {X : Type*} [TopologicalSpace X] [CompactSpace X] [Nonempty X]). The\nfile currently has EXACTLY ONE sorry: kreinRutman_core. It also contains (all PROVED):\n  def positiveCone : Set C(X, R) := { f | forall x, 0 <= f x }\n  def IsPositive (T : C(X,R) ->L[R] C(X,R)) : Prop := MapsTo T positiveCone positiveCone\n  theorem IsPositive.monotone (hT : IsPositive T) {f g} (hfg : f <= g) : T f <= T g\n  theorem IsPositive.smul (hT : IsPositive T) (hc : 0 <= c) : IsPositive (c s T)\n  theorem IsPositive.add / IsPositive.pow (hT : IsPositive T) (n : N) : IsPositive (T ^ n)\n  theorem exists_eigenvector_with_domination {T} (hTpos : IsPositive T)\n    (hTcomp : IsCompactOperator T) (hRho : 0 < spectralRadius R T) :\n    exists v : C(X,R), v != 0 / exists mu : R,\n      |mu| = (spectralRadius R T).toReal / T v = mu s v /      forall x, (spectralRadius R T).toReal * |v x| <= (T |v|) x\n  lemma resolvent_scaled_norm_lt_one, resolvent_scaling, resolvent_neumann_series,\n  theorem resolvent_positivity_at_norm: {T} (hTpos : IsPositive T) {lam : R}\n    (hlam : 0 < lam) (hT : ||T|| < lam) : IsPositive (Ring.inverse (lam s 1 - T))\nThe normed-ring facts used there: (C(X,R) ->L[R] C(X,R)) is a NormedRing\n(Mathlib/Analysis/Normed/Operator/NormedSpace.lean toNormedRing instance) and complete,\nso HasSummableGeomSeries + NormedRing.inverse_one_sub (Mathlib/Analysis/Normed/Ring/Units.lean\nlean:98) hold; HasSum (fun n => rT^n) (Ring.inverse (1 - rT)) for ||rT|| < 1.\n\nNEW: lean/Riemann/RealGelfand.lean (namespace Riemann, already merged on master) is GENERIC:\nvariable {A : Type*} [NormedRing A] [NormedAlgebra R A] [CompleteSpace A] (a : A), and has:\n  theorem realSpectralRadius_le_liminf_pow_nnnorm_pow_one_div  (PROVED)\n  theorem realGelfandUpperBound (THE single documented sorry: limsup of (||a^n||_+)^(1/n)\n    <= spectralRadius R a; mathlib has only the complex version)\n  theorem realGelfandFormula (PROVED): Tendsto (fun n => (||a^n||_+ : RNNatInf)^(1/n : R))\n    atTop (nhds (spectralRadius R a))\nImport it with `import Riemann.RealGelfand` (works: same Lean project, mathlib is built).\nSpecialize realGelfandFormula to a = T as the CLM (all three typeclasses exist for it).\n\nGUARDRAILS (violations = automatic rejection, applied to your FINAL committed head):\n* NO new `sorry` beyond the allowed budget stated in YOUR task. `admit` compiles as an\n  axiom AND bypasses the sorry count — the reviewer greps for `admit`; docstring prose like\n  \"admitted\" is fine (verify with `grep -n admit FILE | grep -v admitted` mentally).\n* Do NOT weaken any existing theorem's statement. Do NOT delete or alter existing proved\n  theorems. Do NOT resurrect the FALSE \"collapse lemma\" (rho*f <= T f => equality).\n* Do NOT use the lowercase Greek letter 'lambda' as an identifier (it is the reserved\n  lambda-binder token in Lean and is unparsable). If you need a scalar parameter, name it\n  `lam`. 'rho' / 'rho0' are fine.\n* `set_option maxHeartbeats 5000000` at top of declarations when reflection/closures blow\n  the budget. Use `open scoped NNReal` / `open Filter ENNReal` / `open ENNReal` for\n  RNNatInf arithmetic; on C(X,R) prefer `DFunLike.congr_fun` / ext over congr_fun.\n* Commit early and often with message prefix from YOUR task id (the orchestrator\n  auto-commits your worktree at the end; the FINAL head is what gets reviewed, so make sure\n  your last commit is your best honest state — do not delete proved lemmas near the end).\n* If a step resists a clean proof after honest effort: DO NOT admit it. Prove every lemma\n  you genuinely can (partial honest progress is a valid deliverable), and document exactly\n  what blocked the rest in a file-header comment. Leave total sorries within budget.\n* NEVER modify lean/lake-manifest.json, lean/lean-toolchain, lean/lakefile.lean.\n  Only the scope file(s) listed for YOUR task may be touched.\n* Verify before your final commit: cd lean && lake env lean <your file> MUST compile with\n  no errors and the allowed sorry count. Then commit. The acceptance gate will rebuild on a\n  gate host; a 'gate failed, retry' result usually means the build is slow or a transient\n  infra issue, it does NOT mean make more edits blindly.\n",
-   "deps": [],
-   "scope": [
-    "lean/Riemann/OrbitClosure.lean"
-   ],
-   "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.OrbitClosure chemie-lernen.org lean/Riemann/OrbitClosure.lean",
-   "acceptance_prose": "lake build Riemann.OrbitClosure exits 0 on chemie-lernen.org; OrbitClosure.lean has <= 1 sorry (only the documented orbit_bounded if present); lemmas (1)-(5) proved or honest partial state; no admit; no weakening; KreinRutman.lean/RealGelfand.lean untouched.",
-   "manual": true,
-   "remote": "chemie-lernen.org"
-  },
-  {
-   "id": "RH-32",
-   "title": "RH-32: CONTEXT. Repo 'riemann', Lean 4 / mathlib, module dir lean/Riemann/. The real Gelfand file lean/Riemann/RealGelfand.lean (namespace Riemann, variables {A : Type*} [NormedRing A] [NormedAlgebra R A] [CompleteSpace A] (a : A)) currently contains a FALSE admitted lemma:\n\n  theorem realGelfandUpperBound : limsup (fun n : ℕ => (‖a ^ n‖₊ : ℝ≥0∞) ^ (1 / n : ℝ)) atTop ≤ spectralRadius ℝ a := by sorry\n\nIt is false for general real normed algebras: take A = ℂ (all mathlib instances exist: NormedRing ℂ, NormedAlgebra ℝ ℂ, CompleteSpace ℂ) and a = Complex.I. Then spectrum ℝ Complex.I = ∅ (for every s : ℝ the scalar s - I is invertible with inverse (s + I)/(s^2+1)), so spectralRadius ℝ Complex.I = 0, while ‖I^n‖ = 1 for all n, so the limsup equals 1 and 1 ≤ 0 is false.\n\nYOUR JOB (three parts):\n\n(1) FORMALIZE THE COUNTEREXAMPLE in RealGelfand.lean: prove\n  theorem counterexampleRotation :\n    ¬ (limsup (fun n : ℕ => ((‖(Complex.I : ℂ) ^ n‖₊ : ℝ≥0∞) ^ (1 / (n : ℝ)))) atTop ≤ spectralRadius ℝ Complex.I)\nRoute: prove spectrum ℝ Complex.I = ∅ — for s : ℝ, IsUnit (s - Complex.I) holds with explicit inverse (s + Complex.I)/(s^2+1): check (s - I)*(s + I) = s^2 + 1 and use isUnit_iff_exists_inv (search mathlib for how spectrum memberships are disproved; `Ring.inverse` needs IsUnit). spectralRadius ℝ I = 0 then follows from the ⨆ over the empty spectrum. And ‖Complex.I ^ n‖ = 1 for all n (norm_pow: ‖I^n‖ = ‖I‖^n = 1 since ‖Complex.I‖ = 1). Hence limsup ≥ 1 > 0 = spectralRadius — the negated instance follows e.g. via not_le.mpr.\n(2) DELETE the false lemma realGelfandUpperBound and the derived realGelfandFormula (whose proof consumes it). KEEP the proved lower bound realSpectralRadius_le_liminf_pow_nnnorm_pow_one_div untouched. Add a docstring noting the general-real upper bound is FALSE with the (now proved) Complex.I counterexample and that over ℂ mathlib's own Gelfand formula applies.\n(3) REPAIR THE DEPENDENT CHAIN in lean/Riemann/KreinRutman.lean (import Riemann.RealGelfand at line 44). The CLOSED theorem eventually_pow_norm_le {T} (eps : ℝ) (heps : 0 < eps) : ∃ C, 0 < C ∧ ∀ n, ‖T ^ n‖ ≤ C * ((spectralRadius ℝ T).toReal + eps) ^ n (around line 661) is proved from realGelfandFormula and is UNSOUND as a closed statement. Convert it to hypothesis form by adding the parameter (hg : Tendsto (fun n : ℕ => (‖T ^ n‖₊ : ℝ≥0∞) ^ (1 / (n : ℝ))) atTop (𝓝 (spectralRadius ℝ T))) — its body then just calls eventually_pow_norm_le_of_gelfand hg heps (the hypothesis-form sibling near line 534 already has exactly this shape; alternatively delete eventually_pow_norm_le and keep only the _of_gelfand version — whichever gives the smaller diff). Then thread the SAME hypothesis into resolvent_neumann_series_at_radius (around line 677) and resolvent_positivity_at_radius (around line 856), which consume it. Grep for other callers in the file first and thread the hypothesis along. EXPECTED END STATE: nothing in the chain is closed over the removed lemma; the sorry count of KreinRutman.lean stays EXACTLY 1 (kreinRutman_core — do NOT touch it).\n\nGUARDRAILS (violations = automatic rejection, applied to your FINAL committed head):\n* Adding hypotheses to eventually_pow_norm_le / resolvent_neumann_series_at_radius / resolvent_positivity_at_radius is REQUIRED (authorized soundness repair, NOT a forbidden weakening). Deleting realGelfandUpperBound/realGelfandFormula is REQUIRED. Do not weaken or delete any OTHER proved statement.\n* NO new `sorry` anywhere: MAX_SORRY = 1 total in KreinRutman.lean (kreinRutman_core) and 0 in RealGelfand.lean. `admit` compiles as an axiom AND bypasses the sorry count — the reviewer greps for `admit` on every merge.\n* Do NOT modify lean/lake-manifest.json, lean/lean-toolchain, lean/lakefile.lean.\n* Do NOT use the identifier `lambda` (reserved token); use `lam`.\n* Scope: ONLY lean/Riemann/RealGelfand.lean and lean/Riemann/KreinRutman.lean.\n* Commit early and often with prefix `feat(RH-32):`. Fast iteration: cd lean && lake env lean Riemann/RealGelfand.lean (the .lake cache in your worktree is prebuilt).",
-   "deps": [],
-   "scope": [
-    "lean/Riemann/RealGelfand.lean",
-    "lean/Riemann/KreinRutman.lean"
-   ],
-   "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.KreinRutman tobi-yoga lean/Riemann/KreinRutman.lean",
-   "acceptance_prose": "lake build Riemann.RealGelfand Riemann.KreinRutman exits 0; RealGelfand.lean has 0 sorries and contains counterexampleRotation (the formal Complex.I counterexample); KreinRutman.lean has exactly 1 sorry (kreinRutman_core); no closed theorem depends on the deleted false lemma; 0 `admit`; build-infra untouched",
-   "manual": true,
-   "remote": "tobi-yoga"
-  },
-  {
-   "id": "RH-33",
-   "title": "RH-33: CONTEXT. Repo 'riemann', Lean 4 / mathlib, module dir lean/Riemann/. The Krein-Rutman machine is fully assembled. In lean/Riemann/KreinRutman.lean (namespace Riemann, variables {X : Type*} [TopologicalSpace X] [CompactSpace X] [Nonempty X]), all PROVED:\n  def positiveCone : Set C(X, ℝ) := { f | ∀ x, 0 ≤ f x }\n  def IsPositive (T : C(X, ℝ) →L[ℝ] C(X, ℝ)) : Prop\n  theorem exists_eigenvector_with_domination {T} (hTpos : IsPositive T) (hTcomp : IsCompactOperator T) (hρ : 0 < spectralRadius ℝ T) : ∃ v : C(X, ℝ), v ≠ 0 ∧ ∃ μ : ℝ, |μ| = (spectralRadius ℝ T).toReal ∧ T v = μ • v ∧ ∀ x, (spectralRadius ℝ T).toReal * |v x| ≤ (T |v|) x\nIn lean/Riemann/OrbitClosure.lean (namespace Riemann), all PROVED:\n  def superharmonicOrbit (T) (rho : ℝ) (w : C(X, ℝ)) (n : ℕ) : C(X, ℝ) := (rho⁻¹)^n • T^n w\n  theorem superharmonicOrbit_mem / _navigation / _nonzero / _mono, norm_le_of_nonneg_le\n  theorem orbit_bounded (hT) (hrho : 0 < rho) {w v} (hw : w ∈ positiveCone) (hv : v ∈ positiveCone) (hdom : T w ≥ rho • w) (hle : w ≤ v) (hTw_v : T v = rho • v) : ∃ C, ∀ n, ‖superharmonicOrbit T rho w n‖ ≤ C\n  theorem bounded_orbit_yields_positive_eigenvector {T} (hTpos : IsPositive T) (hTcomp : IsCompactOperator T) {rho : ℝ} (hrho : 0 < rho) {w : C(X, ℝ)} (hw0 : w ≠ 0) (hw : w ∈ positiveCone) (hdom : T w ≥ rho • w) (hbound : ∃ C, ∀ n, ‖superharmonicOrbit T rho w n‖ ≤ C) : ∃ f, f ∈ positiveCone ∧ f ≠ 0 ∧ T f = rho • f\n\nYOUR JOB: create the NEW file lean/Riemann/KreinDichotomy.lean (namespace Riemann, same variables, noncomputable section, imports `Riemann.KreinRutman` and `Riemann.OrbitClosure` — do NOT modify ANY existing file) containing:\n\n(1) theorem exists_positive_eigenvector_of_superharmonic {T} (hTpos : IsPositive T) (hTcomp : IsCompactOperator T) {rho : ℝ} (hrho : 0 < rho) {w : C(X, ℝ)} (hw0 : w ≠ 0) (hw : w ∈ positiveCone) (hdom : rho • w ≤ T w) : ∃ f : C(X, ℝ), f ∈ positiveCone ∧ f ≠ 0 ∧ T f = rho • f\n    PROOF STRUCTURE: by_cases hbdd : ∃ C, ∀ n, ‖superharmonicOrbit T rho w n‖ ≤ C.\n    * Bounded branch: apply bounded_orbit_yields_positive_eigenvector directly (its hdom is `T w ≥ rho • w`; yours is `rho • w ≤ T w` — the same inequality, flip with `ge`/`le`). This branch must be FULLY PROVED.\n    * Unbounded branch: this is the classical normalized-orbit cluster argument and is the ONLY permitted sorry of the whole file. Write `· sorry` preceded by a detailed docstring sketch: u_n := orbit n / ‖orbit n‖; T u_n = rho * (‖orbit (n+1)‖ / ‖orbit n‖) • u (n+1) (from navigation + smul_norm); compactness of T gives a subsequence with T u (φ k) → g; after passing to further subsequences u (φ k + 1) → u* with ‖u*‖ = 1 and u* ∈ positiveCone (the cone is closed); iterating yields a cluster chain u*, u**, … with T u* = rho ρ* • u**; the monotonicity orbit n ≤ orbit (n+1) is what must force the chain to stabilize at an eigenvector.\n(2) theorem kreinRutman_core' {T} (hTpos : IsPositive T) (hTcomp : IsCompactOperator T) (hρ : 0 < spectralRadius ℝ T) : ∃ f : C(X, ℝ), f ∈ positiveCone ∧ f ≠ 0 ∧ T f = (spectralRadius ℝ T).toReal • f\n    FULLY PROVED (no sorry): obtain the seed from exists_eigenvector_with_domination (v, μ with |μ| = ρ, T v = μ • v, ρ • |v| ≤ T |v| pointwise), set w := |v| (look at how KreinRutman.lean constructs |v| as an element of C(X, ℝ) and reuse its exact term; membership in positiveCone is trivial since 0 ≤ |v x|; w ≠ 0 since v ≠ 0), then apply (1) with rho := (spectralRadius ℝ T).toReal and hdom from the pointwise domination (convert ∀ x, rho * |v x| ≤ (T |v|) x into rho • w ≤ T w via ContinuousMap.le_def / funext; check how the domination hypothesis is stated and mirror the conversion).\n(3) BONUS (only if (1)+(2) are done and compiling; skip if time is tight):\n  theorem krein_noninvertible {T} (hTpos : IsPositive T) (hTcomp : IsCompactOperator T) (hρ : 0 < spectralRadius ℝ T) : ¬ IsUnit ((spectralRadius ℝ T).toReal • 1 - T)\n  Sketch: assume IsUnit; set lam := ρ + 1; the pointwise domination S_N(w) ≤ (lam • 1 - T)⁻¹ w (Neumann partial sums on the cone lie below the resolvent, since the remainder T^(N+1)/lam^(N+1) • (lam • 1 - T)⁻¹ w is ≥ 0 for w ≥ 0 — this is exactly resolvent_positivity_at_radius territory, see KreinRutman.lean ~line 856) bounds the orbit of every cone vector w; then the bounded branch of (1) gives f ≠ 0 with (ρ • 1 - T) f = 0, contradicting IsUnit (a unit kills only 0).\n\nGUARDRAILS (violations = automatic rejection, applied to your FINAL committed head):\n* EXACTLY ONE `sorry` in the whole file (the unbounded branch of (1)). `admit` compiles as an axiom AND bypasses the sorry count — the reviewer greps for `admit` on every merge.\n* Do NOT modify any existing file (scope: ONLY lean/Riemann/KreinDichotomy.lean).\n* Do NOT modify lean/lake-manifest.json, lean/lean-toolchain, lean/lakefile.lean.\n* Do NOT use the identifier `lambda` (reserved token); use `lam`. `rho` is fine.\n* Do NOT set `maxHeartbeats` above 5000000.\n* Commit early and often with prefix `feat(RH-33):`. Fast iteration: cd lean && lake env lean Riemann/KreinDichotomy.lean (the .lake cache in your worktree is prebuilt).",
-   "deps": [],
-   "scope": [
-    "lean/Riemann/KreinDichotomy.lean"
-   ],
-   "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.KreinDichotomy chemie-lernen.org lean/Riemann/KreinDichotomy.lean",
-   "acceptance_prose": "New file KreinDichotomy.lean compiles (lake env lean Riemann/KreinDichotomy.lean exit 0); contains exists_positive_eigenvector_of_superharmonic (bounded branch proved, unbounded branch = the single sorry), kreinRutman_core' FULLY PROVED (0 sorries), optional krein_noninvertible; no existing file modified; 0 `admit`; build-infra untouched",
-   "manual": true,
-   "remote": "chemie-lernen.org"
-  },
-  {
-   "id": "RH-35",
-   "title": "RH-35: capture the normalized-orbit cluster chain — convert the unbounded-branch sorry in KreinDichotomy.lean into a crisp beta-stabilization gap",
-   "deps": [],
-   "manual": false,
-   "remote": "tobi-yoga",
-   "scope": [
-    "RH-35: CONTEXT. Repo 'riemann', Lean 4 / mathlib, module dir lean/Riemann/. File lean/Riemann/KreinDichotomy.lean (namespace Riemann) contains the Krein-Rutman dichotomy. ALL PROVED there (do not modify their statements):\n* `superharmonicOrbit T rho w n := (rho^-1)^n * T^n w` and in Riemann.OrbitClosure the lemmas `_mem` (stays on the cone), `_nonzero`, `_mono` (pointwise orbit_n <= orbit_{n+1}), `_navigation` (T orbit_n = rho * orbit_{n+1}), and `bounded_orbit_yields_positive_eigenvector` (bounded orbit => cone eigenvector at rho).\n* `exists_positive_eigenvector_of_superharmonic` (hTpos) (hTcomp) (hrho : 0 < rho) (hr : rho = (spectralRadius ℝ T).toReal) (hw0) (hw : w ∈ positiveCone) (hdom : rho • w ≤ T w): the dichotomy. Bounded branch fully proved; UNBOUNDED branch is the file's single `sorry`.\n* `kreinRutman_core'` — fully proved from the dichotomy with seed w := |v| from Riemann.KreinRutman.exists_eigenvector_with_domination.\n* The hypothesis `hr` (rho = spectral radius) is NECESSARY and must NOT be removed or weakened (documented counterexample T(x,y)=(x+y,y), w=(0,1), rho=1/2 in the docstring).",
-    "YOUR TASK — make the unbounded branch's remaining gap CRISP. Concretely:\n1. Prove a new closed lemma in KreinDichotomy.lean (zero sorries inside it):",
-    "   theorem normalized_orbit_cluster {T : C(X, ℝ) →L[ℝ] C(X, ℝ)}\n       (hTpos : IsPositive T) (hTcomp : IsCompactOperator T) {rho : ℝ} (hrho : 0 < rho)\n       {w : C(X, ℝ)} (hw0 : w ≠ 0) (hw : w ∈ positiveCone) (hdom : rho • w ≤ T w) :\n       ∃ φ : ℕ → ℕ, StrictMono φ ∧ ∃ uStar uDStar : C(X, ℝ), ∃ beta : ℝ,\n         uStar ∈ positiveCone ∧ uDStar ∈ positiveCone ∧ ‖uStar‖ = 1 ∧ ‖uDStar‖ = 1 ∧\n         1 ≤ beta ∧ T uStar = (rho * beta) • uDStar",
-    "   Proof sketch (all ingredients standard): set orb n := superharmonicOrbit T rho w n; u n := orb n / ‖orb n‖ (well-defined via superharmonicOrbit_nonzero; ‖u n‖ = 1, u n ∈ cone via _mem + cone closed under smul). From _navigation: T (orb n) = rho • orb (n+1), so dividing by ‖orb n‖: T (u n) = (rho * beta n) • u (n+1) with beta n := ‖orb (n+1)‖ / ‖orb n‖. beta n ≥ 1 because orb n ≤ orb (n+1) (_mono) applied at the sup-norm point (use the generic norm_le_of_nonneg_le from OrbitClosure, or ‖orb n‖ = orb n x_n ≤ orb (n+1) x_n ≤ ‖orb (n+1)‖). beta n ≤ ‖T‖ / rho because ‖orb (n+1)‖ = ‖T (orb n)‖ / rho ≤ ‖T‖ ‖orb n‖ / rho. Compactness: u (phi k) lies in the unit ball, so T (u (phi k)) has a convergent subsequence (IsCompactOperator: grep .lake/packages/mathlib for IsCompactOperator image compact, e.g. `IsCompactOperator.image_ball` / `MapCompactness` / use IsCompact.tendsto_subseq on T '' closedBall — RH-31's bounded_orbit_yields_positive_eigenvector already extracts such subsequences, copy that pattern). Passing to a further subsequence (u (phi k + 1) in the unit ball again; beta (phi k) in the compact interval [1, ‖T‖/rho]) gives the limits uStar := lim u (phi k), uDStar := lim u (phi k + 1), beta := lim beta (phi k). Norms pass to the limit (norm continuity); cone closedness passes (OrbitClosure/Cone closed — positiveCone is closed, see how bounded_orbit_yields_positive_eigenvector proves it); the identity passes by continuity of T and smul. You may compose two StrictMono extractions instead of a diagonal if simpler.\n2. Then RESTRUCTURE `exists_positive_eigenvector_of_superharmonic`'s unbounded branch: derive it from `normalized_orbit_cluster` plus a single explicitly-stated stabilization lemma that carries THE one `sorry` of the file, e.g.",
-    "   theorem cluster_chain_stabilizes ... : (hypotheses from normalized_orbit_cluster's output, plus the full chain context you find convenient) → ∃ f, f ∈ positiveCone ∧ f ≠ 0 ∧ T f = rho • f",
-    "   with a docstring explaining what remains: the cluster chain u*, u**, ... satisfies T u* = rho*beta* • u** with all norms 1; if beta* = 1 the chain already gives T u* = rho • u**, done; the remaining analytic step is forcing beta = 1 (or extracting an eigenvector from beta > 1). Cite Krein-Rutman 1948 / Schaefer's Banach Lattices III. The net effect: the file's single sorry moves from a vague unbounded branch into a crisply-stated lemma. Alternatively keep the sorry directly in the unbounded branch but call normalized_orbit_cluster first and reduce what the sorry must assume — either restructure is acceptable, as long as `normalized_orbit_cluster` itself is CLOSED.\n3. BONUS (only if 1-2 are done and compiling): prove `krein_noninvertible_of_gelfand` — under the SAME hg hypothesis that Riemann.KreinRutman.resolvent_positivity_at_radius takes (Tendsto (fun n => (‖T ^ n‖₊ : ℝ≥0∞) ^ (1 / n)) atTop (𝓝 (spectralRadius ℝ T))), show ¬IsUnit ((spectralRadius ℝ T).toReal • 1 - T) in the CLM ring: if it were a unit, partial Neumann sums S_N(w) ≤ (λ•1−T)⁻¹ w (λ := rho + 1, via resolvent_positivity_at_radius + the algebraic tail identity) would bound EVERY cone orbit, and the bounded branch would produce a cone eigenvector f at rho, contradicting IsUnit since (rho•1−T) f = 0 with f ≠ 0 means the map has a nontrivial kernel. Do NOT add it unless it compiles cleanly.",
-    "HARD CONSTRAINTS:\n* NEVER modify lean/lake-manifest.json, lean/lean-toolchain, lean/lakefile.lean. NEVER touch any file other than lean/Riemann/KreinDichotomy.lean.\n* Do NOT remove or weaken any existing statement (keep `hr`, keep `kreinRutman_core'` exactly as is — its proof may need a trivial update only if you change the dichotomy's internals, but its STATEMENT is frozen).\n* The file must end with AT MOST ONE `sorry` (the stabilization gap). `normalized_orbit_cluster` must be CLOSED. No `admit` anywhere (watch docstrings: the reviewer greps 'admit').\n* set_option maxHeartbeats 5000000 is already in the file; keep it.\n* Commit early and often with prefix `feat(RH-35):`. Fast iteration: cd lean && lake env lean Riemann/KreinDichotomy.lean (the .lake cache in your worktree is prebuilt)."
-   ],
-   "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.KreinDichotomy tobi-yoga lean/Riemann/KreinDichotomy.lean",
-   "acceptance_prose": "lake env lean Riemann/KreinDichotomy.lean prints exactly one 'declaration uses sorry' warning (the stabilization gap); normalized_orbit_cluster compiles with zero sorries inside; zero 'admit' tokens anywhere in the file; no file other than lean/Riemann/KreinDichotomy.lean changed; build-infra files untouched."
-  }
- ]
+  "tasks": [
+    {
+      "id": "RH-1",
+      "title": "Prove transferOperatorBounded and transferOperator_series→CLM assembly in lean/Riemann/TransferOperator/Operator.lean (kill the 2 remaining sorries). Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify lean/lake-manifest.json, lean/lean-toolchain or lean/lakefile.lean — the build environment is pre-seeded; if lake build is slow, just wait. Strategy: define (L_s f) x = tsum of transferOperatorSummand s f n x; each summand is continuous in x (Complex.continuousAt_cpow at nonzero base + composition), the series converges uniformly on Set.Icc 0 1 by Weierstrass M-test with x-free bound ‖f‖ * ((n:ℝ)+1)^(-2*s.re) (use inverse_pow_monotone_x and Real.summable_nat_rpow + summable_nat_add_iff, both already proven in BasicProofs.lean); tsum of continuous functions is continuous via Summable.of_norm in the Banach space C(Set.Icc 0 1, ℂ); linearity from tsum commutation with evaluation (ContinuousLinearMap.map_tsum or hasSum_apply); assemble the ContinuousLinearMap via LinearMap.mkContinuous with bound C = (∑' n, (n+1)^(-2*re s)) * ‖f‖ or via tsum-based operator norm. Grep .lake/packages/mathlib for exact names: continuousAt_cpow, M-test lemmas (tendstoUniformly, hasSum), LinearMap.mkContinuous.",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/TransferOperator/Operator.lean"
+      ],
+      "accept": "GATE_TIMEOUT=2400 bash lean/fleet-gate.sh Riemann.TransferOperator.Operator contextual-intelligence.org lean/Riemann/TransferOperator/Operator.lean",
+      "acceptance_prose": "lake build Riemann exits 0 on host contextual-intelligence.org AND Operator.lean contains no 'sorry'. The def transferOperatorBounded must be the actual tsum-based operator (no placeholder).",
+      "manual": true
+    },
+    {
+      "id": "RH-2",
+      "title": "Prove the 6 elementary Fleet-3 sorries in lean/Riemann/TransferOperator/GaussMap.lean (continuity of the Gauss map and inverse branches, contraction estimate, monotone bijection). Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify lean/lake-manifest.json, lean/lean-toolchain or lean/lakefile.lean — the build environment is pre-seeded; if lake build is slow, just wait. These are elementary real-analysis facts: continuity of x ↦ 1/(n+1+x) on x>0 (Continuous.inv_ones or Continuous.div with positivity), continuity of fract of 1/x minus floor away from discontinuities, contraction |I x - I y| = |x-y|/((n+1+x)(n+1+y)) ≤ |x-y|/4 (linarith/ring + div_le_div), monotone bijection [0,1] → [1/(n+2), 1/(n+1)] (Monotone + surjectivity via intermediate value or explicit inverse). Grep .lake/packages/mathlib for: Continuous.fract? Real.fract, ContinuousOn, div_le_div_iff, strictMono_incrOn, ContinuousOn.intermediate_value, homeomorph constructors.",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/TransferOperator/GaussMap.lean"
+      ],
+      "accept": "GATE_TIMEOUT=2400 bash lean/fleet-gate.sh Riemann.TransferOperator.GaussMap tobi-yoga lean/Riemann/TransferOperator/GaussMap.lean",
+      "acceptance_prose": "lake build Riemann exits 0 on host tobi-yoga AND GaussMap.lean contains no 'sorry'.",
+      "manual": true
+    },
+    {
+      "id": "RH-3",
+      "title": "Prove riemannZeta_ne_zero_of_re_eq_one in lean/Riemann/PrimeNumberTheorem.lean (Fleet 6 line theorem: riemannZeta s ≠ 0 for Re s = 1, s ≠ 1). Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify lean/lake-manifest.json, lean/lean-toolchain or lean/lakefile.lean — the build environment is pre-seeded; if lake build is slow, just wait. This is the classical Hadamard–de la Vallée Poussin consequence: ζ(s) ≠ 0 on Re s = 1 (s ≠ 1) follows from the non-vanishing of ζ on Re s > 1 and the functional equation / Hadamard product theory, OR from the classical 3-point argument via (1 - 2^{1-s}) ζ(s) = ζ Dirichlet eta relation. Mathlib may already have: grep for riemannZeta ne_zero, RiemannZeta.s_ne_zero, Analysis.RiemannZeta — Mathlib.Mathlib.NumberTheory.RiemannZeta has s_ne_zero_of_one_lt_re or similar; also check Mathlib.NumberTheory.LSeries. If Mathlib has the statement for Re s > 1 only, combine with zeta_reflect (already in the file) and continuity/analytic continuation (riemannZeta_analytic / DifferentiableOn) + identity theorem to push to the line Re s = 1. If truly missing in Mathlib, prove the line theorem via the eta-function limit argument. IMPORTANT: do not introduce axioms; if a substep is out of reach, split it into a documented sorry-lemma ONLY for that substep and explain in the commit message.",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/PrimeNumberTheorem.lean"
+      ],
+      "accept": "GATE_TIMEOUT=2400 bash lean/fleet-gate.sh Riemann.PrimeNumberTheorem chemie-lernen.org lean/Riemann/PrimeNumberTheorem.lean",
+      "acceptance_prose": "lake build Riemann exits 0 on host chemie-lernen.org AND PrimeNumberTheorem.lean contains no 'sorry'.",
+      "manual": true
+    },
+    {
+      "id": "RH-4",
+      "title": "Fill the trace-class / Fredholm determinant skeleton in lean/Riemann/FredholmDeterminants.lean (13 sorries). Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify lean/lake-manifest.json, lean/lean-toolchain or lean/lakefile.lean — the build environment is pre-seeded; if lake build is slow, just wait. Work incrementally: kill the EASIEST sorries first (algebraic identities, norm estimates, finite-rank facts) and leave the genuinely hard analytic ones (nuclear trace theorem, infinite-determinant identities) as clearly-documented one-line sorry-lemmas with a comment explaining exactly what is missing — partial credit counts. Grep .lake/packages/mathlib for: traceClass (Mathlib.Analysis.TraceClass?), NuclearBanach?, Fredholm determinant (likely NOT in mathlib — you must build the finite-dimensional/algebraic version), ContinuousLinearMap.trace, traceExists, Matrix.det, sum of finite rank operators.",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/FredholmDeterminants.lean"
+      ],
+      "accept": "MAX_SORRY=9 GATE_TIMEOUT=2400 bash lean/fleet-gate.sh Riemann.FredholmDeterminants tobias-weiss.org lean/Riemann/FredholmDeterminants.lean",
+      "acceptance_prose": "lake build Riemann exits 0 on host tobias-weiss.org AND the number of 'sorry' occurrences in FredholmDeterminants.lean is strictly lower than 13 (target: 0).",
+      "manual": true
+    },
+    {
+      "id": "RH-5",
+      "title": "Attack the 8 Fleet-5 sorries in lean/Riemann/TransferOperator/Theorem3_3.lean (spectral theory of L_s: eigenvalue, positivity/Krein-Rutman, analytic perturbation). Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify lean/lake-manifest.json, lean/lean-toolchain or lean/lakefile.lean — the build environment is pre-seeded; if lake build is slow, just wait. Work incrementally, easiest first: the constant-function eigenfunction statement (line 47) and the spectralRadius bound (line 84) are elementary given Definitions.lean helpers; Krein-Rutman needs Mathlib's version — grep for kreinRutman, compactOperator, spectralRadius, IsCompactOperator. The analyticity/perturbation sorries may need known mathlib theorems on analyticFredholm / analytic spectrum — grep AnalyticOn, spectrum analytic. If a sorry is genuinely research-level (mixing rules out invariant subspaces), document precisely what is missing as a one-line sorry-lemma and move on — partial credit counts.",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/TransferOperator/Theorem3_3.lean"
+      ],
+      "accept": "MAX_SORRY=5 GATE_TIMEOUT=2400 bash lean/fleet-gate.sh Riemann.TransferOperator.Theorem3_3 mac lean/Riemann/TransferOperator/Theorem3_3.lean",
+      "acceptance_prose": "lake build Riemann exits 0 on host mac AND the number of 'sorry' occurrences in Theorem3_3.lean is strictly lower than 8 (target: 0).",
+      "manual": true
+    },
+    {
+      "id": "RH-6",
+      "title": "Finish the remaining 4 sorries in lean/Riemann/FredholmDeterminants.lean (a previous agent already killed 9; the remaining 4 are documented at the bottom of the file with comments explaining what is missing). Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify lean/lake-manifest.json, lean/lean-toolchain or lean/lakefile.lean. Work easiest-first; if a remaining sorry is genuinely hard (nuclear/trace-class analysis absent from mathlib), leave it documented and kill any other accessible one. Grep .lake/packages/mathlib for trace-class and determinant lemmas before assuming they are missing.",
+      "deps": [
+        "RH-4"
+      ],
+      "scope": [
+        "lean/Riemann/FredholmDeterminants.lean"
+      ],
+      "accept": "MAX_SORRY=2 GATE_TIMEOUT=2400 bash lean/fleet-gate.sh Riemann.FredholmDeterminants tobias-weiss.org lean/Riemann/FredholmDeterminants.lean",
+      "acceptance_prose": "lake build Riemann exits 0 on host tobias-weiss.org AND FredholmDeterminants.lean has at most 2 remaining sorries.",
+      "manual": true
+    },
+    {
+      "id": "RH-7",
+      "title": "Prove the 2 remaining sorries in lean/Riemann/TransferOperator/Operator.lean: transferOperatorBounded (the tsum-based ContinuousLinearMap) and transferOperator_compact (IsCompactOperator). Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify lean/lake-manifest.json, lean/lean-toolchain or lean/lakefile.lean. Strategy for bounded: uniform convergence via M-test with x-free bound; summand continuity via Complex.continuousAt_cpow; assemble with LinearMap.mkContinuous. Strategy for compact: the image of the unit ball is equi-Lipschitz (derivative estimate with summable bound sum_inverse_pow_converges applied to a larger exponent) + uniformly bounded, then Arzela-Ascoli (Mathlib: IsCompactOperator via Equicontinuous + bounded, or ContinuousMap space + ArzelaAscoli theorem CompactSpace Equicontinuous — grep .lake/packages/mathlib for IsCompactOperator and ArzelaAscoli).",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/TransferOperator/Operator.lean"
+      ],
+      "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.TransferOperator.Operator tobi-yoga lean/Riemann/TransferOperator/Operator.lean",
+      "acceptance_prose": "lake build Riemann exits 0 on host tobi-yoga AND Operator.lean contains no sorry.",
+      "manual": true
+    },
+    {
+      "id": "RH-8",
+      "title": "Finish the remaining 3 sorries in lean/Riemann/TransferOperator/Theorem3_3.lean (a previous agent killed 5; remaining 3 are at the bottom, documented). Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify lean/lake-manifest.json, lean/lean-toolchain or lean/lakefile.lean. Work easiest-first. The remaining ones are likely: mixing rules out invariant subspaces (ergodicity), analyticity of lambda_1 + perturbation theory, and the final contradiction — these are research-level; if a sorry needs mathlib machinery that does not exist, leave it documented and explain precisely in a comment what is missing.",
+      "deps": [
+        "RH-5"
+      ],
+      "scope": [
+        "lean/Riemann/TransferOperator/Theorem3_3.lean"
+      ],
+      "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.TransferOperator.Theorem3_3 mac lean/Riemann/TransferOperator/Theorem3_3.lean",
+      "acceptance_prose": "lake build Riemann exits 0 on host mac AND Theorem3_3.lean has at most 1 remaining sorry.",
+      "manual": true
+    },
+    {
+      "id": "RH-9",
+      "title": "Kill as many of the 6 sorries as possible in lean/Riemann/ThermodynamicFormalism.lean (Fleet 4: thermodynamic formalism for the Gauss map transfer operator). Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify lean/lake-manifest.json, lean/lean-toolchain or lean/lakefile.lean. Easiest-first; leave genuinely-missing mathlib machinery documented in comments.",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/ThermodynamicFormalism.lean"
+      ],
+      "accept": "MAX_SORRY=3 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.ThermodynamicFormalism contextual-intelligence.org lean/Riemann/ThermodynamicFormalism.lean",
+      "acceptance_prose": "lake build Riemann exits 0 on host contextual-intelligence.org AND at most 3 sorries remain.",
+      "manual": true
+    },
+    {
+      "id": "RH-10",
+      "title": "Kill as many of the 4 sorries as possible in lean/Riemann/TransferOperator/Complete.lean (Mayer identity chain completion). Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify build-infra files.",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/TransferOperator/Complete.lean"
+      ],
+      "accept": "MAX_SORRY=2 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.TransferOperator.Complete tobias-weiss.org lean/Riemann/TransferOperator/Complete.lean",
+      "acceptance_prose": "lake build Riemann exits 0 on host tobias-weiss.org AND at most 2 sorries remain.",
+      "manual": true
+    },
+    {
+      "id": "RH-11",
+      "title": "Kill the 2 sorries in lean/Riemann/RamanujanProperty.lean. Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify build-infra files.",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/RamanujanProperty.lean"
+      ],
+      "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.RamanujanProperty chemie-lernen.org lean/Riemann/RamanujanProperty.lean",
+      "acceptance_prose": "lake build Riemann exits 0 on host chemie-lernen.org AND at most 1 sorry remains.",
+      "manual": true
+    },
+    {
+      "id": "RH-12",
+      "title": "Kill the 1 sorry in lean/Riemann/TransferOperator/Definitions.lean. Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify build-infra files.",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/TransferOperator/Definitions.lean"
+      ],
+      "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.TransferOperator.Definitions mac lean/Riemann/TransferOperator/Definitions.lean",
+      "acceptance_prose": "lake build Riemann exits 0 on host mac AND zero sorries remain.",
+      "manual": true
+    },
+    {
+      "id": "RH-13",
+      "title": "Kill the last sorry in lean/Riemann/TransferOperator/Theorem3_3.lean (final: contradiction step of Theorem 3.3). A previous agent killed 7 of 8; the last one is documented at the bottom. Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify build-infra files.",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/TransferOperator/Theorem3_3.lean"
+      ],
+      "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.TransferOperator.Theorem3_3 tobi-yoga lean/Riemann/TransferOperator/Theorem3_3.lean",
+      "acceptance_prose": "lake build Riemann exits 0 on host tobi-yoga AND at most 1 sorry remains.",
+      "manual": true
+    },
+    {
+      "id": "RH-14",
+      "title": "Kill the FINAL sorry in lean/Riemann/CompleteProof.lean — this is the capstone assembly of the whole transfer-operator argument. Read the file and lean/PROOF_TASKS_BRIEF.md first; all upstream modules now have their proofs (Operator, Theorem3_3, FredholmDeterminants etc.). NEVER modify build-infra files.",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/CompleteProof.lean"
+      ],
+      "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.CompleteProof mac lean/Riemann/CompleteProof.lean",
+      "acceptance_prose": "lake build Riemann exits 0 on host mac AND zero sorries in the whole Riemann tree.",
+      "manual": true
+    },
+    {
+      "id": "RH-15",
+      "title": "Kill the 1 remaining sorry in lean/Riemann/FredholmDeterminants.lean (nuclear/trace-class residue; a comment documents what is missing). Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify build-infra files.",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/FredholmDeterminants.lean"
+      ],
+      "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.FredholmDeterminants tobias-weiss.org lean/Riemann/FredholmDeterminants.lean",
+      "acceptance_prose": "lake build Riemann exits 0 on host tobias-weiss.org AND zero sorries in the whole Riemann tree.",
+      "manual": true
+    },
+    {
+      "id": "RH-16",
+      "title": "Kill the 1 remaining sorry in lean/Riemann/ThermodynamicFormalism.lean. Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify build-infra files.",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/ThermodynamicFormalism.lean"
+      ],
+      "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.ThermodynamicFormalism contextual-intelligence.org lean/Riemann/ThermodynamicFormalism.lean",
+      "acceptance_prose": "lake build Riemann exits 0 on host contextual-intelligence.org AND zero sorries in the whole Riemann tree.",
+      "manual": true
+    },
+    {
+      "id": "RH-17",
+      "title": "Kill the 1 remaining sorry in lean/Riemann/TransferOperator/Complete.lean. Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify build-infra files.",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/TransferOperator/Complete.lean"
+      ],
+      "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.TransferOperator.Complete chemie-lernen.org lean/Riemann/TransferOperator/Complete.lean",
+      "acceptance_prose": "lake build Riemann exits 0 on host chemie-lernen.org AND zero sorries in the whole Riemann tree.",
+      "manual": true
+    },
+    {
+      "id": "RH-18",
+      "title": "Kill the 1 remaining sorry in lean/Riemann/TransferOperator/Theorem3_3.lean (the previous agent left exactly one, documented at the bottom — likely an analytic perturbation step). Read lean/PROOF_TASKS_BRIEF.md first. NEVER modify build-infra files.",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/TransferOperator/Theorem3_3.lean"
+      ],
+      "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.TransferOperator.Theorem3_3 tobi-yoga lean/Riemann/TransferOperator/Theorem3_3.lean",
+      "acceptance_prose": "lake build Riemann exits 0 on host tobi-yoga AND zero sorries in the whole Riemann tree.",
+      "manual": true
+    },
+    {
+      "id": "RH-19",
+      "title": "Formalize the Krein-Rutman theorem in a NEW file lean/Riemann/KreinRutman.lean: a compact, positive (maps the cone {f | ∀ x, 0 ≤ f x} into itself) operator T on C(X, ℝ) (X compact Hausdorff, e.g. Set.Icc (0:ℝ) 1) with 0 < spectralRadius T has the spectral radius as a POSITIVE eigenvalue: ∃ f ≠ 0, (∀ x, 0 ≤ f x) ∧ T f = spectralRadius T • f. Strong form optional: eigenvalue is geometrically simple if T is strongly positive. Mathlib has NO KreinRutman (grep to confirm) — build from: spectralRadius exists (Mathlib SpectralRadius), compactness via IsCompactOperator (already used in Operator.lean), cone as convex closed set + applying the Schauder fixed-point / Edelstein route OR the positive-minimum argument on the eigenspace equation. Keep it generic (mathlib-PR-ready, Riemann namespace only for the application remark). Grep mathlib for: IsCompactOperator, spectralRadius, ContinuousMap.apply_pos, cone machinery. NEVER modify build-infra files.",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/KreinRutman.lean"
+      ],
+      "accept": "MAX_SORRY=2 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.KreinRutman mac lean/Riemann/KreinRutman.lean",
+      "acceptance_prose": "lake build Riemann exits 0 on host mac AND at most 2 sorries in the new file (target 0).",
+      "manual": true,
+      "remote": "contextual-intelligence.org"
+    },
+    {
+      "id": "RH-20",
+      "title": "Move the Gauss-map transfer operator onto the DISK (Ruelle space), new file lean/Riemann/DiskOperator.lean. Define E := C(Metric.closedBall (0:ℂ) 2, ℂ) (sup norm — reuse FunctionSpace-style CLM pattern from Operator.lean). For fixed s : ℂ with 1/2 < s.re, define L_s f (z) = ∑ (n:ℕ)+1 ≤ N partial, then tsum: L_s f z = tsum fun n => (transferOperatorWeightCm-like weight) * f (1/(n+1+z)) — i.e. weight (n+1+z)^(-s) = cpow, branch OK since |n+1+z| ≥ n ≥ 1 for |z| ≤ 2, n ≥ 1 (NEVER n=0: start the sum at n=1 or shift; check Operator.lean conventions). Prove: (1) each summand is continuous in z (Complex.continuousAt_cpow with n+1+z nonzero — positivity via abs), (2) uniform convergence on the ball by M-test with x-free bound ‖f‖ * (n)^(-s.re) (reuse BasicProofs summability lemmas), (3) hence transferOperatorDisk s : E →L[ℂ] E via LinearMap.mkContinuous, (4) compactness via Arzela-Ascoli exactly as transferOperator_compact in Operator.lean (equi-Lipschitz from weight derivative with s.re shifted, uniformly bounded). This is the Ruelle space where the eventual determinant theory lives. Grep .lake/packages/mathlib for cpow lemmas and reuse Operator.lean verbatim patterns where possible. NEVER modify build-infra files.",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/DiskOperator.lean"
+      ],
+      "accept": "MAX_SORRY=2 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.DiskOperator contextual-intelligence.org lean/Riemann/DiskOperator.lean",
+      "acceptance_prose": "lake build Riemann exits 0 on host contextual-intelligence.org AND at most 2 sorries in the new file (target 0).",
+      "manual": true,
+      "remote": "contextual-intelligence.org"
+    },
+    {
+      "id": "RH-21",
+      "title": "Build finite-rank Fredholm determinant infrastructure, new file lean/Riemann/FredholmFiniteRank.lean. Mathlib has NO nuclear/Fredholm-determinant theory (verified). Target: for a finite-rank A : E →L[ℂ] E on a normed space E, and using a basis of the finite-dimensional range, define det(1 - A) as the Matrix.det of (id + matrix of A) on the range. Practical route: work on FiniteDimensional ℂ E directly first — for A : E →L[ℂ] E with [FiniteDimensional ℂ E], det(1-A) := LinearMap.det (1 - A) (mathlib HAS LinearMap.det for finite-dim: grep LinearMap.det). Prove: (1) multiplicativity det((1-A)(1-B)) = det(1-A) * det(1-B) (from LinearMap.det_mul), (2) det(1-A) ≠ 0 ↔ (1-A) is bijective (LinearMap.det_eq_zero_iff / ker=0+surj), (3) for rank-1 A = fun x => c • (φ x) with φ : E →L[ℂ] ℂ: det(1 - A) = 1 - φ c (compute via matrix in a basis adapting to φ), (4) if 1 is NOT an eigenvalue (IsCompactOperator setting) then det ≠ 0. This is the seed of the eventual infinite-dim determinant. Grep mathlib for LinearMap.det, Matrix.charpoly, LinearMap.det_eq_zero_iff. NEVER modify build-infra files.",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/FredholmFiniteRank.lean"
+      ],
+      "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.FredholmFiniteRank tobias-weiss.org lean/Riemann/FredholmFiniteRank.lean",
+      "acceptance_prose": "lake build Riemann exits 0 on host tobias-weiss.org AND at most 1 sorry in the new file (target 0).",
+      "manual": true,
+      "remote": "tobias-weiss.org"
+    },
+    {
+      "id": "RH-22",
+      "title": "HONESTY PASS on the formalization (no new math): (1) Create research/FRONTIER.md documenting: the chain circularity (fredholmDet s := C(s)⁻¹ * ζ(2s) in Complete.lean is definitional; leadingEigenvalue := exp(1/2 - s) in Theorem3_3.lean is a model, not a spectrum — cite file:line), the PROVEN real results (Gauss-map operator on C([0,1]) bounded+compact, BasicProofs summability, Euler-region nonvanishing, PNT line theorem modulo the strip lemma, functional-equation reflection), and the FRONTIER equivalence: no_zeros_right_half_plane (1/2 < Re < 1) is EQUIVALENT to the RH hard half — ρ(L_s) < 1 for Re s > 1/4 would imply RH, and is exactly as hard. (2) Rename in Theorem3_3.lean: leadingEigenvalue -> modelLeadingEigenvalue (update all references in that file only). (3) Add lean/Riemann/AxiomAudit.lean with #print axioms statements for: riemannZeta_ne_zero_of_re_eq_one, functionalEquation_reflection, riemannHypothesis_criticalStrip, transferOperatorBounded, transferOperator_compact, mayer_identity, fredholmDet_ne_zero_of_one_lt_half — then run `lake env lean lean/Riemann/AxiomAudit.lean` locally to capture output into the file as a comment block. NEVER modify build-infra files. NEVER weaken or delete any theorem statement.",
+      "deps": [],
+      "scope": [
+        "research/FRONTIER.md",
+        "lean/Riemann/TransferOperator/Theorem3_3.lean",
+        "lean/Riemann/AxiomAudit.lean"
+      ],
+      "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.AxiomAudit chemie-lernen.org lean/Riemann/AxiomAudit.lean lean/Riemann/TransferOperator/Theorem3_3.lean",
+      "acceptance_prose": "lake build Riemann exits 0 on host chemie-lernen.org, FRONTIER.md exists with all three sections, renames complete, audit output captured.",
+      "manual": true,
+      "remote": "chemie-lernen.org"
+    },
+    {
+      "id": "RH-23",
+      "title": "PAPER HONESTY PASS: revise paper/transfer-operator-rh.tex + paper/README.md + ABSOLUTE_TRUST.md to the conditional architecture: (1) present the Mayer-operator framework as a CONDITIONAL reduction: RH (strip half) follows from the operator-side spectral bound rho(L_s)<1 for Re s > 1/4 on the Ruelle space — state clearly this bound is exactly as hard as RH and currently unproven; (2) keep and highlight the honest results: PNT line theorem (modulo Hadamard-de la Vallee Poussin), functional-equation reflection, Euler-region nonvanishing via the correspondence, compactness of the C([0,1]) Gauss-map operator, GaussMap mathlib PR #43744; (3) remove/soften any claim that RH is proven or that the current Lean development proves RH — it proves the reduction architecture plus the Euler-region corollaries. German-language root markdown files: do NOT touch. NEVER modify build-infra files.",
+      "deps": [],
+      "scope": [
+        "paper/transfer-operator-rh.tex",
+        "paper/README.md",
+        "ABSOLUTE_TRUST.md"
+      ],
+      "accept": "GATE_TIMEOUT=1200 bash lean/fleet-gate.sh Riemann.CompleteProof tobi-yoga lean/Riemann/CompleteProof.lean",
+      "acceptance_prose": "gate passes trivially (no Lean changes expected); tex/README/ABSOLUTE_TRUST revised per instructions.",
+      "manual": true,
+      "remote": "tobi-yoga"
+    },
+    {
+      "id": "RH-26",
+      "title": "CLOSE OR ADVANCE the single documented frontier in lean/Riemann/KreinRutman.lean: kreinRutman_core (a compact positive operator T on C(X,R) with 0 < spectralRadius R T has a nonzero positive eigenvector f at the spectral radius: exists f in positiveCone, f != 0, T f = (spectralRadius R T).toReal smul f). CRITICAL CONTEXT — the base is the REPAIRED master a722878: an earlier sharper 'collapse' lemma ('rho*f <= T f on the cone forces equality') was **REMOVED** because it is FALSE (counterexample documented in the docstring: X a two-point space, T = [[2,1],[0,2]], f=(0,1) has rho*f = (0,2) < (1,2) = Tf strictly while Tf != rho*f). DO NOT re-admit that collapse lemma or anything equivalent (this is the repo's false-lemma trap; re-admitting it fails the round). DO NOT weaken the statement of kreinRutman_core, kreinRutman, kreinRutman_strong, or any existing theorem. DO NOT introduce axioms. The file currently compiles with exactly ONE sorry (kreinRutman_core); all other theorems are proved. Three routes to close it, all absent from mathlib over the real field: (1) Gelfand's formula over R — prove Tendsto (fun n => ||T^n||^(1/n)) atTop (nhds (spectralRadius R T).toReal) (mathlib's limit formula spectrum.pow_nnnorm_pow_one_div_tendsto_nhds_spectralRadius is complex-only), then for e in positiveCone nonzero with tight orbit, normalize T^n e / ||T^n e|| and extract a positive cluster-point eigenvector from compactness of T (IsCompactOperator); (2) Neumann/resolvent positivity on (rho(T), infty): represent (lambda - T)^-1 = sum_n T^n / lambda^(n+1) with a convergence-radius argument at the spectral radius (not just at ||T||), deduce the resolvent is positive, then run the classical two-sided domination contradiction; (3) complexification spectral-radius transfer (see RH-27's file lean/Riemann/ComplexificationSpectrum.lean). IDEAL OUTCOME: kreinRutman_core genuinely proved (1 sorry -> 0; gate MAX_SORRY=1 lets you land with the sorry still in place). MINIMUM ACCEPTABLE: prove new unambiguous TRUE infrastructure in this same file — e.g. the real Gelfand formula for (not necessarily positive) bounded operators, or resolvent-invertibility/positivity facts — each as its own fully checked lemma, LEAVE the single core sorry in place, and keep total sorries in the file <= 1. A 'close' that merely replaces the sorry with another sorry, weakens a statement, or hides the collapse lemma anywhere will FAIL review. Respect the documented computation quirk: obtain/rcases on an ENNReal-coerced exists times out at default heartbeats — raise set_option maxHeartbeats 5000000 for that declaration; use DFunLike.congr_fun (not congr_fun) on C(X,R) hypotheses. NEVER modify lean/lake-manifest.json, lean/lean-toolchain, lean/lakefile.lean. Run the acceptance gate inside your worktree before committing; commit with message prefix feat(RH-26): or infra(RH-26): .",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/KreinRutman.lean"
+      ],
+      "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.KreinRutman tobi-yoga lean/Riemann/KreinRutman.lean",
+      "acceptance_prose": "lake build Riemann.KreinRutman exits 0 on tobi-yoga; total sorries in KreinRutman.lean <= 1 (0 if the core was genuinely closed); no statement weakened, no axiom, no collapse-lemma resurrection; only scope file touched.",
+      "manual": true,
+      "remote": "tobi-yoga"
+    },
+    {
+      "id": "RH-27",
+      "title": "PROBE the complexification route to the Krein-Rutman frontier: write a NEW file lean/Riemann/ComplexificationSpectrum.lean proving spectral-radius/spectrum transfer lemmas between a real continuous linear map and its complexification, as mathlib-PR-ready infrastructure (Riemann namespace only where unavoidable, generic statements preferred). Context: lean/Riemann/KreinRutman.lean now reduces the Krein-Rutman theorem on C(X,R) to ONE admitted existence lemma (kreinRutman_core); closing it over R needs either a real Gelfand formula, resolvent positivity, or the spectrum/spectralRadius identity between a real operator T : E ->L[R] E and its complexification T_C : E_C ->L[C] E_C. First grep mathlib in .lake/packages/mathlib for existing API: complexification (LinearMap.complexification, ContinuousLinearMap.complexification, Complex.complexification), spectrum + algebra maps, spectralRadius, IsCompactOperator, and check whether C(X,R) complexifies to C(X,C) (ContinuousMap complexification). Prove what is TRUE and machine-checked: e.g. spectrum membership transfer sigma(T) subset sigma(T_C), spectralRadius R T = spectralRadius C T_C (or one-way inequality if that is all that is true), positivity preservation under complexification. Conclude the file with a precise documented 'next-step' comment stating which identity remains open and exactly why (e.g. missing realification lemma in mathlib). DO NOT weaken anything, DO NOT introduce axioms, DO NOT touch any file other than the new one (total sorries in THIS file <= 1 allowed, each must be a documented one-line sorry-lemma with a name and a comment naming the missing mathlib fact). NEVER modify lean/lake-manifest.json, lean/lean-toolchain, lean/lakefile.lean. Run the acceptance gate inside your worktree before committing; commit with message prefix feat(RH-27): or infra(RH-27): .",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/ComplexificationSpectrum.lean"
+      ],
+      "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.ComplexificationSpectrum chemie-lernen.org lean/Riemann/ComplexificationSpectrum.lean",
+      "acceptance_prose": "lake build Riemann.ComplexificationSpectrum exits 0 on chemie-lernen.org; total sorries in ComplexificationSpectrum.lean <= 1 and documented; no axiom, no weakening; only the new file touched.",
+      "manual": true,
+      "remote": "chemie-lernen.org"
+    },
+    {
+      "id": "RH-28",
+      "title": "PROVE the resolvent-positivity warm-up for the Krein-Rutman frontier in lean/Riemann/KreinRutman.lean (Route 2: Neumann/resolvent positivity on (rho(T), infty)). This round is FULLY PROVABLE with NO new sorries — do not admit anything. Deliver, as checked theorems in this file: (1) IsPositive.pow: hT : IsPositive T -> IsPositive (T ^ n) for all n (closed under powers; iterate composition and use the existing IsPositive.monotone / IsPositive.add / IsPositive.smul / isPositive_id in this file). (2) The Neumann series identity at lambda > ||T||: for 0 < lambda and ||T|| < lambda, HasSum (fun n : N => T ^ n / lambda ^ (n + 1)) (Ring.inverse (lambda * 1 - T)) — or equivalently with the scaled operator rT = lambda^-1 * T, HasSum (fun n => rT ^ n) (Ring.inverse (1 - rT)) — using mathlib API: CLM endomorphisms (C(X,R) ->L[R] C(X,R)) ARE a NormedRing (instance toNormedRing in Mathlib/Analysis/Normed/Operator/NormedSpace.lean), C(X,R) is complete so HasSummableGeomSeries applies (instance in Mathlib/Analysis/SpecificLimits/Normed.lean:279, lemma summable_geometric_of_norm_lt_one), and NormedRing.inverse_one_sub (Mathlib/Analysis/Normed/Ring/Units.lean:98) gives inverse (1 - t) = (Units.oneSub t h)^-1 for ||t|| < 1; Ring.inverse of a unit is the true inverse. Rescale carefully to express the resolvent Ring.inverse (lambda * 1 - T). (3) resolvent_positivity_at_norm: for IsPositive T, 0 < lambda, ||T|| < lambda: IsPositive (Ring.inverse (lambda * 1 - T)) — via the Neumann series: every term (rT)^n with rT = lambda^-1 * T is positive (combine IsPositive.pow with IsPositive.smul), and a summable series of positive operators is positive on the cone (for f in positiveCone, show 0 <= (((sum of terms) f) x) termwise via tsum_nonneg / Real.tsum_nonneg on the nonnegative real sequence, since each term maps the cone into itself), then identify the series with the inverse. IMPORTANT: the file already has exactly ONE sorry (kreinRutman_core) which is the documented frontier — the total sorry count in the file must STAY <= 1, i.e. you may add ZERO new sorries/admits. If an intermediate step resists a clean proof, do NOT admit: prove the partial genuinely-true lemmas you can (e.g. IsPositive.pow alone already advances the route), document in the file header exactly what blocked the rest, and leave total sorries at 1. CRITICAL HONESTY RULES: do not weaken any statement; do not re-add the FALSE collapse lemma (rho*f <= T f on the cone forces equality — counterexample documented in the docstring, re-adding it fails review); hidden 'admit' commands compile as axioms and bypass the sorry count — they FAIL review, grep will catch them; no 'def ... := by sorry' placeholders. Computation quirk: obtain/rcases on an ENNReal-coerced exists may blow the heartbeat budget — raise 'set_option maxHeartbeats 5000000' for that declaration; on C(X,R) use DFunLike.congr_fun rather than congr_fun. NEVER modify lean/lake-manifest.json, lean/lean-toolchain, lean/lakefile.lean. You may add imports if needed. Run the acceptance gate inside your worktree before committing (cd lean && lake env lean Riemann/KreinRutman.lean must compile with exactly 1 sorry before you commit); commit with message prefix feat(RH-28): or infra(RH-28): .",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/KreinRutman.lean"
+      ],
+      "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.KreinRutman tobi-yoga lean/Riemann/KreinRutman.lean",
+      "acceptance_prose": "lake build Riemann.KreinRutman exits 0 on tobi-yoga; total sorries in KreinRutman.lean stays <= 1 (the pre-existing kreinRutman_core); no NEW sorry/admit; no weakened statement; no collapse-lemma resurrection; only scope file touched.",
+      "manual": true,
+      "remote": "tobi-yoga"
+    },
+    {
+      "id": "RH-29",
+      "title": "BUILD the real Gelfand spectral-radius module in a NEW file lean/Riemann/RealGelfand.lean — reducing the Krein-Rutman frontier to exactly ONE documented admission (the real Gelfand UPPER bound), with everything else proved. Context: master's lean/Riemann/KreinRutman.lean proves Krein-Rutman modulo one sorry kreinRutman_core (compact positive T on C(X,R), 0 < spectralRadius R T, has a nonzero positive eigenvector at the spectral radius). The single mathematical fact that blocks every attack route is the real version of Gelfand's formula (mathlib's is complex-only: pow_nnnorm_pow_one_div_tendsto_nhds_spectralRadius in Mathlib/Analysis/Normed/Algebra/GelfandFormula.lean requires [NormedAlgebra C A]; its upper-bound half limsup_pow_nnnorm_pow_one_div_le_spectralRadius uses complex analytic power-series radius arguments). Work GENERICALLY (mathlib-PR-ready), like mathlib: variable {A : Type*} [NormedRing A] [NormedAlgebra R A] [CompleteSpace A] (a : A), lemma spectralRadius R a. Deliver, as checked theorems in the new file: (1) realSpectralRadius_le_liminf_pow_nnnorm_pow_one_div: spectralRadius R a <= atTop.liminf (fun n => (‖a ^ n‖₊ : ℝ≥0∞) ^ (1 / n : ℝ)) — the LOWER bound is already field-general in mathlib (spectralRadius_le_liminf_pow_nnnorm_pow_one_div in Mathlib/Analysis/Normed/Algebra/Spectrum.lean, 'variable (K)' — instantiate at K = R, should be a one-liner; if it needs hypotheses add exactly what mathlib's statement needs). (2) realGelfandUpperBound: atTop.limsup (fun n => ‖a ^ n‖₊ ^ (1 / n : ℝ)) <= spectralRadius R a — THE single documented sorry. Give it a docstring that: states this is the frontier; explains mathlib has only the complex version (cite limsup_pow_nnnorm_pow_one_div_le_spectralRadius); names the two viable mathlib-PR paths — (a) generalizing the upper bound to any NontriviallyNormedField K where the running norm/spectralRadius behaves well, or (b) an intrinsic real argument (subharmonicity / series radius / Beurling-Gelfand); and notes that once this bound is closed in mathlib, kreinRutman_core closes. EXACTLY ONE sorry, nothing else admitted. (3) realGelfandFormula: Tendsto (fun n => (‖a ^ n‖₊ : ℝ≥0∞) ^ (1 / n : ℝ)) atTop (nhds (spectralRadius R a)) — PROVED from (1)+(2) via tendsto_of_le_liminf_of_limsup_le (mirror mathlib's own two-line assembly). (4) eventually_pow_norm_le (the practical boundedness the orbit argument needs): for any eps > 0 there is C with ∀ n, ‖a ^ n‖ ≤ C * (spectralRadius R a + eps) ^ n — PROVED from (3): convert the ENNReal tendsto to a norm bound with the ratio (‖a^n‖ / (rho+eps)^n) eventually <= 1 + something (mind the frontier sorry's hypotheses; state it for arbitrary nonzero real spectralRadius — make the statement robust to spectralRadius = 0 by allowing any eps>0 threshold; if the 0 case is awkward, require 0 < spectralRadius R a and note it). Do NOT add tetration or false statements 'for fun' — every theorem must be true, proved, and used. CRITICAL HONESTY RULES: exactly one sorry total in the file; no hidden 'admit' (bypasses the sorry count, fails review); no weakened statements; no 'def ... := by sorry'; nothing speculative. Open ENNReal and NNReal scopes; import Mathlib.Analysis.Normed.Algebra.Spectrum and Mathlib.Analysis.Normed.Algebra.GelfandFormula (open scoped NNReal Topology Ring, open Filter ENNReal — copy mathlib's GelfandFormula.lean style). This file must NOT import KreinRutman.lean — keep it generic. NEVER modify lean/lake-manifest.json, lean/lean-toolchain, lean/lakefile.lean. Run the acceptance gate inside your worktree before committing (cd lean && lake env lean Riemann/RealGelfand.lean must compile with exactly 1 sorry = realGelfandUpperBound before you commit); commit with message prefix feat(RH-29): or infra(RH-29): .",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/RealGelfand.lean"
+      ],
+      "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.RealGelfand chemie-lernen.org lean/Riemann/RealGelfand.lean",
+      "acceptance_prose": "lake build Riemann.RealGelfand exits 0 on chemie-lernen.org; exactly 1 sorry in RealGelfand.lean (realGelfandUpperBound, documented); other theorems proved; no admit; no weakening; only scope file touched.",
+      "manual": true,
+      "remote": "chemie-lernen.org"
+    },
+    {
+      "id": "RH-30",
+      "title": "RH-30: extend the resolvent-positivity infrastructure of lean/Riemann/KreinRutman.lean (Scope: ONLY lean/Riemann/KreinRutman.lean) from its current norm-level form (lam > ||T||) to the FULL interval (lambda > rho(T)) using the real Gelfand formula (Riemann.RealGelfand.realGelfandFormula). Everything in this task is PROVABLE: you add ZERO new sorries (the file keeps its single existing kreinRutman_core sorry). Deliver these as checked declarations in the file: (1) import Riemann.RealGelfand (add to imports). (2) `theorem eventually_pow_norm_le {T : C(X, R) ->L[R] C(X, R)} (eps : R) (heps : 0 < eps) : exists C > 0, forall n : N, ||T ^ n|| <= C * ((spectralRadius R T).toReal + eps) ^ n` — from realGelfandFormula (a := T): the ENNReal tendsto of (||T^n||_+)^(1/n) to spectralRadius R T gives, for specifically-chosen n0 and delta < eps, ||T^n|| <= (rho.toReal + eps)^n eventually (raise to the n-th power of the ENNReal bound, mind the conversion RNNatInf <-> R and that spectralRadius R T is always < oo because spectralRadius_le_nnnorm), and the finitely many early terms are absorbed into C (max over a finite iSup / Finset.max of ||T^i|| / bound^i). This is the bounded-orbit estimate the whole route needs. (3) `theorem resolvent_neumann_series_at_radius {T : C(X, R) ->L[R] C(X, R)} {lam : R} (hlam : 0 < lam) (hrho : (spectralRadius R T).toReal < lam) : HasSum (fun n : N => (lam^-1 : R) ^ (n + 1) s T ^ n) (Ring.inverse (lam s (1 : C(X, R) ->L[R] C(X, R)) - T))`. Proceed thus: pick eps>0 with (rho.toReal + eps) < lam; from eventually_pow_norm_le the terms of the series satisfy ||(lam^-1)^(n+1) s T^n|| <= C*((rho.toReal+eps)/lam)^(n+1) hence the series is summable (geometric, ratio<1; Summable.of_norm / NormedSpace summable_criterion), and with rT := lam^-1 s T you get ||rT^n|| -> 0. Show it HASSUM the Ring.inverse by the telescoping product identity (1 - rT) * (sum_{k<n} rT^k) = 1 - rT^n and its mirror, pass to the limit using that left and right CLM multiplication by a fixed operator is continuous (it is a topological ring: use the normed-ring continuity / ContinuousLinearMap.mulLeft / mulRight or `simpa using tendsto...`) to get (lam s 1 - T) * tsum = 1 and tsum * (lam s 1 - T) = 1, then conclude tsum = Ring.inverse (lam s 1 - T) via the ring.inverse characterization (Ring.inverse_unit / Ring.inverse_eq if IsUnit; or use `Ring.inverse` is the two-sided inverse of units: isUnit_one_sub_of_norm_lt_one-style lemmas exist in Mathlib/Analysis/Normed/Ring/Units.lean). Honest fallback if the HasSum form resists: deliver `theorem resolvent_tsum_at_radius` stating the same sum equality with ∑' (tsum) and prove that, plus (2) and (4), documenting in a comment the one step that resisted. (4) `theorem resolvent_positivity_at_radius {T : C(X, R) ->L[R] C(X, R)} (hTpos : IsPositive T) {lam : R} (hlam : 0 < lam) (hrho : (spectralRadius R T).toReal < lam) : IsPositive (Ring.inverse (lam s (1 : C(X, R) ->L[R] C(X, R)) - T))` — copy the series-positivity method of resolvent_positivity_at_norm VERBATIM in structure: each summand (lam^-1)^(n+1) s T^n is positive (IsPositive.pow + IsPositive.smul with 0 <= (lam^-1)^(n+1)), a summable series of positive operators is positive termwise on the cone (tsum_nonneg pointwise), and the tsum equals the inverse by (3). Gate: the acceptance gate counts sorries ONLY in KreinRutman.lean (MAX_SORRY=1), and a remote `lake build Riemann.KreinRutman` must exit 0 on the gate host.\nCONTEXT. Repo 'riemann', Lean 4 / mathlib. Module dir lean/Riemann/. The Krein-Rutman\nformalization is in lean/Riemann/KreinRutman.lean (namespace Riemann, noncomputable\nsection, variable {X : Type*} [TopologicalSpace X] [CompactSpace X] [Nonempty X]). The\nfile currently has EXACTLY ONE sorry: kreinRutman_core. It also contains (all PROVED):\n  def positiveCone : Set C(X, R) := { f | forall x, 0 <= f x }\n  def IsPositive (T : C(X,R) ->L[R] C(X,R)) : Prop := MapsTo T positiveCone positiveCone\n  theorem IsPositive.monotone (hT : IsPositive T) {f g} (hfg : f <= g) : T f <= T g\n  theorem IsPositive.smul (hT : IsPositive T) (hc : 0 <= c) : IsPositive (c s T)\n  theorem IsPositive.add / IsPositive.pow (hT : IsPositive T) (n : N) : IsPositive (T ^ n)\n  theorem exists_eigenvector_with_domination {T} (hTpos : IsPositive T)\n    (hTcomp : IsCompactOperator T) (hRho : 0 < spectralRadius R T) :\n    exists v : C(X,R), v != 0 / exists mu : R,\n      |mu| = (spectralRadius R T).toReal / T v = mu s v /      forall x, (spectralRadius R T).toReal * |v x| <= (T |v|) x\n  lemma resolvent_scaled_norm_lt_one, resolvent_scaling, resolvent_neumann_series,\n  theorem resolvent_positivity_at_norm: {T} (hTpos : IsPositive T) {lam : R}\n    (hlam : 0 < lam) (hT : ||T|| < lam) : IsPositive (Ring.inverse (lam s 1 - T))\nThe normed-ring facts used there: (C(X,R) ->L[R] C(X,R)) is a NormedRing\n(Mathlib/Analysis/Normed/Operator/NormedSpace.lean toNormedRing instance) and complete,\nso HasSummableGeomSeries + NormedRing.inverse_one_sub (Mathlib/Analysis/Normed/Ring/Units.lean\nlean:98) hold; HasSum (fun n => rT^n) (Ring.inverse (1 - rT)) for ||rT|| < 1.\n\nNEW: lean/Riemann/RealGelfand.lean (namespace Riemann, already merged on master) is GENERIC:\nvariable {A : Type*} [NormedRing A] [NormedAlgebra R A] [CompleteSpace A] (a : A), and has:\n  theorem realSpectralRadius_le_liminf_pow_nnnorm_pow_one_div  (PROVED)\n  theorem realGelfandUpperBound (THE single documented sorry: limsup of (||a^n||_+)^(1/n)\n    <= spectralRadius R a; mathlib has only the complex version)\n  theorem realGelfandFormula (PROVED): Tendsto (fun n => (||a^n||_+ : RNNatInf)^(1/n : R))\n    atTop (nhds (spectralRadius R a))\nImport it with `import Riemann.RealGelfand` (works: same Lean project, mathlib is built).\nSpecialize realGelfandFormula to a = T as the CLM (all three typeclasses exist for it).\n\nGUARDRAILS (violations = automatic rejection, applied to your FINAL committed head):\n* NO new `sorry` beyond the allowed budget stated in YOUR task. `admit` compiles as an\n  axiom AND bypasses the sorry count — the reviewer greps for `admit`; docstring prose like\n  \"admitted\" is fine (verify with `grep -n admit FILE | grep -v admitted` mentally).\n* Do NOT weaken any existing theorem's statement. Do NOT delete or alter existing proved\n  theorems. Do NOT resurrect the FALSE \"collapse lemma\" (rho*f <= T f => equality).\n* Do NOT use the lowercase Greek letter 'lambda' as an identifier (it is the reserved\n  lambda-binder token in Lean and is unparsable). If you need a scalar parameter, name it\n  `lam`. 'rho' / 'rho0' are fine.\n* `set_option maxHeartbeats 5000000` at top of declarations when reflection/closures blow\n  the budget. Use `open scoped NNReal` / `open Filter ENNReal` / `open ENNReal` for\n  RNNatInf arithmetic; on C(X,R) prefer `DFunLike.congr_fun` / ext over congr_fun.\n* Commit early and often with message prefix from YOUR task id (the orchestrator\n  auto-commits your worktree at the end; the FINAL head is what gets reviewed, so make sure\n  your last commit is your best honest state — do not delete proved lemmas near the end).\n* If a step resists a clean proof after honest effort: DO NOT admit it. Prove every lemma\n  you genuinely can (partial honest progress is a valid deliverable), and document exactly\n  what blocked the rest in a file-header comment. Leave total sorries within budget.\n* NEVER modify lean/lake-manifest.json, lean/lean-toolchain, lean/lakefile.lean.\n  Only the scope file(s) listed for YOUR task may be touched.\n* Verify before your final commit: cd lean && lake env lean <your file> MUST compile with\n  no errors and the allowed sorry count. Then commit. The acceptance gate will rebuild on a\n  gate host; a 'gate failed, retry' result usually means the build is slow or a transient\n  infra issue, it does NOT mean make more edits blindly.\n",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/KreinRutman.lean"
+      ],
+      "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.KreinRutman tobi-yoga lean/Riemann/KreinRutman.lean",
+      "acceptance_prose": "lake build Riemann.KreinRutman exits 0 on tobi-yoga; KreinRutman.lean has exactly 1 sorry (kreinRutman_core); 0 new sorries/admits; resolvent positivity proved on (rho(T), oo); no weakening; only scope file touched.",
+      "manual": true,
+      "remote": "tobi-yoga"
+    },
+    {
+      "id": "RH-31",
+      "title": "RH-31: build the Gelfand-orbit closure structure in a NEW file lean/Riemann/OrbitClosure.lean (Scope: ONLY that new file; KreinRutman.lean and RealGelfand.lean are READ-ONLY dependencies — import `import Riemann.KreinRutman` and reuse its positiveCone / IsPositive / IsPositive.monotone / IsPositive.pow / exists_eigenvector_with_domination in namespace Riemann). This is the functional-analysis step of the classical proof: from a dominating subsolution on the positive cone, the normalized orbit T^n w / rho^n is an increasing sequence whose boundedness (a cluster-point argument) yields the positive eigenvector. Context of use: exists_eigenvector_with_domination produces w = |v| with T w >= rho*w pointwise, rho := (spectralRadius R T).toReal > 0. Define `noncomputable def superharmonicOrbit (T : C(X,R) ->L[R] C(X,R)) (rho : R) (w : C(X,R)) (n : N) : C(X,R) := (rho^-1 : R) ^ n s (T ^ n) w`. Deliver as checked theorems (all PROVABLE; 0 sorries unless you choose the optional frontier below): (1) superharmonicOrbit_mem: {T} (hT : IsPositive T) {rho} (hrho : 0 < rho) {w} (hw : w in positiveCone) (hdom : T w >= rho s w) : forall n, superharmonicOrbit T rho w n in positiveCone (induction: membership follows from IsPositive.apply_nonneg at each step since T w >= rho*w and 0 <= (rho^-1)^n). (2) superharmonicOrbit_nonzero: w != 0, hT : IsPositive T, 0 < rho, w in cone, hdom : T w >= rho s w => forall n, superharmonicOrbit T rho w n != 0 (iterated: each factor is >= and w != 0 stays nonzero; note forall-nonzero functions and rho^-1 != 0). (3) superharmonicOrbit_mono: same hypotheses => forall n, superharmonicOrbit T rho w n <= superharmonicOrbit T rho w (n + 1) pointwise (use IsPositive.monotone on hdom and the hypothesis T w >= rho s w, plus that multiplying a nonneg inequality by (rho^-1)^n preserves order: have T^(n+1) w >= rho * T^n w by monotone iteration, then normalize). (4) superharmonicOrbit_navigation: {T} {rho} {w} : T (superharmonicOrbit T rho w n) = rho s superharmonicOrbit T rho w (n+1) — pure algebra (map_smul / ring, CLM linearity). (5) THE MAIN THEOREM — hypothesis form (PROVABLE, this is the compactness hand-off): `theorem bounded_orbit_yields_positive_eigenvector {T : C(X,R) ->L[R] C(X,R)} (hTpos : IsPositive T) (hTcomp : IsCompactOperator T) {rho : R} (hrho : 0 < rho) {w : C(X,R)} (hw0 : w != 0) (hw : w in positiveCone) (hdom : T w >= rho s w) (hbound : exists C, forall n, ||superharmonicOrbit T rho w n|| <= C) : exists f : C(X,R), f in positiveCone / f != 0 / T f = rho s f`. Outline: the sequence A n := T (superharmonicOrbit T rho w n) = rho * orbit(n+1) is bounded in norm (from hbound via (4)) and since T is compact its image set { A n } lies in a compact set, so by the Bolzano-Weierstrass property (choose the mathlib lemma that a sequence in a compact set has a converging subsequence, e.g. isCompact.tendsto_subseq / seq_of for `Metric`/TopologicalSpace; complete the details) obtain a subsequence phi with (orbit (phi k + 1)) converging in norm to f. Then f in positiveCone (cone is closed), f != 0 (each ||orbit n|| >= ||w|| > 0 because the monotone increasing orbit starts at w, both nonneg — argue via the pointwise order and ContinuousMap norm), and T f = rho f by continuity of T passing (4) through the limit (T (orbit phi k) = rho * orbit (phi k + 1) and both sides converge). This is the exact statement that, given the boundedness, closes kreinRutman_core of KreinRutman.lean (apply it with w = |v| from exists_eigenvector_with_domination, rho = (spectralRadius R T).toReal). OPTIONAL (ONLY if you want): state `theorem orbit_bounded` — the single allowed sorry and the true frontier ('rho*w <= T w and 0 < rho is the spectral radius forces ||T^n w||/rho^n bounded') — with a thorough docstring noting it is exactly the deep Krein-Rutman step and that resolvent positivity at the radius (merged future) plus the strict-domination contradiction are the planned route. If you leave it out entirely, the round is still complete: (1)-(5) with 0 sorries. MAX total sorries in OrbitClosure.lean: 1. Do NOT edit KreinRutman.lean (its kreinRutman_core stays; closing it is a later manual step).\nCONTEXT. Repo 'riemann', Lean 4 / mathlib. Module dir lean/Riemann/. The Krein-Rutman\nformalization is in lean/Riemann/KreinRutman.lean (namespace Riemann, noncomputable\nsection, variable {X : Type*} [TopologicalSpace X] [CompactSpace X] [Nonempty X]). The\nfile currently has EXACTLY ONE sorry: kreinRutman_core. It also contains (all PROVED):\n  def positiveCone : Set C(X, R) := { f | forall x, 0 <= f x }\n  def IsPositive (T : C(X,R) ->L[R] C(X,R)) : Prop := MapsTo T positiveCone positiveCone\n  theorem IsPositive.monotone (hT : IsPositive T) {f g} (hfg : f <= g) : T f <= T g\n  theorem IsPositive.smul (hT : IsPositive T) (hc : 0 <= c) : IsPositive (c s T)\n  theorem IsPositive.add / IsPositive.pow (hT : IsPositive T) (n : N) : IsPositive (T ^ n)\n  theorem exists_eigenvector_with_domination {T} (hTpos : IsPositive T)\n    (hTcomp : IsCompactOperator T) (hRho : 0 < spectralRadius R T) :\n    exists v : C(X,R), v != 0 / exists mu : R,\n      |mu| = (spectralRadius R T).toReal / T v = mu s v /      forall x, (spectralRadius R T).toReal * |v x| <= (T |v|) x\n  lemma resolvent_scaled_norm_lt_one, resolvent_scaling, resolvent_neumann_series,\n  theorem resolvent_positivity_at_norm: {T} (hTpos : IsPositive T) {lam : R}\n    (hlam : 0 < lam) (hT : ||T|| < lam) : IsPositive (Ring.inverse (lam s 1 - T))\nThe normed-ring facts used there: (C(X,R) ->L[R] C(X,R)) is a NormedRing\n(Mathlib/Analysis/Normed/Operator/NormedSpace.lean toNormedRing instance) and complete,\nso HasSummableGeomSeries + NormedRing.inverse_one_sub (Mathlib/Analysis/Normed/Ring/Units.lean\nlean:98) hold; HasSum (fun n => rT^n) (Ring.inverse (1 - rT)) for ||rT|| < 1.\n\nNEW: lean/Riemann/RealGelfand.lean (namespace Riemann, already merged on master) is GENERIC:\nvariable {A : Type*} [NormedRing A] [NormedAlgebra R A] [CompleteSpace A] (a : A), and has:\n  theorem realSpectralRadius_le_liminf_pow_nnnorm_pow_one_div  (PROVED)\n  theorem realGelfandUpperBound (THE single documented sorry: limsup of (||a^n||_+)^(1/n)\n    <= spectralRadius R a; mathlib has only the complex version)\n  theorem realGelfandFormula (PROVED): Tendsto (fun n => (||a^n||_+ : RNNatInf)^(1/n : R))\n    atTop (nhds (spectralRadius R a))\nImport it with `import Riemann.RealGelfand` (works: same Lean project, mathlib is built).\nSpecialize realGelfandFormula to a = T as the CLM (all three typeclasses exist for it).\n\nGUARDRAILS (violations = automatic rejection, applied to your FINAL committed head):\n* NO new `sorry` beyond the allowed budget stated in YOUR task. `admit` compiles as an\n  axiom AND bypasses the sorry count — the reviewer greps for `admit`; docstring prose like\n  \"admitted\" is fine (verify with `grep -n admit FILE | grep -v admitted` mentally).\n* Do NOT weaken any existing theorem's statement. Do NOT delete or alter existing proved\n  theorems. Do NOT resurrect the FALSE \"collapse lemma\" (rho*f <= T f => equality).\n* Do NOT use the lowercase Greek letter 'lambda' as an identifier (it is the reserved\n  lambda-binder token in Lean and is unparsable). If you need a scalar parameter, name it\n  `lam`. 'rho' / 'rho0' are fine.\n* `set_option maxHeartbeats 5000000` at top of declarations when reflection/closures blow\n  the budget. Use `open scoped NNReal` / `open Filter ENNReal` / `open ENNReal` for\n  RNNatInf arithmetic; on C(X,R) prefer `DFunLike.congr_fun` / ext over congr_fun.\n* Commit early and often with message prefix from YOUR task id (the orchestrator\n  auto-commits your worktree at the end; the FINAL head is what gets reviewed, so make sure\n  your last commit is your best honest state — do not delete proved lemmas near the end).\n* If a step resists a clean proof after honest effort: DO NOT admit it. Prove every lemma\n  you genuinely can (partial honest progress is a valid deliverable), and document exactly\n  what blocked the rest in a file-header comment. Leave total sorries within budget.\n* NEVER modify lean/lake-manifest.json, lean/lean-toolchain, lean/lakefile.lean.\n  Only the scope file(s) listed for YOUR task may be touched.\n* Verify before your final commit: cd lean && lake env lean <your file> MUST compile with\n  no errors and the allowed sorry count. Then commit. The acceptance gate will rebuild on a\n  gate host; a 'gate failed, retry' result usually means the build is slow or a transient\n  infra issue, it does NOT mean make more edits blindly.\n",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/OrbitClosure.lean"
+      ],
+      "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.OrbitClosure chemie-lernen.org lean/Riemann/OrbitClosure.lean",
+      "acceptance_prose": "lake build Riemann.OrbitClosure exits 0 on chemie-lernen.org; OrbitClosure.lean has <= 1 sorry (only the documented orbit_bounded if present); lemmas (1)-(5) proved or honest partial state; no admit; no weakening; KreinRutman.lean/RealGelfand.lean untouched.",
+      "manual": true,
+      "remote": "chemie-lernen.org"
+    },
+    {
+      "id": "RH-32",
+      "title": "RH-32: CONTEXT. Repo 'riemann', Lean 4 / mathlib, module dir lean/Riemann/. The real Gelfand file lean/Riemann/RealGelfand.lean (namespace Riemann, variables {A : Type*} [NormedRing A] [NormedAlgebra R A] [CompleteSpace A] (a : A)) currently contains a FALSE admitted lemma:\n\n  theorem realGelfandUpperBound : limsup (fun n : ℕ => (‖a ^ n‖₊ : ℝ≥0∞) ^ (1 / n : ℝ)) atTop ≤ spectralRadius ℝ a := by sorry\n\nIt is false for general real normed algebras: take A = ℂ (all mathlib instances exist: NormedRing ℂ, NormedAlgebra ℝ ℂ, CompleteSpace ℂ) and a = Complex.I. Then spectrum ℝ Complex.I = ∅ (for every s : ℝ the scalar s - I is invertible with inverse (s + I)/(s^2+1)), so spectralRadius ℝ Complex.I = 0, while ‖I^n‖ = 1 for all n, so the limsup equals 1 and 1 ≤ 0 is false.\n\nYOUR JOB (three parts):\n\n(1) FORMALIZE THE COUNTEREXAMPLE in RealGelfand.lean: prove\n  theorem counterexampleRotation :\n    ¬ (limsup (fun n : ℕ => ((‖(Complex.I : ℂ) ^ n‖₊ : ℝ≥0∞) ^ (1 / (n : ℝ)))) atTop ≤ spectralRadius ℝ Complex.I)\nRoute: prove spectrum ℝ Complex.I = ∅ — for s : ℝ, IsUnit (s - Complex.I) holds with explicit inverse (s + Complex.I)/(s^2+1): check (s - I)*(s + I) = s^2 + 1 and use isUnit_iff_exists_inv (search mathlib for how spectrum memberships are disproved; `Ring.inverse` needs IsUnit). spectralRadius ℝ I = 0 then follows from the ⨆ over the empty spectrum. And ‖Complex.I ^ n‖ = 1 for all n (norm_pow: ‖I^n‖ = ‖I‖^n = 1 since ‖Complex.I‖ = 1). Hence limsup ≥ 1 > 0 = spectralRadius — the negated instance follows e.g. via not_le.mpr.\n(2) DELETE the false lemma realGelfandUpperBound and the derived realGelfandFormula (whose proof consumes it). KEEP the proved lower bound realSpectralRadius_le_liminf_pow_nnnorm_pow_one_div untouched. Add a docstring noting the general-real upper bound is FALSE with the (now proved) Complex.I counterexample and that over ℂ mathlib's own Gelfand formula applies.\n(3) REPAIR THE DEPENDENT CHAIN in lean/Riemann/KreinRutman.lean (import Riemann.RealGelfand at line 44). The CLOSED theorem eventually_pow_norm_le {T} (eps : ℝ) (heps : 0 < eps) : ∃ C, 0 < C ∧ ∀ n, ‖T ^ n‖ ≤ C * ((spectralRadius ℝ T).toReal + eps) ^ n (around line 661) is proved from realGelfandFormula and is UNSOUND as a closed statement. Convert it to hypothesis form by adding the parameter (hg : Tendsto (fun n : ℕ => (‖T ^ n‖₊ : ℝ≥0∞) ^ (1 / (n : ℝ))) atTop (𝓝 (spectralRadius ℝ T))) — its body then just calls eventually_pow_norm_le_of_gelfand hg heps (the hypothesis-form sibling near line 534 already has exactly this shape; alternatively delete eventually_pow_norm_le and keep only the _of_gelfand version — whichever gives the smaller diff). Then thread the SAME hypothesis into resolvent_neumann_series_at_radius (around line 677) and resolvent_positivity_at_radius (around line 856), which consume it. Grep for other callers in the file first and thread the hypothesis along. EXPECTED END STATE: nothing in the chain is closed over the removed lemma; the sorry count of KreinRutman.lean stays EXACTLY 1 (kreinRutman_core — do NOT touch it).\n\nGUARDRAILS (violations = automatic rejection, applied to your FINAL committed head):\n* Adding hypotheses to eventually_pow_norm_le / resolvent_neumann_series_at_radius / resolvent_positivity_at_radius is REQUIRED (authorized soundness repair, NOT a forbidden weakening). Deleting realGelfandUpperBound/realGelfandFormula is REQUIRED. Do not weaken or delete any OTHER proved statement.\n* NO new `sorry` anywhere: MAX_SORRY = 1 total in KreinRutman.lean (kreinRutman_core) and 0 in RealGelfand.lean. `admit` compiles as an axiom AND bypasses the sorry count — the reviewer greps for `admit` on every merge.\n* Do NOT modify lean/lake-manifest.json, lean/lean-toolchain, lean/lakefile.lean.\n* Do NOT use the identifier `lambda` (reserved token); use `lam`.\n* Scope: ONLY lean/Riemann/RealGelfand.lean and lean/Riemann/KreinRutman.lean.\n* Commit early and often with prefix `feat(RH-32):`. Fast iteration: cd lean && lake env lean Riemann/RealGelfand.lean (the .lake cache in your worktree is prebuilt).",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/RealGelfand.lean",
+        "lean/Riemann/KreinRutman.lean"
+      ],
+      "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.KreinRutman tobi-yoga lean/Riemann/KreinRutman.lean",
+      "acceptance_prose": "lake build Riemann.RealGelfand Riemann.KreinRutman exits 0; RealGelfand.lean has 0 sorries and contains counterexampleRotation (the formal Complex.I counterexample); KreinRutman.lean has exactly 1 sorry (kreinRutman_core); no closed theorem depends on the deleted false lemma; 0 `admit`; build-infra untouched",
+      "manual": true,
+      "remote": "tobi-yoga"
+    },
+    {
+      "id": "RH-33",
+      "title": "RH-33: CONTEXT. Repo 'riemann', Lean 4 / mathlib, module dir lean/Riemann/. The Krein-Rutman machine is fully assembled. In lean/Riemann/KreinRutman.lean (namespace Riemann, variables {X : Type*} [TopologicalSpace X] [CompactSpace X] [Nonempty X]), all PROVED:\n  def positiveCone : Set C(X, ℝ) := { f | ∀ x, 0 ≤ f x }\n  def IsPositive (T : C(X, ℝ) →L[ℝ] C(X, ℝ)) : Prop\n  theorem exists_eigenvector_with_domination {T} (hTpos : IsPositive T) (hTcomp : IsCompactOperator T) (hρ : 0 < spectralRadius ℝ T) : ∃ v : C(X, ℝ), v ≠ 0 ∧ ∃ μ : ℝ, |μ| = (spectralRadius ℝ T).toReal ∧ T v = μ • v ∧ ∀ x, (spectralRadius ℝ T).toReal * |v x| ≤ (T |v|) x\nIn lean/Riemann/OrbitClosure.lean (namespace Riemann), all PROVED:\n  def superharmonicOrbit (T) (rho : ℝ) (w : C(X, ℝ)) (n : ℕ) : C(X, ℝ) := (rho⁻¹)^n • T^n w\n  theorem superharmonicOrbit_mem / _navigation / _nonzero / _mono, norm_le_of_nonneg_le\n  theorem orbit_bounded (hT) (hrho : 0 < rho) {w v} (hw : w ∈ positiveCone) (hv : v ∈ positiveCone) (hdom : T w ≥ rho • w) (hle : w ≤ v) (hTw_v : T v = rho • v) : ∃ C, ∀ n, ‖superharmonicOrbit T rho w n‖ ≤ C\n  theorem bounded_orbit_yields_positive_eigenvector {T} (hTpos : IsPositive T) (hTcomp : IsCompactOperator T) {rho : ℝ} (hrho : 0 < rho) {w : C(X, ℝ)} (hw0 : w ≠ 0) (hw : w ∈ positiveCone) (hdom : T w ≥ rho • w) (hbound : ∃ C, ∀ n, ‖superharmonicOrbit T rho w n‖ ≤ C) : ∃ f, f ∈ positiveCone ∧ f ≠ 0 ∧ T f = rho • f\n\nYOUR JOB: create the NEW file lean/Riemann/KreinDichotomy.lean (namespace Riemann, same variables, noncomputable section, imports `Riemann.KreinRutman` and `Riemann.OrbitClosure` — do NOT modify ANY existing file) containing:\n\n(1) theorem exists_positive_eigenvector_of_superharmonic {T} (hTpos : IsPositive T) (hTcomp : IsCompactOperator T) {rho : ℝ} (hrho : 0 < rho) {w : C(X, ℝ)} (hw0 : w ≠ 0) (hw : w ∈ positiveCone) (hdom : rho • w ≤ T w) : ∃ f : C(X, ℝ), f ∈ positiveCone ∧ f ≠ 0 ∧ T f = rho • f\n    PROOF STRUCTURE: by_cases hbdd : ∃ C, ∀ n, ‖superharmonicOrbit T rho w n‖ ≤ C.\n    * Bounded branch: apply bounded_orbit_yields_positive_eigenvector directly (its hdom is `T w ≥ rho • w`; yours is `rho • w ≤ T w` — the same inequality, flip with `ge`/`le`). This branch must be FULLY PROVED.\n    * Unbounded branch: this is the classical normalized-orbit cluster argument and is the ONLY permitted sorry of the whole file. Write `· sorry` preceded by a detailed docstring sketch: u_n := orbit n / ‖orbit n‖; T u_n = rho * (‖orbit (n+1)‖ / ‖orbit n‖) • u (n+1) (from navigation + smul_norm); compactness of T gives a subsequence with T u (φ k) → g; after passing to further subsequences u (φ k + 1) → u* with ‖u*‖ = 1 and u* ∈ positiveCone (the cone is closed); iterating yields a cluster chain u*, u**, … with T u* = rho ρ* • u**; the monotonicity orbit n ≤ orbit (n+1) is what must force the chain to stabilize at an eigenvector.\n(2) theorem kreinRutman_core' {T} (hTpos : IsPositive T) (hTcomp : IsCompactOperator T) (hρ : 0 < spectralRadius ℝ T) : ∃ f : C(X, ℝ), f ∈ positiveCone ∧ f ≠ 0 ∧ T f = (spectralRadius ℝ T).toReal • f\n    FULLY PROVED (no sorry): obtain the seed from exists_eigenvector_with_domination (v, μ with |μ| = ρ, T v = μ • v, ρ • |v| ≤ T |v| pointwise), set w := |v| (look at how KreinRutman.lean constructs |v| as an element of C(X, ℝ) and reuse its exact term; membership in positiveCone is trivial since 0 ≤ |v x|; w ≠ 0 since v ≠ 0), then apply (1) with rho := (spectralRadius ℝ T).toReal and hdom from the pointwise domination (convert ∀ x, rho * |v x| ≤ (T |v|) x into rho • w ≤ T w via ContinuousMap.le_def / funext; check how the domination hypothesis is stated and mirror the conversion).\n(3) BONUS (only if (1)+(2) are done and compiling; skip if time is tight):\n  theorem krein_noninvertible {T} (hTpos : IsPositive T) (hTcomp : IsCompactOperator T) (hρ : 0 < spectralRadius ℝ T) : ¬ IsUnit ((spectralRadius ℝ T).toReal • 1 - T)\n  Sketch: assume IsUnit; set lam := ρ + 1; the pointwise domination S_N(w) ≤ (lam • 1 - T)⁻¹ w (Neumann partial sums on the cone lie below the resolvent, since the remainder T^(N+1)/lam^(N+1) • (lam • 1 - T)⁻¹ w is ≥ 0 for w ≥ 0 — this is exactly resolvent_positivity_at_radius territory, see KreinRutman.lean ~line 856) bounds the orbit of every cone vector w; then the bounded branch of (1) gives f ≠ 0 with (ρ • 1 - T) f = 0, contradicting IsUnit (a unit kills only 0).\n\nGUARDRAILS (violations = automatic rejection, applied to your FINAL committed head):\n* EXACTLY ONE `sorry` in the whole file (the unbounded branch of (1)). `admit` compiles as an axiom AND bypasses the sorry count — the reviewer greps for `admit` on every merge.\n* Do NOT modify any existing file (scope: ONLY lean/Riemann/KreinDichotomy.lean).\n* Do NOT modify lean/lake-manifest.json, lean/lean-toolchain, lean/lakefile.lean.\n* Do NOT use the identifier `lambda` (reserved token); use `lam`. `rho` is fine.\n* Do NOT set `maxHeartbeats` above 5000000.\n* Commit early and often with prefix `feat(RH-33):`. Fast iteration: cd lean && lake env lean Riemann/KreinDichotomy.lean (the .lake cache in your worktree is prebuilt).",
+      "deps": [],
+      "scope": [
+        "lean/Riemann/KreinDichotomy.lean"
+      ],
+      "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.KreinDichotomy chemie-lernen.org lean/Riemann/KreinDichotomy.lean",
+      "acceptance_prose": "New file KreinDichotomy.lean compiles (lake env lean Riemann/KreinDichotomy.lean exit 0); contains exists_positive_eigenvector_of_superharmonic (bounded branch proved, unbounded branch = the single sorry), kreinRutman_core' FULLY PROVED (0 sorries), optional krein_noninvertible; no existing file modified; 0 `admit`; build-infra untouched",
+      "manual": true,
+      "remote": "chemie-lernen.org"
+    },
+    {
+      "id": "RH-35",
+      "title": "RH-35: capture the normalized-orbit cluster chain — convert the unbounded-branch sorry in KreinDichotomy.lean into a crisp beta-stabilization gap",
+      "deps": [],
+      "manual": true,
+      "remote": "tobi-yoga",
+      "scope": [
+        "RH-35: CONTEXT. Repo 'riemann', Lean 4 / mathlib, module dir lean/Riemann/. File lean/Riemann/KreinDichotomy.lean (namespace Riemann) contains the Krein-Rutman dichotomy. ALL PROVED there (do not modify their statements):\n* `superharmonicOrbit T rho w n := (rho^-1)^n * T^n w` and in Riemann.OrbitClosure the lemmas `_mem` (stays on the cone), `_nonzero`, `_mono` (pointwise orbit_n <= orbit_{n+1}), `_navigation` (T orbit_n = rho * orbit_{n+1}), and `bounded_orbit_yields_positive_eigenvector` (bounded orbit => cone eigenvector at rho).\n* `exists_positive_eigenvector_of_superharmonic` (hTpos) (hTcomp) (hrho : 0 < rho) (hr : rho = (spectralRadius ℝ T).toReal) (hw0) (hw : w ∈ positiveCone) (hdom : rho • w ≤ T w): the dichotomy. Bounded branch fully proved; UNBOUNDED branch is the file's single `sorry`.\n* `kreinRutman_core'` — fully proved from the dichotomy with seed w := |v| from Riemann.KreinRutman.exists_eigenvector_with_domination.\n* The hypothesis `hr` (rho = spectral radius) is NECESSARY and must NOT be removed or weakened (documented counterexample T(x,y)=(x+y,y), w=(0,1), rho=1/2 in the docstring).",
+        "YOUR TASK — make the unbounded branch's remaining gap CRISP. Concretely:\n1. Prove a new closed lemma in KreinDichotomy.lean (zero sorries inside it):",
+        "   theorem normalized_orbit_cluster {T : C(X, ℝ) →L[ℝ] C(X, ℝ)}\n       (hTpos : IsPositive T) (hTcomp : IsCompactOperator T) {rho : ℝ} (hrho : 0 < rho)\n       {w : C(X, ℝ)} (hw0 : w ≠ 0) (hw : w ∈ positiveCone) (hdom : rho • w ≤ T w) :\n       ∃ φ : ℕ → ℕ, StrictMono φ ∧ ∃ uStar uDStar : C(X, ℝ), ∃ beta : ℝ,\n         uStar ∈ positiveCone ∧ uDStar ∈ positiveCone ∧ ‖uStar‖ = 1 ∧ ‖uDStar‖ = 1 ∧\n         1 ≤ beta ∧ T uStar = (rho * beta) • uDStar",
+        "   Proof sketch (all ingredients standard): set orb n := superharmonicOrbit T rho w n; u n := orb n / ‖orb n‖ (well-defined via superharmonicOrbit_nonzero; ‖u n‖ = 1, u n ∈ cone via _mem + cone closed under smul). From _navigation: T (orb n) = rho • orb (n+1), so dividing by ‖orb n‖: T (u n) = (rho * beta n) • u (n+1) with beta n := ‖orb (n+1)‖ / ‖orb n‖. beta n ≥ 1 because orb n ≤ orb (n+1) (_mono) applied at the sup-norm point (use the generic norm_le_of_nonneg_le from OrbitClosure, or ‖orb n‖ = orb n x_n ≤ orb (n+1) x_n ≤ ‖orb (n+1)‖). beta n ≤ ‖T‖ / rho because ‖orb (n+1)‖ = ‖T (orb n)‖ / rho ≤ ‖T‖ ‖orb n‖ / rho. Compactness: u (phi k) lies in the unit ball, so T (u (phi k)) has a convergent subsequence (IsCompactOperator: grep .lake/packages/mathlib for IsCompactOperator image compact, e.g. `IsCompactOperator.image_ball` / `MapCompactness` / use IsCompact.tendsto_subseq on T '' closedBall — RH-31's bounded_orbit_yields_positive_eigenvector already extracts such subsequences, copy that pattern). Passing to a further subsequence (u (phi k + 1) in the unit ball again; beta (phi k) in the compact interval [1, ‖T‖/rho]) gives the limits uStar := lim u (phi k), uDStar := lim u (phi k + 1), beta := lim beta (phi k). Norms pass to the limit (norm continuity); cone closedness passes (OrbitClosure/Cone closed — positiveCone is closed, see how bounded_orbit_yields_positive_eigenvector proves it); the identity passes by continuity of T and smul. You may compose two StrictMono extractions instead of a diagonal if simpler.\n2. Then RESTRUCTURE `exists_positive_eigenvector_of_superharmonic`'s unbounded branch: derive it from `normalized_orbit_cluster` plus a single explicitly-stated stabilization lemma that carries THE one `sorry` of the file, e.g.",
+        "   theorem cluster_chain_stabilizes ... : (hypotheses from normalized_orbit_cluster's output, plus the full chain context you find convenient) → ∃ f, f ∈ positiveCone ∧ f ≠ 0 ∧ T f = rho • f",
+        "   with a docstring explaining what remains: the cluster chain u*, u**, ... satisfies T u* = rho*beta* • u** with all norms 1; if beta* = 1 the chain already gives T u* = rho • u**, done; the remaining analytic step is forcing beta = 1 (or extracting an eigenvector from beta > 1). Cite Krein-Rutman 1948 / Schaefer's Banach Lattices III. The net effect: the file's single sorry moves from a vague unbounded branch into a crisply-stated lemma. Alternatively keep the sorry directly in the unbounded branch but call normalized_orbit_cluster first and reduce what the sorry must assume — either restructure is acceptable, as long as `normalized_orbit_cluster` itself is CLOSED.\n3. BONUS (only if 1-2 are done and compiling): prove `krein_noninvertible_of_gelfand` — under the SAME hg hypothesis that Riemann.KreinRutman.resolvent_positivity_at_radius takes (Tendsto (fun n => (‖T ^ n‖₊ : ℝ≥0∞) ^ (1 / n)) atTop (𝓝 (spectralRadius ℝ T))), show ¬IsUnit ((spectralRadius ℝ T).toReal • 1 - T) in the CLM ring: if it were a unit, partial Neumann sums S_N(w) ≤ (λ•1−T)⁻¹ w (λ := rho + 1, via resolvent_positivity_at_radius + the algebraic tail identity) would bound EVERY cone orbit, and the bounded branch would produce a cone eigenvector f at rho, contradicting IsUnit since (rho•1−T) f = 0 with f ≠ 0 means the map has a nontrivial kernel. Do NOT add it unless it compiles cleanly.",
+        "HARD CONSTRAINTS:\n* NEVER modify lean/lake-manifest.json, lean/lean-toolchain, lean/lakefile.lean. NEVER touch any file other than lean/Riemann/KreinDichotomy.lean.\n* Do NOT remove or weaken any existing statement (keep `hr`, keep `kreinRutman_core'` exactly as is — its proof may need a trivial update only if you change the dichotomy's internals, but its STATEMENT is frozen).\n* The file must end with AT MOST ONE `sorry` (the stabilization gap). `normalized_orbit_cluster` must be CLOSED. No `admit` anywhere (watch docstrings: the reviewer greps 'admit').\n* set_option maxHeartbeats 5000000 is already in the file; keep it.\n* Commit early and often with prefix `feat(RH-35):`. Fast iteration: cd lean && lake env lean Riemann/KreinDichotomy.lean (the .lake cache in your worktree is prebuilt)."
+      ],
+      "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.KreinDichotomy tobi-yoga lean/Riemann/KreinDichotomy.lean",
+      "acceptance_prose": "lake env lean Riemann/KreinDichotomy.lean prints exactly one 'declaration uses sorry' warning (the stabilization gap); normalized_orbit_cluster compiles with zero sorries inside; zero 'admit' tokens anywhere in the file; no file other than lean/Riemann/KreinDichotomy.lean changed; build-infra files untouched.",
+      "status": "completed",
+      "completed_commit": "bdd5445",
+      "completed_note": "Manual repair of agent salvage: normalized_orbit_cluster CLOSED (2-layer tendsto_subseq on T-images), cluster_chain_stabilizes gains hr (was false without it). Gate-pass, 1 sorry. Commit bdd5445."
+    }
+  ]
 }
