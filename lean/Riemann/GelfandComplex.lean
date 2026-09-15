@@ -85,4 +85,83 @@ theorem norm_cmOfReal (g : C(X, ℝ)) : ‖cmOfReal g‖ = ‖g‖ := by
   · rw [← Complex.norm_real (g x)]
     simpa only [cmOfReal_apply] using (cmOfReal g).norm_coe_le_norm x
 
+
+/-! ## The complexification of a real operator -/
+
+theorem cmRe_add (f g : C(X, ℂ)) : cmRe (f + g) = cmRe f + cmRe g := rfl
+
+theorem cmIm_add (f g : C(X, ℂ)) : cmIm (f + g) = cmIm f + cmIm g := rfl
+
+theorem cmRe_smul (c : ℂ) (f : C(X, ℂ)) :
+    cmRe (c • f) = c.re • cmRe f - c.im • cmIm f := by
+  ext x
+  rw [cmRe_apply, ContinuousMap.smul_apply, smul_eq_mul, Complex.mul_re,
+    ContinuousMap.sub_apply, ContinuousMap.smul_apply, smul_eq_mul,
+    ContinuousMap.smul_apply, smul_eq_mul, cmRe_apply, cmIm_apply]
+
+theorem cmIm_smul (c : ℂ) (f : C(X, ℂ)) :
+    cmIm (c • f) = c.re • cmIm f + c.im • cmRe f := by
+  ext x
+  rw [cmIm_apply, ContinuousMap.smul_apply, smul_eq_mul, Complex.mul_im,
+    ContinuousMap.add_apply, ContinuousMap.smul_apply, smul_eq_mul,
+    ContinuousMap.smul_apply, smul_eq_mul, cmRe_apply, cmIm_apply]
+
+/-- The complexification `T_ℂ` of a real operator `T` on `C(X, ℝ)`:
+`T_ℂ f = T (re f) + i • T (im f)`. -/
+noncomputable def complexifyFun (T : C(X, ℝ) →L[ℝ] C(X, ℝ)) (f : C(X, ℂ)) : C(X, ℂ) :=
+  cmOfReal (T (cmRe f)) + Complex.I • cmOfReal (T (cmIm f))
+
+theorem cmRe_complexifyFun (T : C(X, ℝ) →L[ℝ] C(X, ℝ)) (f : C(X, ℂ)) :
+    cmRe (complexifyFun T f) = T (cmRe f) := by
+  ext x
+  simp only [cmRe_apply, complexifyFun, ContinuousMap.add_apply, ContinuousMap.smul_apply,
+    cmOfReal_apply, smul_eq_mul]
+  simp
+
+theorem cmIm_complexifyFun (T : C(X, ℝ) →L[ℝ] C(X, ℝ)) (f : C(X, ℂ)) :
+    cmIm (complexifyFun T f) = T (cmIm f) := by
+  ext x
+  simp only [cmIm_apply, complexifyFun, ContinuousMap.add_apply, ContinuousMap.smul_apply,
+    cmOfReal_apply, smul_eq_mul]
+  simp
+
+/-- The complexification `T_ℂ` of `T`: a continuous ℂ-linear operator on
+`C(X, ℂ)` extending `T` (bounded by `2 * ‖T‖`). -/
+noncomputable def complexify (T : C(X, ℝ) →L[ℝ] C(X, ℝ)) : C(X, ℂ) →L[ℂ] C(X, ℂ) :=
+  LinearMap.mkContinuous
+    { toFun := complexifyFun T
+      map_add' := by
+        intro f g
+        refine cm_ext_re_im ?_ ?_
+        · rw [cmRe_add (complexifyFun T f) (complexifyFun T g), cmRe_complexifyFun,
+            cmRe_complexifyFun, cmRe_complexifyFun, cmRe_add f g, map_add]
+        · rw [cmIm_add (complexifyFun T f) (complexifyFun T g), cmIm_complexifyFun,
+            cmIm_complexifyFun, cmIm_complexifyFun, cmIm_add f g, map_add]
+      map_smul' := by
+        intro c f
+        show complexifyFun T (c • f) = c • complexifyFun T f
+        refine cm_ext_re_im ?_ ?_
+        · rw [cmRe_complexifyFun, cmRe_smul, cmRe_smul c (complexifyFun T f),
+            cmRe_complexifyFun, cmIm_complexifyFun, map_sub, map_smul, map_smul]
+        · rw [cmIm_complexifyFun, cmIm_smul, cmIm_smul c (complexifyFun T f),
+            cmIm_complexifyFun, cmRe_complexifyFun, map_add, map_smul, map_smul] }
+    (2 * ‖T‖) (by
+      intro f
+      have h1 : ‖complexifyFun T f‖ ≤ ‖T (cmRe f)‖ + ‖T (cmIm f)‖ := by
+        refine (norm_add_le _ _).trans ?_
+        rw [norm_smul, norm_cmOfReal, norm_cmOfReal, norm_I, one_mul]
+      have h2 : ‖T‖ * ‖cmRe f‖ + ‖T‖ * ‖cmIm f‖ ≤ 2 * ‖T‖ * ‖f‖ := by
+        have hT : (0:ℝ) ≤ ‖T‖ := norm_nonneg T
+        calc ‖T‖ * ‖cmRe f‖ + ‖T‖ * ‖cmIm f‖
+            ≤ ‖T‖ * ‖f‖ + ‖T‖ * ‖f‖ :=
+              add_le_add (mul_le_mul_of_nonneg_left (norm_cmRe_le f) hT)
+                (mul_le_mul_of_nonneg_left (norm_cmIm_le f) hT)
+          _ = 2 * ‖T‖ * ‖f‖ := by ring
+      calc ‖complexifyFun T f‖
+          ≤ ‖T (cmRe f)‖ + ‖T (cmIm f)‖ := h1
+        _ ≤ ‖T‖ * ‖cmRe f‖ + ‖T‖ * ‖cmIm f‖ :=
+            add_le_add (ContinuousLinearMap.le_opNorm T _)
+              (ContinuousLinearMap.le_opNorm T _)
+        _ ≤ 2 * ‖T‖ * ‖f‖ := h2)
+
 end Riemann
