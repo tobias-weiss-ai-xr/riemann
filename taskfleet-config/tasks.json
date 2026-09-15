@@ -351,7 +351,7 @@
    ],
    "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.KreinRutman tobi-yoga lean/Riemann/KreinRutman.lean",
    "acceptance_prose": "lake build Riemann.RealGelfand Riemann.KreinRutman exits 0; RealGelfand.lean has 0 sorries and contains counterexampleRotation (the formal Complex.I counterexample); KreinRutman.lean has exactly 1 sorry (kreinRutman_core); no closed theorem depends on the deleted false lemma; 0 `admit`; build-infra untouched",
-   "manual": false,
+   "manual": true,
    "remote": "tobi-yoga"
   },
   {
@@ -363,7 +363,7 @@
    ],
    "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.KreinDichotomy chemie-lernen.org lean/Riemann/KreinDichotomy.lean",
    "acceptance_prose": "New file KreinDichotomy.lean compiles (lake env lean Riemann/KreinDichotomy.lean exit 0); contains exists_positive_eigenvector_of_superharmonic (bounded branch proved, unbounded branch = the single sorry), kreinRutman_core' FULLY PROVED (0 sorries), optional krein_noninvertible; no existing file modified; 0 `admit`; build-infra untouched",
-   "manual": false,
+   "manual": true,
    "remote": "chemie-lernen.org"
   },
   {
