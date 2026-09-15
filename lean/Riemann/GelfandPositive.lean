@@ -457,4 +457,17 @@ theorem resolvent_positivity_of_gt_spectralRadius {T : C(X, ℝ) →L[ℝ] C(X, 
     exact hν'W.2.2 μ (le_of_lt hν'lt) hμl₀
   exact hmain lam hlam hlamle
 
+/-- **Gelfand formula, lower half (unconditional)**: for any `T` on `C(X, ℝ)`
+the spectral radius is bounded by the `liminf` of the normalized power norms.
+This is mathlib's `spectrum.spectralRadius_le_liminf_pow_nnnorm_pow_one_div`
+(valid over any complete normed algebra, in particular over `ℝ`); the
+corresponding `limsup` half is *false* over `ℝ` in general (the rotation
+`T(x, y) = (-y, x)` has empty real spectrum but `‖Tⁿ‖^(1/n) → 1`), so for a
+full real Gelfand formula positivity must enter — see the roadmap note on
+`resolvent_positivity_of_gt_spectralRadius`. -/
+theorem spectralRadius_le_liminf_pow (T : C(X, ℝ) →L[ℝ] C(X, ℝ)) :
+    spectralRadius ℝ T ≤
+      Filter.atTop.liminf fun n : ℕ => (‖T ^ n‖₊ : ℝ≥0∞) ^ (1 / n : ℝ) :=
+  spectrum.spectralRadius_le_liminf_pow_nnnorm_pow_one_div ℝ T
+
 end Riemann
