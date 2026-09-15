@@ -46,6 +46,15 @@ a nonzero eigenvector `f` in the positive cone at eigenvalue `rho`.
 orbit-closure theorem `bounded_orbit_yields_positive_eigenvector` applies
 directly (its hypothesis `T w ≥ rho • w` is the same inequality).
 
+The hypothesis `rho = spectralRadius ℝ T` is *necessary*: take
+`T(x, y) = (x + y, y)` on `C(ℕ₂)` (positive, compact) with seed `w = (0, 1)`
+and `rho = 1/2`; the domination `rho • w ≤ T w` holds, yet `T`'s only
+eigenvalue is `1`, so no cone eigenvector at `1/2` exists.  At rates below
+the spectral radius both branches fail (the bounded branch of the orbit
+closure survives only vacuously there: boundedness itself already forces the
+eigenvector).  The spectral-radius link is exactly the classical
+Krein–Rutman superharmonic-seed hypothesis.
+
 *Unbounded branch (the analytic frontier, one open gap).*  The
 classical normalized-orbit cluster argument: set `orb n := orbit n` and
 `u n := orb n / ‖orb n‖` (well-defined since `superharmonicOrbit_nonzero`).
@@ -71,6 +80,7 @@ chain closes up to an exact eigenvector `T u° = rho • u°` with `u° ≠ 0`
 and `u° ∈ positiveCone`. -/
 theorem exists_positive_eigenvector_of_superharmonic {T : C(X, ℝ) →L[ℝ] C(X, ℝ)}
     (hTpos : IsPositive T) (hTcomp : IsCompactOperator T) {rho : ℝ} (hrho : 0 < rho)
+    (hr : rho = (spectralRadius ℝ T).toReal)
     {w : C(X, ℝ)} (hw0 : w ≠ 0) (hw : w ∈ positiveCone) (hdom : rho • w ≤ T w) :
     ∃ f : C(X, ℝ), f ∈ positiveCone ∧ f ≠ 0 ∧ T f = rho • f := by
   by_cases hbdd : ∃ C : ℝ, ∀ n : ℕ, ‖superharmonicOrbit T rho w n‖ ≤ C
@@ -137,7 +147,7 @@ theorem kreinRutman_core' {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} (hTpos : IsPositiv
     change ρr * |v x| ≤ (T w) x
     simpa [ρr, smul_eq_mul] using hvdom x
   simpa [ρr] using
-    exists_positive_eigenvector_of_superharmonic hTpos hTcomp hρr hwne hwcon hdom'
+    exists_positive_eigenvector_of_superharmonic hTpos hTcomp hρr rfl hwne hwcon hdom'
 
 end
 
