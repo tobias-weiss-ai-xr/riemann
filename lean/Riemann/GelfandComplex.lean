@@ -164,4 +164,45 @@ noncomputable def complexify (T : C(X, ℝ) →L[ℝ] C(X, ℝ)) : C(X, ℂ) →
               (ContinuousLinearMap.le_opNorm T _)
         _ ≤ 2 * ‖T‖ * ‖f‖ := h2)
 
+/-! ## Functoriality of the complexification -/
+
+theorem complexify_apply (T : C(X, ℝ) →L[ℝ] C(X, ℝ)) (f : C(X, ℂ)) :
+    complexify T f = complexifyFun T f := rfl
+
+theorem cmOfReal_zero : cmOfReal (0 : C(X, ℝ)) = 0 := rfl
+
+/-- The complexification of the identity is the identity. -/
+@[simp]
+theorem complexify_id : complexify (ContinuousLinearMap.id ℝ (C(X, ℝ))) =
+    ContinuousLinearMap.id ℂ (C(X, ℂ)) := by
+  refine ContinuousLinearMap.ext fun f => ?_
+  rw [complexify_apply, complexifyFun, map_id, map_id, cmOfReal_re_add_I]
+
+/-- The complexification is multiplicative: `(S ∘ T)_ℂ = S_ℂ ∘ T_ℂ`. -/
+theorem complexify_mul (S T : C(X, ℝ) →L[ℝ] C(X, ℝ)) :
+    complexify (S * T) = complexify S * complexify T := by
+  refine ContinuousLinearMap.ext fun f => ?_
+  show complexifyFun (S * T) f = (complexify S * complexify T) f
+  rw [ContinuousLinearMap.mul_apply, complexify_apply,
+    complexify_apply S (complexifyFun T f)]
+  refine cm_ext_re_im ?_ ?_
+  · rw [cmRe_complexifyFun, cmRe_complexifyFun, cmRe_complexifyFun,
+      ContinuousLinearMap.mul_apply]
+  · rw [cmIm_complexifyFun, cmIm_complexifyFun, cmIm_complexifyFun,
+      ContinuousLinearMap.mul_apply]
+
+/-- Powers commute with complexification. -/
+theorem complexify_pow (T : C(X, ℝ) →L[ℝ] C(X, ℝ)) (n : ℕ) :
+    complexify (T ^ n) = (complexify T) ^ n := by
+  induction n with
+  | zero => rw [pow_zero, pow_zero]; exact complexify_id
+  | succ n ih => rw [pow_succ, pow_succ, complexify_mul, ih]
+
+/-- Real functions are mapped to real functions. -/
+theorem complexifyFun_cmOfReal (T : C(X, ℝ) →L[ℝ] C(X, ℝ)) (g : C(X, ℝ)) :
+    complexifyFun T (cmOfReal g) = cmOfReal (T g) := by
+  have hre : cmRe (cmOfReal g) = g := rfl
+  have him : cmIm (cmOfReal g) = 0 := rfl
+  rw [complexifyFun, hre, him, map_zero, cmOfReal_zero, smul_zero, add_zero]
+
 end Riemann
