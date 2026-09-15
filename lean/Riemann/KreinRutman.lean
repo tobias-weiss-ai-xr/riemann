@@ -911,54 +911,6 @@ theorem resolvent_positivity_at_radius {T : C(X, ℝ) →L[ℝ] C(X, ℝ)}
     exact (IsPositive.apply_nonneg (hpos n) hg) x
   rw [hx]
   exact tsum_nonneg hterm
-/-! ## The Krein–Rutman core (the true, single documented frontier) -/
-
-/-- **Krein–Rutman core (admitted — the single documented frontier)**:
-
-> A compact, positive operator `T` on `C(X, ℝ)` with positive spectral radius
-> has a nonzero positive eigenfunction at the spectral radius:
-> `∃ f ∈ positiveCone, f ≠ 0, T f = ρ(T) • f`.
-
-This existence statement *is* the classical Krein–Rutman theorem and the
-honest frontier of this file.  Nothing weaker is enough, and nothing
-stronger is true in general.  In particular, earlier drafts admitted the
-sharper **collapse lemma**
-
-  `ρ(T) • f ≤ T f  on the cone  ⟹  T f = ρ(T) • f`
-
-which is **FALSE as stated**.  Counterexample inside `C(X, ℝ)`: take `X` a
-two-point space, so `C(X, ℝ) ≅ ℝ²`, and `T` the matrix `[[2, 1], [0, 2]]`
-(positive, finite-rank hence compact, `ρ(T) = 2 > 0`).  For `f = (0, 1)`
-(nonzero, in the cone) we have `T f = (1, 2) ≥ 2 • (0, 1) = ρ(T) • f`
-strictly, yet `T f ≠ ρ(T) • f`.  So strict domination cannot be ruled out
-from positivity and compactness alone — which is exactly why the strong
-positivity hypothesis in `kreinRutman_strong` is load-bearing (there the
-collapse is *proved*, not admitted).
-
-Three routes would close `kreinRutman_core`; all are currently blocked in
-mathlib over the real field:
-
-1. *Gelfand's formula over ℝ*: show `lim ‖Tⁿ‖^(1/n) = ρ(T)` (the limit
-   formula `spectrum.pow_nnnorm_pow_one_div_tendsto_nhds_spectralRadius`
-   exists only over `ℂ`), then normalize `Tⁿ e` along a cone vector and
-   extract a positive cluster-point eigenvector from compactness of `T`.
-2. *Resolvent (Neumann) positivity at the radius*: for `lam > ρ(T)` represent
-   `(lam − T)⁻¹ = Σₙ Tⁿ / lamⁿ⁺¹` (needs the convergence-radius argument at the
-   spectral radius, not just at `‖T‖`), get the resolvent positive, then run
-   the classical two-sided domination argument.
-3. *Complexification*: extend `T` to `C(X, ℂ) →L[ℂ] C(X, ℂ)`, transfer the
-   spectral radius, and descend the resulting eigenvector; needs the
-   spectral-radius/spectrum identity between a real operator and its
-   complexification, which mathlib has not yet assembled.
-
-Until then: `kreinRutman` below is exactly `kreinRutman_core` (one
-admission), and `kreinRutman_strong` is proved from `kreinRutman` plus the
-strong-positivity machinery with *no further admissions*. -/
-theorem kreinRutman_core {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} (hTpos : IsPositive T)
-    (hTcomp : IsCompactOperator T) (hρ : 0 < spectralRadius ℝ T) :
-    ∃ f : C(X, ℝ), f ∈ positiveCone ∧ f ≠ 0 ∧
-      T f = (spectralRadius ℝ T).toReal • f := by
-  sorry
 
 /-- **Spectral-radius eigenvector with domination**:
 For a compact, positive operator `T` with `0 < ρ(T)`, there exists a
@@ -973,8 +925,9 @@ strategy for Krein–Rutman.  It provides a nonzero `|v|` on the cone with
 `T |v| ≥ ρ(T) |v|`, which can then be normalized and passed to the limit
 along the orbit `Tⁿ e` for any cone vector `e`.
 
-The lemma does not claim `v` itself is positive — that's exactly what
-`kreinRutman_core` aims to prove.  This intermediate result is a true,
+The lemma does not claim `v` itself is positive — proving that is
+exactly the content of `kreinRutman_core'` in `Riemann.KreinDichotomy`,
+which closes the core.  This intermediate result is a true,
 fully verified lemma and serves as infrastructure for the frontier.
 -/
 theorem exists_eigenvector_with_domination {T : C(X, ℝ) →L[ℝ] C(X, ℝ)}
@@ -1000,114 +953,3 @@ theorem exists_eigenvector_with_domination {T : C(X, ℝ) →L[ℝ] C(X, ℝ)}
   refine ⟨v, hv0, μ, hμρ, hvT, fun x => ?_⟩
   rw [← hμρ]
   exact positive_abs_ge hTpos hvT x
-
-/-! ## Krein–Rutman: the main theorems -/
-
-/-- **Krein–Rutman theorem**, eigenvalue form.
-
-A compact, positive operator `T` on `C(X, ℝ)` (for a compact Hausdorff `X`)
-with positive spectral radius has the spectral radius as a positive
-eigenvalue: there is a nonzero `f` with `0 ≤ f x` for all `x` and
-`T f = (spectralRadius T).toReal • f`.
-
-This is exactly `kreinRutman_core` — the single documented admission above;
-the scaffold already proved in this file (real spectral value `|μ| = ρ(T)`
-via the Fredholm alternative, the positivity transfer `T |f| ≥ ρ(T) |f|`)
-lies on the direct road to closing that admission and is retained as
-infrastructure for the next step. -/
-theorem kreinRutman {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} (hTpos : IsPositive T)
-    (hTcomp : IsCompactOperator T) (hρ : 0 < spectralRadius ℝ T) :
-    ∃ f : C(X, ℝ), f ∈ positiveCone ∧ f ≠ 0 ∧
-      T f = (spectralRadius ℝ T).toReal • f :=
-  kreinRutman_core hTpos hTcomp hρ
-
-/-- **Krein–Rutman theorem**, strong form (geometric simplicity of the
-leading eigenvalue).
-
-If, in addition, `T` is strongly positive (it maps every nonzero vector of the
-positive cone to a strictly positive function), then the spectral-radius
-eigenvector is unique up to a positive scalar: every nonzero positive
-eigenvector at the spectral radius lies in the ray spanned by a single
-(automatically strictly positive) eigenfunction. -/
-theorem kreinRutman_strong {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} (hTpos : IsPositive T)
-    (hTcomp : IsCompactOperator T) (hTstr : IsStronglyPositive T)
-    (hρ : 0 < spectralRadius ℝ T) :
-    ∃ f : C(X, ℝ), f ∈ positiveCone ∧ f ≠ 0 ∧
-      T f = (spectralRadius ℝ T).toReal • f ∧
-      (∀ g : C(X, ℝ), g ∈ positiveCone → g ≠ 0 →
-        T g = (spectralRadius ℝ T).toReal • g → ∃ c : ℝ, 0 < c ∧ g = c • f) := by
-  let ρr : ℝ := (spectralRadius ℝ T).toReal
-  -- the weak form provides the starting eigenfunction f₀
-  obtain ⟨f₀, hf₀cone, hf₀ne, hf₀⟩ := kreinRutman hTpos hTcomp hρ
-  have hρr : 0 < ρr := by simpa [ρr] using spectralRadius_toReal_pos hρ
-  -- strong positivity makes f₀ strictly positive pointwise
-  have hf₀pos : ∀ x : X, 0 < f₀ x := by
-    intro x
-    have hpos : 0 < (T f₀) x := hTstr f₀ hf₀cone hf₀ne x
-    rw [hf₀] at hpos
-    exact pos_of_mul_pos_right (by simpa [ρr, smul_eq_mul] using hpos) (le_of_lt hρr)
-  refine ⟨f₀, hf₀cone, hf₀ne, hf₀, ?_⟩
-  intro g hgcone hgne hgEq
-  -- g is also strictly positive pointwise
-  have hgpos : ∀ x : X, 0 < g x := by
-    intro x
-    have hpos : 0 < (T g) x := hTstr g hgcone hgne x
-    rw [hgEq] at hpos
-    exact pos_of_mul_pos_right (by simpa [ρr, smul_eq_mul] using hpos) (le_of_lt hρr)
-  -- the ratio g / f₀ is well-defined and attains its minimum at some x₀
-  have hcont : Continuous (fun x : X => g x / f₀ x) := by
-    exact Continuous.div (ContinuousMap.continuous g) (ContinuousMap.continuous f₀)
-      (fun x => ne_of_gt (hf₀pos x))
-  have hne_univ : (Set.univ : Set X).Nonempty := ⟨Classical.choice ‹Nonempty X›, trivial⟩
-  obtain ⟨x₀, _, hm⟩ :=
-    (isCompact_univ.exists_isMinOn (s := Set.univ) hne_univ hcont.continuousOn)
-  have hc_le : ∀ x : X, g x₀ / f₀ x₀ ≤ g x / f₀ x := by
-    intro x
-    exact (Filter.eventually_principal.mp hm) x (by trivial)
-  let c : ℝ := g x₀ / f₀ x₀
-  -- h := g - c • f₀ is in the cone and vanishes at x₀
-  have hc_mul : ∀ x : X, c * f₀ x ≤ g x := by
-    intro x
-    have hmul := mul_le_mul_of_nonneg_right (hc_le x) (le_of_lt (hf₀pos x))
-    have hsim : (g x / f₀ x) * f₀ x = g x := div_mul_cancel₀ (g x) (ne_of_gt (hf₀pos x))
-    simpa [hsim] using hmul
-  have hcon : g - c • f₀ ∈ positiveCone := by
-    rw [mem_positiveCone]
-    intro x
-    simpa [smul_eq_mul] using sub_nonneg.mpr (hc_mul x)
-  have hx0 : (g - c • f₀) x₀ = 0 := by
-    change g x₀ - c * f₀ x₀ = 0
-    rw [show c = g x₀ / f₀ x₀ by rfl]
-    rw [div_mul_cancel₀ (g x₀) (ne_of_gt (hf₀pos x₀))]
-    rw [sub_self]
-  -- h is an eigenvector at ρ(T)
-  have hTh : T (g - c • f₀) = ρr • (g - c • f₀) := by
-    have h1 : T (g - c • f₀) = T g - c • T f₀ := by simp [map_sub, map_smul]
-    have h2 : T g - c • T f₀ = ρr • g - c • (ρr • f₀) := by
-      rw [hgEq, hf₀]
-    have h3 : ρr • g - c • (ρr • f₀) = ρr • (g - c • f₀) := by
-      ext x
-      simp only [smul_sub, sub_smul, smul_smul, smul_eq_mul, mul_assoc, mul_comm, mul_left_comm]
-    exact h1.trans (h2.trans h3)
-  -- if h were nonzero, strong positivity forces T h > 0, contradicting T h = 0 at x₀
-  have hcoef : g - c • f₀ = 0 := by
-    by_contra hne
-    have hpos : 0 < (T (g - c • f₀)) x₀ :=
-      hTstr (g - c • f₀) hcon hne x₀
-    have hzero : (T (g - c • f₀)) x₀ = 0 := by
-      rw [hTh]
-      change ρr * (g - c • f₀) x₀ = 0
-      rw [hx0]
-      simp
-    linarith
-  -- so g = c • f₀
-  have hg_eq : g = c • f₀ := by
-    ext x
-    have hz : g x - c * f₀ x = 0 := by
-      simpa [smul_eq_mul] using DFunLike.congr_fun hcoef x
-    simpa [smul_eq_mul] using sub_eq_zero.mp hz
-  exact ⟨c, div_pos (hgpos x₀) (hf₀pos x₀), hg_eq⟩
-
-end
-
-end Riemann

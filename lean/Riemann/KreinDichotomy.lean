@@ -380,6 +380,114 @@ theorem kreinRutman_core' {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} (hTpos : IsPositiv
   simpa [ρr] using
     exists_positive_eigenvector_of_superharmonic hTpos hTcomp hρr rfl hwne hwcon hdom'
 
+/-! ## Krein–Rutman: the main theorems -/
+
+/-- **Krein–Rutman theorem**, eigenvalue form.
+
+A compact, positive operator `T` on `C(X, ℝ)` (for a compact Hausdorff `X`)
+with positive spectral radius has the spectral radius as a positive
+eigenvalue: there is a nonzero `f` with `0 ≤ f x` for all `x` and
+`T f = (spectralRadius T).toReal • f`.
+
+This is `kreinRutman_core'` above (proved modulo the file's single
+documented admission, the β-stabilization gap);
+the scaffold already proved in this file (real spectral value `|μ| = ρ(T)`
+via the Fredholm alternative, the positivity transfer `T |f| ≥ ρ(T) |f|`)
+lies on the direct road to closing that admission and is retained as
+infrastructure for the next step. -/
+theorem kreinRutman {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} (hTpos : IsPositive T)
+    (hTcomp : IsCompactOperator T) (hρ : 0 < spectralRadius ℝ T) :
+    ∃ f : C(X, ℝ), f ∈ positiveCone ∧ f ≠ 0 ∧
+      T f = (spectralRadius ℝ T).toReal • f :=
+  kreinRutman_core' hTpos hTcomp hρ
+
+/-- **Krein–Rutman theorem**, strong form (geometric simplicity of the
+leading eigenvalue).
+
+If, in addition, `T` is strongly positive (it maps every nonzero vector of the
+positive cone to a strictly positive function), then the spectral-radius
+eigenvector is unique up to a positive scalar: every nonzero positive
+eigenvector at the spectral radius lies in the ray spanned by a single
+(automatically strictly positive) eigenfunction. -/
+theorem kreinRutman_strong {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} (hTpos : IsPositive T)
+    (hTcomp : IsCompactOperator T) (hTstr : IsStronglyPositive T)
+    (hρ : 0 < spectralRadius ℝ T) :
+    ∃ f : C(X, ℝ), f ∈ positiveCone ∧ f ≠ 0 ∧
+      T f = (spectralRadius ℝ T).toReal • f ∧
+      (∀ g : C(X, ℝ), g ∈ positiveCone → g ≠ 0 →
+        T g = (spectralRadius ℝ T).toReal • g → ∃ c : ℝ, 0 < c ∧ g = c • f) := by
+  let ρr : ℝ := (spectralRadius ℝ T).toReal
+  -- the weak form provides the starting eigenfunction f₀
+  obtain ⟨f₀, hf₀cone, hf₀ne, hf₀⟩ := kreinRutman hTpos hTcomp hρ
+  have hρr : 0 < ρr := by simpa [ρr] using spectralRadius_toReal_pos hρ
+  -- strong positivity makes f₀ strictly positive pointwise
+  have hf₀pos : ∀ x : X, 0 < f₀ x := by
+    intro x
+    have hpos : 0 < (T f₀) x := hTstr f₀ hf₀cone hf₀ne x
+    rw [hf₀] at hpos
+    exact pos_of_mul_pos_right (by simpa [ρr, smul_eq_mul] using hpos) (le_of_lt hρr)
+  refine ⟨f₀, hf₀cone, hf₀ne, hf₀, ?_⟩
+  intro g hgcone hgne hgEq
+  -- g is also strictly positive pointwise
+  have hgpos : ∀ x : X, 0 < g x := by
+    intro x
+    have hpos : 0 < (T g) x := hTstr g hgcone hgne x
+    rw [hgEq] at hpos
+    exact pos_of_mul_pos_right (by simpa [ρr, smul_eq_mul] using hpos) (le_of_lt hρr)
+  -- the ratio g / f₀ is well-defined and attains its minimum at some x₀
+  have hcont : Continuous (fun x : X => g x / f₀ x) := by
+    exact Continuous.div (ContinuousMap.continuous g) (ContinuousMap.continuous f₀)
+      (fun x => ne_of_gt (hf₀pos x))
+  have hne_univ : (Set.univ : Set X).Nonempty := ⟨Classical.choice ‹Nonempty X›, trivial⟩
+  obtain ⟨x₀, _, hm⟩ :=
+    (isCompact_univ.exists_isMinOn (s := Set.univ) hne_univ hcont.continuousOn)
+  have hc_le : ∀ x : X, g x₀ / f₀ x₀ ≤ g x / f₀ x := by
+    intro x
+    exact (Filter.eventually_principal.mp hm) x (by trivial)
+  let c : ℝ := g x₀ / f₀ x₀
+  -- h := g - c • f₀ is in the cone and vanishes at x₀
+  have hc_mul : ∀ x : X, c * f₀ x ≤ g x := by
+    intro x
+    have hmul := mul_le_mul_of_nonneg_right (hc_le x) (le_of_lt (hf₀pos x))
+    have hsim : (g x / f₀ x) * f₀ x = g x := div_mul_cancel₀ (g x) (ne_of_gt (hf₀pos x))
+    simpa [hsim] using hmul
+  have hcon : g - c • f₀ ∈ positiveCone := by
+    rw [mem_positiveCone]
+    intro x
+    simpa [smul_eq_mul] using sub_nonneg.mpr (hc_mul x)
+  have hx0 : (g - c • f₀) x₀ = 0 := by
+    change g x₀ - c * f₀ x₀ = 0
+    rw [show c = g x₀ / f₀ x₀ by rfl]
+    rw [div_mul_cancel₀ (g x₀) (ne_of_gt (hf₀pos x₀))]
+    rw [sub_self]
+  -- h is an eigenvector at ρ(T)
+  have hTh : T (g - c • f₀) = ρr • (g - c • f₀) := by
+    have h1 : T (g - c • f₀) = T g - c • T f₀ := by simp [map_sub, map_smul]
+    have h2 : T g - c • T f₀ = ρr • g - c • (ρr • f₀) := by
+      rw [hgEq, hf₀]
+    have h3 : ρr • g - c • (ρr • f₀) = ρr • (g - c • f₀) := by
+      ext x
+      simp only [smul_sub, sub_smul, smul_smul, smul_eq_mul, mul_assoc, mul_comm, mul_left_comm]
+    exact h1.trans (h2.trans h3)
+  -- if h were nonzero, strong positivity forces T h > 0, contradicting T h = 0 at x₀
+  have hcoef : g - c • f₀ = 0 := by
+    by_contra hne
+    have hpos : 0 < (T (g - c • f₀)) x₀ :=
+      hTstr (g - c • f₀) hcon hne x₀
+    have hzero : (T (g - c • f₀)) x₀ = 0 := by
+      rw [hTh]
+      change ρr * (g - c • f₀) x₀ = 0
+      rw [hx0]
+      simp
+    linarith
+  -- so g = c • f₀
+  have hg_eq : g = c • f₀ := by
+    ext x
+    have hz : g x - c * f₀ x = 0 := by
+      simpa [smul_eq_mul] using DFunLike.congr_fun hcoef x
+    simpa [smul_eq_mul] using sub_eq_zero.mp hz
+  exact ⟨c, div_pos (hgpos x₀) (hf₀pos x₀), hg_eq⟩
+
 end
 
 end Riemann
