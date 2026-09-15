@@ -12,7 +12,7 @@
    ],
    "accept": "GATE_TIMEOUT=2400 bash lean/fleet-gate.sh Riemann.TransferOperator.Operator contextual-intelligence.org lean/Riemann/TransferOperator/Operator.lean",
    "acceptance_prose": "lake build Riemann exits 0 on host contextual-intelligence.org AND Operator.lean contains no 'sorry'. The def transferOperatorBounded must be the actual tsum-based operator (no placeholder).",
-   "manual": false
+   "manual": true
   },
   {
    "id": "RH-2",
@@ -23,7 +23,7 @@
    ],
    "accept": "GATE_TIMEOUT=2400 bash lean/fleet-gate.sh Riemann.TransferOperator.GaussMap tobi-yoga lean/Riemann/TransferOperator/GaussMap.lean",
    "acceptance_prose": "lake build Riemann exits 0 on host tobi-yoga AND GaussMap.lean contains no 'sorry'.",
-   "manual": false
+   "manual": true
   },
   {
    "id": "RH-3",
@@ -34,7 +34,7 @@
    ],
    "accept": "GATE_TIMEOUT=2400 bash lean/fleet-gate.sh Riemann.PrimeNumberTheorem chemie-lernen.org lean/Riemann/PrimeNumberTheorem.lean",
    "acceptance_prose": "lake build Riemann exits 0 on host chemie-lernen.org AND PrimeNumberTheorem.lean contains no 'sorry'.",
-   "manual": false
+   "manual": true
   },
   {
    "id": "RH-4",
@@ -45,7 +45,7 @@
    ],
    "accept": "MAX_SORRY=9 GATE_TIMEOUT=2400 bash lean/fleet-gate.sh Riemann.FredholmDeterminants tobias-weiss.org lean/Riemann/FredholmDeterminants.lean",
    "acceptance_prose": "lake build Riemann exits 0 on host tobias-weiss.org AND the number of 'sorry' occurrences in FredholmDeterminants.lean is strictly lower than 13 (target: 0).",
-   "manual": false
+   "manual": true
   },
   {
    "id": "RH-5",
@@ -56,7 +56,7 @@
    ],
    "accept": "MAX_SORRY=5 GATE_TIMEOUT=2400 bash lean/fleet-gate.sh Riemann.TransferOperator.Theorem3_3 mac lean/Riemann/TransferOperator/Theorem3_3.lean",
    "acceptance_prose": "lake build Riemann exits 0 on host mac AND the number of 'sorry' occurrences in Theorem3_3.lean is strictly lower than 8 (target: 0).",
-   "manual": false
+   "manual": true
   },
   {
    "id": "RH-6",
@@ -69,7 +69,7 @@
    ],
    "accept": "MAX_SORRY=2 GATE_TIMEOUT=2400 bash lean/fleet-gate.sh Riemann.FredholmDeterminants tobias-weiss.org lean/Riemann/FredholmDeterminants.lean",
    "acceptance_prose": "lake build Riemann exits 0 on host tobias-weiss.org AND FredholmDeterminants.lean has at most 2 remaining sorries.",
-   "manual": false
+   "manual": true
   },
   {
    "id": "RH-7",
@@ -80,7 +80,7 @@
    ],
    "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.TransferOperator.Operator tobi-yoga lean/Riemann/TransferOperator/Operator.lean",
    "acceptance_prose": "lake build Riemann exits 0 on host tobi-yoga AND Operator.lean contains no sorry.",
-   "manual": false
+   "manual": true
   },
   {
    "id": "RH-8",
@@ -93,7 +93,7 @@
    ],
    "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.TransferOperator.Theorem3_3 mac lean/Riemann/TransferOperator/Theorem3_3.lean",
    "acceptance_prose": "lake build Riemann exits 0 on host mac AND Theorem3_3.lean has at most 1 remaining sorry.",
-   "manual": false
+   "manual": true
   },
   {
    "id": "RH-9",
@@ -104,7 +104,7 @@
    ],
    "accept": "MAX_SORRY=3 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.ThermodynamicFormalism contextual-intelligence.org lean/Riemann/ThermodynamicFormalism.lean",
    "acceptance_prose": "lake build Riemann exits 0 on host contextual-intelligence.org AND at most 3 sorries remain.",
-   "manual": false
+   "manual": true
   },
   {
    "id": "RH-10",
@@ -115,7 +115,7 @@
    ],
    "accept": "MAX_SORRY=2 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.TransferOperator.Complete tobias-weiss.org lean/Riemann/TransferOperator/Complete.lean",
    "acceptance_prose": "lake build Riemann exits 0 on host tobias-weiss.org AND at most 2 sorries remain.",
-   "manual": false
+   "manual": true
   },
   {
    "id": "RH-11",
@@ -126,7 +126,7 @@
    ],
    "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.RamanujanProperty chemie-lernen.org lean/Riemann/RamanujanProperty.lean",
    "acceptance_prose": "lake build Riemann exits 0 on host chemie-lernen.org AND at most 1 sorry remains.",
-   "manual": false
+   "manual": true
   },
   {
    "id": "RH-12",
@@ -137,7 +137,7 @@
    ],
    "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.TransferOperator.Definitions mac lean/Riemann/TransferOperator/Definitions.lean",
    "acceptance_prose": "lake build Riemann exits 0 on host mac AND zero sorries remain.",
-   "manual": false
+   "manual": true
   },
   {
    "id": "RH-13",
@@ -148,7 +148,7 @@
    ],
    "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.TransferOperator.Theorem3_3 tobi-yoga lean/Riemann/TransferOperator/Theorem3_3.lean",
    "acceptance_prose": "lake build Riemann exits 0 on host tobi-yoga AND at most 1 sorry remains.",
-   "manual": false
+   "manual": true
   },
   {
    "id": "RH-14",
@@ -159,7 +159,7 @@
    ],
    "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.CompleteProof mac lean/Riemann/CompleteProof.lean",
    "acceptance_prose": "lake build Riemann exits 0 on host mac AND zero sorries in the whole Riemann tree.",
-   "manual": false
+   "manual": true
   },
   {
    "id": "RH-15",
@@ -170,7 +170,7 @@
    ],
    "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.FredholmDeterminants tobias-weiss.org lean/Riemann/FredholmDeterminants.lean",
    "acceptance_prose": "lake build Riemann exits 0 on host tobias-weiss.org AND zero sorries in the whole Riemann tree.",
-   "manual": false
+   "manual": true
   },
   {
    "id": "RH-16",
@@ -181,7 +181,7 @@
    ],
    "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.ThermodynamicFormalism contextual-intelligence.org lean/Riemann/ThermodynamicFormalism.lean",
    "acceptance_prose": "lake build Riemann exits 0 on host contextual-intelligence.org AND zero sorries in the whole Riemann tree.",
-   "manual": false
+   "manual": true
   },
   {
    "id": "RH-17",
@@ -192,7 +192,7 @@
    ],
    "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.TransferOperator.Complete chemie-lernen.org lean/Riemann/TransferOperator/Complete.lean",
    "acceptance_prose": "lake build Riemann exits 0 on host chemie-lernen.org AND zero sorries in the whole Riemann tree.",
-   "manual": false
+   "manual": true
   },
   {
    "id": "RH-18",
@@ -203,7 +203,7 @@
    ],
    "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.TransferOperator.Theorem3_3 tobi-yoga lean/Riemann/TransferOperator/Theorem3_3.lean",
    "acceptance_prose": "lake build Riemann exits 0 on host tobi-yoga AND zero sorries in the whole Riemann tree.",
-   "manual": false
+   "manual": true
   },
   {
    "id": "RH-19",
@@ -214,7 +214,7 @@
    ],
    "accept": "MAX_SORRY=2 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.KreinRutman mac lean/Riemann/KreinRutman.lean",
    "acceptance_prose": "lake build Riemann exits 0 on host mac AND at most 2 sorries in the new file (target 0).",
-   "manual": false,
+   "manual": true,
    "remote": "contextual-intelligence.org"
   },
   {
@@ -226,7 +226,7 @@
    ],
    "accept": "MAX_SORRY=2 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.DiskOperator contextual-intelligence.org lean/Riemann/DiskOperator.lean",
    "acceptance_prose": "lake build Riemann exits 0 on host contextual-intelligence.org AND at most 2 sorries in the new file (target 0).",
-   "manual": false,
+   "manual": true,
    "remote": "contextual-intelligence.org"
   },
   {
@@ -238,7 +238,7 @@
    ],
    "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.FredholmFiniteRank tobias-weiss.org lean/Riemann/FredholmFiniteRank.lean",
    "acceptance_prose": "lake build Riemann exits 0 on host tobias-weiss.org AND at most 1 sorry in the new file (target 0).",
-   "manual": false,
+   "manual": true,
    "remote": "tobias-weiss.org"
   },
   {
@@ -252,7 +252,7 @@
    ],
    "accept": "GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.AxiomAudit chemie-lernen.org lean/Riemann/AxiomAudit.lean lean/Riemann/TransferOperator/Theorem3_3.lean",
    "acceptance_prose": "lake build Riemann exits 0 on host chemie-lernen.org, FRONTIER.md exists with all three sections, renames complete, audit output captured.",
-   "manual": false,
+   "manual": true,
    "remote": "chemie-lernen.org"
   },
   {
@@ -266,7 +266,7 @@
    ],
    "accept": "GATE_TIMEOUT=1200 bash lean/fleet-gate.sh Riemann.CompleteProof tobi-yoga lean/Riemann/CompleteProof.lean",
    "acceptance_prose": "gate passes trivially (no Lean changes expected); tex/README/ABSOLUTE_TRUST revised per instructions.",
-   "manual": false,
+   "manual": true,
    "remote": "tobi-yoga"
   },
   {
@@ -278,7 +278,7 @@
    ],
    "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.KreinRutman tobi-yoga lean/Riemann/KreinRutman.lean",
    "acceptance_prose": "lake build Riemann.KreinRutman exits 0 on tobi-yoga; total sorries in KreinRutman.lean <= 1 (0 if the core was genuinely closed); no statement weakened, no axiom, no collapse-lemma resurrection; only scope file touched.",
-   "manual": false,
+   "manual": true,
    "remote": "tobi-yoga"
   },
   {
@@ -302,7 +302,7 @@
    ],
    "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.KreinRutman tobi-yoga lean/Riemann/KreinRutman.lean",
    "acceptance_prose": "lake build Riemann.KreinRutman exits 0 on tobi-yoga; total sorries in KreinRutman.lean stays <= 1 (the pre-existing kreinRutman_core); no NEW sorry/admit; no weakened statement; no collapse-lemma resurrection; only scope file touched.",
-   "manual": false,
+   "manual": true,
    "remote": "tobi-yoga"
   },
   {
@@ -314,7 +314,7 @@
    ],
    "accept": "MAX_SORRY=1 GATE_TIMEOUT=3000 bash lean/fleet-gate.sh Riemann.RealGelfand chemie-lernen.org lean/Riemann/RealGelfand.lean",
    "acceptance_prose": "lake build Riemann.RealGelfand exits 0 on chemie-lernen.org; exactly 1 sorry in RealGelfand.lean (realGelfandUpperBound, documented); other theorems proved; no admit; no weakening; only scope file touched.",
-   "manual": false,
+   "manual": true,
    "remote": "chemie-lernen.org"
   },
   {
