@@ -47,7 +47,7 @@
     },
     {
       "name": "tud-glm",
-      "enabled": true,
+      "enabled": false,
       "provider": "litellm",
       "model": "tud/glm-5.2-awq",
       "endpoint": "http://127.0.0.1:4000",
