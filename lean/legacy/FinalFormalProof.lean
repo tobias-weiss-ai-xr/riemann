@@ -1,4 +1,15 @@
 /-
+⚠️ ARCHIVED LEGACY MODULE — NOT PART OF THE FORMALIZATION (2026-09-16)
+
+This file predates the honesty pass (research/FRONTIER.md). It is NOT in the
+lake build graph (the lakefile globs `Riemann/` submodules only) and carries
+unverified placeholders — none of its results are machine-checked. Its claims
+are superseded by the verified modules under `lean/Riemann/`. Kept for
+historical interest only — do not import, do not cite. See
+research/FRONTIER.md for the machine-checked reality.
+-/
+
+/-
 Copyright (c) 2026 Riemann Project. All rights reserved.
 
 FORMAL PROOF OF RIEMANN HYPOTHESIS USING EXISTING MATHLIB

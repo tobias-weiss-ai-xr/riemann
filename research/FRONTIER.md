@@ -430,6 +430,10 @@ Elaboration notes for future rounds: `let` + rfl-lemma instead of `set`
 
 ## 4. One-line summary
 
+- **Legacy**: pre-honesty-pass root-level modules (`FormalRH`, `Waterproof`,
+  `FinalFormalProof`, `FinalWaterproof`, `VerifiableBase`) were moved to
+  `lean/legacy/` with deprecation banners (2026-09-16) — never in the lake
+  build graph, sorried, superseded; kept for history, not citable.
 - **Proven for real**: bounded Gauss-map operator on C([0,1],ℂ) (§2a), uniform
   Ruelle convergence (§2b, compactness *disproven* on C([0,1])), Euler-region
   nonvanishing (§2c), Re s = 1 nonvanishing + trivial-zero exclusion (§2d),
