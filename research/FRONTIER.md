@@ -426,6 +426,33 @@ Elaboration notes for future rounds: `let` + rfl-lemma instead of `set`
 `dist x 0` via `tendsto_iff_dist_tendsto_zero` (the old
 `tendsto_iff_norm_tendsto_zero` does not exist in this mathlib).
 
+**RH-40 (disc algebra, phase 1 of the Mayer campaign — `lean/Riemann/
+MayerAnalyticClass.lean`).**  Step (1) of the §3b upgrade path now has its
+foundation, real and sorry-free: the **disc algebra** `A(D)` — continuous on
+the closed unit disc, holomorphic on the interior — is formalized as a
+`Subalgebra ℂ C(closedBall (0:ℂ) 1, ℂ)` (`discAlgebra`), i.e. continuity on
+the closed disc is inherited from the ambient sup-norm space and only
+interior holomorphy is carrier-defining (via `toHol`, the extension-by-zero
+view of an element as a plain `ℂ → ℂ` function).  Proven: **Weierstrass
+closedness** — `isSeqClosed_carrier` via uniform ⇒ locally-uniform
+(`TendstoUniformlyOn.tendstoLocallyUniformlyOn` + `.mono`) ⇒
+`TendstoLocallyUniformlyOn.differentiableOn`; hence `isClosed_carrier` and
+the **Banach-space instance** `discAlgebra_complete`
+(`completeSpace_iff_isComplete_univ` + `Subtype.isComplete_iff` +
+`IsClosed.isComplete`); and **evaluation at interior points**
+`discAlgebraEval z : discAlgebra →L[ℂ] ℂ` with `‖·‖ ≤ 1`
+(`norm_discAlgebraEval_le`, via `opNorm_le_bound`).  This is the analytic
+class on which Mayer's operator becomes compact — as opposed to `C([0,1])`,
+where §2b showed compactness is *false*.  Next (phase 2): the transfer
+operator on `discAlgebra` (Gauss-map inverse branches), boundedness,
+compactness via Montel/Arzelà–Ascoli.  Elaboration notes: `dite` on set
+membership needs `open scoped Classical`; `ContinuousMap.add_apply` does not
+exist in this mathlib — use `ContinuousMap.coe_add : ⇑(f+g) = f + g` then
+`Pi.add_apply`; global-theorem dot-notation (`mem.mpr`) can fail name
+resolution — parenthesize (`(mem_discAlgebra x).mpr`); `IsSeqClosed` binds
+`∀ ⦃x : ℕ → X⦄ ⦃p : X⦄` — `intro u p hu hx`; a bare `end` must precede
+`end Riemann` when a `noncomputable section` is open.
+
 ---
 
 ## 4. One-line summary
