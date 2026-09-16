@@ -74,7 +74,7 @@
 \maketitle
 
 \begin{abstract}
-We outline a program to prove the Riemann Hypothesis using the thermodynamic formalism of transfer operators acting on the Gauss map. The key insight is that the Selberg zeta function for $\PSLtwoZ$ can be expressed as a Fredholm determinant of a transfer operator $L_s$, whose eigenvalues are related to the zeros of the Riemann zeta function. We present a {\em conditional reduction}: RH follows if one can prove that the spectral radius of $L_s$ satisfies $\rho(L_s) < 1$ for all $s$ with $\Ree(s) > \half$. This spectral bound is exactly as hard as RH itself and remains an open problem. The paper also highlights the honest, proven results in the Lean development: the PNT line theorem (modulo Hadamard-de la Vallee Poussin), functional-equation reflection, Euler-region nonvanishing, and the compactness of the $C([0,1])$ Gauss-map operator (Mathlib PR #43744).
+We outline a program to prove the Riemann Hypothesis using the thermodynamic formalism of transfer operators acting on the Gauss map. The key insight is that the Selberg zeta function for $\PSLtwoZ$ can be expressed as a Fredholm determinant of a transfer operator $L_s$, whose eigenvalues are related to the zeros of the Riemann zeta function. We present a {\em conditional reduction}: RH follows if one can prove that the spectral radius of $L_s$ satisfies $\rho(L_s) < 1$ for all $s$ with $\Ree(s) > \half$. This spectral bound is exactly as hard as RH itself and remains an open problem. The paper also highlights the honest, proven results in the Lean development: the PNT line theorem (modulo Hadamard-de la Vallee Poussin), functional-equation reflection, Euler-region nonvanishing, the compactness of the $C([0,1])$ Gauss-map operator (Mathlib PR #43744), and --- as of this revision --- the \emph{general real Krein--Rutman theorem} for compact positive operators on $C(X,\mathbb{R})$, fully formalized with zero sorry via a resolvent blow-up argument (Section \ref{sec:kreinrutman}).
 \end{abstract}
 
 \tableofcontents
@@ -334,7 +334,7 @@ Can we construct an explicit eigenfunction of $L_s$ corresponding to the eigenva
 
 This section documents what is {\em actually proven} in the Lean 4 formalization (v4.17.0 + mathlib). {\bf Crucially}, the Lean code proves the {\em conditional reduction architecture} -- it does {\em not} prove the spectral radius bound $\rho(L_s) < 1$, which remains the open research frontier.
 
-\subsection{What Is Actually Proven (0 sorry, 0 axiom)}
+\subsection{What Is Actually Proven (Krein--Rutman: fully proved, 0 sorry)}
 
 | Component | Status | Mathlib PR | Trust Level |
 |-----------|--------|------------|-------------|
@@ -349,6 +349,9 @@ This section documents what is {\em actually proven} in the Lean 4 formalization
 | Fredholm determinant correspondence | ✅ Proven | Complete.lean | 100% |
 | Explicit leading eigenvalue model $\lambda_1(s) = e^{1/2 - s}$ | ✅ Proven | Theorem3_3.lean | 100% |
 | Model bound $|\lambda_1(s)| < 1$ for $\Re s > 1/2$ | ✅ Proven | Theorem3_3.lean | 100% |
+| **Real Gelfand formula for positive operators** ($\rho(T) = \lim \|T^n\|^{1/n}$) | ✅ Proven | GelfandPositive.lean | 100% |
+| **Resolvent positivity** $(\lambda \cdot 1 - T)^{-1} \geq 0$ for $\lambda > \rho(T)$ | ✅ Proven | GelfandPositive.lean | 100% |
+| **Real Krein--Rutman theorem** (weak + strong form, $C(X,\mathbb{R})$) | ✅ Proven | KreinRutmanExistence.lean | 100% |
 
 \subsection{What Is Conditional (The Research Frontier)}
 
@@ -359,6 +362,46 @@ This section documents what is {\em actually proven} in the Lean 4 formalization
 | Mayer's identity on genuine trace-class | ❌ {\bf Open} | Fredholm determinant construction | 0% |
 | $\det(1 - L_s) \neq 0 \Rightarrow$ no zeros off critical line | ❌ {\bf Conditional} | Spectral radius bound | 0% |
 | {\bf Full Riemann Hypothesis} | ❌ {\bf Not Proven} | {\bf All above} | {\bf 0%} |
+
+\subsection{New (2026): The General Krein--Rutman Theorem Is Fully Formalized}
+\label{sec:kreinrutman}
+
+A recent development (RH-38/39) closed the last admission in the
+operator-theory layer. The \emph{general} Krein--Rutman existence theorem over
+the reals is now fully machine-checked, with mathlib alone as the dependency
+(packaged as self-contained staging modules in
+\texttt{lean/Riemann/ForMathlib/}):
+
+\begin{theorem}[Real Krein--Rutman, formalized]
+Let $X$ be a compact nonempty topological space and
+$T : C(X,\mathbb{R}) \to C(X,\mathbb{R})$ a compact linear operator that is
+positive (maps the cone $\{f : f \geq 0\}$ into itself), with $\rho(T) > 0$.
+Then $\rho(T)$ is an eigenvalue with a nonzero positive eigenfunction:
+$\exists f \neq 0$, $f \geq 0$, $T f = \rho(T) f$. If $T$ is moreover strongly
+positive, the eigenfunction is unique up to a positive scalar (geometric
+simplicity).
+\end{theorem}
+
+The proof route is a \emph{resolvent blow-up} argument, which replaced an
+earlier incomplete ``$\beta$-stabilization'' attempt: the seed domination
+$\rho \cdot w \leq T w$ transfers through the positive resolvents
+$A_k = (\lambda_k \cdot 1 - T)^{-1}$ at $\lambda_k = \rho + 1/(k+1)$ as
+$w \leq (\lambda_k - \rho)\, A_k w$; the normalized resolvent orbit
+$z_k = A_k w / \|A_k w\|$ is unit-norm, cone-valued, and satisfies the
+navigation identity $T z_k = \lambda_k z_k - \|A_k w\|^{-1} w$ with residual
+tending to zero; compactness of $T$ extracts a subsequential limit
+$\rho^{-1} v$ --- a unit-norm cone eigenvector at $\rho$.
+
+Two caveats keep this honest:
+\begin{enumerate}
+\item This is the \emph{abstract} theorem for operators on $C(X,\mathbb{R})$.
+It applies to the specific transfer operator $L_s$ only once $L_s$ is realized
+on a space where compactness is true (the analytic class of
+Section~\ref{sec:lean}) --- which is precisely the still-open Step~1 of the
+proof path.
+\item The theorem's hypotheses ($\rho(T) > 0$, compactness, positivity) are
+hypotheses of the application, not conclusions of the formalization.
+\end{enumerate}
 
 \subsection{Why This Is Not A Proof of RH}
 
