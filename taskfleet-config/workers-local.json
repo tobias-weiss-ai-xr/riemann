@@ -1,0 +1,97 @@
+{
+  "defaults": {
+    "accept_timeout_s": 3600,
+    "max_attempts": 3,
+    "retry_delay_s": 30,
+    "agent_timeout_s": 10800,
+    "dispatch_timeout_s": 10800,
+    "no_op_max_attempts": 2,
+    "timeout_retry_multiplier": 1.5
+  },
+  "workers": [
+    {
+      "name": "qwen-coder-a",
+      "enabled": true,
+      "provider": "litellm",
+      "model": "saia/qwen3-coder-next",
+      "endpoint": "http://127.0.0.1:4000",
+      "api_key_env": "LITELLM_API_KEY",
+      "tiers": [
+        "standard",
+        "fast"
+      ]
+    },
+    {
+      "name": "deepseek-ai1",
+      "enabled": true,
+      "provider": "litellm",
+      "model": "saia/deepseek-v4-flash-0731",
+      "endpoint": "http://127.0.0.1:4000",
+      "api_key_env": "LITELLM_API_KEY",
+      "tiers": [
+        "standard",
+        "deep"
+      ]
+    },
+    {
+      "name": "qwen-coder-b",
+      "enabled": true,
+      "provider": "litellm",
+      "model": "saia/qwen3-coder-next",
+      "endpoint": "http://127.0.0.1:4000",
+      "api_key_env": "LITELLM_API_KEY",
+      "tiers": [
+        "standard",
+        "booster"
+      ]
+    },
+    {
+      "name": "tud-glm",
+      "enabled": true,
+      "provider": "litellm",
+      "model": "tud/glm-5.2-awq",
+      "endpoint": "http://127.0.0.1:4000",
+      "api_key_env": "LITELLM_API_KEY",
+      "tiers": [
+        "standard",
+        "deep"
+      ]
+    },
+    {
+      "name": "tud-mistral",
+      "enabled": true,
+      "provider": "litellm",
+      "model": "tud/mistral-medium-3.5-128b",
+      "endpoint": "http://127.0.0.1:4000",
+      "api_key_env": "LITELLM_API_KEY",
+      "tiers": [
+        "standard",
+        "deep"
+      ]
+    },
+    {
+      "name": "tud-gemma",
+      "enabled": true,
+      "provider": "litellm",
+      "model": "tud/gemma-4-31B-it",
+      "endpoint": "http://127.0.0.1:4000",
+      "api_key_env": "LITELLM_API_KEY",
+      "tiers": [
+        "standard",
+        "fast"
+      ]
+    },
+    {
+      "name": "zai-glm-flash",
+      "enabled": true,
+      "provider": "litellm",
+      "model": "zai/glm-5.3-flash",
+      "endpoint": "http://127.0.0.1:4000",
+      "api_key_env": "LITELLM_API_KEY",
+      "tiers": [
+        "standard",
+        "fast"
+      ]
+    }
+  ]
+}
