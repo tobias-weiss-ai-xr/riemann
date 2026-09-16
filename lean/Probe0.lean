@@ -1,0 +1,6 @@
+import Riemann.MayerHalf.CompactSummand
+import Mathlib.Topology.ContinuousMap.Bounded.ArzelaAscoli
+open BoundedContinuousFunction Complex Riemann
+#check isCompactOperator_iff_isCompact_closure_image_closedBall
+#check Metric.equicontinuousAt_iff_right
+#check EquicontinuousAt
