@@ -163,6 +163,81 @@ theorem norm_transferSummandCLM_le (n : ℕ) (f : halfDiscAlgebra) :
     ‖transferSummandCLM n f‖ ≤ ‖(f : C(↥halfDisc, ℂ))‖ / ((n : ℝ) + 1) ^ 2 := by
   simpa [transferSummandCLM] using norm_transferSummandL_le n f
 
+/-! ### Arzelà–Ascoli: equicontinuity of the transfer family -/
+
+/-- The uniform interior margin radius `1 / (2 · (n+2)²)` — same for every branch image. -/
+noncomputable def r₀ (n : ℕ) : ℝ := 1 / (2 * ((n : ℝ) + 2) ^ 2)
+
+theorem r₀_pos (n : ℕ) : 0 < r₀ n := by
+  unfold r₀
+  positivity
+
+theorem r₀_nonneg (n : ℕ) : 0 ≤ r₀ n := le_of_lt (r₀_pos n)
+
+/-- A ball of radius `r₀` around the branch image stays in the interior. -/
+theorem branch_image_ball_subset_interior_r₀ (n : ℕ) (hn : 0 < n) (z : ℂ) (hz : z ∈ halfDisc) :
+    ball (gaussBranch n z) (r₀ n) ⊆ interior halfDisc := by
+  simpa [r₀] using branch_image_ball_subset_interior n hn z hz
+
+/-- The supremum norm of the squared Gauss branch is at most `1` on the whole half-disc. -/
+theorem branch_sq_norm_le_one (n : ℕ) (z : ↥halfDisc) :
+    ‖(gaussBranch n z.1 : ℂ) ^ 2‖ ≤ 1 := by
+  have hb : ‖gaussBranch n z.1‖ ≤ 1 := by
+    have h : ‖gaussBranch n z.1‖ ≤ 1 / ((n : ℝ) + 1) := branch_norm_le n z.1 z.property
+    have hp : (0 : ℝ) < (n : ℝ) + 1 := by linarith [Nat.cast_nonneg (α := ℝ) n]
+    exact le_trans h (by rw [one_div, inv_le_one₀ hp]; linarith [Nat.cast_nonneg (α := ℝ) n])
+  calc
+    ‖(gaussBranch n z.1 : ℂ) ^ 2‖ = ‖gaussBranch n z.1‖ ^ 2 := by rw [norm_pow]
+    _ ≤ 1 ^ 2 := pow_le_pow_left₀ (norm_nonneg _) hb 2
+    _ = 1 := by norm_num
+
+/-- **Uniform local Lipschitz bound.** The holomorphic half-disc-algebra family is
+`(2M)/(r₀/2)`-Lipschitz on the ball of radius `r₀/2` around any branch image. -/
+theorem holFamily_lipschitz (n : ℕ) (hn : 0 < n) (f : C(↥halfDisc, ℂ)) (hf : f ∈ halfDiscAlgebra)
+    (M : ℝ) (hM : ‖f‖ ≤ M) (z z₀ : ↥halfDisc)
+    (hclose : dist (gaussBranch n z.1) (gaussBranch n z₀.1) < r₀ n / 2) :
+    ‖(f : C(↥halfDisc, ℂ)) ⟨gaussBranch n z.1, branchMapsTo_halfDisc n z.property⟩ -
+      (f : C(↥halfDisc, ℂ)) ⟨gaussBranch n z₀.1, branchMapsTo_halfDisc n z₀.property⟩‖
+      ≤ (2 * M) / (r₀ n / 2) * ‖gaussBranch n z.1 - gaussBranch n z₀.1‖ := by
+  -- K a small convex ball in the interior
+  let s : Set ℂ := ball (gaussBranch n z₀.1) (r₀ n / 2)
+  have hhalfr : (r₀ n / 2) ≤ r₀ n := by linarith [r₀_nonneg n]
+  have hsub : s ⊆ interior halfDisc := by
+    intro x hx
+    exact branch_image_ball_subset_interior_r₀ n hn z₀.1 z₀.property
+      (ball_subset_ball hhalfr hx)
+  -- differentiability at every point of the ball
+  have hdiff : ∀ x ∈ s, DifferentiableAt ℂ (toHalfHol f) x := by
+    intro x hx
+    have hd : DifferentiableOn ℂ (toHalfHol f) (interior halfDisc) :=
+      (mem_halfDiscAlgebra f).mp hf
+    exact hd.differentiableAt (isOpen_interior.mem_nhds (hsub hx))
+  -- derivative bound via the Cauchy estimate
+  have hbound : ∀ x ∈ s, ‖deriv (toHalfHol f) x‖ ≤ (2 * M) / (r₀ n / 2) := by
+    intro x hx
+    refine norm_deriv_toHalfHol_le f hf M hM x (r₀ n / 2) (by exact half_pos (r₀_pos n)) ?_
+    intro y hy
+    refine branch_image_ball_subset_interior_r₀ n hn z₀.1 z₀.property ?_
+    have hy' : dist y x < r₀ n / 2 := by simpa [mem_ball] using hy
+    have hx' : dist x (gaussBranch n z₀.1) < r₀ n / 2 := by simpa [s, mem_ball] using hx
+    rw [mem_ball]
+    linarith [dist_triangle y x (gaussBranch n z₀.1), hy', hx']
+  -- the two endpoints
+  have hxs : gaussBranch n z₀.1 ∈ s := by
+    dsimp [s]
+    rw [mem_ball, dist_self]
+    exact half_pos (r₀_pos n)
+  have hys : gaussBranch n z.1 ∈ s := by
+    dsimp [s]
+    rw [mem_ball]
+    exact hclose
+  -- mean value theorem on the convex ball
+  have hMVT := Convex.norm_image_sub_le_of_norm_deriv_le (𝕜 := ℂ) hdiff hbound (convex_ball _ _) hxs hys
+  -- rewrite `toHalfHol` values to the `ContinuousMap` values
+  rw [toHalfHol_apply f (gaussBranch n z.1) (branchMapsTo_halfDisc n z.property),
+      toHalfHol_apply f (gaussBranch n z₀.1) (branchMapsTo_halfDisc n z₀.property)] at hMVT
+  exact hMVT
+
 end
 
 end Riemann
