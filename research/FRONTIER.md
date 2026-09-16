@@ -403,6 +403,29 @@ placeholder-model pattern.  Route 3 is dropped until mathlib grows
 a warm-up, using `NormedRing.inverse_one_sub` / `HasSummableGeomSeries`)
 remains the most promising near-term attack.
 
+**RH-39 (merged `b5a9e18`) closed the last admission — Krein–Rutman is fully
+proved, repo-wide 0 sorries.**  The β-stabilization route was abandoned
+entirely: a *direct resolvent blow-up* proof of
+`exists_positive_eigenvector_of_superharmonic` (statement unchanged) makes
+the stabilization question moot.  The seven β-framework declarations
+(`superharmonicBeta`, `uNorm`, `uNorm_norm`, `uNorm_mem`,
+`superharmonicBeta_ge_one`, `normalized_orbit_cluster`,
+`cluster_chain_stabilizes`) were deleted (zero external users); the
+replacement proof runs: for `λ_k = ρ + 1/(k+1)` the positive resolvents
+`A_k = (λ_k•1 − T)⁻¹` exist (RH-38's
+`resolvent_positivity_of_gt_spectralRadius`); the seed domination transfers
+as `w ≤ (λ_k−ρ) • A_k w`, giving `‖w‖ ≤ (λ_k−ρ)·‖A_k w‖` (blow-up); the
+normalized orbit `z_k = A_k w/‖A_k w‖` is unit-norm, cone-valued, and
+navigates as `T z_k = λ_k z_k − ‖A_k w‖⁻¹•w` with residual → 0; compactness
+of `T` extracts `T z_{φ(k)} → v` and the navigation identity forces
+`z_{φ(k)} → ρ⁻¹•v`, a unit cone eigenvector at `ρ`.  `kreinRutman` (weak
+form), `kreinRutman_core'`, and `kreinRutman_strong` are now unconditional.
+Elaboration notes for future rounds: `let` + rfl-lemma instead of `set`
+(`set` makes inner-variable `rw` fail); `Filter.Tendsto.congr` takes a plain
+`∀ x, f₁ x = f₂ x` (not `Eventually.of_forall`); squeeze on
+`dist x 0` via `tendsto_iff_dist_tendsto_zero` (the old
+`tendsto_iff_norm_tendsto_zero` does not exist in this mathlib).
+
 ---
 
 ## 4. One-line summary
@@ -418,9 +441,17 @@ remains the most promising near-term attack.
   equivalent to RH; a spectral `ρ(L_s) < 1` for Re s > 1/4 would imply it and
   is exactly as hard; the current formalization stops at Re s > 1/2.
 - **Krein–Rutman (KreinRutman.lean + RealGelfand.lean + OrbitClosure.lean +
-  KreinDichotomy.lean)**: weak form reduces to ONE analytic lemma — the
-  unbounded normalized-orbit branch of the superharmonic-seed dichotomy
-  (single documented sorry in KreinDichotomy.lean); strong form (geometric
+  KreinDichotomy.lean)**: ~~weak form reduces to ONE analytic lemma~~ **weak
+  form FULLY PROVED, 0 sorry** — the β-stabilization framework (7 declarations
+  incl. the single repo-wide sorry `cluster_chain_stabilizes`) was deleted and
+  replaced by a direct, unconditional resolvent blow-up proof of
+  `exists_positive_eigenvector_of_superharmonic` with statement unchanged
+  (RH-39): seed domination `ρ•w ≤ T•w` transfers through the resolvents
+  `A_k = (λ_k•1−T)⁻¹` at `λ_k = ρ+1/(k+1)` as `w ≤ (λ_k−ρ)•A_k w`, so the
+  normalized resolvent orbit `z_k = A_k w/‖A_k w‖` is unit-norm cone-valued and
+  navigates as `T z_k = λ_k z_k − ‖A_k w‖⁻¹•w` with residual → 0; compactness of
+  `T` yields a subsequential limit `ρ⁻¹•v` — a unit cone eigenvector at `ρ`.
+  Strong form (geometric
   simplicity) fully proved; two previously admitted FALSE lemmas were caught
   by auditing and removed with formal counterexamples (RH-25 collapse lemma;
   RH-32 `realGelfandUpperBound` refuted by `Complex.I` — RealGelfand.lean now
