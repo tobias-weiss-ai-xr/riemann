@@ -4,25 +4,26 @@ Krein–Rutman dichotomy: superharmonic seeds forced onto exact eigenvectors.
 
 This module closes the Krein–Rutman existence argument without touching
 `Riemann.KreinRutman.kreinRutman_core` (which remains the single documented
-admission of that file).  The route is the *dichotomy*:
+admission of that file).  The route is the *resolvent blow-up*:
 
-* every nonzero cone vector `w` with `rho • w ≤ T w` (`rho > 0`) either has a
-  bounded superharmonic orbit — then `Riemann.OrbitClosure`
-  (`bounded_orbit_yields_positive_eigenvector`) produces a positive exact
-  eigenvector at `rho` — or its normalized orbit clusters onto one
-  (the classical compactness argument via `normalized_orbit_cluster`);
-* the domination seed `|v|` obtained from
-  `Riemann.KreinRutman.exists_eigenvector_with_domination` satisfies
-  `rho • |v| ≤ T |v|` on the cone, so the dichotomy yields the positive
-  spectral-radius eigenvector `kreinRutman_core'` with *no further
-  admission in this file*.
+* the resolvents `(lam k • 1 - T)⁻¹` exist for every `lam k = rho + 1/(k+1)`
+  (`GelfandPositive.resolvent_positivity_of_gt_spectralRadius`) and are positive;
+* the seed domination `rho • w ≤ T w` propagates through the resolvent:
+  `w ≤ (lam k - rho) • (lam k • 1 - T)⁻¹ w`, so the normalized resolvent orbit
+  `z k = (lam k • 1 - T)⁻¹ w / ‖...‖` lives in the positive cone and navigates
+  as `T (z k) = lam k • z k - c k • w` with residual `c k • w → 0`;
+* compactness of `T` extracts a subsequence of `T (z k)` whose limit is a
+  unit cone eigenvector at `rho` — no beta-stabilization machinery needed.
 
-The only analytic admission in this file is now the crisp
-`cluster_chain_stabilizes` lemma (the beta-stabilization gap).
+The domination seed `|v|` obtained from
+`Riemann.KreinRutman.exists_eigenvector_with_domination` satisfies
+`rho • |v| ≤ T |v|` on the cone, so `kreinRutman_core'` follows with *no
+admission in this file*.
 -/
 
 import Riemann.KreinRutman
 import Riemann.OrbitClosure
+import Riemann.GelfandPositive
 
 open scoped ContinuousMap NNReal Topology
 open Filter
@@ -36,311 +37,270 @@ set_option maxHeartbeats 5000000
 
 variable {X : Type*} [TopologicalSpace X] [CompactSpace X] [Nonempty X]
 
-/-- The beta ratio for the superharmonic orbit. -/
-def superharmonicBeta (T : C(X, ℝ) →L[ℝ] C(X, ℝ)) (rho : ℝ) (w : C(X, ℝ)) (n : ℕ) : ℝ :=
-  ‖superharmonicOrbit T rho w (n + 1)‖ / ‖superharmonicOrbit T rho w n‖
-
-/-- Normalized superharmonic orbit. -/
-def uNorm (T : C(X, ℝ) →L[ℝ] C(X, ℝ)) (rho : ℝ) (w : C(X, ℝ)) (n : ℕ) : C(X, ℝ) :=
-  (‖superharmonicOrbit T rho w n‖)⁻¹ • superharmonicOrbit T rho w n
-
-/-- The normalized superharmonic orbit has unit norm. -/
-theorem uNorm_norm {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} (hT : IsPositive T) {rho : ℝ} (hrho : 0 < rho)
-    {w : C(X, ℝ)} (hw0 : w ≠ 0) (hw : w ∈ positiveCone) (hdom : rho • w ≤ T w)
-    (n : ℕ) : ‖uNorm T rho w n‖ = 1 := by
-  unfold uNorm
-  have hne : superharmonicOrbit T rho w n ≠ 0 :=
-    superharmonicOrbit_nonzero hT hrho hw0 hw hdom n
-  have hnn : ‖superharmonicOrbit T rho w n‖ ≠ 0 := norm_ne_zero_iff.mpr hne
-  have hnp : 0 < ‖superharmonicOrbit T rho w n‖ := norm_pos_iff.mpr hne
-  simp only [norm_smul, Real.norm_eq_abs, abs_inv, abs_of_pos hnp]
-  exact inv_mul_cancel₀ hnn
-
-/-- The normalized superharmonic orbit lies in the positive cone. -/
-theorem uNorm_mem {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} (hT : IsPositive T) {rho : ℝ} (hrho : 0 < rho)
-    {w : C(X, ℝ)} (hw0 : w ≠ 0) (hw : w ∈ positiveCone) (hdom : rho • w ≤ T w) (n : ℕ) :
-    uNorm T rho w n ∈ positiveCone := by
-  unfold uNorm
-  have hc : superharmonicOrbit T rho w n ∈ positiveCone :=
-    superharmonicOrbit_mem hT hrho hw hdom n
-  have hnp : 0 < ‖superharmonicOrbit T rho w n‖ :=
-    norm_pos_iff.mpr (superharmonicOrbit_nonzero hT hrho hw0 hw hdom n)
-  rw [mem_positiveCone]
-  intro x
-  simp only [ContinuousMap.coe_smul, Pi.smul_apply, smul_eq_mul]
-  exact mul_nonneg (inv_nonneg.mpr (le_of_lt hnp)) (hc x)
-
-/-- Beta is at least 1 (from monotonicity of the superharmonic orbit). -/
-theorem superharmonicBeta_ge_one {T : C(X, ℝ) →L[ℝ] C(X, ℝ)} (hT : IsPositive T)
-    {rho : ℝ} (hrho : 0 < rho) {w : C(X, ℝ)} (hw0 : w ≠ 0) (hw : w ∈ positiveCone)
-    (hdom : rho • w ≤ T w) (n : ℕ) : 1 ≤ superharmonicBeta T rho w n := by
-  unfold superharmonicBeta
-  have hmono : superharmonicOrbit T rho w n ≤ superharmonicOrbit T rho w (n + 1) :=
-    superharmonicOrbit_mono hT hrho hw hdom n
-  have h0 : (0 : C(X, ℝ)) ≤ superharmonicOrbit T rho w n := by
-    rw [ContinuousMap.le_def]
-    intro x
-    exact superharmonicOrbit_mem hT hrho hw hdom n x
-  have hnorm : ‖superharmonicOrbit T rho w n‖ ≤ ‖superharmonicOrbit T rho w (n + 1)‖ :=
-    norm_le_of_nonneg_le h0 hmono
-  have hnpos : 0 < ‖superharmonicOrbit T rho w n‖ :=
-    norm_pos_iff.mpr (superharmonicOrbit_nonzero hT hrho hw0 hw hdom n)
-  exact (one_le_div hnpos).mpr hnorm
-
-/-- **Normalized-orbit cluster chain**: the superharmonic orbit produces a
-subsequence along which `T` acts as a scaled isometry between cluster points
-with ratio at least 1.
-
-This is the compactness half of the classical Krein–Rutman argument for the
-unbounded branch.  The compactness input is *not* compactness of the unit
-ball (which fails in infinite dimension) but compactness of the image of the
-ball under the compact operator `T`; the scalar limits `beta` come for free
-from norm convergence of the `T`-images.  The remaining analytic step
-(forcing the scaling factor to equal 1) is isolated in
-`cluster_chain_stabilizes`.
-
-Reference: Krein–Rutman (1948), §3; Schaefer, *Banach Lattices and Positive
-Operators*, III.7. -/
-theorem normalized_orbit_cluster {T : C(X, ℝ) →L[ℝ] C(X, ℝ)}
-    (hTpos : IsPositive T) (hTcomp : IsCompactOperator T) {rho : ℝ} (hrho : 0 < rho)
-    {w : C(X, ℝ)} (hw0 : w ≠ 0) (hw : w ∈ positiveCone) (hdom : rho • w ≤ T w) :
-    ∃ φ : ℕ → ℕ, StrictMono φ ∧ ∃ uStar uDStar : C(X, ℝ), ∃ beta : ℝ,
-      uStar ∈ positiveCone ∧ uDStar ∈ positiveCone ∧ ‖uStar‖ = 1 ∧ ‖uDStar‖ = 1 ∧
-      1 ≤ beta ∧ T uStar = (rho * beta) • uDStar := by
-  let orb : ℕ → C(X, ℝ) := fun n => superharmonicOrbit T rho w n
-  let u : ℕ → C(X, ℝ) := fun n => uNorm T rho w n
-  let beta : ℕ → ℝ := fun n => superharmonicBeta T rho w n
-  have hu_norm : ∀ n, ‖u n‖ = 1 := fun n => uNorm_norm hTpos hrho hw0 hw hdom n
-  have hu_mem : ∀ n, u n ∈ positiveCone := fun n => uNorm_mem hTpos hrho hw0 hw hdom n
-  have hbeta_ge : ∀ n, 1 ≤ beta n := fun n => superharmonicBeta_ge_one hTpos hrho hw0 hw hdom n
-  have hβpos : ∀ n, 0 < beta n := fun n => lt_of_lt_of_le zero_lt_one (hbeta_ge n)
-  have hnav : ∀ n, T (u n) = (rho * beta n) • u (n + 1) := by
-    intro n
-    unfold u beta uNorm superharmonicBeta
-    have hne_n : orb n ≠ 0 := superharmonicOrbit_nonzero hTpos hrho hw0 hw hdom n
-    have hne_np1 : orb (n + 1) ≠ 0 := superharmonicOrbit_nonzero hTpos hrho hw0 hw hdom (n + 1)
-    have hnn : ‖orb n‖ ≠ 0 := norm_ne_zero_iff.mpr hne_n
-    have hnnp1 : ‖orb (n + 1)‖ ≠ 0 := norm_ne_zero_iff.mpr hne_np1
-    have hnav_raw : T (orb n) = rho • orb (n + 1) :=
-      superharmonicOrbit_navigation (ne_of_gt hrho) n
-    calc
-      T ((‖orb n‖)⁻¹ • orb n) = (‖orb n‖)⁻¹ • T (orb n) := by rw [map_smul]
-      _ = (‖orb n‖)⁻¹ • (rho • orb (n + 1)) := by rw [hnav_raw]
-      _ = rho • ((‖orb n‖)⁻¹ • orb (n + 1)) := by rw [smul_comm]
-      _ = rho • ((‖orb (n + 1)‖ / ‖orb n‖) • ((‖orb (n + 1)‖)⁻¹ • orb (n + 1))) := by
-        congr 1
-        have h_inv_mul : (‖orb (n + 1)‖ / ‖orb n‖) * (‖orb (n + 1)‖)⁻¹ = (‖orb n‖)⁻¹ := by
-          field_simp [hnn, hnnp1]
-        calc
-          (‖orb n‖)⁻¹ • orb (n + 1) =
-              ((‖orb (n + 1)‖ / ‖orb n‖) * (‖orb (n + 1)‖)⁻¹) • orb (n + 1) := by
-            rw [← h_inv_mul]
-          _ = (‖orb (n + 1)‖ / ‖orb n‖) • ((‖orb (n + 1)‖)⁻¹ • orb (n + 1)) := by
-            rw [mul_smul]
-      _ = (rho * (‖orb (n + 1)‖ / ‖orb n‖)) • ((‖orb (n + 1)‖)⁻¹ • orb (n + 1)) := by
-        rw [mul_smul]
-      _ = (rho * (‖orb (n + 1)‖ / ‖orb n‖)) • u (n + 1) := rfl
-  -- norm of the T-images: ‖T (u m)‖ = rho * beta m
-  have huTnorm : ∀ m, ‖T (u m)‖ = rho * beta m := by
-    intro m
-    calc ‖T (u m)‖ = ‖(rho * beta m) • u (m + 1)‖ := by rw [hnav m]
-      _ = |rho * beta m| * ‖u (m + 1)‖ := norm_smul _ _
-      _ = rho * beta m := by
-        rw [abs_of_nonneg (mul_nonneg hrho.le (zero_le_one.trans (hbeta_ge m))),
-          hu_norm (m + 1), mul_one]
-  -- compactness: the image of the closed ball of radius max ‖T‖ 1 under the
-  -- compact operator T (compactness of the ball itself fails in infinite
-  -- dimension!); every u m lies in that ball since ‖u m‖ = 1
-  have hK : IsCompact (closure (T '' Metric.closedBall (0 : C(X, ℝ)) (max ‖T‖ 1))) :=
-    hTcomp.isCompact_closure_image_closedBall (max ‖T‖ 1)
-  have humemK : ∀ m, T (u m) ∈ closure (T '' Metric.closedBall (0 : C(X, ℝ)) (max ‖T‖ 1)) := by
-    intro m
-    exact subset_closure (mem_image_of_mem T (by
-      simpa [Metric.mem_closedBall, dist_eq_norm, u] using
-        le_trans (hu_norm m).le (le_max_right ‖T‖ 1)))
-  have huTcone : ∀ m, T (u m) ∈ positiveCone := by
-    intro m
-    rw [mem_positiveCone]
-    intro x
-    exact hTpos.apply_nonneg (hu_mem m) x
-  -- layer 1: T (u (k + 1)) converges along a subsequence φA
-  obtain ⟨h₁, _h₁K, φA, hφAmono, hTφA⟩ :=
-    IsCompact.tendsto_subseq hK (fun k => humemK (k + 1))
-  -- layer 2: refine so that T (u (k + 2)) converges as well
-  obtain ⟨h₂, _h₂K, φB, hφBmono, hTφB⟩ :=
-    IsCompact.tendsto_subseq hK (fun k => humemK (φA k + 2))
-  have hT1 : Tendsto (fun k => T (u (φA (φB k) + 1))) atTop (nhds h₁) :=
-    hTφA.comp hφBmono.tendsto_atTop
-  have hT2 : Tendsto (fun k => T (u (φA (φB k) + 2))) atTop (nhds h₂) := hTφB
-  set b₁ : ℝ := ‖h₁‖ / rho with hb₁def
-  set b₂ : ℝ := ‖h₂‖ / rho with hb₂def
-  have hnorm1 : Tendsto (fun k => ‖T (u (φA (φB k) + 1))‖) atTop (nhds ‖h₁‖) :=
-    (continuous_norm.tendsto _).comp hT1
-  have hnorm2 : Tendsto (fun k => ‖T (u (φA (φB k) + 2))‖) atTop (nhds ‖h₂‖) :=
-    (continuous_norm.tendsto _).comp hT2
-  have hnorm1ge : rho ≤ ‖h₁‖ :=
-    ge_of_tendsto hnorm1 (Eventually.of_forall fun k => by
-      rw [huTnorm]
-      simpa using mul_le_mul_of_nonneg_left (hbeta_ge _) hrho.le)
-  have hnorm2ge : rho ≤ ‖h₂‖ :=
-    ge_of_tendsto hnorm2 (Eventually.of_forall fun k => by
-      rw [huTnorm]
-      simpa using mul_le_mul_of_nonneg_left (hbeta_ge _) hrho.le)
-  have hb1eq : rho * b₁ = ‖h₁‖ := by
-    rw [hb₁def]
-    field_simp
-  have hb2eq : rho * b₂ = ‖h₂‖ := by
-    rw [hb₂def]
-    field_simp
-  have hb1pos : 0 < rho * b₁ := by rw [hb1eq]; exact lt_of_lt_of_le hrho hnorm1ge
-  have hb2pos : 0 < rho * b₂ := by rw [hb2eq]; exact lt_of_lt_of_le hrho hnorm2ge
-  have hne1 : rho * b₁ ≠ 0 := ne_of_gt hb1pos
-  have hne2 : rho * b₂ ≠ 0 := ne_of_gt hb2pos
-  have hne0₁ : h₁ ≠ 0 := by
-    intro hh
-    rw [hh, norm_zero] at hnorm1ge
-    exact lt_irrefl rho (lt_of_le_of_lt hnorm1ge hrho)
-  have hne0₂ : h₂ ≠ 0 := by
-    intro hh
-    rw [hh, norm_zero] at hnorm2ge
-    exact lt_irrefl rho (lt_of_le_of_lt hnorm2ge hrho)
-  -- cluster points: uStar := lim u (… + 2), uDStar := lim u (… + 3),
-  -- obtained as rescaled limits of the convergent T-images
-  have hb1con : Tendsto (fun k => rho * beta (φA (φB k) + 1)) atTop (nhds (rho * b₁)) := by
-    have hrew : (fun k => rho * beta (φA (φB k) + 1))
-        = fun k => ‖T (u (φA (φB k) + 1))‖ := by
-      funext k; exact (huTnorm _).symm
-    rw [hrew, hb1eq]; exact hnorm1
-  have hscal1 : Tendsto (fun k => (rho * beta (φA (φB k) + 1))⁻¹) atTop (nhds (rho * b₁)⁻¹) := by
-    have hinv : ContinuousAt (fun x : ℝ => x⁻¹) (rho * b₁) :=
-      ContinuousAt.inv₀ continuousAt_id hne1
-    exact hinv.tendsto.comp hb1con
-  have hb2con : Tendsto (fun k => rho * beta (φA (φB k) + 2)) atTop (nhds (rho * b₂)) := by
-    have hrew : (fun k => rho * beta (φA (φB k) + 2))
-        = fun k => ‖T (u (φA (φB k) + 2))‖ := by
-      funext k; exact (huTnorm _).symm
-    rw [hrew, hb2eq]; exact hnorm2
-  have hscal2 : Tendsto (fun k => (rho * beta (φA (φB k) + 2))⁻¹) atTop (nhds (rho * b₂)⁻¹) := by
-    have hinv : ContinuousAt (fun x : ℝ => x⁻¹) (rho * b₂) :=
-      ContinuousAt.inv₀ continuousAt_id hne2
-    exact hinv.tendsto.comp hb2con
-  set uStar : C(X, ℝ) := (rho * b₁)⁻¹ • h₁ with huStardef
-  set uDStar : C(X, ℝ) := (rho * b₂)⁻¹ • h₂ with huDStardef
-  -- uStar and uDStar are the subsequential limits of the normalized orbit
-  have huStar_lim : Tendsto (fun k => u (φA (φB k) + 2)) atTop (nhds uStar) := by
-    have hrew : (fun k => u (φA (φB k) + 2))
-        = fun k => (rho * beta (φA (φB k) + 1))⁻¹ • T (u (φA (φB k) + 1)) := by
-      funext k
-      rw [hnav (φA (φB k) + 1), inv_smul_smul₀ (mul_ne_zero (ne_of_gt hrho) (ne_of_gt (hβpos _)))]
-    rw [hrew]
-    exact hscal1.smul hT1
-  have huDStar_lim : Tendsto (fun k => u (φA (φB k) + 3)) atTop (nhds uDStar) := by
-    have hrew : (fun k => u (φA (φB k) + 3))
-        = fun k => (rho * beta (φA (φB k) + 2))⁻¹ • T (u (φA (φB k) + 2)) := by
-      funext k
-      rw [hnav (φA (φB k) + 2), inv_smul_smul₀ (mul_ne_zero (ne_of_gt hrho) (ne_of_gt (hβpos _)))]
-    rw [hrew]
-    exact hscal2.smul hT2
-  -- unit norms: ‖h‖ = rho * b rescales the T-image limits to norm 1
-  have hnormS : ‖uStar‖ = 1 := by
-    rw [huStardef, norm_smul, Real.norm_eq_abs, abs_of_pos (inv_pos.mpr hb1pos), hb1eq,
-      inv_mul_cancel₀ (norm_ne_zero_iff.mpr hne0₁)]
-  have hnormD : ‖uDStar‖ = 1 := by
-    rw [huDStardef, norm_smul, Real.norm_eq_abs, abs_of_pos (inv_pos.mpr hb2pos), hb2eq,
-      inv_mul_cancel₀ (norm_ne_zero_iff.mpr hne0₂)]
-  -- cone membership (rescaling by a positive scalar keeps the cone)
-  have h₁cone : h₁ ∈ positiveCone :=
-    isClosed_positiveCone.mem_of_tendsto hT1
-      (Eventually.of_forall fun k => huTcone _)
-  have h₂cone : h₂ ∈ positiveCone :=
-    isClosed_positiveCone.mem_of_tendsto hT2
-      (Eventually.of_forall fun k => huTcone _)
-  have huStarcone : uStar ∈ positiveCone := by
-    rw [mem_positiveCone]
-    intro x
-    rw [huStardef]
-    simp only [ContinuousMap.coe_smul, Pi.smul_apply, smul_eq_mul]
-    exact mul_nonneg (inv_nonneg.mpr hb1pos.le) (h₁cone x)
-  have huDStarcone : uDStar ∈ positiveCone := by
-    rw [mem_positiveCone]
-    intro x
-    rw [huDStardef]
-    simp only [ContinuousMap.coe_smul, Pi.smul_apply, smul_eq_mul]
-    exact mul_nonneg (inv_nonneg.mpr hb2pos.le) (h₂cone x)
-  -- the relation: T uStar = h₂ = (rho * b₂) • uDStar
-  have hTuStar : T uStar = h₂ := by
-    have h1 : Tendsto (fun k => T (u (φA (φB k) + 2))) atTop (nhds (T uStar)) :=
-      (T.continuous.tendsto uStar).comp huStar_lim
-    exact tendsto_nhds_unique h1 hT2
-  have hbeta : 1 ≤ b₂ := by
-    rw [hb₂def]
-    exact (one_le_div hrho).mpr hnorm2ge
-  refine ⟨fun k => φA (φB k), hφAmono.comp hφBmono, uStar, uDStar, b₂,
-    huStarcone, huDStarcone, hnormS, hnormD, hbeta, ?_⟩
-  rw [hTuStar, huDStardef, smul_inv_smul₀ hne2]
-
-/-- **Cluster-chain stabilization gap (the single analytic admission).**
-
-Given the cluster-chain data from `normalized_orbit_cluster`:
-`T uStar = (rho * beta) • uDStar` with all norms 1 and all vectors in the
-positive cone, and `beta ≥ 1`, extract a positive eigenvector.
-
-What is known: if `beta = 1` then `T uStar = rho • uDStar` with
-`uDStar ≠ 0` (since `‖uDStar‖ = 1`) — we are done: `uStar` is the desired
-positive eigenvector at `rho`.
-
-However, the general case requires showing that the beta-stabilization
-mechanism forces beta = 1.  This is the analytic frontier of the real
-Krein–Rutman proof.  The hypothesis `rho = spectralRadius ℝ T` is
-*essential* here: at sub-radius rates the stabilization fails (the
-counterexample `T(x, y) = (x + y, y)` with seed `(0, 1)` and `rho = 1/2`
-admits a cluster chain with `beta > 1` but has no eigenvector at `1/2` —
-its only eigenvalue is `1`).
-
-Reference: Krein–Rutman (1948), §6-7; Schaefer, *Banach Lattices and
-Positive Operators*, III.8–9. -/
-theorem cluster_chain_stabilizes {T : C(X, ℝ) →L[ℝ] C(X, ℝ)}
-    (hTpos : IsPositive T) (hTcomp : IsCompactOperator T) {rho : ℝ} (hrho : 0 < rho)
-    (hr : rho = (spectralRadius ℝ T).toReal)
-    {uStar uDStar : C(X, ℝ)} (huStar : uStar ∈ positiveCone) (huDStar : uDStar ∈ positiveCone)
-    (hnormS : ‖uStar‖ = 1) (hnormD : ‖uDStar‖ = 1) {beta : ℝ} (hbeta : 1 ≤ beta)
-    (heq : T uStar = (rho * beta) • uDStar) :
-    ∃ f : C(X, ℝ), f ∈ positiveCone ∧ f ≠ 0 ∧ T f = rho • f :=
-  sorry
-
-/-- **Superharmonic seeds force exact positive eigenvectors (dichotomy).**
+/-- **Superharmonic seeds force exact positive eigenvectors (resolvent blow-up).**
 
 If a nonzero cone vector `w` satisfies the domination inequality
-`rho • w ≤ T w` (equivalently `T w ≥ rho • w`) for `rho > 0`, then `T` has
-a nonzero eigenvector `f` in the positive cone at eigenvalue `rho`.
+`rho • w ≤ T w` (equivalently `T w ≥ rho • w`) for
+`rho = (spectralRadius ℝ T).toReal`, then `T` has a nonzero eigenvector `f`
+in the positive cone at eigenvalue `rho`.
 
-*Bounded branch.*  If `‖superharmonicOrbit T rho w n‖` is bounded, the
-orbit-closure theorem `bounded_orbit_yields_positive_eigenvector` applies
-directly (its hypothesis `T w ≥ rho • w` is the same inequality).
+*Proof sketch.*  For `lam k = rho + 1/(k+1)` the resolvents
+`A k = (lam k • 1 - T)⁻¹` exist and are positive
+(`resolvent_positivity_of_gt_spectralRadius`).  The domination transfers
+through the resolvent: `w ≤ (lam k - rho) • A k w`, hence
+`‖w‖ ≤ (lam k - rho) · ‖A k w‖`, so the normalized orbit
+`z k = A k w / ‖A k w‖` satisfies `‖z k‖ = 1`, stays in the cone, and
+navigates as `T (z k) = lam k • z k - c k • w` with residual
+`c k = ‖A k w‖⁻¹ → 0`.  Compactness of `T` gives a subsequence with
+`T (z (φ k)) → v`, and the navigation identity forces `z (φ k) → rho⁻¹ • v`,
+a unit cone eigenvector at `rho`.
 
 The hypothesis `rho = spectralRadius ℝ T` is *necessary*: take
-`T(x, y) = (x + y, y)` on `C(ℕ₂)` (positive, compact) with seed `w = (0, 1)`
+`T(x, y) = (x + y, y)` (positive, compact) with seed `w = (0, 1)`
 and `rho = 1/2`; the domination `rho • w ≤ T w` holds, yet `T`'s only
-eigenvalue is `1`, so no cone eigenvector at `1/2` exists.  At rates below
-the spectral radius both branches fail (the bounded branch of the orbit
-closure survives only vacuously there: boundedness itself already forces the
-eigenvector).  The spectral-radius link is exactly the classical
-Krein–Rutman superharmonic-seed hypothesis.
-
-*Unbounded branch.*  Derives from `normalized_orbit_cluster` +
-the single remaining analytic gap `cluster_chain_stabilizes`. -/
+eigenvalue is `1`, so no cone eigenvector at `1/2` exists. -/
 theorem exists_positive_eigenvector_of_superharmonic {T : C(X, ℝ) →L[ℝ] C(X, ℝ)}
     (hTpos : IsPositive T) (hTcomp : IsCompactOperator T) {rho : ℝ} (hrho : 0 < rho)
     (hr : rho = (spectralRadius ℝ T).toReal)
     {w : C(X, ℝ)} (hw0 : w ≠ 0) (hw : w ∈ positiveCone) (hdom : rho • w ≤ T w) :
     ∃ f : C(X, ℝ), f ∈ positiveCone ∧ f ≠ 0 ∧ T f = rho • f := by
-  by_cases hbdd : ∃ C : ℝ, ∀ n : ℕ, ‖superharmonicOrbit T rho w n‖ ≤ C
-  · -- bounded branch
-    exact bounded_orbit_yields_positive_eigenvector hTpos hTcomp hrho hw0 hw hdom hbdd
-  · -- unbounded branch: normalized-orbit cluster argument
-    obtain ⟨φ, hφmono, uStar, uDStar, beta, huStar, huDStar, hnormS, hnormD, hbeta, heq⟩ :=
-      normalized_orbit_cluster hTpos hTcomp hrho hw0 hw hdom
-    exact cluster_chain_stabilizes hTpos hTcomp hrho hr huStar huDStar hnormS hnormD hbeta heq
+  -- the resolvent levels lam k = rho + 1/(k+1) decrease to rho
+  let lam : ℕ → ℝ := fun k => rho + 1 / ((k : ℝ) + 1)
+  have hlamdef : ∀ k : ℕ, lam k = rho + 1 / ((k : ℝ) + 1) := fun k => rfl
+  have hlampos : ∀ k : ℕ, 0 < lam k - rho := by
+    intro k; rw [hlamdef k]
+    linarith [(by positivity : (0:ℝ) < 1 / (((k:ℕ):ℝ) + 1))]
+  have hone : Filter.Tendsto (fun k : ℕ => (1:ℝ) / (((k:ℕ):ℝ) + 1)) Filter.atTop (𝓝 0) := by
+    rw [Metric.tendsto_atTop]
+    intro ε hε
+    obtain ⟨N, hN⟩ := exists_nat_gt ((1:ℝ)/ε)
+    refine ⟨N, fun k hk => ?_⟩
+    have hkle : ((k:ℕ):ℝ) + 1 ≥ ((N:ℕ):ℝ) + 1 := by exact_mod_cast (Nat.succ_le_succ hk)
+    have hNpos : (0:ℝ) < ((N:ℕ):ℝ) + 1 := by positivity
+    have hgt : (1:ℝ) / ε < ((N:ℕ):ℝ) + 1 := by linarith
+    have h1 : (1:ℝ) / (((N:ℕ):ℝ) + 1) < ε := by
+      rw [div_lt_iff₀ hNpos]
+      have hmul := mul_lt_mul_of_pos_right hgt hε
+      rw [div_mul_cancel₀ (1:ℝ) (ne_of_gt hε), mul_comm] at hmul
+      exact hmul
+    rw [Real.dist_eq, sub_zero, abs_of_nonneg (by positivity : (0:ℝ) ≤ 1 / (((k:ℕ):ℝ) + 1))]
+    calc (1:ℝ) / (((k:ℕ):ℝ) + 1) ≤ (1:ℝ) / (((N:ℕ):ℝ) + 1) :=
+        one_div_le_one_div_of_le (by positivity) hkle
+      _ < ε := h1
+  have hspec : ∀ k : ℕ, (spectralRadius ℝ T).toReal < lam k := by
+    intro k; rw [hlamdef k, hr]
+    linarith [(by positivity : (0:ℝ) < 1 / (((k:ℕ):ℝ) + 1))]
+  -- resolvents exist and are positive
+  have hres : ∀ k : ℕ, (lam k : ℝ) ∈ resolventSet ℝ T ∧
+      IsPositive (Ring.inverse ((lam k : ℝ) • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) - T)) :=
+    fun k => resolvent_positivity_of_gt_spectralRadius hTpos (hspec k)
+  set M : ℕ → (C(X, ℝ) →L[ℝ] C(X, ℝ)) :=
+    fun k => (lam k : ℝ) • (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) - T with hMdef
+  set A : ℕ → (C(X, ℝ) →L[ℝ] C(X, ℝ)) := fun k => Ring.inverse (M k) with hAdef
+  have hApos : ∀ k : ℕ, IsPositive (A k) := fun k => (hres k).2
+  have hu : ∀ k : ℕ, IsUnit (M k) := by
+    intro k
+    show IsUnit (algebraMap ℝ (C(X, ℝ) →L[ℝ] C(X, ℝ)) (lam k) - T)
+    exact (hres k).1
+  have hAMA : ∀ k : ℕ, M k * A k = 1 := fun k => Ring.mul_inverse_cancel _ (hu k)
+  have hAM : ∀ k : ℕ, A k * M k = 1 := fun k => Ring.inverse_mul_cancel _ (hu k)
+  -- navigation: T (A k g) = lam k • A k g - g
+  have hnav : ∀ (k : ℕ) (g : C(X, ℝ)), T (A k g) = lam k • A k g - g := by
+    intro k g
+    have h1 : (M k * A k) g = (1 : C(X, ℝ) →L[ℝ] C(X, ℝ)) g := by
+      rw [hAMA k, ContinuousLinearMap.one_apply]
+    simp only [ContinuousLinearMap.mul_apply, hMdef, ContinuousLinearMap.sub_apply,
+      ContinuousLinearMap.smul_apply, ContinuousLinearMap.one_apply] at h1
+    rw [sub_eq_iff_eq_add] at h1
+    rw [h1]
+    abel
+  -- the domination transfers to the resolvent: w ≤ (lam k - rho) • A k w
+  have hwle : ∀ k : ℕ, w ≤ (lam k - rho) • A k w := by
+    intro k
+    have hMw : M k w ≤ (lam k - rho) • w := by
+      rw [hMdef, ContinuousMap.le_def]
+      intro x
+      simp only [ContinuousMap.coe_sub, ContinuousMap.coe_smul, Pi.sub_apply, Pi.smul_apply,
+        ContinuousMap.coe_one, ContinuousMap.one_apply, smul_eq_mul]
+      have hd : rho * w x ≤ (T w) x := by
+        have hx := ContinuousMap.le_def.mp hdom x
+        simpa [ContinuousMap.coe_smul, Pi.smul_apply, smul_eq_mul] using hx
+      calc lam k * w x - (T w) x ≤ lam k * w x - rho * w x := by linarith
+        _ = (lam k - rho) * w x := by ring
+    have hstep1 : A k (M k w) = w := by
+      have h := congrArg (fun F : C(X, ℝ) →L[ℝ] C(X, ℝ) => F w) (hAM k)
+      simpa [ContinuousLinearMap.mul_apply, ContinuousLinearMap.one_apply] using h
+    have hmono : A k (M k w) ≤ (lam k - rho) • A k w := by
+      have h := IsPositive.monotone (hApos k) hMw
+      rwa [map_smul] at h
+    rwa [hstep1] at hmono
+  -- norm bounds
+  have hwpos : 0 < ‖w‖ := norm_pos_iff.mpr hw0
+  have hwnorm : ∀ k : ℕ, ‖w‖ ≤ (lam k - rho) * ‖A k w‖ := by
+    intro k
+    have h0w : (0 : C(X, ℝ)) ≤ w := by
+      rw [ContinuousMap.le_def]
+      intro x
+      exact mem_positiveCone.mp hw x
+    have h := norm_le_of_nonneg_le h0w (hwle k)
+    rwa [norm_smul, Real.norm_eq_abs, abs_of_pos (hlampos k)] at h
+  have hAWpos : ∀ k : ℕ, 0 < ‖A k w‖ := by
+    intro k
+    have h := hwnorm k
+    have h2 : ‖w‖ / (lam k - rho) ≤ ‖A k w‖ := by
+      rw [div_le_iff₀ (hlampos k), mul_comm]
+      exact h
+    have h1 : (0:ℝ) < ‖w‖ / (lam k - rho) := div_pos hwpos (hlampos k)
+    exact lt_of_lt_of_le h1 h2
+  -- the normalized resolvent orbit z k = A k w / ‖A k w‖
+  set c : ℕ → ℝ := fun k => (‖A k w‖)⁻¹ with hcdef
+  set z : ℕ → C(X, ℝ) := fun k => c k • A k w with hzdef
+  have hcpos : ∀ k : ℕ, 0 < c k := fun k => by rw [hcdef]; exact inv_pos.mpr (hAWpos k)
+  have hznorm : ∀ k : ℕ, ‖z k‖ = 1 := by
+    intro k
+    rw [hzdef, norm_smul, Real.norm_eq_abs, abs_of_pos (hcpos k), hcdef]
+    exact inv_mul_cancel₀ (ne_of_gt (hAWpos k))
+  have hAwc : ∀ k : ℕ, A k w ∈ positiveCone := fun k => (hres k).2 hw
+  have hzcone : ∀ k : ℕ, z k ∈ positiveCone := by
+    intro k
+    rw [mem_positiveCone]
+    intro x
+    have hcx := mem_positiveCone.mp (hAwc k) x
+    rw [hzdef]
+    simp only [ContinuousMap.coe_smul, Pi.smul_apply, smul_eq_mul]
+    exact mul_nonneg (le_of_lt (hcpos k)) hcx
+  -- navigation for z: T (z k) = lam k • z k - c k • w
+  have hznav : ∀ k : ℕ, T (z k) = lam k • z k - c k • w := by
+    intro k
+    have hAw := hnav k w
+    rw [hzdef, map_smul, hAw, smul_sub, smul_smul, smul_smul, mul_comm (c k) (lam k)]
+  -- compactness: T (z k) lies in a compact set, extract a convergent subsequence
+  have hK : IsCompact (closure (T '' Metric.closedBall 0 1)) :=
+    hTcomp.isCompact_closure_image_closedBall 1
+  have hTzin : ∀ k : ℕ, T (z k) ∈ closure (T '' Metric.closedBall 0 1) :=
+    fun k => subset_closure (mem_image_of_mem T (by
+      rw [Metric.mem_closedBall, dist_eq_norm, sub_zero, hznorm k]))
+  obtain ⟨v, -, φ, hφmono, hvlim⟩ := IsCompact.tendsto_subseq hK hTzin
+  have hφge : ∀ k : ℕ, k ≤ φ k := by
+    intro k
+    induction k with
+    | zero => exact Nat.zero_le _
+    | succ n ih =>
+        exact Nat.succ_le_of_lt (Nat.lt_of_le_of_lt ih (hφmono (Nat.lt_succ_self n)))
+  -- scalar limits
+  have hzero : Filter.Tendsto (fun k => lam (φ k) - rho) Filter.atTop (𝓝 0) := by
+    have h2 : Filter.Tendsto (fun k => 1 / (((φ k : ℕ):ℝ) + 1)) Filter.atTop (𝓝 0) := by
+      refine squeeze_zero (fun k => by positivity) (fun k => ?_) hone
+      apply one_div_le_one_div_of_le (by positivity)
+      exact_mod_cast Nat.succ_le_succ (hφge k)
+    have hcongr : ∀ k : ℕ, 1 / (((φ k : ℕ):ℝ) + 1) = lam (φ k) - rho := by
+      intro k
+      rw [hlamdef]
+      ring
+    exact Filter.Tendsto.congr hcongr h2
+  have hlamφ : Filter.Tendsto (fun k => lam (φ k)) Filter.atTop (𝓝 rho) := by
+    have hadd : Filter.Tendsto (fun k => (lam (φ k) - rho) + rho) Filter.atTop (𝓝 (0 + rho)) :=
+      hzero.add (tendsto_const_nhds (x := rho))
+    rw [zero_add] at hadd
+    have hcongr : ∀ k : ℕ, (lam (φ k) - rho) + rho = lam (φ k) := by
+      intro k; ring
+    exact Filter.Tendsto.congr hcongr hadd
+  -- the residual c (φ k) • w → 0
+  have hcz : Filter.Tendsto (fun k => c (φ k) • w) Filter.atTop (𝓝 0) := by
+    rw [tendsto_iff_dist_tendsto_zero]
+    have hnorm : ∀ k : ℕ, ‖c (φ k) • w‖ = c (φ k) * ‖w‖ := by
+      intro k; rw [norm_smul, Real.norm_eq_abs, abs_of_pos (hcpos _)]
+    have hbound : ∀ k : ℕ, c (φ k) * ‖w‖ ≤ (1:ℝ) / (((k:ℕ):ℝ) + 1) := by
+      intro k
+      have h := hwnorm (φ k)
+      have hre := inv_mul_cancel₀ (hAWpos (φ k)).ne'
+      have hstep : c (φ k) * ‖w‖ ≤ lam (φ k) - rho := by
+        rw [hcdef]
+        have hscale := mul_le_mul_of_nonneg_left h (inv_nonneg.mpr (norm_nonneg (A (φ k) w)))
+        calc (‖A (φ k) w‖)⁻¹ * ‖w‖ ≤
+            (‖A (φ k) w‖)⁻¹ * ((lam (φ k) - rho) * ‖A (φ k) w‖) := hscale
+          _ = (lam (φ k) - rho) * ((‖A (φ k) w‖)⁻¹ * ‖A (φ k) w‖) := by ring
+          _ = lam (φ k) - rho := by rw [hre, mul_one]
+      have h2 : lam (φ k) - rho ≤ (1:ℝ) / (((k:ℕ):ℝ) + 1) := by
+        rw [hlamdef]
+        have hmid : (1:ℝ) / (((φ k : ℕ):ℝ) + 1) ≤ 1 / (((k:ℕ):ℝ) + 1) := by
+          apply one_div_le_one_div_of_le (by positivity)
+          exact_mod_cast Nat.succ_le_succ (hφge k)
+        calc rho + 1 / (((φ k : ℕ):ℝ) + 1) - rho = 1 / (((φ k : ℕ):ℝ) + 1) := by ring
+          _ ≤ 1 / (((k:ℕ):ℝ) + 1) := hmid
+      exact hstep.trans h2
+    refine squeeze_zero (fun k => by positivity) (fun k => ?_) hone
+    show dist (c (φ k) • w) 0 ≤ 1 / (((k:ℕ):ℝ) + 1)
+    rw [dist_zero_right, hnorm k]
+    exact hbound k
+  -- the subsequence limit is a cone eigenvector at rho
+  have hzlim : Filter.Tendsto (fun k => z (φ k)) Filter.atTop (𝓝 ((rho:ℝ)⁻¹ • v)) := by
+    have hlamne : ∀ k : ℕ, (lam (φ k) : ℝ) ≠ 0 := by
+      intro k
+      have hpos : 0 < lam (φ k) := by
+        have := hlampos (φ k)
+        rw [hlamdef] at this
+        linarith [(by positivity : (0:ℝ) < 1 / (((φ k : ℕ):ℝ) + 1))]
+      exact ne_of_gt hpos
+    have hrew : ∀ k : ℕ, z (φ k) = (lam (φ k))⁻¹ • (T (z (φ k)) + c (φ k) • w) := by
+      intro k
+      have h := hznav (φ k)
+      rw [eq_sub_iff_add_eq] at h
+      calc z (φ k) = (lam (φ k))⁻¹ • (lam (φ k) • z (φ k)) := by
+            rw [inv_smul_smul₀ (hlamne k)]
+        _ = (lam (φ k))⁻¹ • (T (z (φ k)) + c (φ k) • w) := by rw [h]
+    have hinv : Filter.Tendsto (fun k => (lam (φ k))⁻¹) Filter.atTop (𝓝 (rho⁻¹)) :=
+      Filter.Tendsto.inv₀ hlamφ (ne_of_gt hrho)
+    have hsum : Filter.Tendsto (fun k => T (z (φ k)) + c (φ k) • w) Filter.atTop (𝓝 (v + 0)) :=
+      hvlim.add hcz
+    have hs : Filter.Tendsto (fun k => (lam (φ k))⁻¹ • (T (z (φ k)) + c (φ k) • w))
+        Filter.atTop (𝓝 ((rho:ℝ)⁻¹ • v)) := by
+      simpa only [add_zero] using Filter.Tendsto.smul hinv hsum
+    have hsmul : Filter.Tendsto (fun k => (lam (φ k))⁻¹ • (T (z (φ k)) + c (φ k) • w))
+        Filter.atTop (𝓝 ((rho:ℝ)⁻¹ • v)) := by
+      simpa only [add_zero] using Filter.Tendsto.smul hinv hsum
+    have hcongr : ∀ k : ℕ, (lam (φ k))⁻¹ • (T (z (φ k)) + c (φ k) • w) = z (φ k) := by
+      intro k
+      exact (hrew k).symm
+    exact Filter.Tendsto.congr hcongr hsmul
+  have hfT : T ((rho:ℝ)⁻¹ • v) = v := by
+    have h1 : Filter.Tendsto (fun k => T (z (φ k))) Filter.atTop (𝓝 (T ((rho:ℝ)⁻¹ • v))) :=
+      (T.continuous.tendsto _).comp hzlim
+    exact tendsto_nhds_unique h1 hvlim
+  have hfeq : rho • ((rho:ℝ)⁻¹ • v) = v := by
+    have hA : Filter.Tendsto (fun k => lam (φ k) • z (φ k)) Filter.atTop
+        (𝓝 (rho • ((rho:ℝ)⁻¹ • v))) :=
+      Filter.Tendsto.smul hlamφ hzlim
+    have hcong : ∀ k : ℕ, lam (φ k) • z (φ k) = T (z (φ k)) + c (φ k) • w := by
+      intro k
+      have h := hznav (φ k)
+      rw [eq_sub_iff_add_eq] at h
+      exact h.symm
+    have hadd2 : Filter.Tendsto (fun k => T (z (φ k)) + c (φ k) • w) Filter.atTop (𝓝 (v + 0)) :=
+      hvlim.add hcz
+    have hcongrB : ∀ k : ℕ, T (z (φ k)) + c (φ k) • w = lam (φ k) • z (φ k) := by
+      intro k
+      exact (hcong k).symm
+    have hB : Filter.Tendsto (fun k => lam (φ k) • z (φ k)) Filter.atTop (𝓝 (v + 0)) :=
+      Filter.Tendsto.congr hcongrB hadd2
+    rw [add_zero] at hB
+    exact tendsto_nhds_unique hA hB
+  refine ⟨(rho:ℝ)⁻¹ • v, ?_, ?_, ?_⟩
+  · exact isClosed_positiveCone.mem_of_tendsto hzlim
+      (Filter.Eventually.of_forall fun k => hzcone _)
+  · have hnormf : ‖((rho:ℝ)⁻¹ • v)‖ = 1 := by
+      have h1 : Filter.Tendsto (fun k => ‖z (φ k)‖) Filter.atTop (𝓝 ‖((rho:ℝ)⁻¹ • v)‖) :=
+        (continuous_norm.tendsto _).comp hzlim
+      have hcongrN : ∀ k : ℕ, ‖z (φ k)‖ = (1:ℝ) := by
+        intro k
+        exact hznorm (φ k)
+      have h2 : Filter.Tendsto (fun k : ℕ => (1:ℝ)) Filter.atTop (𝓝 ‖((rho:ℝ)⁻¹ • v)‖) :=
+        Filter.Tendsto.congr hcongrN h1
+      exact tendsto_nhds_unique h2 (tendsto_const_nhds (x := 1))
+    intro hzero
+    rw [hzero] at hnormf
+    simp at hnormf
+  · rw [hfT, hfeq]
 
 /-- **Krein–Rutman core (proved here, no admission).**
 
