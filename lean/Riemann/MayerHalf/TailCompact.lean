@@ -1,6 +1,8 @@
 import Riemann.MayerHalf.Operator
 import Riemann.MayerHalf.CompactLimit
+import Riemann.MayerHalf.CompactSummand
 import Mathlib.Topology.Instances.NNReal.Lemmas
+import Mathlib.Topology.UniformSpace.Ascoli
 
 /-!
 # The compact tail of the Mayer transfer operator
@@ -276,6 +278,40 @@ theorem isCompactOperator_mayerTail (hS : ∀ n : ℕ, 0 < n → IsCompactOperat
         rw [hsplit]
         exact IsCompactOperator.add ih (hS (k + 1) (Nat.succ_pos k))
   exact isCompactOperator_of_tendsto_nat tendsto_mayerPartial hfinite
+
+/-- The summand operator `summandOp n` is compact under the surgical Montel
+hypothesis: the coe `halfDiscAlgebra → C(↥halfDisc, ℂ)` is an isometry
+(`rfl` — the subalgebra norm is the ambient coe norm), hence a closed
+embedding, and preimages of compact sets under closed embeddings are compact.
+Pointwise, `↑(summandOp n f) = transferSummandCLM n f` holds by `rfl`. -/
+theorem isCompactOperator_summandOp_of_pointwiseRelCompact (n : ℕ) (hn : 0 < n)
+    (hrc : IsCompact (ContinuousMap.toFun ''
+      ((fun f : {g : halfDiscAlgebra // ‖g‖ ≤ 1} => transferSummandCLM n f.1) '' univ))) :
+    IsCompactOperator (summandOp n) := by
+  obtain ⟨K, hK, hKf⟩ := isCompactOperator_transferSummandCLM_of_pointwiseRelCompact n hn hrc
+  have hcemb : IsClosedEmbedding
+      (Subtype.val : {x : C(↥halfDisc, ℂ) // x ∈ halfDiscAlgebra} → C(↥halfDisc, ℂ)) :=
+    Isometry.isClosedEmbedding fun _a _b => rfl
+  refine ⟨Subtype.val ⁻¹' K, IsClosedEmbedding.isCompact_preimage hcemb hK, ?_⟩
+  have hpre : (summandOp n) ⁻¹' (Subtype.val ⁻¹' K)
+      = (transferSummandCLM n) ⁻¹' K := by
+    ext f
+    exact Iff.rfl
+  rw [hpre]
+  exact hKf
+
+/-- **The honest unconditional shape of RH-42**: the Mayer tail is a compact
+operator as soon as the single normal-families input holds for every
+`n ≥ 1` — the pointwise image of the transfer family on the unit ball is
+relatively compact in `↥halfDisc → ℂ` (Montel / Vitali–Porter, phase-3
+frontier).  This chains the surgical T3 reduction through
+`isCompactOperator_summandOp_of_pointwiseRelCompact` into the T5 assembly. -/
+theorem isCompactOperator_mayerTail_of_pointwiseRelCompact
+    (hrc : ∀ n : ℕ, 0 < n → IsCompact (ContinuousMap.toFun ''
+      ((fun f : {g : halfDiscAlgebra // ‖g‖ ≤ 1} => transferSummandCLM n f.1) '' univ))) :
+    IsCompactOperator mayerTail :=
+  isCompactOperator_mayerTail fun n hn =>
+    isCompactOperator_summandOp_of_pointwiseRelCompact n hn (hrc n hn)
 
 end
 

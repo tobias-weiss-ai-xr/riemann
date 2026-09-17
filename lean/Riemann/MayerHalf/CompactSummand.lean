@@ -344,4 +344,41 @@ theorem equicontinuous_transferSummand (n : ℕ) (hn : 0 < n) :
   exact (hxf f).trans_lt hx₁
 end
 
+/-! ### The compactness of a summand, modulo the normal-families input -/
+
+/-- **Surgical Montel reduction** (RH-41): if the pointwise image of the
+transfer family on the closed unit ball is relatively compact in the product
+topology of `↥halfDisc → ℂ` — the one normal-families fact (Montel /
+Vitali–Porter: pointwise cluster limits of uniformly bounded holomorphic maps
+are holomorphic) that mathlib lacks — then Arzelà–Ascoli upgrades it to
+compactness in the sup norm, and the summand `transferSummandCLM n` is a
+compact operator.
+
+Everything except the hypothesis `hrc` is unconditional: equicontinuity is
+`equicontinuous_transferSummand`, and the unit ball maps into the image by
+construction.  Discharging `hrc` for all `n ≥ 1` is the phase-3 frontier. -/
+theorem isCompactOperator_transferSummandCLM_of_pointwiseRelCompact (n : ℕ) (hn : 0 < n)
+    (hrc : IsCompact (ContinuousMap.toFun ''
+      ((fun f : {g : halfDiscAlgebra // ‖g‖ ≤ 1} => transferSummandCLM n f.1) '' univ))) :
+    IsCompactOperator (transferSummandCLM n) := by
+  have heq : Equicontinuous
+      (fun i : ((fun f : {g : halfDiscAlgebra // ‖g‖ ≤ 1} =>
+        transferSummandCLM n f.1) '' univ) =>
+        ((i.1 : C(↥halfDisc, ℂ)) : ↥halfDisc → ℂ)) := by
+    intro z₀
+    rw [Metric.equicontinuousAt_iff_right]
+    intro ε hε
+    have hδ := Metric.equicontinuousAt_iff_right.mp
+      (equicontinuous_transferSummand n hn z₀) ε hε
+    filter_upwards [hδ] with y hy i
+    obtain ⟨g, hg⟩ := i
+    show dist (g z₀) (g y) < ε
+    obtain ⟨f, -, rfl⟩ := hg
+    exact hy f
+  refine ⟨_, ArzelaAscoli.isCompact_of_equicontinuous _ hrc heq, ?_⟩
+  refine Filter.mem_of_superset (Metric.ball_mem_nhds 0 one_pos) ?_
+  intro f hf
+  exact ⟨⟨f, le_of_lt (mem_ball_zero_iff.mp hf)⟩, mem_univ _, rfl⟩
+
+
 end Riemann
