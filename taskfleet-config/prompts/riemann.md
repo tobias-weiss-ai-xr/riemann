@@ -54,6 +54,12 @@ report the blocker in your summary.
 - Hoist `by` blocks into typed `have`s; `rw [one_div]` before `inv_*₀`.
 - Grep `.lake/packages/mathlib/Mathlib/**` for exact lemma names.
 - Count `grep -cE 'error'` AND `grep -cE "declaration uses 'sorry'"` — both 0.
+- **Axiom probe (mandatory since RH-42)**: append a probe file importing your
+  module with `#print axioms Riemann.<YourMainTheorem>` for every headline
+  theorem and run `lake env lean /tmp/axioms.lean` — output must be exactly
+  `[propext, Classical.choice, Quot.sound]` (or a prefix of it).  Anything
+  else (sorryAx, Classical.choice-free is fine but extra axioms are not)
+  fails the gate.  Also `! grep -qiE '\baxiom\b' <your file>`.
 
 ## Definition of Done
 

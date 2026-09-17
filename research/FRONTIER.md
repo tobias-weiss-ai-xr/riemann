@@ -453,6 +453,62 @@ resolution — parenthesize (`(mem_discAlgebra x).mpr`); `IsSeqClosed` binds
 `∀ ⦃x : ℕ → X⦄ ⦃p : X⦄` — `intro u p hu hx`; a bare `end` must precede
 `end Riemann` when a `noncomputable section` is open.
 
+**RH-41/42 (Mayer half-disc transfer, phase 2 — `lean/Riemann/MayerHalf/`,
+five modules, all gate-clean: 0 sorry, 0 axiom, `#print axioms` =
+`[propext, Classical.choice, Quot.sound]`; T1 `c9fa9b9`, T2 `75ec7ca`,
+T3 `4fa0bb3`, T4 `f39c7d0`, T5 `08a1297`).**  The Mayer half-plane transfer
+operator is now assembled end-to-end on the **half-disc algebra**
+`halfDiscAlgebra : Subalgebra ℂ C(↥halfDisc, ℂ)` (T1, replacing the phase-1
+disc algebra — half-disc symmetry halves the branch bookkeeping):
+
+- **T1 `Algebra.lean`**: the analytic class — `halfDisc` (closed half-disc),
+  Gauss inverse branches `gaussBranch n z = ((n+1+z))⁻¹` with
+  `branchMapsTo_halfDisc` and `branch_norm_le`, and the complete normed
+  algebra `halfDiscAlgebra` (uniform limits of holomorphic-on-interior
+  continuous maps are holomorphic: `isSeqClosed_halfDiscAlgebra`,
+  `halfDiscAlgebra_complete`).
+- **T2 `Operator.lean`**: the Mayer summand `transferSummand n f z =
+  (gaussBranch n z)² · f(gaussBranch n z)` as a CLM on the algebra
+  (`mayerOperatorCLM`), with `norm_transferSummand_le`: `‖T_n‖ ≤ 1/(n+1)²`
+  — the branch-to-interior contraction.
+- **T3 `CompactSummand.lean`**: equicontinuity of the transfer family on the
+  unit ball (`equicontinuous_transferSummand`, MVT route through the
+  interior image of the branch) and `norm_transferSummandCLM_le`.  **Open
+  gap**: `isCompactOperator_transferSummandCLM` is docstring-only — closing
+  the Arzelà–Ascoli loop needs the normal-families fact that pointwise
+  cluster limits of uniformly bounded holomorphic maps are holomorphic
+  (Montel/Vitali–Porter), which mathlib lacks.  This is the genuine phase-3
+  frontier.
+- **T4 `CompactLimit.lean`**: operator-norm limits of compact operators are
+  compact (`isCompactOperator_of_tendsto_nat`), stated for the ℕ-indexed
+  filter chain T5 needs.
+- **T5 `TailCompact.lean`**: the assembly — `summandOp n` as a bounded
+  operator on the algebra, partial sums `mayerPartial k = ∑_{n≤k} summandOp
+  (n+1)`, the tail `mayerTail = ∑' summandOp (n+1)` with norm bound
+  `norm_mayerTail_sub_partial_op ≤ ∑_{j} 1/(j+k+2)²`, and
+  `tendsto_mayerPartial : mayerPartial ⟶ mayerTail` (ascribed-
+  `Metric.tendsto_atTop` route).  **`isCompactOperator_mayerTail` is proved
+  CONDITIONALLY on `∀ n > 0, IsCompactOperator (summandOp n)`** — the
+  exact classical shape; discharging the hypothesis is blocked only by the
+  T3 Montel gap above.
+
+Elaboration notes (phase 2): express all norms through the ambient coe
+`‖(f : C(↥halfDisc, ℂ))‖`, never `‖(f : halfDiscAlgebra)‖` directly;
+`Subalgebra.coe_add (S) (x y)` is the coe-of-add lemma (`map_add` does not
+match the ↑-shape); CLM pointwise-add is bare `add_apply`; when instance
+synthesis sticks in lemma application, elaborate against a fully ascribed
+`have hmp : <concrete type> := Lemma.mp …` — named-arg pinning `(β := ℕ)`
+makes it worse; `Metric.tendsto_atTop` in this pin has α = metric side,
+β = index side with `[Nonempty β] [SemilatticeSup β]`;
+`Filter.Tendsto.congr` is the pointwise form (`h.congr fun k => congrFun
+hfun k`); `abel` replaces sub-cancellation lemma roulette; `open Topology`
+is mandatory for `𝓝`; write `NNReal` not `ℝ≥0`.
+
+Next (phase 3): (a) Vitali–Porter normal families to discharge the T3 gap
+and make `IsCompactOperator mayerTail` unconditional; (b) `mayerOperator_eq
+: mayerOperatorCLM = summandOp 0 + mayerTail`; (c) Fredholm determinant of
+the half-plane transfer operator toward the §3b upgrade path.
+
 ---
 
 ## 4. One-line summary

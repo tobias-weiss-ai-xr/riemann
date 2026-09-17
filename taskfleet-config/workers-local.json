@@ -23,7 +23,7 @@
     },
     {
       "name": "deepseek-ai1",
-      "enabled": true,
+      "enabled": false,
       "provider": "litellm",
       "model": "saia/deepseek-v4-flash-0731",
       "endpoint": "http://127.0.0.1:4000",

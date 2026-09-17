@@ -21,13 +21,19 @@ is a **compact operator** on the half-disc algebra:
 
 * bounded: `norm_transferSummandCLM_le` — `‖T_n f‖ ≤ ‖f‖/(n+1)²`
   (`branch_norm_le` — the algebraically transparent part), and
-* compact: `isCompactOperator_transferSummandCLM` — the honest heart of the RH
-  program.  The image of the unit ball is rendered *equicontinuous* by the
-  fact that the branch maps into the interior where the holomorphic elements
-  have uniformly bounded derivative (`norm_deriv_toHalfHol_le` +
-  `branch_image_ball_subset_interior`), and *pointwise bounded* by
-  `norm_transferSummandCLM_le`; Arzelà–Ascoli then makes the ball-image
-  relatively compact.
+* compact: `isCompactOperator_transferSummandCLM` — **not yet proven**; the
+  remaining gap in the RH program.  What IS proven here: the image of the
+  unit ball is *equicontinuous* (`equicontinuous_transferSummand`, via the
+  interior-branch MVT route with `norm_deriv_toHalfHol_le` +
+  `branch_image_ball_subset_interior`) and *pointwise bounded* by
+  `norm_transferSummandCLM_le` — both Arzelà–Ascoli hypotheses except the
+  pointwise-compactness one.  Closing it needs the *normal-families* fact
+  that a pointwise cluster limit of uniformly bounded holomorphic maps is
+  holomorphic (Montel / Vitali–Porter); mathlib has neither, so the final
+  Ascoli closure is deferred to phase 3.  Until then T5 states the tail
+  compactness conditionally on `∀ n > 0, IsCompactOperator (summandOp n)`
+  (`isCompactOperator_mayerTail`, `MayerHalf.TailCompact`), which is exactly
+  the shape the classical proof has.
 
 The compactness of each `n ≥ 1` summand is the key input for the compactness
 of the Mayer tail `Σ_{n ≥ N}` (T5), as the tail is the operator-norm limit of
