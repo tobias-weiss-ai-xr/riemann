@@ -59,7 +59,7 @@
     },
     {
       "name": "tud-mistral",
-      "enabled": true,
+      "enabled": false,
       "provider": "litellm",
       "model": "tud/mistral-medium-3.5-128b",
       "endpoint": "http://127.0.0.1:4000",
