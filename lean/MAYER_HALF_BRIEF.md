@@ -1,5 +1,21 @@
 # Lean Proof Agent Brief — MayerHalf campaign (RH-41/42, phase 2)
 
+> **STATUS (post-phase-2, 2026-09-17).** ALL FIVE phase-2 modules are LANDED
+> and gate-clean on master: T1 `Algebra.lean` (c9fa9b9), T2 `Operator.lean`
+> (75ec7ca), T3 `CompactSummand.lean` (4fa0bb3 + b85a10f), T4
+> `CompactLimit.lean` (f39c7d0), T5 `TailCompact.lean` (08a1297 + b85a10f).
+> Landed: `equicontinuous_transferSummand`, `norm_transferSummandCLM_le`,
+> `summandOp`, `mayerPartial`, `mayerTail`, `mayerOperator_eq`,
+> `tendsto_mayerPartial`, `norm_mayerTail_sub_partial_op`,
+> `isCompactOperator_of_tendsto_nat`, and the **surgical Montel reduction**
+> `isCompactOperator_transferSummandCLM_of_pointwiseRelCompact` /
+> `isCompactOperator_summandOp_of_pointwiseRelCompact` /
+> `isCompactOperator_mayerTail_of_pointwiseRelCompact` — the tail is compact
+> modulo ONE normal-families hypothesis (Montel/Vitali–Porter, not in
+> mathlib).  **Do NOT re-derive these.**  Phase 3 = discharge the `hrc`
+> hypothesis (Vitali–Porter), then the Fredholm determinant.  Current
+> frontier: `research/FRONTIER.md` §RH-41/42.
+
 You are formalizing part of the **Mayer transfer operator on the half-disc
 algebra** (Riemann hypothesis program). Read this BEFORE writing Lean code,
 then read the template file(s) your task names.
