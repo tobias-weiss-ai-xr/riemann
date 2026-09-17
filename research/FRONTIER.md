@@ -473,24 +473,32 @@ disc algebra — half-disc symmetry halves the branch bookkeeping):
   — the branch-to-interior contraction.
 - **T3 `CompactSummand.lean`**: equicontinuity of the transfer family on the
   unit ball (`equicontinuous_transferSummand`, MVT route through the
-  interior image of the branch) and `norm_transferSummandCLM_le`.  **Open
-  gap**: `isCompactOperator_transferSummandCLM` is docstring-only — closing
-  the Arzelà–Ascoli loop needs the normal-families fact that pointwise
-  cluster limits of uniformly bounded holomorphic maps are holomorphic
-  (Montel/Vitali–Porter), which mathlib lacks.  This is the genuine phase-3
-  frontier.
+  interior image of the branch) and `norm_transferSummandCLM_le`, plus the
+  **surgical Montel reduction** `isCompactOperator_transferSummandCLM_of_
+  pointwiseRelCompact`: from the single hypothesis that the pointwise image
+  of the unit-ball family is relatively compact in the product topology of
+  `↥halfDisc → ℂ`, the full Ascoli assembly closes unconditionally and the
+  summand is a compact operator.  Discharging that hypothesis is precisely
+  the normal-families fact that pointwise cluster limits of uniformly
+  bounded holomorphic maps are holomorphic (Montel / Vitali–Porter), which
+  mathlib lacks — the genuine phase-3 frontier, now exactly ONE Lean
+  statement.
 - **T4 `CompactLimit.lean`**: operator-norm limits of compact operators are
   compact (`isCompactOperator_of_tendsto_nat`), stated for the ℕ-indexed
   filter chain T5 needs.
 - **T5 `TailCompact.lean`**: the assembly — `summandOp n` as a bounded
   operator on the algebra, partial sums `mayerPartial k = ∑_{n≤k} summandOp
-  (n+1)`, the tail `mayerTail = ∑' summandOp (n+1)` with norm bound
+  (n+1)`, the tail `mayerTail` with `mayerOperator_eq :
+  mayerOperatorCLM = summandOp 0 + mayerTail`, norm bound
   `norm_mayerTail_sub_partial_op ≤ ∑_{j} 1/(j+k+2)²`, and
-  `tendsto_mayerPartial : mayerPartial ⟶ mayerTail` (ascribed-
-  `Metric.tendsto_atTop` route).  **`isCompactOperator_mayerTail` is proved
-  CONDITIONALLY on `∀ n > 0, IsCompactOperator (summandOp n)`** — the
-  exact classical shape; discharging the hypothesis is blocked only by the
-  T3 Montel gap above.
+  `tendsto_mayerPartial : mayerPartial ⟶ mayerTail`.  **`isCompactOperator_
+  mayerTail` is proved CONDITIONALLY on `∀ n > 0, IsCompactOperator
+  (summandOp n)`** (T5, `08a1297`); the capstone `isCompactOperator_
+  mayerTail_of_pointwiseRelCompact` (`b85a10f`) chains the surgical T3
+  reduction (via `isCompactOperator_summandOp_of_pointwiseRelCompact` — the
+  coe is an isometric closed embedding by `rfl`) so the conditional now has
+  the exact shape: ONE normal-families hypothesis for all `n ≥ 1` ⇒
+  compact Mayer tail.
 
 Elaboration notes (phase 2): express all norms through the ambient coe
 `‖(f : C(↥halfDisc, ℂ))‖`, never `‖(f : halfDiscAlgebra)‖` directly;
@@ -504,10 +512,18 @@ makes it worse; `Metric.tendsto_atTop` in this pin has α = metric side,
 hfun k`); `abel` replaces sub-cancellation lemma roulette; `open Topology`
 is mandatory for `𝓝`; write `NNReal` not `ℝ≥0`.
 
-Next (phase 3): (a) Vitali–Porter normal families to discharge the T3 gap
-and make `IsCompactOperator mayerTail` unconditional; (b) `mayerOperator_eq
-: mayerOperatorCLM = summandOp 0 + mayerTail`; (c) Fredholm determinant of
-the half-plane transfer operator toward the §3b upgrade path.
+Next (phase 3): (a) Vitali–Porter normal families to discharge the single
+`hrc` hypothesis of `isCompactOperator_mayerTail_of_pointwiseRelCompact` and
+make `IsCompactOperator mayerTail` unconditional; (b) Fredholm determinant
+of the half-plane transfer operator toward the §3b upgrade path.
+(`mayerOperator_eq` is already landed, T5.)  Elaboration traps found while
+landing the reduction: `Isometry.isClosedEmbedding fun _ _ => rfl` solves
+its implicit `f` as `fun _ => _` BEFORE the expected type propagates —
+ascribe `have hcemb : IsClosedEmbedding (Subtype.val : … → …) := …` first;
+the subalgebra coe in preimage positions is `Subtype.val` of the
+set-membership subtype, not the `↑` coercion; `hy` from
+`equicontinuous_transferSummand` takes the unit-ball SUBTYPE element
+directly (`hy f`, not `hy f.1`).
 
 ---
 
