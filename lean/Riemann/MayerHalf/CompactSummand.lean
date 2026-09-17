@@ -85,7 +85,8 @@ noncomputable def transferSummandL (n : ℕ) : halfDiscAlgebra →ₗ[ℂ] C(↥
   toFun := fun f =>
     ⟨fun z => (gaussBranch n z.1) ^ 2 * (f : C(↥halfDisc, ℂ)) ⟨gaussBranch n z.1, branchMapsTo_halfDisc n z.property⟩,
       by
-        exact (weightSqCM n * ((f : C(↥halfDisc, ℂ)).comp (branchCM n))).continuous⟩
+        refine Continuous.congr (weightSqCM n * ((f : C(↥halfDisc, ℂ)).comp (branchCM n))).continuous
+          (fun z => rfl)⟩
   map_add' := by
     intro f g
     ext z
@@ -238,6 +239,7 @@ theorem holFamily_lipschitz (n : ℕ) (hn : 0 < n) (f : C(↥halfDisc, ℂ)) (hf
       toHalfHol_apply f (gaussBranch n z₀.1) (branchMapsTo_halfDisc n z₀.property)] at hMVT
   exact hMVT
 
+set_option maxHeartbeats 4000000 in
 /-- The Mayer transfer family is equicontinuous on the closed unit ball
 (Arzelà–Ascoli hypothesis), via the factorisation `(T f) z = w(z)² · f(φ z)`. -/
 theorem equicontinuous_transferSummand (n : ℕ) (hn : 0 < n) :
@@ -245,14 +247,13 @@ theorem equicontinuous_transferSummand (n : ℕ) (hn : 0 < n) :
       (transferSummandCLM n f.1) z) := by
   intro z₀
   let C : ℝ := (2 * 1) / (r₀ n / 2)
-  show EquicontinuousAt (fun f z => (transferSummandCLM n f.1) z) z₀
-  -- modulus: |w(z₀)²-w(z)²| + C·‖φ z - φ z₀‖ (both → 0)
-  let b : ↥halfDisc → ℝ := fun z =>
+  set b : ↥halfDisc → ℝ := fun z =>
     ‖weightSqCM n z₀ - weightSqCM n z‖ +
-      C * ‖(gaussBranch n z.1 : ℂ) - (gaussBranch n z₀.1 : ℂ)‖
+      C * ‖(gaussBranch n z.1 : ℂ) - (gaussBranch n z₀.1 : ℂ)‖ with hb_def
   have hb0 : Tendsto b (𝓝 z₀) (𝓝 0) := by
     unfold b
-    have h₁ : Tendsto (fun z : ↥halfDisc => ‖weightSqCM n z₀ - weightSqCM n z‖) (𝓝 z₀) (𝓝 0) := by
+    have h₁ : Tendsto (fun z : ↥halfDisc => ‖weightSqCM n z₀ - weightSqCM n z‖)
+        (𝓝 z₀) (𝓝 0) := by
       have hg : ContinuousAt (fun z : ↥halfDisc => weightSqCM n z₀ - weightSqCM n z) z₀ := by
         exact (continuous_const.sub (weightSqCM n).continuous).continuousAt
       have hgT : Tendsto (fun z : ↥halfDisc => weightSqCM n z₀ - weightSqCM n z) (𝓝 z₀) (𝓝 0) := by
@@ -260,49 +261,51 @@ theorem equicontinuous_transferSummand (n : ℕ) (hn : 0 < n) :
       simpa using hgT.norm
     have h₂ : Tendsto (fun z : ↥halfDisc => ‖(gaussBranch n z.1 : ℂ) - (gaussBranch n z₀.1 : ℂ)‖)
         (𝓝 z₀) (𝓝 0) := by
-      have hg : ContinuousAt (fun z : ↥halfDisc => (gaussBranch n z.1 : ℂ)) z₀ :=
-        (continuous_branch_val n).continuousAt
       have hgT : Tendsto (fun z : ↥halfDisc => (gaussBranch n z.1 : ℂ) -
           (gaussBranch n z₀.1 : ℂ)) (𝓝 z₀) (𝓝 0) := by
-        simpa using hg.tendsto
+        have h0 : Tendsto (fun z : ↥halfDisc => (gaussBranch n z.1 : ℂ)) (𝓝 z₀)
+            (𝓝 (gaussBranch n z₀.1 : ℂ)) := (continuous_branch_val n).continuousAt.tendsto
+        simpa using h0.sub_const (gaussBranch n z₀.1 : ℂ)
       simpa using hgT.norm
     simpa using (h₁.add (h₂.const_mul C))
-  -- the eventual bound
   have hev : ∀ᶠ z in 𝓝 z₀, ∀ f : {g : halfDiscAlgebra // ‖g‖ ≤ 1},
       dist ((transferSummandCLM n f.1) z₀) ((transferSummandCLM n f.1) z) ≤ b z := by
-    -- φ is continuous at z₀, so ‖φ z - φ z₀‖ < r₀/2 eventually
     have hclose_ev : ∀ᶠ z in 𝓝 z₀, dist (gaussBranch n z.1) (gaussBranch n z₀.1) < r₀ n / 2 := by
-      have hb : ContinuousAt (fun z : ↥halfDisc => (gaussBranch n z.1 : ℂ)) z₀ :=
-        (continuous_branch_val n).continuousAt
-      exact (Metric.continuousAt_iff.1 hb) (r₀ n / 2) (by exact half_pos (r₀_pos n))
+      have h2c : ContinuousAt (fun z : ↥halfDisc => dist (gaussBranch n z.1) (gaussBranch n z₀.1)) z₀ :=
+        ((continuous_branch_val n).dist continuous_const).continuousAt
+      have h2t : Tendsto (fun z : ↥halfDisc => dist (gaussBranch n z.1) (gaussBranch n z₀.1))
+          (𝓝 z₀) (𝓝 0) := by
+        simpa using h2c.tendsto
+      exact h2t.eventually (gt_mem_nhds (half_pos (r₀_pos n)))
     filter_upwards [hclose_ev] with z hclose
-    intro f hf
+    intro f
+    -- hoist the coercion once: `g` is the continuous map underlying `f.1`
+    set g : C(↥halfDisc, ℂ) := (f.1 : C(↥halfDisc, ℂ)) with hg_def
+    have hgB : ‖g‖ ≤ 1 := f.property
     let A : ↥halfDisc → ℂ := fun x => weightSqCM n x
     let G : ↥halfDisc → ℂ := fun x =>
-      (f.1 : C(↥halfDisc, ℂ)) ⟨gaussBranch n x.1, branchMapsTo_halfDisc n x.property⟩
+      g ⟨gaussBranch n x.1, branchMapsTo_halfDisc n x.property⟩
     -- expand (T f) x = A x * G x
     have hT (x : ↥halfDisc) :
         (transferSummandCLM n f.1) x = A x * G x := by
-      unfold A G
-      rw [transferSummandCLM_apply, weightSqCM_apply]
+      rw [transferSummandCLM_apply]
+      simp only [A, G, weightSqCM_apply]
       ring
     -- bound ‖A z₀‖ ≤ 1
     have hA : ‖weightSqCM n z₀‖ ≤ 1 := branch_sq_norm_le_one n z₀
     -- bound ‖G z‖ ≤ 1
-    have hG1 : ‖G z‖ ≤ 1 := by
-      unfold G
-      have h : ‖(f.1 : C(↥halfDisc, ℂ)) ⟨gaussBranch n z.1, _⟩‖ ≤ ‖(f.1 : C(↥halfDisc, ℂ))‖ :=
-        ContinuousMap.norm_coe_le_norm (f.1 : C(↥halfDisc, ℂ)) _
-      have hbnd : ‖(f.1 : C(↥halfDisc, ℂ))‖ ≤ 1 := by
-        simpa using f.property
-      exact le_trans h hbnd
+    have hG1 : ‖G z‖ ≤ 1 :=
+      (ContinuousMap.norm_coe_le_norm g
+        (⟨gaussBranch n z.1, branchMapsTo_halfDisc n z.property⟩ : ↥halfDisc)).trans hgB
     -- Lipschitz bound on G
     have hGLip : ‖G z₀ - G z‖ ≤ C * ‖(gaussBranch n z.1 : ℂ) - (gaussBranch n z₀.1 : ℂ)‖ := by
-      unfold G C
-      have hl := holFamily_lipschitz n hn (f.1 : C(↥halfDisc, ℂ)) f.1.property 1 (by simpa using f.property)
-        z z₀ hclose
-      -- hl : ‖f⟨bz⟩ - f⟨bz₀⟩‖ ≤ (2*1)/(r₀/2) * ‖bz - bz₀‖
-      simpa [norm_sub_rev, one_mul] using hl
+      have hl := holFamily_lipschitz n hn g f.1.property 1 hgB z z₀ hclose
+      -- hl : ‖g⟨bz⟩ - g⟨bz₀⟩‖ ≤ (2*1)/(r₀/2) * ‖bz - bz₀‖
+      show ‖g ⟨gaussBranch n z₀.1, branchMapsTo_halfDisc n z₀.property⟩ -
+          g ⟨gaussBranch n z.1, branchMapsTo_halfDisc n z.property⟩‖
+          ≤ (2 * 1) / (r₀ n / 2) * ‖(gaussBranch n z.1 : ℂ) - (gaussBranch n z₀.1 : ℂ)‖
+      rw [norm_sub_rev]
+      exact hl
     -- assemble
     have hdist : dist ((transferSummandCLM n f.1) z₀) ((transferSummandCLM n f.1) z) ≤
         ‖weightSqCM n z₀ - weightSqCM n z‖ + C * ‖(gaussBranch n z.1 : ℂ) - (gaussBranch n z₀.1 : ℂ)‖ := by
@@ -315,28 +318,24 @@ theorem equicontinuous_transferSummand (n : ℕ) (hn : 0 < n) :
               rw [← sub_add_sub_cancel]
               exact norm_add_le _ _
         _ ≤ ‖weightSqCM n z₀ - weightSqCM n z‖ + C * ‖(gaussBranch n z.1 : ℂ) - (gaussBranch n z₀.1 : ℂ)‖ := by
-               -- ‖A z₀ * (G z₀ - G z)‖ ≤ ‖A z₀‖ * ‖G z₀ - G z‖ ≤ 1 * (C*‖φz - φz₀‖)
-               -- ‖(A z₀ - A z) * G z‖ ≤ ‖A z₀ - A z‖ * ‖G z‖ ≤ ‖A z₀ - A z‖ * 1
                have h1 : ‖A z₀ * G z₀ - A z₀ * G z‖ ≤ C * ‖(gaussBranch n z.1 : ℂ) - (gaussBranch n z₀.1 : ℂ)‖ := by
-                 rw [← mul_sub]
-                 calc
-                   ‖A z₀ * (G z₀ - G z)‖ ≤ ‖A z₀‖ * ‖G z₀ - G z‖ := norm_mul_le _ _
-                   _ ≤ 1 * ‖G z₀ - G z‖ := by
-                     gcongr
-                     exact hA
-                   _ ≤ C * ‖(gaussBranch n z.1 : ℂ) - (gaussBranch n z₀.1 : ℂ)‖ := hGLip
+                 have h0 := norm_mul_le (A z₀) (G z₀ - G z)
+                 rw [mul_sub] at h0
+                 exact h0.trans ((mul_le_mul_of_nonneg_right hA (norm_nonneg _)).trans
+                   (by rw [one_mul]; exact hGLip))
                have h2 : ‖A z₀ * G z - A z * G z‖ ≤ ‖weightSqCM n z₀ - weightSqCM n z‖ := by
-                 rw [← sub_mul]
-                 calc
-                   ‖(A z₀ - A z) * G z‖ ≤ ‖A z₀ - A z‖ * ‖G z‖ := norm_mul_le _ _
-                   _ ≤ ‖A z₀ - A z‖ * 1 := by gcongr; exact hG1
-                   _ = ‖weightSqCM n z₀ - weightSqCM n z‖ := by simp [A]
+                 have h0 := norm_mul_le (A z₀ - A z) (G z)
+                 rw [sub_mul] at h0
+                 exact h0.trans ((mul_le_mul_of_nonneg_left hG1 (norm_nonneg _)).trans
+                   (by rw [mul_one]))
                linarith
-    unfold b
-    simpa using hdist
-  exact Metric.equicontinuousAt_of_continuity_modulus b hb0
-    (fun f z => (transferSummandCLM n f.1) z) hev
-
+    exact hdist
+  -- final assembly
+  rw [Metric.equicontinuousAt_iff_right]
+  intro ε hε0
+  filter_upwards [hb0 (Iio_mem_nhds hε0), hev] with x hx₁ hxf
+  intro f
+  exact (hxf f).trans_lt hx₁
 end
 
 end Riemann
