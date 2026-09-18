@@ -489,6 +489,16 @@ disc algebra — half-disc symmetry halves the branch bookkeeping):
   hypothesis — the transfer image is closed in the product topology, i.e.
   *pointwise limits of the family are continuous functions* — pure
   complex analysis, zero topology in what remains to prove.
+  **Elementary half landed (`99c882e`)**: `continuous_pointwiseLimit_branch`
+  proves the CONTINUITY of pointwise limits of `fₖ ∘ gaussBranch n`
+  (`‖fₖ‖ ≤ 1`) unconditionally — equi-Lipschitz via `holFamily_lipschitz`
+  + ε/3, no complex analysis.  Also `gaussBranch_injective` (Möbius +
+  inv-injective), the g-reconstruction ingredient.  The remaining
+  Vitali–Porter wall is exactly the HOLOMORPHY of the pointwise limit on
+  `interior halfDisc` (bounded-holomorphic limits are holomorphic), after
+  which: locally-uniform convergence on the interior image (pointwise +
+  equicontinuity), Weierstrass via T1, reconstruction
+  `g := G ∘ gaussBranch⁻¹` (injectivity!), ‖g‖ ≤ 1, `h = T g`.
 - **T4 `CompactLimit.lean`**: operator-norm limits of compact operators are
   compact (`isCompactOperator_of_tendsto_nat`), stated for the ℕ-indexed
   filter chain T5 needs.

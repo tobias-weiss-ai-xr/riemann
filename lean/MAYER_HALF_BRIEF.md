@@ -16,9 +16,13 @@
 > bare `IsClosed` statement per summand:
 > `isCompactOperator_mayerTail_of_piClosed` — pointwise limits of the
 > uniformly bounded transfer family are continuous, nothing else.  **Do NOT
-> re-derive these.**  Phase 3 = prove that `IsClosed` (Vitali–Porter), then
-> the Fredholm determinant.  Current frontier: `research/FRONTIER.md`
-> §RH-41/42.
+> re-derive these.**  Phase 3 progress (`99c882e`): the elementary half is
+> DONE — `continuous_pointwiseLimit_branch` (continuity of pointwise limits,
+> equi-Lipschitz ε/3, no complex analysis) and `gaussBranch_injective` are
+> landed in CompactSummand.lean.  Remaining Vitali wall = HOLOMORPHY of the
+> pointwise limit on the interior, then Weierstrass (T1) + reconstruction
+> `g := G ∘ gaussBranch⁻¹`.  Then the Fredholm determinant.  Current
+> frontier: `research/FRONTIER.md` §RH-41/42.
 
 You are formalizing part of the **Mayer transfer operator on the half-disc
 algebra** (Riemann hypothesis program). Read this BEFORE writing Lean code,
