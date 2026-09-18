@@ -482,7 +482,13 @@ disc algebra — half-disc symmetry halves the branch bookkeeping):
   the normal-families fact that pointwise cluster limits of uniformly
   bounded holomorphic maps are holomorphic (Montel / Vitali–Porter), which
   mathlib lacks — the genuine phase-3 frontier, now exactly ONE Lean
-  statement.
+  statement.  **Final packaging (`07a31d1`)**: the unconditional Tychonoff
+  half `isCompact_piClosure_transferImage` (the pointwise closure lives in
+  `∏_z closedBall 0 (1/(n+1)²)`) is landed, so the frontier reduces further
+  to `isCompactOperator_transferSummandCLM_of_piClosed`: ONE `IsClosed`
+  hypothesis — the transfer image is closed in the product topology, i.e.
+  *pointwise limits of the family are continuous functions* — pure
+  complex analysis, zero topology in what remains to prove.
 - **T4 `CompactLimit.lean`**: operator-norm limits of compact operators are
   compact (`isCompactOperator_of_tendsto_nat`), stated for the ℕ-indexed
   filter chain T5 needs.
@@ -498,7 +504,10 @@ disc algebra — half-disc symmetry halves the branch bookkeeping):
   reduction (via `isCompactOperator_summandOp_of_pointwiseRelCompact` — the
   coe is an isometric closed embedding by `rfl`) so the conditional now has
   the exact shape: ONE normal-families hypothesis for all `n ≥ 1` ⇒
-  compact Mayer tail.
+  compact Mayer tail.  The piClosed capstone `isCompactOperator_mayerTail_
+  of_piClosed` (`07a31d1`) is the honest shape of the remaining work:
+  `(∀ n > 0, IsClosed (pointwise transfer image)) → IsCompactOperator
+  mayerTail`.
 
 Elaboration notes (phase 2): express all norms through the ambient coe
 `‖(f : C(↥halfDisc, ℂ))‖`, never `‖(f : halfDiscAlgebra)‖` directly;
@@ -512,9 +521,11 @@ makes it worse; `Metric.tendsto_atTop` in this pin has α = metric side,
 hfun k`); `abel` replaces sub-cancellation lemma roulette; `open Topology`
 is mandatory for `𝓝`; write `NNReal` not `ℝ≥0`.
 
-Next (phase 3): (a) Vitali–Porter normal families to discharge the single
-`hrc` hypothesis of `isCompactOperator_mayerTail_of_pointwiseRelCompact` and
-make `IsCompactOperator mayerTail` unconditional; (b) Fredholm determinant
+Next (phase 3): (a) Vitali–Porter normal families — discharge the single
+`hclosed` hypothesis of `isCompactOperator_mayerTail_of_piClosed` (the
+pointwise transfer image is closed, per summand `n ≥ 1`; all topology is
+already unconditional) and make `IsCompactOperator mayerTail` unconditional;
+(b) Fredholm determinant
 of the half-plane transfer operator toward the §3b upgrade path.
 (`mayerOperator_eq` is already landed, T5.)  Elaboration traps found while
 landing the reduction: `Isometry.isClosedEmbedding fun _ _ => rfl` solves

@@ -12,9 +12,13 @@
 > `isCompactOperator_summandOp_of_pointwiseRelCompact` /
 > `isCompactOperator_mayerTail_of_pointwiseRelCompact` — the tail is compact
 > modulo ONE normal-families hypothesis (Montel/Vitali–Porter, not in
-> mathlib).  **Do NOT re-derive these.**  Phase 3 = discharge the `hrc`
-> hypothesis (Vitali–Porter), then the Fredholm determinant.  Current
-> frontier: `research/FRONTIER.md` §RH-41/42.
+> mathlib); the final packaging (`07a31d1`) reduces that hypothesis to a
+> bare `IsClosed` statement per summand:
+> `isCompactOperator_mayerTail_of_piClosed` — pointwise limits of the
+> uniformly bounded transfer family are continuous, nothing else.  **Do NOT
+> re-derive these.**  Phase 3 = prove that `IsClosed` (Vitali–Porter), then
+> the Fredholm determinant.  Current frontier: `research/FRONTIER.md`
+> §RH-41/42.
 
 You are formalizing part of the **Mayer transfer operator on the half-disc
 algebra** (Riemann hypothesis program). Read this BEFORE writing Lean code,
