@@ -380,6 +380,85 @@ theorem isCompactOperator_transferSummandCLM_of_pointwiseRelCompact (n : ℕ) (h
   intro f hf
   exact ⟨⟨f, le_of_lt (mem_ball_zero_iff.mp hf)⟩, mem_univ _, rfl⟩
 
+/-- The branch is injective on the half-disc: a Möbius map (translation +
+inversion) followed by the injective inversion. -/
+theorem gaussBranch_injective (n : ℕ) :
+    Function.Injective (fun z : ↥halfDisc => (gaussBranch n z.1 : ℂ)) :=
+  (inv_injective (G := ℂ)).comp
+    (fun z₁ z₂ (h : (n : ℂ) + 1 + z₁.1 = (n : ℂ) + 1 + z₂.1) =>
+      Subtype.ext (add_left_cancel (G := ℂ) h))
+
+/-- **Elementary half of Vitali–Porter** (no complex analysis needed): a
+pointwise limit of the transfer family `fₖ ∘ gaussBranch n` with uniformly
+bounded `‖fₖ‖ ≤ 1` is *continuous*.  Via `holFamily_lipschitz` the family is
+equi-Lipschitz along the branch image, and an ε/3 argument transports
+pointwise convergence to continuity of the limit.  The holomorphy of the
+limit — the genuine Vitali–Porter wall — is not needed for this. -/
+theorem continuous_pointwiseLimit_branch (n : ℕ) (hn : 0 < n)
+    (f : ℕ → halfDiscAlgebra) (hf : ∀ k, ‖f k‖ ≤ 1)
+    (G : ↥halfDisc → ℂ)
+    (hpt : ∀ z : ↥halfDisc, Tendsto
+      (fun k => (f k : C(↥halfDisc, ℂ)) ⟨gaussBranch n z.1, branchMapsTo_halfDisc n z.2⟩)
+      atTop (𝓝 (G z))) :
+    Continuous G := by
+  refine Metric.continuous_iff.mpr fun z₀ ε hε => ?_
+  have hCpos : 0 < 2 / (r₀ n / 2) := div_pos (by norm_num) (half_pos (r₀_pos n))
+  have h3 : 0 < ε / 3 := by linarith
+  have hρpos : 0 < min (r₀ n / 2) (ε / (3 * (2 / (r₀ n / 2)))) :=
+    lt_min (half_pos (r₀_pos n)) (div_pos hε (mul_pos (by norm_num) hCpos))
+  have hφcont : ContinuousAt (fun z : ↥halfDisc => (gaussBranch n z.1 : ℂ)) z₀ :=
+    (continuous_branch_val n).continuousAt
+  obtain ⟨δ, hδpos, hδ⟩ := Metric.continuousAt_iff.mp hφcont _ hρpos
+  refine ⟨δ, hδpos, fun z hz => ?_⟩
+  have hφlt : dist (gaussBranch n z.1) (gaussBranch n z₀.1)
+      < min (r₀ n / 2) (ε / (3 * (2 / (r₀ n / 2)))) := hδ hz
+  -- k-uniform Lipschitz along the branch image
+  have hLip : ∀ k, ‖(f k : C(↥halfDisc, ℂ)) ⟨gaussBranch n z.1, branchMapsTo_halfDisc n z.2⟩ -
+      (f k : C(↥halfDisc, ℂ)) ⟨gaussBranch n z₀.1, branchMapsTo_halfDisc n z₀.2⟩‖
+      ≤ 2 / (r₀ n / 2) * dist (gaussBranch n z.1) (gaussBranch n z₀.1) := by
+    intro k
+    have hl := holFamily_lipschitz n hn (f k : C(↥halfDisc, ℂ)) (f k).property 1 (hf k)
+      z z₀ (lt_of_lt_of_le hφlt (min_le_left _ _))
+    rw [dist_eq_norm]
+    norm_num at hl ⊢
+    exact hl
+  obtain ⟨N₁, hN₁⟩ := Metric.tendsto_atTop.mp (hpt z₀) (ε / 3) h3
+  obtain ⟨N₂, hN₂⟩ := Metric.tendsto_atTop.mp (hpt z) (ε / 3) h3
+  set k := max N₁ N₂ with hk
+  have h2 : dist ((f k : C(↥halfDisc, ℂ)) ⟨gaussBranch n z₀.1,
+      branchMapsTo_halfDisc n z₀.2⟩) (G z₀) < ε / 3 := hN₁ k (le_max_left _ _)
+  have h1 : dist ((f k : C(↥halfDisc, ℂ)) ⟨gaussBranch n z.1,
+      branchMapsTo_halfDisc n z.2⟩) (G z) < ε / 3 := hN₂ k (le_max_right _ _)
+  have h3' : dist ((f k : C(↥halfDisc, ℂ)) ⟨gaussBranch n z.1,
+      branchMapsTo_halfDisc n z.2⟩) ((f k : C(↥halfDisc, ℂ)) ⟨gaussBranch n z₀.1,
+      branchMapsTo_halfDisc n z₀.2⟩) < ε / 3 := by
+    rw [dist_eq_norm]
+    calc ‖(f k : C(↥halfDisc, ℂ)) ⟨gaussBranch n z.1, branchMapsTo_halfDisc n z.2⟩ -
+        (f k : C(↥halfDisc, ℂ)) ⟨gaussBranch n z₀.1, branchMapsTo_halfDisc n z₀.2⟩‖
+        ≤ 2 / (r₀ n / 2) * dist (gaussBranch n z.1) (gaussBranch n z₀.1) := hLip k
+      _ < 2 / (r₀ n / 2) * min (r₀ n / 2) (ε / (3 * (2 / (r₀ n / 2)))) :=
+        (mul_lt_mul_of_pos_left (a := (2 / (r₀ n / 2))) hφlt hCpos)
+      _ ≤ ε / 3 := by
+        have h4 : (2:ℝ) / (r₀ n / 2) * (ε / (3 * (2 / (r₀ n / 2)))) = ε / 3 := by
+          field_simp
+          exact mul_inv_cancel₀ (ne_of_gt (r₀_pos n))
+        calc (2 / (r₀ n / 2)) * min (r₀ n / 2) (ε / (3 * (2 / (r₀ n / 2))))
+            ≤ (2 / (r₀ n / 2)) * (ε / (3 * (2 / (r₀ n / 2)))) :=
+              mul_le_mul_of_nonneg_left (min_le_right _ _) hCpos.le
+          _ = ε / 3 := h4
+  have e1 : dist (G z) (G z₀) ≤ dist (G z) ((f k : C(↥halfDisc, ℂ)) ⟨gaussBranch n z.1,
+      branchMapsTo_halfDisc n z.2⟩) + dist ((f k : C(↥halfDisc, ℂ)) ⟨gaussBranch n z.1,
+      branchMapsTo_halfDisc n z.2⟩) (G z₀) := dist_triangle _ _ _
+  have e2 : dist ((f k : C(↥halfDisc, ℂ)) ⟨gaussBranch n z.1,
+      branchMapsTo_halfDisc n z.2⟩) (G z₀) ≤ dist ((f k : C(↥halfDisc, ℂ)) ⟨gaussBranch n z.1,
+      branchMapsTo_halfDisc n z.2⟩) ((f k : C(↥halfDisc, ℂ)) ⟨gaussBranch n z₀.1,
+      branchMapsTo_halfDisc n z₀.2⟩) + dist ((f k : C(↥halfDisc, ℂ)) ⟨gaussBranch n z₀.1,
+      branchMapsTo_halfDisc n z₀.2⟩) (G z₀) := dist_triangle _ _ _
+  have h1s : dist (G z) ((f k : C(↥halfDisc, ℂ)) ⟨gaussBranch n z.1,
+      branchMapsTo_halfDisc n z.2⟩) = dist ((f k : C(↥halfDisc, ℂ)) ⟨gaussBranch n z.1,
+      branchMapsTo_halfDisc n z.2⟩) (G z) := dist_comm _ _
+  linarith [h1s]
+
 /-- **Tychonoff half of the Montel reduction** (unconditional): the pointwise
 closure of the unit-ball transfer image is compact in the product topology --
 it lives in the product of `closedBall 0 (1/(n+1)^2)` by
