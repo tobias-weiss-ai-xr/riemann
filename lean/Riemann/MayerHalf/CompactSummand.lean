@@ -459,6 +459,117 @@ theorem continuous_pointwiseLimit_branch (n : ℕ) (hn : 0 < n)
       branchMapsTo_halfDisc n z.2⟩) (G z) := dist_comm _ _
   linarith [h1s]
 
+/-- **Generic compactness lemma (uniform equicontinuity)**: an equicontinuous
+family on a compact metric space is uniformly equicontinuous -- the finite
+subcover / radius-min over the compact. -/
+theorem exists_delta_uniform_equicontinuous {X : Type*} [MetricSpace X] [CompactSpace X]
+    {ι : Type*} {α : Type*} [PseudoMetricSpace α] (F : ι → X → α) (hF : Equicontinuous F)
+    {ε : ℝ} (hε : 0 < ε) :
+    ∃ δ > 0, ∀ x y : X, dist x y < δ → ∀ i, dist (F i x) (F i y) < ε := by
+  have h2 : 0 < ε / 2 := by linarith
+  have hpoint : ∀ x : X, ∃ d > 0, ∀ y, dist y x < d → ∀ i, dist (F i x) (F i y) < ε / 2 :=
+    fun x => Metric.equicontinuousAt_iff.mp (hF x) (ε / 2) h2
+  choose! δ₀ hδ₀ hball using hpoint
+  obtain ⟨t, ht⟩ := isCompact_univ.elim_finite_subcover
+    (fun x : X => ball x (δ₀ x / 2)) (fun x => isOpen_ball)
+    (fun z _ => Set.mem_iUnion.mpr ⟨z, mem_ball_self (by linarith [hδ₀ z])⟩)
+  rcases t.eq_empty_or_nonempty with hempty | hne
+  · refine ⟨1, one_pos, fun x y _ _ => ?_⟩
+    rw [hempty] at ht
+    simp at ht
+    exact ht.elim x
+  · have hδpos : 0 < t.inf' hne (fun x => δ₀ x / 2) :=
+      (Finset.lt_inf'_iff hne).2 fun c hc => by linarith [hδ₀ c]
+    refine ⟨t.inf' hne (fun x => δ₀ x / 2), hδpos, fun x y hxy i => ?_⟩
+    have hx : x ∈ ⋃ z ∈ t, ball z (δ₀ z / 2) := ht (mem_univ x)
+    obtain ⟨c, hc, hcx⟩ := Set.mem_iUnion₂.mp hx
+    have h1 : t.inf' hne (fun x => δ₀ x / 2) ≤ δ₀ c / 2 := by
+      by_contra hcon
+      have hlow := (Finset.lt_inf'_iff hne).mp (not_le.mp hcon) c hc
+      linarith
+    have hdcx : dist x c < δ₀ c / 2 := mem_ball.mp hcx
+    have hdcy : dist y c < δ₀ c := by
+      have htri := dist_triangle y x c
+      have hsym : dist y x = dist x y := dist_comm y x
+      linarith
+    have e1 := hball c x (by linarith [hdcx, hδ₀ c]) i
+    have e2 := hball c y hdcy i
+    calc dist (F i x) (F i y) ≤ dist (F i x) (F i c) + dist (F i c) (F i y) :=
+        dist_triangle _ _ _
+      _ < ε := by rw [dist_comm (F i x) (F i c)]; linarith
+
+/-- **Generic compactness lemma (uniform convergence)**: on a compact metric
+space, uniform equicontinuity (e.g. from the previous lemma) plus pointwise
+convergence on a dense sequence plus continuity of the limit implies uniform
+convergence -- the classical ε/3 + total-boundedness + finite-max argument. -/
+theorem tendstoUniformly_of_tendstoOn_dense {X : Type*} [MetricSpace X] [CompactSpace X]
+    {α : Type*} [PseudoMetricSpace α]
+    (F : ℕ → X → α) (g : X → α) (D : ℕ → X)
+    (hD : DenseRange D)
+    (hFD : ∀ j, Tendsto (fun k => F k (D j)) atTop (𝓝 (g (D j))))
+    (hg : Continuous g)
+    (huni : ∀ ε > 0, ∃ δ > 0, ∀ x y : X, dist x y < δ → ∀ k, dist (F k x) (F k y) < ε) :
+    TendstoUniformly F g atTop := by
+  rw [Metric.tendstoUniformly_iff]
+  intro ε hε
+  have h3 : 0 < ε / 3 := by linarith
+  obtain ⟨δ, hδ, hδball⟩ := huni (ε / 3) h3
+  obtain ⟨δg, hδg, hδgball⟩ := Metric.uniformContinuous_iff.mp
+    (CompactSpace.uniformContinuous_of_continuous hg) (ε / 3) h3
+  have hρpos : 0 < min (δ / 2) (δg / 2) := lt_min (by linarith) (by linarith)
+  have hTB : TotallyBounded (univ : Set X) := isCompact_univ.totallyBounded
+  obtain ⟨t, htf, hcover⟩ := (Metric.totallyBounded_iff.mp hTB)
+    (min (δ / 2) (δg / 2)) hρpos
+  have hdens : ∀ y : X, ∃ j, y ∈ t → dist (D j) y < min (δ / 2) (δg / 2) := by
+    intro y
+    by_cases hy : y ∈ t
+    · have hballne : (ball y (min (δ / 2) (δg / 2)) ∩ range D).Nonempty :=
+        (dense_iff_inter_open.mp hD) _ isOpen_ball ⟨y, mem_ball_self hρpos⟩
+      obtain ⟨d, hd, ⟨j, rfl⟩⟩ := hballne
+      exact ⟨j, fun _ => mem_ball.mp hd⟩
+    · exact ⟨0, fun h => absurd h hy⟩
+  choose j hj using hdens
+  have hN : ∀ y : X, ∃ N, y ∈ t → ∀ k ≥ N, dist (F k (D (j y))) (g (D (j y))) < ε / 3 := by
+    intro y
+    by_cases hy : y ∈ t
+    · simpa [hy, dist_comm] using Metric.tendsto_atTop.mp (hFD (j y)) (ε / 3) h3
+    · exact ⟨0, fun h => absurd h hy⟩
+  choose N hN using hN
+  set N₀ : ℕ := (htf.toFinset.image N).sup id with hN₀
+  have hev : ∀ᶠ k in atTop, ∀ x, dist (g x) (F k x) < ε := by
+    refine Filter.eventually_atTop.mpr ⟨N₀, fun k hkN x => ?_⟩
+    obtain ⟨y, hy, hyx⟩ := Set.mem_iUnion₂.mp (hcover (mem_univ x))
+    have hxy : dist x y < min (δ / 2) (δg / 2) := mem_ball.mp hyx
+    have hmin1 : min (δ / 2) (δg / 2) ≤ δ / 2 := min_le_left _ _
+    have hmin2 : min (δ / 2) (δg / 2) ≤ δg / 2 := min_le_right _ _
+    have hxyN : dist x y < δ := by linarith
+    have hxyg : dist x y < δg := by linarith
+    have hyk : N y ≤ k :=
+      Nat.le_trans (Finset.le_sup (f := id)
+        (Finset.mem_image.mpr ⟨y, htf.mem_toFinset.mpr hy, rfl⟩)) hkN
+    have hdmid : dist (D (j y)) y < min (δ / 2) (δg / 2) := hj y hy
+    have hxdg : dist x (D (j y)) < δg := by
+      have htri := dist_triangle x y (D (j y))
+      rw [dist_comm y (D (j y))] at htri
+      have hdhalf : δg / 2 < δg := by linarith
+      linarith
+    have hxdF : dist (D (j y)) x < δ := by
+      have htri := dist_triangle (D (j y)) y x
+      rw [dist_comm y x] at htri
+      have hdhalf : δ / 2 < δ := by linarith
+      linarith
+    have hga : dist (g x) (g (D (j y))) < ε / 3 := hδgball hxdg
+    have hmid : dist (g (D (j y))) (F k (D (j y))) < ε / 3 := by
+      rw [dist_comm (g (D (j y))) (F k (D (j y)))]
+      exact hN y hy k hyk
+    have hFc : dist (F k (D (j y))) (F k x) < ε / 3 := hδball (D (j y)) x hxdF k
+    have htri1 : dist (g x) (F k x) ≤ dist (g x) (g (D (j y))) +
+        dist (g (D (j y))) (F k x) := dist_triangle (g x) (g (D (j y))) (F k x)
+    have htri2 : dist (g (D (j y))) (F k x) ≤ dist (g (D (j y))) (F k (D (j y))) +
+        dist (F k (D (j y))) (F k x) := dist_triangle (g (D (j y))) (F k (D (j y))) (F k x)
+    linarith
+  exact hev
+
 /-- **Tychonoff half of the Montel reduction** (unconditional): the pointwise
 closure of the unit-ball transfer image is compact in the product topology --
 it lives in the product of `closedBall 0 (1/(n+1)^2)` by
