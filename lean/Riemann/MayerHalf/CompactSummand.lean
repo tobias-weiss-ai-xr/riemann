@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Riemann.MayerHalf.Algebra
 import Mathlib.Topology.UniformSpace.Ascoli
+import Mathlib.Topology.ContinuousMap.Bounded.ArzelaAscoli
 import Mathlib.Analysis.Normed.Operator.Compact.Basic
 import Mathlib.Topology.ContinuousMap.Compact
 import Mathlib.Analysis.Complex.CauchyIntegral
@@ -21,24 +22,24 @@ is a **compact operator** on the half-disc algebra:
 
 * bounded: `norm_transferSummandCLM_le` — `‖T_n f‖ ≤ ‖f‖/(n+1)²`
   (`branch_norm_le` — the algebraically transparent part), and
-* compact: `isCompactOperator_transferSummandCLM` — **not yet proven**; the
-  remaining gap in the RH program.  What IS proven here: the image of the
-  unit ball is *equicontinuous* (`equicontinuous_transferSummand`, via the
-  interior-branch MVT route with `norm_deriv_toHalfHol_le` +
-  `branch_image_ball_subset_interior`) and *pointwise bounded* by
-  `norm_transferSummandCLM_le` — both Arzelà–Ascoli hypotheses except the
-  pointwise-compactness one.  Closing it needs the *normal-families* fact
-  that a pointwise cluster limit of uniformly bounded holomorphic maps is
-  holomorphic (Montel / Vitali–Porter); mathlib has neither, so the final
-  Ascoli closure is deferred to phase 3.  Until then T5 states the tail
-  compactness conditionally on `∀ n > 0, IsCompactOperator (summandOp n)`
-  (`isCompactOperator_mayerTail`, `MayerHalf.TailCompact`), which is exactly
-  the shape the classical proof has.
+* compact: `isCompactOperator_transferSummandCLM` — **unconditional**
+  (RH-43): the image of the unit ball is *equicontinuous*
+  (`equicontinuous_transferSummand`, via the interior-branch MVT route with
+  `norm_deriv_toHalfHol_le` + `branch_image_ball_subset_interior`) and
+  takes values in the compact ball `closedBall 0 (1/(n+1)²)`
+  (`norm_transferSummandCLM_le`); Arzelà–Ascoli
+  (`BoundedContinuousFunction.arzela_ascoli`) then makes the closure of the
+  transported image compact, which is exactly what mathlib's
+  `IsCompactOperator` definition requires.  No normal-families
+  (Montel / Vitali–Porter) input is needed: the earlier phase-3 plan asked
+  for the unit-ball image itself to be compact — a statement that is false
+  as stated (pointwise limits can leave the image) and was never necessary.
 
-The compactness of each `n ≥ 1` summand is the key input for the compactness
-of the Mayer tail `Σ_{n ≥ N}` (T5), as the tail is the operator-norm limit of
-finite partial sums of compact summands (`isCompactOperator_of_tendsto_nat`,
-`MayerHalf.CompactLimit`).
+T5 then assembles the compactness of the Mayer tail `Σ_{n ≥ 1}` as the
+operator-norm limit of finite partial sums of compact summands
+(`isCompactOperator_of_tendsto_nat`, `MayerHalf.CompactLimit`);
+unconditionally via `isCompactOperator_mayerTail_unconditional`
+(`MayerHalf.TailCompact`).
 -/
 
 open Metric Set Filter Complex Topology
@@ -343,6 +344,74 @@ theorem equicontinuous_transferSummand (n : ℕ) (hn : 0 < n) :
   intro f
   exact (hxf f).trans_lt hx₁
 end
+
+/-! ### Unconditional compactness of a summand (Arzelà–Ascoli closure route) -/
+
+/-- **The `n ≥ 1` Mayer summand is a compact operator — unconditionally**
+(RH-43).  Mathlib's `IsCompactOperator` asks for a compact set *containing*
+the image of a neighbourhood of zero, not for a closed image: an
+equicontinuous family whose values lie in a compact set has *relatively
+compact* image by Arzelà–Ascoli (`BoundedContinuousFunction.arzela_ascoli`),
+and relative compactness suffices.  The image of the unit ball under
+`transferSummandCLM n` is equicontinuous (`equicontinuous_transferSummand`)
+and takes values in the compact ball `closedBall 0 (1/(n+1)²)`
+(`norm_transferSummandCLM_le`), so the closure of the transported image is
+compact in `↥halfDisc →ᵇ ℂ`; transporting back through the isometry
+`isometryEquivBoundedOfCompact` exhibits a compact superset of the image of
+the unit ball, which is exactly what `IsCompactOperator` requires.
+
+This discharges the phase-3 Vitali–Porter / Montel frontier in full: the
+hypotheses `hrc`/`hclosed` of `..._of_pointwiseRelCompact` /
+`..._of_piClosed` below were artefacts of asking for compactness of the
+*image* instead of its *closure* — a normal-families statement that is in
+fact false as stated (the pointwise closure contains limits of unit-ball
+elements that need not admit a preimage in the unit ball).  No
+holomorphy-of-limits input is needed for compactness of the operator. -/
+theorem isCompactOperator_transferSummandCLM (n : ℕ) (hn : 0 < n) :
+    IsCompactOperator (transferSummandCLM n) := by
+  set e : C(↥halfDisc, ℂ) ≃ᵢ BoundedContinuousFunction ↥halfDisc ℂ :=
+    ContinuousMap.isometryEquivBoundedOfCompact ↥halfDisc ℂ with he
+  set A : Set (BoundedContinuousFunction ↥halfDisc ℂ) :=
+    e '' ((fun f : {g : halfDiscAlgebra // ‖g‖ ≤ 1} => transferSummandCLM n f.1) '' univ)
+    with hA
+  -- every value of every member of `A` lies in the compact ball of radius `1/(n+1)²`
+  have hin : ∀ (g : BoundedContinuousFunction ↥halfDisc ℂ) (z : ↥halfDisc),
+      g ∈ A → g z ∈ Metric.closedBall (0 : ℂ) (1 / ((n : ℝ) + 1) ^ 2) := by
+    intro g z hg
+    rw [mem_closedBall_zero_iff]
+    obtain ⟨w, hw, rfl⟩ := hg
+    obtain ⟨p, -, rfl⟩ := hw
+    rw [ContinuousMap.isometryEquivBoundedOfCompact_apply]
+    have h2 : ‖(p.1 : C(↥halfDisc, ℂ))‖ ≤ 1 := p.2
+    have h3 : ‖transferSummandCLM n p.1‖ ≤ 1 / ((n : ℝ) + 1) ^ 2 :=
+      (norm_transferSummandCLM_le n p.1).trans
+        (div_le_div_of_nonneg_right h2 (by positivity))
+    exact (ContinuousMap.norm_coe_le_norm _ z).trans h3
+  -- the transported family is equicontinuous (transfer of `equicontinuous_transferSummand`)
+  have hequi : Equicontinuous ((↑) : A → ↥halfDisc → ℂ) := by
+    intro z₀
+    rw [Metric.equicontinuousAt_iff_right]
+    intro ε hε
+    have hδ := Metric.equicontinuousAt_iff_right.mp
+      (equicontinuous_transferSummand n hn z₀) ε hε
+    filter_upwards [hδ] with y hy i
+    obtain ⟨g, hg⟩ := i
+    show dist (g z₀) (g y) < ε
+    obtain ⟨w, hw, rfl⟩ := hg
+    obtain ⟨p, -, rfl⟩ := hw
+    exact hy p
+  -- Arzelà–Ascoli: the closure of `A` is compact in `↥halfDisc →ᵇ ℂ`
+  have hcomp := BoundedContinuousFunction.arzela_ascoli
+    (Metric.closedBall (0 : ℂ) (1 / ((n : ℝ) + 1) ^ 2))
+    (isCompact_closedBall (0 : ℂ) (1 / ((n : ℝ) + 1) ^ 2)) A hin hequi
+  -- transport back: the image under `e.symm` is a compact superset of the image of the ball
+  refine ⟨⇑e.symm '' closure A, hcomp.image e.symm.isometry_toFun.continuous, ?_⟩
+  refine Filter.mem_of_superset (Metric.ball_mem_nhds 0 one_pos) ?_
+  intro f hf
+  have hf1 : ‖f‖ ≤ 1 := le_of_lt (mem_ball_zero_iff.mp hf)
+  have hmem : e (transferSummandCLM n f) ∈ A :=
+    ⟨transferSummandCLM n f, ⟨⟨f, hf1⟩, mem_univ _, rfl⟩, rfl⟩
+  exact ⟨e (transferSummandCLM n f), subset_closure hmem, e.symm_apply_apply _⟩
 
 /-! ### The compactness of a summand, modulo the normal-families input -/
 

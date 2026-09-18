@@ -16,6 +16,10 @@ RH-42, T5: assembly of the compactness pipeline.
 * `isCompactOperator_mayerTail` : if every summand `n ≥ 1` is a compact operator
   (each `n ≥ 1` branch maps into the interior — Ascoli, T3), then `mayerTail`
   is compact, via `isCompactOperator_of_tendsto_nat` (T4).
+* `isCompactOperator_mayerTail_unconditional` : the same conclusion, with no
+  hypothesis — the per-summand compactness is now unconditional
+  (`isCompactOperator_transferSummandCLM`, Arzelà–Ascoli closure route), so
+  the Vitali–Porter / Montel phase-3 frontier is fully discharged.
 
 The `n = 0` branch is *not* compact (its branch does not land in the interior),
 so `mayerTail` — not `mayerOperatorCLM` — is the honest compact object of
@@ -329,6 +333,40 @@ theorem isCompactOperator_mayerTail_of_piClosed
     isCompactOperator_summandOp_of_pointwiseRelCompact n hn
       (IsCompact.of_isClosed_subset (isCompact_piClosure_transferImage n) (hclosed n hn)
         subset_closure)
+
+/-! ### The unconditional tail (RH-43) -/
+
+/-- **Unconditional T3→T5 transfer** (RH-43): each summand operator
+`summandOp n` (`n ≥ 1`) is compact.  The coe
+`halfDiscAlgebra → C(↥halfDisc, ℂ)` is an isometry (`rfl` — the subalgebra
+norm is the ambient coe norm), hence a closed embedding, and preimages of
+compact sets under closed embeddings are compact.  Pointwise,
+`↑(summandOp n f) = transferSummandCLM n f` holds by `rfl`. -/
+theorem isCompactOperator_summandOp (n : ℕ) (hn : 0 < n) :
+    IsCompactOperator (summandOp n) := by
+  obtain ⟨K, hK, hKf⟩ := isCompactOperator_transferSummandCLM n hn
+  have hcemb : IsClosedEmbedding
+      (Subtype.val : {x : C(↥halfDisc, ℂ) // x ∈ halfDiscAlgebra} → C(↥halfDisc, ℂ)) :=
+    Isometry.isClosedEmbedding fun _a _b => rfl
+  refine ⟨Subtype.val ⁻¹' K, IsClosedEmbedding.isCompact_preimage hcemb hK, ?_⟩
+  have hpre : (summandOp n) ⁻¹' (Subtype.val ⁻¹' K)
+      = (transferSummandCLM n) ⁻¹' K := by
+    ext f
+    exact Iff.rfl
+  rw [hpre]
+  exact hKf
+
+/-- **The Mayer tail is compact — unconditionally** (RH-43): every `n ≥ 1`
+summand is compact (`isCompactOperator_transferSummandCLM`, via Arzelà–Ascoli
+with the `IsCompactOperator` *closure* reading), so the tail — the
+operator-norm limit of its finite partial sums of compact summands — is
+compact (`isCompactOperator_of_tendsto_nat`, T4).  No normal-families
+hypothesis remains anywhere in the chain: the former phase-3 Vitali–Porter /
+Montel frontier was an artefact of requiring the unit-ball image to be
+closed rather than merely relatively compact. -/
+theorem isCompactOperator_mayerTail_unconditional :
+    IsCompactOperator mayerTail :=
+  isCompactOperator_mayerTail fun n hn => isCompactOperator_summandOp n hn
 
 end
 

@@ -531,13 +531,25 @@ makes it worse; `Metric.tendsto_atTop` in this pin has α = metric side,
 hfun k`); `abel` replaces sub-cancellation lemma roulette; `open Topology`
 is mandatory for `𝓝`; write `NNReal` not `ℝ≥0`.
 
-Next (phase 3): (a) Vitali–Porter normal families — discharge the single
-`hclosed` hypothesis of `isCompactOperator_mayerTail_of_piClosed` (the
-pointwise transfer image is closed, per summand `n ≥ 1`; all topology is
-already unconditional) and make `IsCompactOperator mayerTail` unconditional;
-(b) Fredholm determinant
-of the half-plane transfer operator toward the §3b upgrade path.
-(`mayerOperator_eq` is already landed, T5.)  Elaboration traps found while
+Next (phase 3): ~~(a) Vitali–Porter normal families~~ — **DISCHARGED
+(RH-43), and the hypothesis was never provable.** The decisive observation:
+mathlib's `IsCompactOperator` is defined as `∃ K, IsCompact K ∧ f ⁻¹' K ∈
+𝓝 0` — a neighbourhood of zero must map INTO a compact set — NOT as "the
+unit-ball image is compact". The phase-2 plan asked for image-closedness
+(`hclosed`), which is FALSE (dilates f_r(z) = f(rz) of a bounded holomorphic
+f without continuous boundary extension produce pointwise limits of the
+unit-ball family that admit no unit-ball preimage), and was never needed:
+equicontinuity (`equicontinuous_transferSummand`) + values in the compact
+ball `closedBall 0 (1/(n+1)²)` (`norm_transferSummandCLM_le`) give RELATIVE
+compactness via `BoundedContinuousFunction.arzela_ascoli` (transport
+`isometryEquivBoundedOfCompact`), which is exactly what the definition
+requires.  Landed as `isCompactOperator_transferSummandCLM` (unconditional,
+per `n ≥ 1`) → `isCompactOperator_summandOp` →
+`isCompactOperator_mayerTail_unconditional`: **the Mayer tail is a compact
+operator, no hypothesis.**  The remaining frontier is (b): Fredholm
+determinant of the half-plane transfer operator toward the §3b upgrade
+path, and the honest treatment of the non-compact `n = 0` summand
+(`mayerOperatorCLM = summandOp 0 + mayerTail`, `mayerOperator_eq`, T5).  Elaboration traps found while
 landing the reduction: `Isometry.isClosedEmbedding fun _ _ => rfl` solves
 its implicit `f` as `fun _ => _` BEFORE the expected type propagates —
 ascribe `have hcemb : IsClosedEmbedding (Subtype.val : … → …) := …` first;
