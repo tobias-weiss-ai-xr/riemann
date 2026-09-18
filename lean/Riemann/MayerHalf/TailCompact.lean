@@ -313,6 +313,23 @@ theorem isCompactOperator_mayerTail_of_pointwiseRelCompact
   isCompactOperator_mayerTail fun n hn =>
     isCompactOperator_summandOp_of_pointwiseRelCompact n hn (hrc n hn)
 
+/-- **The honest shape of the phase-3 frontier**: if for every `n ≥ 1` the
+pointwise image of the unit-ball transfer family is CLOSED in the product
+topology of `↥halfDisc → ℂ` — the pure Vitali–Porter fact that pointwise
+limits of uniformly bounded holomorphic maps are holomorphic, with no
+topology left in the hypotheses — then the Mayer tail is a compact operator.
+This composes `isCompactOperator_transferSummandCLM_of_piClosed` (T3) with
+the `isCompactOperator_summandOp_of_pointwiseRelCompact` transfer and the T5
+assembly. -/
+theorem isCompactOperator_mayerTail_of_piClosed
+    (hclosed : ∀ n : ℕ, 0 < n → IsClosed (ContinuousMap.toFun ''
+      ((fun f : {g : halfDiscAlgebra // ‖g‖ ≤ 1} => transferSummandCLM n f.1) '' univ))) :
+    IsCompactOperator mayerTail :=
+  isCompactOperator_mayerTail fun n hn =>
+    isCompactOperator_summandOp_of_pointwiseRelCompact n hn
+      (IsCompact.of_isClosed_subset (isCompact_piClosure_transferImage n) (hclosed n hn)
+        subset_closure)
+
 end
 
 end Riemann

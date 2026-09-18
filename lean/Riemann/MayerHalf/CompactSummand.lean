@@ -380,5 +380,44 @@ theorem isCompactOperator_transferSummandCLM_of_pointwiseRelCompact (n : ℕ) (h
   intro f hf
   exact ⟨⟨f, le_of_lt (mem_ball_zero_iff.mp hf)⟩, mem_univ _, rfl⟩
 
+/-- **Tychonoff half of the Montel reduction** (unconditional): the pointwise
+closure of the unit-ball transfer image is compact in the product topology --
+it lives in the product of `closedBall 0 (1/(n+1)^2)` by
+`norm_transferSummandCLM_le`. -/
+theorem isCompact_piClosure_transferImage (n : ℕ) :
+    IsCompact (closure (ContinuousMap.toFun ''
+      ((fun f : {g : halfDiscAlgebra // ‖g‖ ≤ 1} => transferSummandCLM n f.1) '' univ))) := by
+  have hbnd : ContinuousMap.toFun ''
+      ((fun f : {g : halfDiscAlgebra // ‖g‖ ≤ 1} => transferSummandCLM n f.1) '' univ)
+      ⊆ univ.pi (fun _ : ↥halfDisc => closedBall (0 : ℂ) (1 / ((n : ℝ) + 1) ^ 2)) := by
+    rintro G ⟨g, hg, rfl⟩ z -
+    obtain ⟨f, -, rfl⟩ := hg
+    have h1 : ‖(transferSummandCLM n f.1) z‖ ≤ ‖transferSummandCLM n f.1‖ :=
+      ContinuousMap.norm_coe_le_norm _ z
+    have h2 := norm_transferSummandCLM_le n f.1
+    refine mem_closedBall.mpr ?_
+    rw [dist_zero_right]
+    exact le_trans h1 (le_trans h2 (by gcongr; exact f.property))
+  have hs : IsCompact (univ.pi fun _ : ↥halfDisc =>
+      closedBall (0 : ℂ) (1 / ((n : ℝ) + 1) ^ 2)) :=
+    isCompact_univ_pi fun _ => isCompact_closedBall 0 (1 / ((n : ℝ) + 1) ^ 2)
+  have hc : closure (ContinuousMap.toFun ''
+      ((fun f : {g : halfDiscAlgebra // ‖g‖ ≤ 1} => transferSummandCLM n f.1) '' univ)) ⊆
+      univ.pi (fun _ : ↥halfDisc => closedBall (0 : ℂ) (1 / ((n : ℝ) + 1) ^ 2)) :=
+    closure_minimal hbnd (isClosed_set_pi fun _ _ => isClosed_closedBall)
+  exact IsCompact.of_isClosed_subset hs isClosed_closure hc
+
+/-- **The final frontier packaging**: pi-closedness of the transfer image --
+the pure Vitali-Porter statement, *no topology left in the hypothesis* --
+gives the compact operator.  `hclosed` says: every pointwise limit of maps
+`f ↦ (gaussBranch n)² · (f ∘ gaussBranch n)` with `‖f‖ ≤ 1` is a continuous
+function.  Proving it (for all `n ≥ 1`) is the phase-3 research milestone. -/
+theorem isCompactOperator_transferSummandCLM_of_piClosed (n : ℕ) (hn : 0 < n)
+    (hclosed : IsClosed (ContinuousMap.toFun ''
+      ((fun f : {g : halfDiscAlgebra // ‖g‖ ≤ 1} => transferSummandCLM n f.1) '' univ))) :
+    IsCompactOperator (transferSummandCLM n) :=
+  isCompactOperator_transferSummandCLM_of_pointwiseRelCompact n hn
+    (IsCompact.of_isClosed_subset (isCompact_piClosure_transferImage n) hclosed
+      subset_closure)
 
 end Riemann
