@@ -570,6 +570,47 @@ theorem tendstoUniformly_of_tendstoOn_dense {X : Type*} [MetricSpace X] [Compact
     linarith
   exact hev
 
+
+/-- Equicontinuity of the *unweighted* unit-ball family along the branch
+image — the analytic input for the Arzelà–Ascoli extraction of a uniformly
+convergent subsequence.  Same skeleton as `continuous_pointwiseLimit_branch`,
+without the limit. -/
+theorem equicontinuous_comp_branch (n : ℕ) (hn : 0 < n) :
+    Equicontinuous (fun (f : {g : halfDiscAlgebra // ‖g‖ ≤ 1}) (z : ↥halfDisc) =>
+      (f.1 : C(↥halfDisc, ℂ)) ⟨gaussBranch n z.1, branchMapsTo_halfDisc n z.2⟩) := by
+  intro z₀
+  rw [Metric.equicontinuousAt_iff]
+  intro ε hε
+  have hCpos : 0 < 2 / (r₀ n / 2) := div_pos (by norm_num) (half_pos (r₀_pos n))
+  have hρpos : 0 < min (r₀ n / 2) (ε / (2 / (r₀ n / 2))) :=
+    lt_min (half_pos (r₀_pos n)) (div_pos hε hCpos)
+  have hφcont : ContinuousAt (fun z : ↥halfDisc => (gaussBranch n z.1 : ℂ)) z₀ :=
+    (continuous_branch_val n).continuousAt
+  obtain ⟨δ, hδpos, hδ⟩ := Metric.continuousAt_iff.mp hφcont _ hρpos
+  refine ⟨δ, hδpos, fun z hz => ?_⟩
+  have hφlt : dist (gaussBranch n z.1) (gaussBranch n z₀.1)
+      < min (r₀ n / 2) (ε / (2 / (r₀ n / 2))) := hδ hz
+  intro f
+  have hl := holFamily_lipschitz n hn (f.1 : C(↥halfDisc, ℂ)) f.1.property 1 f.2 z z₀
+    (lt_of_lt_of_le hφlt (min_le_left _ _))
+  rw [dist_eq_norm]
+  calc ‖(f.1 : C(↥halfDisc, ℂ)) ⟨gaussBranch n z₀.1, branchMapsTo_halfDisc n z₀.2⟩ -
+      (f.1 : C(↥halfDisc, ℂ)) ⟨gaussBranch n z.1, branchMapsTo_halfDisc n z.2⟩‖
+      ≤ (2 / (r₀ n / 2)) * dist (gaussBranch n z.1) (gaussBranch n z₀.1) := by
+        rw [dist_eq_norm, norm_sub_rev]
+        norm_num at hl ⊢
+        exact hl
+    _ < (2 / (r₀ n / 2)) * min (r₀ n / 2) (ε / (2 / (r₀ n / 2))) :=
+        (mul_lt_mul_of_pos_left (a := (2 / (r₀ n / 2))) hφlt hCpos)
+    _ ≤ ε := by
+        have h4 : (2:ℝ) / (r₀ n / 2) * (ε / (2 / (r₀ n / 2))) = ε := by
+          field_simp
+          exact mul_inv_cancel₀ (ne_of_gt (r₀_pos n))
+        calc (2 / (r₀ n / 2)) * min (r₀ n / 2) (ε / (2 / (r₀ n / 2)))
+            ≤ (2 / (r₀ n / 2)) * (ε / (2 / (r₀ n / 2))) :=
+              mul_le_mul_of_nonneg_left (min_le_right _ _) hCpos.le
+          _ = ε := h4
+
 /-- **Tychonoff half of the Montel reduction** (unconditional): the pointwise
 closure of the unit-ball transfer image is compact in the product topology --
 it lives in the product of `closedBall 0 (1/(n+1)^2)` by
