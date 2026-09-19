@@ -216,6 +216,18 @@ and this document says so instead of claiming a completed proof.
   weighted composition operator), so the Fredholm alternative does not apply
   to `1 − (1−B)⁻¹·A`; the reduction is a clean algebraic identity, not a
   spectral reduction to a compact operator.
+- **M-A⁺⁺ — DONE (`6ce49fa`).** **Fredholm compact perturbation (RH-45):**
+  `fredholm_compact_perturbation : ∃ K, IsCompactOperator K ∧
+  mayerTailUnit⁻¹ · summandOp 0 = summandOp 0 + K`. The witness is
+  `K = mayerTail · (mayerTailUnit⁻¹ · summandOp 0)`, compact because
+  `mayerTail` is compact (`isCompactOperator_mayerTail_unconditional`) and
+  composition with a bounded operator preserves compactness
+  (`IsCompactOperator.comp_clm`). The pointwise geometric identity
+  `B⁻¹ y = y + B(B⁻¹ y)` (from `Units.mul_inv`) lifts to the CLM level via
+  `ContinuousLinearMap.ext`. Combined with RH-44, the invertibility of `1 − L`
+  reduces to that of `1 − summandOp 0 − K` with `K` compact: the spectral
+  question is now pinned on the `n = 0` head (Gauss-map weighted composition)
+  up to a **compact** perturbation, which is the honest Fredholm setting.
 - **M-B — blocked.** Trace-class Fredholm determinant `det(1 − L_s)`: mathlib
   has no nuclear / trace-class machinery; a formalization project of its own,
   not near-term.
