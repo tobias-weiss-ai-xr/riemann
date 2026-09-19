@@ -194,6 +194,25 @@ Krein–Rutman / `ρ(L_s) < 1` down to Re s > 1/4; (4) invoke §3a. Steps 2–4 
 each exactly as hard as the corresponding half of RH — there is no free lunch,
 and this document says so instead of claiming a completed proof.
 
+**Milestone status of the half-disc Mayer pipeline (RH-42/43,
+`lean/Riemann/MayerHalf/`):**
+
+- **M-A — DONE (`f4ca54c`).** `1 − mayerTail` is invertible
+  (`isUnit_one_sub_mayerTail`, Neumann series via `‖mayerTail‖ ≤ 3/4`,
+  telescoping bound `∑' i, 1/(i+2)² ≤ 1/4 + 1/2`). Together with the
+  unconditional compactness of the tail this pins the entire spectral
+  question on the `n = 0` head: `1 ∈ spectrum L ⟺ 1 ∈ spectrum summandOp 0`
+  up to the finite-rank analysis of `summandOp 0`.
+- **M-B — blocked.** Trace-class Fredholm determinant `det(1 − L_s)`: mathlib
+  has no nuclear / trace-class machinery; a formalization project of its own,
+  not near-term.
+- **M-C — scoped.** s-parameterized operators `L_s` with weights
+  `(φ_n)^{2s}` (complex powers via the principal log; `Re φ_n(z) > 0` on the
+  half-disc makes the branch canonical). Needed for any statement about
+  zeros below Re s = 1/2; Bonanno-style eigenvalue analysis for Re s > 1/2
+  is the honest target. Note `‖L₁‖ ≤ π²/6 > 1`, so the M-A norm trick does
+  **not** extend to the full operator at s = 1.
+
 ---
 
 ### 3c. Krein–Rutman on C(X, ℝ) — existence is the honest frontier
