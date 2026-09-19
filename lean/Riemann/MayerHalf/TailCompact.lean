@@ -3,6 +3,8 @@ import Riemann.MayerHalf.CompactLimit
 import Riemann.MayerHalf.CompactSummand
 import Mathlib.Topology.Instances.NNReal.Lemmas
 import Mathlib.Topology.UniformSpace.Ascoli
+import Mathlib.Topology.Algebra.InfiniteSum.ENNReal
+import Mathlib.Analysis.SpecificLimits.Normed
 
 /-!
 # The compact tail of the Mayer transfer operator
@@ -20,6 +22,13 @@ RH-42, T5: assembly of the compactness pipeline.
   hypothesis — the per-summand compactness is now unconditional
   (`isCompactOperator_transferSummandCLM`, Arzelà–Ascoli closure route), so
   the Vitali–Porter / Montel phase-3 frontier is fully discharged.
+* `norm_mayerTail_le` / `norm_mayerTail_op_le` : `‖mayerTail‖ ≤ 3/4`, by the
+  elementary telescoping bound `∑' i, 1/(i+2)² ≤ 1/4 + 1/2 = 3/4`
+  (`tsum_shifted_weights_le`, via `hasSum_tele_shift`).
+* `isUnit_one_sub_mayerTail` (RH-43, M-A) : `1 − mayerTail` is invertible —
+  Neumann series. Equivalently `1` is a resolvent point and not an eigenvalue
+  of the compact operator `mayerTail`; the RH content of `mayerOperatorCLM`
+  lives entirely in the `n = 0` head (`mayerOperator_eq`).
 
 The `n = 0` branch is *not* compact (its branch does not land in the interior),
 so `mayerTail` — not `mayerOperatorCLM` — is the honest compact object of
@@ -367,6 +376,151 @@ closed rather than merely relatively compact. -/
 theorem isCompactOperator_mayerTail_unconditional :
     IsCompactOperator mayerTail :=
   isCompactOperator_mayerTail fun n hn => isCompactOperator_summandOp n hn
+
+/-! ### `1` is a resolvent point of the tail
+
+The tail is a strict contraction: `‖mayerTail f‖ ≤ (3/4) ‖f‖` (the shifted
+weight series `∑' i, 1/(i+2)²` telescopes to at most `3/4`), so the Neumann
+series makes `1 − mayerTail` invertible.  Combined with unconditional
+compactness this is the Fredholm-alternative shape: `1` is neither an
+eigenvalue nor a spectral point of `mayerTail`.  The RH content sits entirely
+in the `n = 0` head (`mayerOperatorCLM = summandOp 0 + mayerTail`). -/
+
+/-- The shifted reciprocal `1 / ((N : ℝ) + 2)` tends to `0`. -/
+theorem tendsto_one_div_add_two :
+    Tendsto (fun N : ℕ => (1 : ℝ) / ((N : ℝ) + 2)) atTop (𝓝 0) := by
+  have h1 : Tendsto (fun N : ℕ => ((N : ℝ) + 2 : ℝ)) atTop atTop :=
+    tendsto_natCast_atTop_atTop.atTop_add tendsto_const_nhds
+  exact (tendsto_inv_atTop_zero.comp h1).congr (fun N => (one_div ((N : ℝ) + 2)).symm)
+
+/-- Telescoping: `1/2 − 1/3 + 1/3 − 1/4 + …` has sum `1/2`. -/
+theorem hasSum_tele_shift :
+    HasSum (fun n : ℕ => (1 : ℝ) / ((n : ℝ) + 2) - 1 / ((n : ℝ) + 3)) (1 / 2) := by
+  refine (hasSum_iff_tendsto_nat_of_nonneg
+    (fun n => sub_nonneg.mpr
+      (one_div_le_one_div_of_le (by positivity) (by linarith))) _).mpr ?_
+  have hpartial : ∀ N : ℕ, ∑ i ∈ range N,
+      (1 / (((i : ℕ) : ℝ) + 2) - 1 / (((i : ℕ) : ℝ) + 3))
+      = 1 / 2 - 1 / (((N : ℕ) : ℝ) + 2) := by
+    intro N
+    induction N with
+    | zero => simp only [Finset.sum_range_zero]; norm_num
+    | succ N ih =>
+        rw [sum_range_succ, ih]
+        push_cast
+        ring
+  have hlim : Tendsto (fun N : ℕ => 1 / 2 - 1 / ((N : ℝ) + 2)) atTop (𝓝 (1 / 2)) := by
+    have h := (tendsto_const_nhds (x := 1 / 2)).sub tendsto_one_div_add_two
+    simpa only [sub_zero] using h
+  exact hlim.congr (fun N => (hpartial N).symm)
+
+/-- The shifted weights are summable. -/
+theorem summable_shifted_weights :
+    Summable fun i : ℕ => (1 : ℝ) / ((i : ℝ) + 2) ^ 2 :=
+  Summable.of_nonneg_of_le (fun i => by positivity)
+    (fun i =>
+      one_div_le_one_div_of_le (by positivity)
+        (sq_le_sq' (by linarith) (by linarith)))
+    summable_mayerWeights
+
+/-- The shifted weights telescope: `∑' i, 1/(i+2)² ≤ 3/4`. -/
+theorem tsum_shifted_weights_le : ∑' i : ℕ, (1 : ℝ) / ((i : ℝ) + 2) ^ 2 ≤ 3 / 4 := by
+  have hf2 := summable_shifted_weights
+  have hg : Summable fun i : ℕ => (1 : ℝ) / ((i : ℝ) + 2) - 1 / ((i : ℝ) + 3) :=
+    hasSum_tele_shift.summable
+  have hle3 : ∀ i : ℕ, (1 : ℝ) / ((i : ℝ) + 3) ^ 2
+      ≤ (1 : ℝ) / ((i : ℝ) + 2) - 1 / ((i : ℝ) + 3) := by
+    intro i
+    have hi : (0 : ℝ) ≤ (i : ℝ) := Nat.cast_nonneg i
+    have h : (1 : ℝ) / ((i : ℝ) + 2) - 1 / ((i : ℝ) + 3)
+        = 1 / (((i : ℝ) + 2) * ((i : ℝ) + 3)) := by
+      field_simp
+      ring
+    rw [h]
+    exact one_div_le_one_div_of_le (by positivity) (by ring_nf; nlinarith [hi])
+  have hf3 : Summable fun i : ℕ => (1 : ℝ) / ((i : ℝ) + 3) ^ 2 :=
+    Summable.of_nonneg_of_le (fun i => by positivity) hle3 hg
+  have hf3' : Summable fun n : ℕ => (1 : ℝ) / (((n + 1 : ℕ) : ℝ) + 2) ^ 2 := by
+    have heq : (fun n : ℕ => (1 : ℝ) / (((n + 1 : ℕ) : ℝ) + 2) ^ 2)
+        = fun i : ℕ => (1 : ℝ) / ((i : ℝ) + 3) ^ 2 := by
+      funext n
+      push_cast
+      ring
+    rw [heq]
+    exact hf3
+  have hsplit : ∑ i ∈ range 1, (1 : ℝ) / ((i : ℝ) + 2) ^ 2
+      + ∑' (i : ℕ), (1 : ℝ) / (((i + 1 : ℕ) : ℝ) + 2) ^ 2
+      = ∑' i : ℕ, (1 : ℝ) / ((i : ℝ) + 2) ^ 2 :=
+    Summable.sum_add_tsum_nat_add' hf3' (k := 1)
+  rw [← hsplit]
+  simp only [sum_range_one]
+  have hshift : (fun (i : ℕ) => (1 : ℝ) / (((i + 1 : ℕ) : ℝ) + 2) ^ 2)
+      = fun i : ℕ => (1 : ℝ) / ((i : ℝ) + 3) ^ 2 := by
+    funext i
+    push_cast
+    ring
+  rw [hshift]
+  have hmain : ∑' i : ℕ, (1 : ℝ) / ((i : ℝ) + 3) ^ 2 ≤ 1 / 2 := by
+    rw [← hasSum_tele_shift.tsum_eq]
+    exact Summable.tsum_le_tsum hle3 hf3 hg
+  have h04 : 1 / (((0 : ℕ) : ℝ) + 2) ^ 2 = 1 / 4 := by norm_num
+  show (1 : ℝ) / (((0 : ℕ) : ℝ) + 2) ^ 2
+      + ∑' (i : ℕ), (1 : ℝ) / ((i : ℝ) + 3) ^ 2 ≤ 3 / 4
+  rw [h04]
+  linarith
+
+/-- Pointwise norm bound: `‖mayerTail f‖ ≤ (3/4) ‖f‖`. -/
+theorem norm_mayerTail_le (f : halfDiscAlgebra) :
+    ‖mayerTail f‖ ≤ (3 / 4 : ℝ) * ‖f‖ := by
+  have hsumw : Summable fun i : ℕ =>
+      ‖(f : C(↥halfDisc, ℂ))‖ • ((1 : ℝ) / ((i : ℝ) + 2) ^ 2) :=
+    Summable.const_smul _ summable_shifted_weights
+  have hsum : Summable fun i : ℕ =>
+      ‖transferSummand (i + 1) (f : C(↥halfDisc, ℂ))‖ :=
+    Summable.of_nonneg_of_le (fun _ => norm_nonneg _)
+      (fun i => by
+        have h5 := norm_transferSummand_le (i + 1) f
+        rw [smul_eq_mul, mul_one_div]
+        rw [show ((i : ℝ) + 2) = (((i + 1 : ℕ) : ℝ) + 1) from by push_cast; ring]
+        exact h5) hsumw
+  have hle : ∑' i : ℕ, ‖transferSummand (i + 1) (f : C(↥halfDisc, ℂ))‖
+      ≤ (‖(f : C(↥halfDisc, ℂ))‖ : ℝ) * (3 / 4) := by
+    calc ∑' i : ℕ, ‖transferSummand (i + 1) (f : C(↥halfDisc, ℂ))‖
+        ≤ ∑' i : ℕ, ‖(f : C(↥halfDisc, ℂ))‖ • ((1 : ℝ) / ((i : ℝ) + 2) ^ 2) :=
+          Summable.tsum_le_tsum (fun i => by
+            have h5 := norm_transferSummand_le (i + 1) f
+            rw [smul_eq_mul, mul_one_div]
+            rw [show ((i : ℝ) + 2) = (((i + 1 : ℕ) : ℝ) + 1) from by push_cast; ring]
+            exact h5) hsum hsumw
+      _ = ((‖(f : C(↥halfDisc, ℂ))‖ : ℝ)) • ∑' i : ℕ, (1 : ℝ) / ((i : ℝ) + 2) ^ 2 :=
+          Summable.tsum_const_smul _ summable_shifted_weights
+      _ ≤ (‖(f : C(↥halfDisc, ℂ))‖ : ℝ) • ((3 : ℝ) / 4) :=
+          smul_le_smul_of_nonneg_left tsum_shifted_weights_le (norm_nonneg _)
+      _ = (‖(f : C(↥halfDisc, ℂ))‖ : ℝ) * (3 / 4) := by
+          rw [smul_eq_mul]
+  show ‖(mayerTail f : C(↥halfDisc, ℂ))‖
+      ≤ (3 / 4 : ℝ) * ‖(f : C(↥halfDisc, ℂ))‖
+  rw [mayerTail_apply f]
+  exact (le_trans (norm_tsum_le_tsum_norm hsum) hle).trans_eq (by ring)
+
+/-- Operator-norm bound: `‖mayerTail‖ ≤ 3/4`. -/
+theorem norm_mayerTail_op_le : ‖mayerTail‖ ≤ 3 / 4 :=
+  ContinuousLinearMap.opNorm_le_bound _ (by norm_num) norm_mayerTail_le
+
+/-- **`1 − mayerTail` is invertible (RH-43)**: the tail is a strict contraction
+(`‖mayerTail‖ ≤ 3/4 < 1`), so the Neumann series gives an inverse —
+equivalently `1` is a resolvent point of `mayerTail` (`1 ∉ spectrum ℂ
+mayerTail`), and `1` is not an eigenvalue of the compact operator `mayerTail`.
+The RH content sits entirely in the `n = 0` head
+(`mayerOperatorCLM = summandOp 0 + mayerTail`). -/
+theorem isUnit_one_sub_mayerTail :
+    IsUnit (1 - mayerTail : halfDiscAlgebra →L[ℂ] halfDiscAlgebra) := by
+  have hcomp : CompleteSpace (halfDiscAlgebra →L[ℂ] halfDiscAlgebra) :=
+    (SeparatingDual.completeSpace_continuousLinearMap_iff ℂ halfDiscAlgebra halfDiscAlgebra).mpr
+      inferInstance
+  have h' : @norm _ NormedRing.toNorm (mayerTail : halfDiscAlgebra →L[ℂ] halfDiscAlgebra) < 1 :=
+    lt_of_le_of_lt norm_mayerTail_op_le (by norm_num)
+  exact isUnit_one_sub_of_norm_lt_one h'
 
 end
 

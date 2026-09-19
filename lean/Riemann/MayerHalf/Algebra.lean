@@ -287,6 +287,15 @@ theorem mem_halfDiscAlgebra (f : C(↥halfDisc, ℂ)) :
     f ∈ halfDiscAlgebra ↔ DifferentiableOn ℂ (toHalfHol f) (interior halfDisc) :=
   ⟨fun h => h, fun h => h⟩
 
+/-- The half-disc algebra contains the two distinct constants `1 ≠ 0`. -/
+instance : Nontrivial ↥halfDiscAlgebra := by
+  refine ⟨⟨1, one_mem _⟩, ⟨0, zero_mem _⟩, fun h => ?_⟩
+  have h01 : (1 : C(↥halfDisc, ℂ)) = 0 := congrArg Subtype.val h
+  have hz : ((1 : C(↥halfDisc, ℂ)) (⟨(0 : ℂ), by simp [halfDisc]⟩ : halfDisc)) = 0 := by
+    rw [h01]
+    rfl
+  exact one_ne_zero hz
+
 /-- Uniform limits in `C(↥halfDisc)` restrict to uniformly convergent
 sequences of the holomorphic extensions, on the half-disc. -/
 theorem tendstoUniformlyOn_toHalfHol {u : ℕ → C(↥halfDisc, ℂ)}
