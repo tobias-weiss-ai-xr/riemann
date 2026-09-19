@@ -576,6 +576,42 @@ theorem fredholm_reduction :
   rw [hL, hfactor]
   exact IsUnit.mul_left_iff (Units.isUnit u)
 
+/-! ### Fredholm compact perturbation (RH-45) -/
+
+/-- Pointwise geometric identity: `mayerTailUnit⁻¹ y = y + mayerTail (mayerTailUnit⁻¹ y)`,
+from `(1 − mayerTail) · mayerTailUnit⁻¹ = 1` (`Units.mul_inv`). -/
+theorem mayerTailUnit_inv_apply (y : halfDiscAlgebra) :
+    mayerTailUnit.inv y = y + mayerTail (mayerTailUnit.inv y) := by
+  have h1 := DFunLike.congr_fun (Units.mul_inv mayerTailUnit) y
+  rw [mul_apply_eq_comp, one_apply_eq_self] at h1
+  have hv : mayerTailUnit.val = (1 - mayerTail : halfDiscAlgebra →L[ℂ] halfDiscAlgebra) := rfl
+  rw [hv, sub_apply, one_apply_eq_self] at h1
+  exact eq_add_of_sub_eq h1
+
+/-- **Geometric identity for the tail inverse** (CLM level):
+`mayerTailUnit⁻¹ · A = A + mayerTail · (mayerTailUnit⁻¹ · A)` for any CLM `A`. -/
+theorem mayerTailUnit_inv_mul_eq (A : halfDiscAlgebra →L[ℂ] halfDiscAlgebra) :
+    mayerTailUnit.inv * A = A + mayerTail * (mayerTailUnit.inv * A) := by
+  refine ContinuousLinearMap.ext ?_
+  intro x
+  simp only [mul_apply_eq_comp]
+  exact mayerTailUnit_inv_apply (A x)
+
+/-- **Fredholm compact perturbation (RH-45)**: the Fredholm-reduced operator
+`mayerTailUnit⁻¹ · summandOp 0` is the `n = 0` head `summandOp 0` plus a
+**compact** operator `K = mayerTail · (mayerTailUnit⁻¹ · summandOp 0)`, compact because
+`mayerTail` is compact (`isCompactOperator_mayerTail_unconditional`) and composition
+with a bounded operator preserves compactness (`IsCompactOperator.comp_clm`).
+Combined with `fredholm_reduction`, the invertibility of `1 − L` reduces to that
+of `1 − summandOp 0 − K` with `K` compact. -/
+theorem fredholm_compact_perturbation :
+    ∃ K : halfDiscAlgebra →L[ℂ] halfDiscAlgebra,
+      IsCompactOperator K ∧
+      mayerTailUnit.inv * summandOp 0 = summandOp 0 + K :=
+  ⟨mayerTail * (mayerTailUnit.inv * summandOp 0),
+    isCompactOperator_mayerTail_unconditional.comp_clm _,
+    mayerTailUnit_inv_mul_eq _⟩
+
 end
 
 end Riemann
