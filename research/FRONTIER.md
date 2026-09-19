@@ -203,6 +203,19 @@ and this document says so instead of claiming a completed proof.
   unconditional compactness of the tail this pins the entire spectral
   question on the `n = 0` head: `1 ∈ spectrum L ⟺ 1 ∈ spectrum summandOp 0`
   up to the finite-rank analysis of `summandOp 0`.
+- **M-A⁺ — DONE (`044e0f0`).** **Fredholm reduction (RH-44):**
+  `fredholm_reduction : IsUnit(1 − mayerOperatorCLM) ↔
+  IsUnit(1 − mayerTailUnit⁻¹ · summandOp 0)`. Factors
+  `1 − L = (1 − mayerTail) · (1 − (1−mayerTail)⁻¹ · summandOp 0)` and cancels
+  the unit `(1 − mayerTail)` via `IsUnit.mul_left_iff`, isolating the RH
+  content entirely in the `n = 0` head conjugated by the tail inverse.
+  `CLM_mul_sub_factor` proves the factoring identity `u·(1 − u⁻¹·A) = u − A`
+  pointwise via `ContinuousLinearMap.ext` (works around the
+  `ContinuousLinearMap.sub` / `NonUnitalNonAssocRing.toAddCommGroup.toSub`
+  instance diamond). Note: `summandOp 0` is **not** compact (the Gauss-map
+  weighted composition operator), so the Fredholm alternative does not apply
+  to `1 − (1−B)⁻¹·A`; the reduction is a clean algebraic identity, not a
+  spectral reduction to a compact operator.
 - **M-B — blocked.** Trace-class Fredholm determinant `det(1 − L_s)`: mathlib
   has no nuclear / trace-class machinery; a formalization project of its own,
   not near-term.
