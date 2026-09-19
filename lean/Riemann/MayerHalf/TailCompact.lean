@@ -522,6 +522,60 @@ theorem isUnit_one_sub_mayerTail :
     lt_of_le_of_lt norm_mayerTail_op_le (by norm_num)
   exact isUnit_one_sub_of_norm_lt_one h'
 
+/-! ### Fredholm reduction (RH-44) -/
+
+/-- **Factoring identity for CLM**: `u * (1 - u⁻¹ * A) = u - A` for any unit `u`.
+Works around the `ContinuousLinearMap.sub` / `NonUnitalNonAssocRing.toAddCommGroup.toSub`
+instance diamond by going pointwise via `ContinuousLinearMap.ext`. -/
+theorem CLM_mul_sub_factor
+    (u : (halfDiscAlgebra →L[ℂ] halfDiscAlgebra)ˣ)
+    (A : halfDiscAlgebra →L[ℂ] halfDiscAlgebra) :
+    (u.val : halfDiscAlgebra →L[ℂ] halfDiscAlgebra) * (1 - u.inv * A) =
+      u.val - A := by
+  refine ContinuousLinearMap.ext ?_
+  intro x
+  simp only [mul_apply_eq_comp, sub_apply, one_apply_eq_self, map_sub]
+  have heq : (u.val : halfDiscAlgebra →L[ℂ] halfDiscAlgebra) (u.inv (A x)) =
+      ((u.val : halfDiscAlgebra →L[ℂ] halfDiscAlgebra) * u.inv) (A x) :=
+    (mul_apply_eq_comp (u.val : halfDiscAlgebra →L[ℂ] halfDiscAlgebra) u.inv (A x)).symm
+  rw [heq]
+  rw [show ((u.val : halfDiscAlgebra →L[ℂ] halfDiscAlgebra) * u.inv) = 1
+      from Units.mul_inv u]
+  simp only [one_apply_eq_self]
+
+/-- The unit `1 − mayerTail` (M-A), packaged as a `Units` element. -/
+noncomputable def mayerTailUnit :
+    (halfDiscAlgebra →L[ℂ] halfDiscAlgebra)ˣ :=
+  Units.oneSub mayerTail (lt_of_le_of_lt norm_mayerTail_op_le (by norm_num))
+
+/-- **Fredholm reduction (RH-44)**: `1 − mayerOperatorCLM` is invertible iff
+`1 − mayerTailUnit⁻¹ · summandOp 0` is invertible.
+
+Since `mayerOperatorCLM = summandOp 0 + mayerTail`, we factor
+`1 − L = (1 − mayerTail) − summandOp 0 = u · (1 − u⁻¹ · summandOp 0)`
+where `u = mayerTailUnit` is a unit (M-A). The `IsUnit.mul_left_iff` reduction
+isolates the RH content in the `n = 0` head `summandOp 0` conjugated by the
+invertible tail inverse `(1−mayerTail)⁻¹`. -/
+theorem fredholm_reduction :
+    IsUnit (1 - mayerOperatorCLM : halfDiscAlgebra →L[ℂ] halfDiscAlgebra) ↔
+    IsUnit (1 - mayerTailUnit.inv * summandOp 0) := by
+  set u := mayerTailUnit with hu
+  -- 1 − L = (1 − mayerTail) − summandOp 0
+  have hL : 1 - mayerOperatorCLM = (1 - mayerTail : halfDiscAlgebra →L[ℂ] halfDiscAlgebra)
+      - summandOp 0 := by
+    rw [mayerOperator_eq, add_comm (summandOp 0) mayerTail]
+    exact sub_add_eq_sub_sub 1 mayerTail (summandOp 0)
+  -- (1 − mayerTail) = u.val
+  have hval : (u.val : halfDiscAlgebra →L[ℂ] halfDiscAlgebra) = 1 - mayerTail := rfl
+  -- (1 − mayerTail) − A = u.val * (1 − u.inv * A)   [factoring identity]
+  have hfactor : (1 - mayerTail : halfDiscAlgebra →L[ℂ] halfDiscAlgebra) - summandOp 0 =
+      u.val * (1 - u.inv * summandOp 0) := by
+    rw [← hval]
+    exact (CLM_mul_sub_factor u (summandOp 0)).symm
+  -- IsUnit(u.val * x) ↔ IsUnit(x)
+  rw [hL, hfactor]
+  exact IsUnit.mul_left_iff (Units.isUnit u)
+
 end
 
 end Riemann
