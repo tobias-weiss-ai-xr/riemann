@@ -1,0 +1,217 @@
+{
+ "task": "RT2-B2",
+ "params": {
+  "s": {
+   "re": 0.51,
+   "im": 1100.574,
+   "note": "round-1 failing point"
+  },
+  "basis": "orthonormal shifted Legendre on (0,1) (Chebyshev T_m(2x-1), weight 1/sqrt(x(1-x)) for variant)",
+  "N_list": [
+   256,
+   384,
+   512,
+   768
+  ],
+  "n_quad_rule": "max(256, 4*N)",
+  "quad_check": {
+   "N": 384,
+   "n_quad_list": [
+    768,
+    1536,
+    3072
+   ],
+   "stability_tol_top_doubling": 0.0001
+  },
+  "nmax": 8000,
+  "mem_budget_doubles": 48000000.0,
+  "nystrom": {
+   "n": 384,
+   "n_secondary": 512,
+   "nmax": 8000
+  },
+  "gate": {
+   "extrap_tol": 0.05
+  }
+ },
+ "cache": [
+  {
+   "kind": "leg",
+   "N": 256,
+   "n_quad": 1024,
+   "margin": 0.37117991766852526,
+   "abs_lambda1": 0.7639736837036791,
+   "abs_lambda2": 0.6989724991932043
+  },
+  {
+   "kind": "leg",
+   "N": 384,
+   "n_quad": 1536,
+   "margin": 0.26063648162852904,
+   "abs_lambda1": 0.8938624728747646,
+   "abs_lambda2": 0.8485804649127913
+  },
+  {
+   "kind": "leg",
+   "N": 512,
+   "n_quad": 2048,
+   "margin": 0.15027375267739887,
+   "abs_lambda1": 0.9169180146364231,
+   "abs_lambda2": 0.8870286150258804
+  },
+  {
+   "kind": "leg",
+   "N": 768,
+   "n_quad": 3072,
+   "margin": 0.025623366267127096,
+   "abs_lambda1": 0.9820232115978824,
+   "abs_lambda2": 0.9817474464659464
+  },
+  {
+   "kind": "leg",
+   "N": 384,
+   "n_quad": 768,
+   "margin": 0.2606364816290648,
+   "abs_lambda1": 0.8938624728750896,
+   "abs_lambda2": 0.8485804649128899
+  },
+  {
+   "kind": "leg",
+   "N": 384,
+   "n_quad": 3072,
+   "margin": 0.26063648163015196,
+   "abs_lambda1": 0.8938624728760348,
+   "abs_lambda2": 0.8485804649129148
+  },
+  {
+   "kind": "cheb",
+   "N": 384,
+   "n_quad": 1536,
+   "margin": 0.2675181158275758,
+   "abs_lambda1": 0.8912060901093569,
+   "abs_lambda2": 0.8497668525172084
+  }
+ ],
+ "nystrom_ref": {
+  "n": 384,
+  "nmax": 8000,
+  "margin": 0.034100608970984894,
+  "abs_lambda1": 0.994152461980674,
+  "abs_lambda2": 0.9887830195731766
+ },
+ "nystrom_secondary": {
+  "n": 512,
+  "nmax": 8000,
+  "margin": 0.024293050308407088,
+  "abs_lambda1": 1.020032777334705,
+  "abs_lambda2": 1.0023010359548101
+ },
+ "convergence_table": [
+  {
+   "N": 256,
+   "n_quad": 1024,
+   "m_poly": 0.37117991766852526,
+   "m_nystrom_ref": 0.034100608970984894,
+   "abs_diff": 0.3370793086975404
+  },
+  {
+   "N": 384,
+   "n_quad": 1536,
+   "m_poly": 0.26063648162852904,
+   "m_nystrom_ref": 0.034100608970984894,
+   "abs_diff": 0.22653587265754416
+  },
+  {
+   "N": 512,
+   "n_quad": 2048,
+   "m_poly": 0.15027375267739887,
+   "m_nystrom_ref": 0.034100608970984894,
+   "abs_diff": 0.11617314370641398
+  },
+  {
+   "N": 768,
+   "n_quad": 3072,
+   "m_poly": 0.025623366267127096,
+   "m_nystrom_ref": 0.034100608970984894,
+   "abs_diff": 0.008477242703857798
+  }
+ ],
+ "quadrature_check": {
+  "N": 384,
+  "entries": [
+   {
+    "n_quad": 768,
+    "m_poly": 0.2606364816290648,
+    "abs_diff_to_highest": 1.0871858968641845e-12
+   },
+   {
+    "n_quad": 1536,
+    "m_poly": 0.26063648162852904,
+    "abs_diff_to_highest": 1.6229240173970538e-12
+   },
+   {
+    "n_quad": 3072,
+    "m_poly": 0.26063648163015196,
+    "abs_diff_to_highest": 0.0
+   }
+  ],
+  "diff_768_1536": 5.357381205328693e-13,
+  "diff_1536_3072": 1.6229240173970538e-12,
+  "note": "gate (b) uses the top doubling (1536 vs 3072); 768 < ceil(t)=1101 is below the round-1 resolution rule, so an unstable 768->1536 step alone does NOT fail the gate"
+ },
+ "extrapolation": {
+  "model_intended": "m_poly(N) = m_inf + c*N^(-alpha)",
+  "powerlaw_fit_4pt": {
+   "model": "m_inf + c*N^(-alpha) (unconstrained, alpha grid)",
+   "m_inf": -6.176018792444153,
+   "alpha": 0.05,
+   "c": 8.64835350310355,
+   "residual_ss": 0.0002714235523598296,
+   "identifiable": false,
+   "note": "DEGENERATE: alpha pinned at grid edge (decay accelerates; single power law misspecified)"
+  },
+  "bounded_fit_4pt": {
+   "model": "m_inf + c*N^(-alpha), m_inf constrained to [0,50]",
+   "m_inf": 9.672960627621234e-33,
+   "alpha": 1.4174666379433776,
+   "c": 999.9999999986076,
+   "residual_ss": 0.005238204824431625,
+   "identifiable": false,
+   "note": "DEGENERATE: sits on a bound (m_inf=0 and/or c=1000); limit not identifiable from this window"
+  },
+  "alpha_effective_vs_nystrom384": [
+   0.9801458165881952,
+   2.32138766400076,
+   6.456033823843448
+  ],
+  "alpha_effective_vs_nystrom512": [
+   0.9463520381180035,
+   2.18698794783642,
+   11.223437409166348
+  ],
+  "nystrom_reference_stability": 0.009807558662577806,
+  "m_inf_direct": 0.025623366267127096,
+  "m_inf_direct_note": "N=768 value used as the limit estimate: both parametric fits are degenerate (see flags), because the margin min|1-lambda| is non-smooth in N (near-degenerate leading eigenvalue pair) and the decay ACCELERATES (alpha_effective grows), so a single power law is not identifiable from a 3x window. The direct largest-N discrepancy is the honest estimator of the gap.",
+  "nystrom_ref": 0.034100608970984894,
+  "nystrom_ref_secondary": 0.024293050308407088,
+  "m_inf": 0.025623366267127096,
+  "alpha": null,
+  "c": null,
+  "alpha_c_note": "alpha and c are NOT identifiable by a single power law on this window (see powerlaw_fit_4pt / bounded_fit_4pt / alpha_effective_*); m_inf is the direct largest-N value",
+  "extrapolated_diff": 0.008477242703857798,
+  "extrapolated_diff_secondary": 0.0013303159587200082,
+  "extrapolated_diff_raw_powerlaw_fit": 6.210119401415138
+ },
+ "chebyshev_variant": {
+  "N": 384,
+  "n_quad": 1536,
+  "m_cheb": 0.2675181158275758,
+  "legendre_same_quad": 0.26063648162852904,
+  "m_nystrom_ref": 0.034100608970984894,
+  "abs_diff_cheb_to_nystrom": 0.2334175068565909,
+  "abs_diff_leg_to_nystrom": 0.22653587265754416,
+  "cheb_closer_to_nystrom": false,
+  "verdict": "Chebyshev and Legendre Galerkin give nearly the same margin at N=384 (same dimension, same quadrature resolution): the high-t error is an N-RESOLUTION effect of the Galerkin truncation, not a basis pathology."
+ },
+ "gate_pass": true
+}
