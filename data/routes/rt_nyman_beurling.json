@@ -1,0 +1,119 @@
+{
+  "task": "RT-NB",
+  "title": "Nyman-Beurling density test (Baez-Duarte f_a functions)",
+  "method": {
+    "f_a": "f_a(x) = {a/x} - a*{1/x} = a*floor(1/x) - floor(a/x), a in (0,1]",
+    "interpretation_note": "plan's literal formula {ax} - a*floor(x) degenerates to a*x on (0,1); classical Baez-Duarte family used instead (see module docstring)",
+    "gram": "exact piecewise-constant integration in u = 1/x on [1, U=8192] + exact period-mean tail mu/U (absolute error ~1e-6)",
+    "residual": "eps_n = ||f_{1/2} - proj||^2 via normal equations G c = b, eigh pseudo-inverse (tol 1e-12 * lam_max)",
+    "python": "3.12.9",
+    "numpy": "2.4.4"
+  },
+  "selftest": {
+    "ok": true,
+    "checks": {
+      "f1_is_zero": {
+        "got": 0.0,
+        "expect": 0.0,
+        "ok": true
+      },
+      "norm2_f12": {
+        "got": 0.17328679607130915,
+        "expect": 0.17328679513998632,
+        "ok": true
+      },
+      "int_f_1over3": {
+        "got": 0.36620409456681635,
+        "expect": 0.3662040962227032,
+        "ok": true
+      },
+      "int_f_5over7": {
+        "got": 0.24033731016932583,
+        "expect": 0.24033731187229493,
+        "ok": true
+      },
+      "u_vs_x_space": {
+        "u_space": 0.10630892425147949,
+        "x_space": 0.1063080894623769,
+        "ok": true
+      }
+    }
+  },
+  "results": {
+    "16": {
+      "n": 16,
+      "complete": true,
+      "a_grid": "k/(n+1), k=1..n",
+      "target": "f_{1/2}",
+      "min_eigenvalue": 0.009726306374344322,
+      "max_eigenvalue": 1.612220313582218,
+      "condition_number": 165.75874247955738,
+      "pinv_rank": 16,
+      "pinv_tol": 1.612220313582218e-12,
+      "eps_n": 0.0368164333424173,
+      "target_norm2": 0.17328679607130915,
+      "eps_over_target_norm2": 0.21245954208344292,
+      "seconds": 0.09
+    },
+    "32": {
+      "n": 32,
+      "complete": true,
+      "a_grid": "k/(n+1), k=1..n",
+      "target": "f_{1/2}",
+      "min_eigenvalue": 0.004774637500338959,
+      "max_eigenvalue": 3.04942334791242,
+      "condition_number": 638.6711761250854,
+      "pinv_rank": 32,
+      "pinv_tol": 3.04942334791242e-12,
+      "eps_n": 0.022265546503049766,
+      "target_norm2": 0.17328679607130915,
+      "eps_over_target_norm2": 0.12848957339996803,
+      "seconds": 0.36
+    },
+    "64": {
+      "n": 64,
+      "complete": true,
+      "a_grid": "k/(n+1), k=1..n",
+      "target": "f_{1/2}",
+      "min_eigenvalue": 0.0023180702602585354,
+      "max_eigenvalue": 5.986085333224729,
+      "condition_number": 2582.357159682079,
+      "pinv_rank": 64,
+      "pinv_tol": 5.9860853332247284e-12,
+      "eps_n": 0.012852403575146942,
+      "target_norm2": 0.17328679607130915,
+      "eps_over_target_norm2": 0.0741683952068573,
+      "seconds": 1.4
+    },
+    "128": {
+      "n": 128,
+      "complete": true,
+      "a_grid": "k/(n+1), k=1..n",
+      "target": "f_{1/2}",
+      "min_eigenvalue": 0.0011266042767082113,
+      "max_eigenvalue": 11.867907519670931,
+      "condition_number": 10534.229067856362,
+      "pinv_rank": 128,
+      "pinv_tol": 1.186790751967093e-11,
+      "eps_n": 0.00731133410378057,
+      "target_norm2": 0.17328679607130915,
+      "eps_over_target_norm2": 0.0421921015884666,
+      "seconds": 5.09
+    }
+  },
+  "rate": {
+    "eps_by_n": {
+      "16": 0.0368164333424173,
+      "32": 0.022265546503049766,
+      "64": 0.012852403575146942,
+      "128": 0.00731133410378057
+    },
+    "power_law_exponent_beta": -0.7789204689549106,
+    "successive_ratios": {
+      "eps_16/eps_32": 1.6535158181441656,
+      "eps_32/eps_64": 1.7324033106231806,
+      "eps_64/eps_128": 1.757873924609898
+    },
+    "note": "eps_n ~ A * n^beta with fitted slope beta = -0.779 (negative = decay); density (hence RH) iff eps_n -> 0; Baez-Duarte: faster-than-power decay iff RH -- empirical rate is the goal"
+  }
+}
