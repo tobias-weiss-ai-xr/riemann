@@ -1,0 +1,229 @@
+{
+  "task": "RT2-NB",
+  "title": "Nyman-Beurling density at n=256,512,1024 (extended power-law fit)",
+  "params": {
+    "sizes": [
+      16,
+      32,
+      64,
+      128,
+      256,
+      512,
+      1024
+    ],
+    "grid": "a_k = k/(n+1), k=1..n",
+    "target": "f_{1/2}",
+    "f_a": "f_a(x) = a*floor(1/x) - floor(a/x)  (Baez-Duarte family, as round 1)",
+    "period": "P = 2*(n+1) (common period of all grid functions and the target)",
+    "cond_mp_switch": 1000000000000.0,
+    "pinv_tol": "1e-12 * max(lam_max, 1)",
+    "round1_reference": {
+      "eps_128": 0.007311,
+      "beta_4sizes": -0.7789
+    },
+    "gate": {
+      "all_7_sizes": true,
+      "eps_n_and_min_eig_positive": true,
+      "eps_1024_max": 0.01,
+      "abs_beta_min": 0.3
+    }
+  },
+  "method": {
+    "gram": "exact one-period integration in u = 1/x: pieces of [1, 1+P) weighted by (digamma(u1/P) - digamma(u0/P))/P (telescoped Hurwitz zeta over all periodic images); error = float roundoff",
+    "residual": "eps_n = <f,f> - b^T G^+ b via eigh pseudo-inverse (as round 1)",
+    "selftest": "vs round-1 nyman_beurling.gram() and closed forms ln(2)/4, -a*ln(a)",
+    "python": "3.12.9",
+    "numpy": "2.4.4",
+    "scipy": "1.17.1"
+  },
+  "selftest": {
+    "ok": true,
+    "checks": {
+      "weights_sum_to_1": {
+        "got": 1.0,
+        "tol": 1e-09,
+        "ok": true
+      },
+      "target_norm2_ln2_over_4": {
+        "got": 0.1732867951399863,
+        "expect": 0.17328679513998632,
+        "tol": 1e-08,
+        "ok": true
+      },
+      "gram_vs_round1": {
+        "max_abs_diff": 2.3922509251317337e-09,
+        "tol": 1e-05,
+        "ok": true
+      },
+      "target_overlap_vs_round1": {
+        "got": 0.054620678826126645,
+        "ref": 0.05462068083219068,
+        "ok": true
+      },
+      "int_f_equals_minus_a_ln_a": {
+        "max_abs_err": 2.220446049250313e-16,
+        "tol": 1e-09,
+        "ok": true
+      }
+    }
+  },
+  "sizes": [
+    {
+      "n": 16,
+      "complete": true,
+      "a_grid": "k/(n+1), k=1..n",
+      "target": "f_{1/2}",
+      "npieces": 197,
+      "sumw": 1.0,
+      "int_f_max_abs_err": 4.440892098500626e-16,
+      "min_eigenvalue_float64": 0.009726304827752821,
+      "max_eigenvalue": 1.6122203242353332,
+      "min_eig": 0.009726304827752821,
+      "cond": 165.75876993234468,
+      "eps_n": 0.036816430783339515,
+      "target_norm2": 0.17328679513998635,
+      "eps_over_target_norm2": 0.21245952845742275,
+      "pinv_rank": 16,
+      "pinv_tol": 1.6122203242353333e-12,
+      "seconds": 0.0
+    },
+    {
+      "n": 32,
+      "complete": true,
+      "a_grid": "k/(n+1), k=1..n",
+      "target": "f_{1/2}",
+      "npieces": 723,
+      "sumw": 1.0,
+      "int_f_max_abs_err": 8.049116928532385e-16,
+      "min_eigenvalue_float64": 0.004774639128430492,
+      "max_eigenvalue": 3.049423350276903,
+      "min_eig": 0.004774639128430492,
+      "cond": 638.670958841512,
+      "eps_n": 0.022265555657554503,
+      "target_norm2": 0.17328679513998635,
+      "eps_over_target_norm2": 0.12848962691916432,
+      "pinv_rank": 32,
+      "pinv_tol": 3.049423350276903e-12,
+      "seconds": 0.0
+    },
+    {
+      "n": 64,
+      "complete": true,
+      "a_grid": "k/(n+1), k=1..n",
+      "target": "f_{1/2}",
+      "npieces": 2737,
+      "sumw": 1.0,
+      "int_f_max_abs_err": 9.43689570931383e-16,
+      "min_eigenvalue_float64": 0.0023180676663078713,
+      "max_eigenvalue": 5.98608531636375,
+      "min_eig": 0.0023180676663078713,
+      "cond": 2582.360042102721,
+      "eps_n": 0.012852406238914149,
+      "target_norm2": 0.1732867951399863,
+      "eps_over_target_norm2": 0.07416841097748728,
+      "pinv_rank": 64,
+      "pinv_tol": 5.98608531636375e-12,
+      "seconds": 0.01
+    },
+    {
+      "n": 128,
+      "complete": true,
+      "a_grid": "k/(n+1), k=1..n",
+      "target": "f_{1/2}",
+      "npieces": 10790,
+      "sumw": 1.0000000000000002,
+      "int_f_max_abs_err": 3.941291737419306e-15,
+      "min_eigenvalue_float64": 0.0011266116782363686,
+      "max_eigenvalue": 11.86790751869425,
+      "min_eig": 0.0011266116782363686,
+      "cond": 10534.159860008398,
+      "eps_n": 0.007311278986274844,
+      "target_norm2": 0.17328679513998632,
+      "eps_over_target_norm2": 0.04219178374421762,
+      "pinv_rank": 128,
+      "pinv_tol": 1.186790751869425e-11,
+      "seconds": 0.05
+    },
+    {
+      "n": 256,
+      "complete": true,
+      "a_grid": "k/(n+1), k=1..n",
+      "target": "f_{1/2}",
+      "npieces": 42161,
+      "sumw": 1.0000000000000002,
+      "int_f_max_abs_err": 4.440892098500626e-15,
+      "min_eigenvalue_float64": 0.0005433170892207216,
+      "max_eigenvalue": 23.634742724853297,
+      "min_eig": 0.0005433170892207216,
+      "cond": 43500.82703776638,
+      "eps_n": 0.004017519628321448,
+      "target_norm2": 0.17328679513998632,
+      "eps_over_target_norm2": 0.023184222577813697,
+      "pinv_rank": 256,
+      "pinv_tol": 2.3634742724853295e-11,
+      "seconds": 0.35
+    },
+    {
+      "n": 512,
+      "complete": true,
+      "a_grid": "k/(n+1), k=1..n",
+      "target": "f_{1/2}",
+      "npieces": 168822,
+      "sumw": 1.0,
+      "int_f_max_abs_err": 4.829470157119431e-15,
+      "min_eigenvalue_float64": 0.00026412410493560135,
+      "max_eigenvalue": 47.16265457640951,
+      "min_eig": 0.00026412410493560135,
+      "cond": 178562.4776197867,
+      "eps_n": 0.002228962218807279,
+      "target_norm2": 0.17328679513998627,
+      "eps_over_target_norm2": 0.012862850957608491,
+      "pinv_rank": 512,
+      "pinv_tol": 4.716265457640951e-11,
+      "seconds": 3.04
+    },
+    {
+      "n": 1024,
+      "complete": true,
+      "a_grid": "k/(n+1), k=1..n",
+      "target": "f_{1/2}",
+      "npieces": 674032,
+      "sumw": 0.9999999999999998,
+      "int_f_max_abs_err": 2.831068712794149e-15,
+      "min_eigenvalue_float64": 0.00012871752445567524,
+      "max_eigenvalue": 94.2329753147914,
+      "min_eig": 0.00012871752445567524,
+      "cond": 732091.2650650081,
+      "eps_n": 0.0012008902043707526,
+      "target_norm2": 0.17328679513998602,
+      "eps_over_target_norm2": 0.006930073369991286,
+      "pinv_rank": 1024,
+      "pinv_tol": 9.42329753147914e-11,
+      "seconds": 27.14
+    }
+  ],
+  "powerlaw_fit": {
+    "over": "n = 16..1024 (all 7 sizes, recomputed this run)",
+    "A": 0.385820577648773,
+    "beta": -0.8261757656498704,
+    "eps_by_n": {
+      "16": 0.036816430783339515,
+      "32": 0.022265555657554503,
+      "64": 0.012852406238914149,
+      "128": 0.007311278986274844,
+      "256": 0.004017519628321448,
+      "512": 0.002228962218807279,
+      "1024": 0.0012008902043707526
+    },
+    "successive_ratios": {
+      "eps_16/eps_32": 1.6535150233651605,
+      "eps_32/eps_64": 1.7324036638477462,
+      "eps_64/eps_128": 1.757887541022772,
+      "eps_128/eps_256": 1.819848977148509,
+      "eps_256/eps_512": 1.8024171044367134,
+      "eps_512/eps_1024": 1.8560915982949664
+    },
+    "note": "eps_n ~ A*n^beta with beta = -0.826 over a 64x range; density (hence RH) iff eps_n -> 0 -- rate slowdown would be an honest negative result"
+  },
+  "gate_pass": true
+}
