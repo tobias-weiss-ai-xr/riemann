@@ -44,7 +44,7 @@ the closed form, using only certified bounds from mathlib:
 
 The certified computational interval from the first 10 000 zeros,
 `[0.022961009777, 0.023908617943]` (`data/routes/rt_lc_exact.json`),
-lies inside the machine-checked `[0.00128, 0.091]` — so the two
+lies inside the machine-checked `(0.0012, 0.091)` — so the two
 certificates are consistent, with the formal interval a conservative
 enclosure of the numerical one.
 
