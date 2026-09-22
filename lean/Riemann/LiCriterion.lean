@@ -29,21 +29,34 @@ where `γ` is the Euler–Mascheroni constant. Numerically
 (equivalent to RH) is verified computationally over the first 10 000 zeros
 in `data/routes/rt_lc_exact.json` (see `research/JOINT_EVIDENCE.md`).
 
-Here we give a fully rigorous, machine-checked proof that the closed form
-is positive, using only certified bounds from mathlib:
+Here we give a fully rigorous, machine-checked **certified interval** for
+the closed form, using only certified bounds from mathlib:
 
-* `γ > 0.552` — via the harmonic sequence `eulerMascheroniSeq 19 = H₁₉ − log 20`
-  and the sharp bound `log 20 < 2 log 2 + log 5`.
-* `log 2 < 0.6931471808` — `log_two_lt_d9`
-* `log π < 1.1631508109` — via `π < 16/5` and `log(16/5) = 4 log 2 − log 5`.
+* **lower bound** `0.0012 < λ₁` (so in particular `0 < λ₁`):
+  * `γ > 0.552` — via the harmonic sequence `eulerMascheroniSeq 19 = H₁₉ − log 20`
+    and the sharp bound `log 20 < 2 log 2 + log 5`;
+  * `log 2 < 0.6931471808` — `log_two_lt_d9`;
+  * `log π < 1.1631508109` — via `π < 16/5` and `log(16/5) = 4 log 2 − log 5`.
+* **upper bound** `λ₁ < 91/1000`:
+  * `γ < 2/3` — `eulerMascheroniConstant_lt_two_thirds`;
+  * `log 2 > 0.6931471803` — `log_two_gt_d9`;
+  * `log π > 1.0986122885` — via `3 < π` and `log_three_gt_d9`.
+
+The certified computational interval from the first 10 000 zeros,
+`[0.022961009777, 0.023908617943]` (`data/routes/rt_lc_exact.json`),
+lies inside the machine-checked `[0.00128, 0.091]` — so the two
+certificates are consistent, with the formal interval a conservative
+enclosure of the numerical one.
 
 ## Main definition
 
 * `liLambda1`: the closed form `1 + γ/2 − log 2 − log π/2`.
 
-## Main theorem
+## Main theorems
 
-* `liLambda1_pos`: `0 < liLambda1`.
+* `liLambda1_pos`: `0 < liLambda1` (the first step of Li's criterion).
+* `liLambda1_lt`: `liLambda1 < 91/1000` (a certified upper bound).
+* `liLambda1_mem`: `liLambda1 ∈ (0.0012, 91/1000)` (the combined interval).
 -/
 
 namespace Riemann
@@ -113,5 +126,47 @@ theorem liLambda1_pos : 0 < liLambda1 := by
   have h_combined : 1 + (0.552 : ℝ) / 2 - 0.6931471808 - 1.1631508109 / 2 > 0 := by
     norm_num
   linarith
+
+/-- A sharper certified lower bound: `0.0012 < λ₁`. -/
+theorem liLambda1_gt_0012 : 0.0012 < liLambda1 := by
+  unfold liLambda1
+  have hg : (0.552 : ℝ) / 2 < eulerMascheroniConstant / 2 := by
+    linarith [eulerMascheroni_gt_0552]
+  have hl2 : log 2 < 0.6931471808 := log_two_lt_d9
+  have hlp : log Real.pi / 2 < 1.1631508109 / 2 := by
+    linarith [logPi_lt]
+  have h_combined :
+      1 + (0.552 : ℝ) / 2 - 0.6931471808 - 1.1631508109 / 2 > 0.0012 := by
+    norm_num
+  linarith
+
+/-- `1.0986122885 < log π` : a lower bound on `log π`, from `3 < π`. -/
+lemma logPi_gt : 1.0986122885 < log (Real.pi) := by
+  -- 3 < π, so log 3 < log π; and log 3 > 1.0986122885
+  have hmono : log (3 : ℝ) < log Real.pi := log_lt_log (by norm_num) Real.pi_gt_three
+  have h3 : 1.0986122885 < log (3 : ℝ) := log_three_gt_d9
+  exact lt_trans h3 hmono
+
+/-- λ₁ < 91/1000 : a certified upper bound on the first Li coefficient, from
+`γ < 2/3`, `log 2 > 0.6931471803`, and `log π > 1.0986122885`. -/
+theorem liLambda1_lt : liLambda1 < 91 / 1000 := by
+  unfold liLambda1
+  have hg : eulerMascheroniConstant / 2 < (2 / 3 : ℝ) / 2 := by
+    linarith [eulerMascheroniConstant_lt_two_thirds]
+  have hl2 : -log 2 < -0.6931471803 := by linarith [log_two_gt_d9]
+  have hlp : -(log Real.pi / 2) < -(1.0986122885 / 2) := by
+    linarith [logPi_gt]
+  have h_combined :
+      1 + (2 / 3 : ℝ) / 2 - 0.6931471803 - 1.0986122885 / 2 < 91 / 1000 := by
+    norm_num
+  linarith
+
+/-- The first Li coefficient lies in the open interval `(0.0012, 91/1000)`:
+a certified two-sided enclosure consistent with the computational interval
+`[0.022961009777, 0.023908617943]` computed over the first 10 000 zeros. -/
+theorem liLambda1_mem : 0.0012 < liLambda1 ∧ liLambda1 < 91 / 1000 := by
+  constructor
+  · exact liLambda1_gt_0012
+  · exact liLambda1_lt
 
 end Riemann
