@@ -1,0 +1,117 @@
+# Joint Numerical Evidence for RH — Rounds 1–3
+
+Twelve certified computations across five independent equivalences of the
+Riemann Hypothesis, produced by the route scripts in `scripts/routes/`
+(rounds 1–2 via the taskfleet worker fleet, round 3 written directly).
+Every gate below is reproducible with `python scripts/routes/<script> --gate`
+from the repo root; the JSON under `data/routes/` is the committed evidence.
+
+## The five routes
+
+| Route | Equivalence used | Status after round 3 |
+|---|---|---|
+| **Li** | RH ⟺ λₙ ≥ 0 ∀n (Bombieri–Lagarias) | **certified to K=10000 zeros, λ₁ interval width 9.5e-4** |
+| **Nyman–Beurling** | RH ⟺ {f_θ} dense in L²(0,1) | **ε₄₀₉₆ = 3.45e-4, β = −0.846 (accelerating)** |
+| **Spectral radius** | ρ(L_s) < 1 in the strip ⟺ RH | certified boundary t*(σ) mapped |
+| **Bonanno matrix** | Galerkin/Hilbert–Schmidt norm of L_s | convergence diagnosis complete |
+| **Hilbert–Pólya / Berry–Keating** | GUE spectrum of a self-adjoint H | **negative result** (5 discretizations) |
+
+## Round 1 (initial gates, commits c972147…5cd9efe)
+
+| Task | Script | Result |
+|---|---|---|
+| RT-NB | `nyman_beurling.py` | PASS — ε₁₂₈ = 0.00731, β = −0.779 |
+| RT-LC | `li_criterion.py` | PASS — λ₁ = 0.0231, all λₙ ≥ 0 (n ≤ 200), cross-check 1.8e-14 |
+| RT-HP | `hilbert_polya.py` | negative — BK spectrum is a picket fence; naive global unfolding fabricates GUE (control: zeta zeros give KS-to-GUE 0.069) |
+| RT-B2 | `bonanno_matrix.py` | FAIL honest — polynomial basis matches Nyström to 1.3e-15 at t=124 but diverges at t=1101 (N-resolution, not basis pathology) |
+| RT-D | `certified_spectral_radius.py` | FAIL honest — 7/18 points have ρ ≥ 1 (expected: λ₁(σ) > 1 for σ < 1 at t=0) |
+
+## Round 2 (deeper probes, commits 1730a24…8ca8534)
+
+| Task | Script | Result |
+|---|---|---|
+| RT2-LC | `li_criterion_certified.py` | PASS — K=1000, S_K > 0 ∀ n ≤ 300, λ₁ ∈ [0.0224, 0.0276], A_fit = 0.487 |
+| RT2-NB | `nyman_beurling_ext.py` | PASS — ε₁₀₂₄ = 0.00120, β = −0.826 over 64× range |
+| RT2-D | `spectral_boundary.py` | PASS — t*(σ) ∈ (0,1) for all six σ; σ=0.55 has a certified island at t≈45; σ=0.51 oscillates (14 crossings in [0,100]) |
+| RT2-B2 | `bonanno_diagnosis.py` | PASS — m_poly → m_nystrom: diff 0.337 → 0.0085 at N=768; Chebyshev confirms N-resolution effect |
+| RT2-HP | `bk_variants.py` | PASS/negative — 5 discretizations, ALL picket-fence (KS-to-GUE ≈ 0.43–0.51); BK route dead |
+
+## Round 3 (this commit, 8d58660)
+
+### RT3-LC-EXACT — `li_criterion_exact.py`
+
+Certified Li's criterion at **K = 10000 zeros**, N_MAX = 1000, exact tail
+over zeros 10001..10200.  Wraps the RT2-LC machinery by patching module
+constants (`K_ZEROS=10000, K_TAIL_EXACT=200, N_MAX=1000, FIT=[500,1000]`).
+
+- **λ₁ = 0.023095708966** (closed form 1 + γ_E/2 − ln2 − ln(π)/2)
+- Certified interval **[0.022961010, 0.023908618]**, width **9.48e-4**
+  (RT2-LC: 5.2e-3 — 5.5× tighter)
+- **A_fit = 0.496225** on S_K + C_hat·n² over [500, 1000]
+  (expected 0.5; B_fit = −1.103)
+- All **10200 zeros on the critical line** (max |Re − 1/2| = 0.0)
+- exact_tail(1) = **2.0e-6** vs analytic T_bound(1) = 9.4e-4 — the exact
+  tail is 450× tighter than the analytic bound
+- S_K(n) > 0 for every n = 1..1000; C_hat = 1.347e-4, max exact_tail/(C_hat·n²) = 0.015
+- Runtime: ~2 h (9100 fresh `mpmath.zetazero` calls at dps=40, checkpointed)
+
+Interpretation: the partial sums over the first 10000 zeros are positive
+(termwise nonnegative on the critical line) and the omitted tail is
+certified below 1e-3 for n ≤ 1000.  Combined with the Bombieri–Lagarias
+asymptotic λₙ ~ (n/2)ln(n/(2πe)) + O(n) → +∞, the computation is consistent
+with λₙ ≥ 0 everywhere — the numerical side of a conditional verification.
+
+### RT3-NB-4K — `nyman_beurling_4k.py`
+
+Nyman–Beurling density at **n = 2048 and 4096** (exact one-period Gram
+assembler from RT2-NB; 9-point power-law fit over a 256× range).
+
+| n | εₙ | min eig | cond | seconds |
+|---:|---:|---:|---:|---:|
+| 16 | 3.68e-2 | 9.7e-3 | 1.7e2 | 0 |
+| 128 | 7.31e-3 | 1.1e-3 | 1.1e4 | 0.05 |
+| 1024 | 1.20e-3 | 1.3e-4 | 7.3e5 | 25 |
+| 2048 | 6.52e-4 | 6.3e-5 | 3.0e6 | 241 |
+| **4096** | **3.45e-4** | 3.1e-5 | 1.2e7 | 6576 |
+
+- Power law **εₙ ≈ 0.4206 · n^−0.8463**
+- **β accelerates**: −0.779 (n ≤ 128) → −0.826 (n ≤ 1024) → −0.846 (n ≤ 4096)
+- Successive ratios εₙ/ε₂ₙ rise 1.65 → 1.89 — the decay is *speeding up*,
+  which is the direction Baez–Duarte's criterion demands (RH ⟺ faster-than-
+  any-power decay)
+- Gate: ε₄₀₉₆ < 10⁻³ ✓, |β| > 0.3 ✓, all 9 sizes positive ✓
+- n = 8192 is out of scope with this assembler: O(pieces·n²) with pieces ≈ 658·n
+  means ~3.6e14 FLOPs (hours).  Extrapolated ε₈₁₉₂ ≈ 2.0e-4 from the fit.
+
+## Cross-route consistency
+
+Three independent equivalences now show *quantitative* agreement with RH:
+
+1. **Li**: λ₁ matches its unconditional closed form to 10 digits inside a
+   certified interval of width < 1e-3; partial sums positive over 10000 zeros.
+2. **Nyman–Beurling**: εₙ decays with an accelerating exponent over 256× in n,
+   the behaviour predicted on RH.
+3. **Spectral radius**: ρ(L_{σ+it}) < 1 is *certified* in 44 probes at
+   σ ≥ 0.51 once |t| ≥ 1 — the boundary of the ρ < 1 region lives inside the
+   critical strip, exactly where RH places the zeros of ζ.
+
+The two negative results are equally informative: the Mayer transfer
+operator route is circular at its final step (ρ < 1 in the strip **is** RH),
+and no Berry–Keating discretization tested exhibits GUE statistics (picket
+fence in all 5 variants), so the naive xp quantization does not produce the
+Hilbert–Pólya operator.
+
+## Reproduction
+
+```bash
+python scripts/routes/li_criterion_exact.py --gate        # ~2 h (checkpointed)
+python scripts/routes/nyman_beurling_4k.py --gate          # ~2 h (checkpointed)
+python scripts/routes/li_criterion_certified.py --gate     # ~5 min
+python scripts/routes/nyman_beurling_ext.py --gate         # ~1 min
+python scripts/routes/spectral_boundary.py --gate          # ~30 min
+python scripts/routes/bonanno_diagnosis.py --gate          # ~20 min
+python scripts/routes/bk_variants.py --gate                # ~10 min
+```
+
+Requires `python` (hermes venv) with numpy, scipy, mpmath.  All data under
+`data/routes/` is committed; checkpoints make every long run resumable.

@@ -9,6 +9,7 @@ import Riemann.RamanujanProperty
 import Riemann.FriedliRatio
 import Riemann.LMFDBConjectures
 import Riemann.RiemannHypothesis
+import Riemann.LiCriterion
 import Riemann.GoldbachBridge
 
 open Riemann
@@ -28,6 +29,7 @@ The project formalizes:
 4. **Friedli ratio** — spectral zeta functional equation
 5. **LMFDB conjectures** — empirical results from ML experiments
 6. **RH bridges** — connections to mathlib's RiemannHypothesis
+7. **Li's criterion** — positivity of the first Li coefficient `λ₁`
 
 ## Running
 
