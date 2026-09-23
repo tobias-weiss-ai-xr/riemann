@@ -29,7 +29,8 @@ The project formalizes:
 4. **Friedli ratio** — spectral zeta functional equation
 5. **LMFDB conjectures** — empirical results from ML experiments
 6. **RH bridges** — connections to mathlib's RiemannHypothesis
-7. **Li's criterion** — positivity of the first Li coefficient `λ₁`
+7. **Li's criterion** — certified interval λ₁ ∈ (0.0054, 0.091) (`liLambda1_mem`),
+   bridge to the completed zeta (`liLambda1_eq_completedZeta0`)
 
 ## Running
 
