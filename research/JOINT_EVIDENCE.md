@@ -95,6 +95,21 @@ Three independent equivalences now show *quantitative* agreement with RH:
    σ ≥ 0.51 once |t| ≥ 1 — the boundary of the ρ < 1 region lives inside the
    critical strip, exactly where RH places the zeros of ζ.
 
+## Formal cross-validation (Lean 4 + mathlib)
+
+The λ₁ closed form is also **machine-checked** in `lean/Riemann/LiCriterion.lean`
+(Li's criterion, first step). Using only certified mathlib bounds — γ > 0.5604
+via the harmonic sequence at n = 29 (30 = 2·3·5 is 5-smooth), log 2 and log π
+via the 1e-10 decimal lemmas — Lean proves the two-sided interval
+
+    liLambda1_mem : 0.0054 < λ₁ ∧ λ₁ < 0.091
+
+`liLambda1_pos : 0 < λ₁` follows. The formal interval conservatively encloses
+the computational certified interval [0.022961009777, 0.023908617943] above —
+the two certificates (proof assistant vs. interval arithmetic over 10 000 zeros)
+are mutually consistent, and the numeric value 0.023095708966 sits in both.
+Commits `ab13659`, `6f066b4`, `3e5fc59`.
+
 The two negative results are equally informative: the Mayer transfer
 operator route is circular at its final step (ρ < 1 in the strip **is** RH),
 and no Berry–Keating discretization tested exhibits GUE statistics (picket
