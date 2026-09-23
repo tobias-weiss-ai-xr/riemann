@@ -110,6 +110,12 @@ the two certificates (proof assistant vs. interval arithmetic over 10 000 zeros)
 are mutually consistent, and the numeric value 0.023095708966 sits in both.
 Commits `ab13659`, `6f066b4`, `3e5fc59`.
 
+Lean also proves the bridge `liLambda1_eq_completedZeta0 : λ₁ =
+completedRiemannZeta₀ 1` (commit `750e35c`): the certified λ₁ **is** the value
+at s = 1 of mathlib's entire regularization Λ₀(s) = Λ(s) + 1/s + 1/(1−s) of the
+completed Riemann zeta — the anchor point for the Keiper–Li expansion, tying
+the formal interval to the zeta function itself.
+
 The two negative results are equally informative: the Mayer transfer
 operator route is circular at its final step (ρ < 1 in the strip **is** RH),
 and no Berry–Keating discretization tested exhibits GUE statistics (picket
