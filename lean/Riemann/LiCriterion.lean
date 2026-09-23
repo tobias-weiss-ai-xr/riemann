@@ -9,6 +9,7 @@ import Mathlib.NumberTheory.Harmonic.EulerMascheroni
 import Mathlib.NumberTheory.Harmonic.GammaDeriv
 import Mathlib.Analysis.SpecialFunctions.Log.Deriv
 import Mathlib.Analysis.SpecialFunctions.Log.Monotone
+import Mathlib.NumberTheory.Harmonic.ZetaAsymp
 
 open Real
 
@@ -164,12 +165,34 @@ theorem liLambda1_lt : liLambda1 < 91 / 1000 := by
     norm_num
   linarith
 
-/-- The first Li coefficient lies in the open interval `(0.0012, 91/1000)`:
+/-- The first Li coefficient lies in the open interval `(0.0054, 91/1000)`:
 a certified two-sided enclosure consistent with the computational interval
 `[0.022961009777, 0.023908617943]` computed over the first 10 000 zeros. -/
 theorem liLambda1_mem : 0.0054 < liLambda1 ∧ liLambda1 < 91 / 1000 := by
   constructor
   · exact liLambda1_gt_0054
   · exact liLambda1_lt
+
+/-- The bridge to the completed zeta: the certified λ₁ equals the value at
+`s = 1` of mathlib's entire regularization `Λ₀(s) = Λ(s) + 1/s + 1/(1-s)` of
+the completed Riemann zeta `Λ(s) = π^(-s/2) Γ(s/2) ζ(s)` — the anchor point
+for the Keiper-Li expansion of `log Λ₀` at `s = 1`. -/
+theorem liLambda1_eq_completedZeta0 :
+    (liLambda1 : ℂ) = completedRiemannZeta₀ 1 := by
+  unfold liLambda1
+  rw [completedRiemannZeta₀_one]
+  have hlog : Complex.log (4 * (Real.pi : ℂ))
+      = ((2 * Real.log 2 + Real.log π : ℝ) : ℂ) := by
+    have hco : Complex.log (4 * (Real.pi : ℂ))
+        = Complex.log (((4:ℝ) * Real.pi : ℝ) : ℂ) := by
+      congr 1
+      push_cast
+      rfl
+    rw [hco, ← Complex.ofReal_log (by positivity : (0:ℝ) ≤ 4 * Real.pi)]
+    norm_cast
+    rw [log_mul (by norm_num : (4:ℝ) ≠ 0) Real.pi_ne_zero, log_four_eq]
+  rw [hlog]
+  norm_cast
+  ring
 
 end Riemann
