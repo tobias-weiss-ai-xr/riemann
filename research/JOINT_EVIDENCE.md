@@ -75,13 +75,20 @@ assembler from RT2-NB; 9-point power-law fit over a 256× range).
 | **4096** | **3.45e-4** | 3.1e-5 | 1.2e7 | 6576 |
 
 - Power law **εₙ ≈ 0.4206 · n^−0.8463**
-- **β accelerates**: −0.779 (n ≤ 128) → −0.826 (n ≤ 1024) → −0.846 (n ≤ 4096)
+- **β accelerates**: −0.779 (n ≤ 128) → −0.826 (n ≤ 1024) → −0.846 (n ≤ 4096) → −0.854 (n ≤ 8192)
 - Successive ratios εₙ/ε₂ₙ rise 1.65 → 1.89 — the decay is *speeding up*,
   which is the direction Baez–Duarte's criterion demands (RH ⟺ faster-than-
   any-power decay)
-- Gate: ε₄₀₉₆ < 10⁻³ ✓, |β| > 0.3 ✓, all 9 sizes positive ✓
-- n = 8192 is out of scope with this assembler: O(pieces·n²) with pieces ≈ 658·n
-  means ~3.6e14 FLOPs (hours).  Extrapolated ε₈₁₉₂ ≈ 2.0e-4 from the fit.
+- Gate: ε₈₁₉₂ < 10⁻³ ✓, |β| > 0.3 ✓, all 10 sizes positive ✓
+- **n = 8192 reached (RT-NB-8K)** via a fast exact O(n³) Abel-summation
+  assembler (`nyman_beurling_8k.py`, threaded, 57 min): pieces ≈ c² = 43M,
+  G assembled as G = A·kc⊗kc − kc⊗B − B⊗kc + C with C from the closed form
+  C_ij = (4ij·ψ(1+1/2c) − K(i,j) − K(j,i) + h(gcd))/2c.  Verified against the
+  original assembler at n = 12/64/256 to max|ΔG| ≈ 6e-13 (b, b1 bit-exact).
+  Result: **ε₈₁₉₂ = 1.8624e-4** (< 10⁻³ ✓), min_eig = 1.50e-5 > 0,
+  cond(G) = 5.04e7, **10-point power law εₙ ≈ 0.4355·n^−0.8539** — the
+  accelerating decay holds at 512× in n.  (The O(pieces·n²) original would
+  need ~5e15 FLOPs ≈ 40 h; the fit had extrapolated ε₈₁₉₂ ≈ 2.0e-4 — hit.)
 
 ## Cross-route consistency
 
