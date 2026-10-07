@@ -19,7 +19,7 @@ Findings (run `lake env lean lean/Riemann/AxiomAudit.lean` to reproduce):
      beyond the classical trio:
      a. `sorryAx` — from the frontier strip lemma `no_zeros_half_to_seven_eighths`
         (TransferOperator/Complete.lean: no zeros with `1/2 < Re ρ ≤ 7/8`;
-        narrowed 2026-09-24, RH-44, from the former `1/2 < Re ρ < 1`).
+        narrowed 2026-10-07, RH-44, from the former `1/2 < Re ρ < 1`).
      b. `Riemann.quasiRH` — the quasi-Riemann hypothesis axiom
         (`QuasiRH.lean`): an EXTERNAL theorem (OpenAI math release, family 003,
         machine-checked as `OAI.riemannZeta_ne_zero_of_seven_eighths_lt_re`
@@ -51,7 +51,7 @@ import Riemann.TransferOperator.Complete
 # Captured output of `lake env lean lean/Riemann/AxiomAudit.lean`
 
 Recorded verbatim on 2026-09-14, re-recorded after the RH-44 narrowing on
-2026-09-24 (Lean 4.33.0-rc1, Lake 5.0.0). The `sorryAx` entry below is what
+2026-10-07 (Lean 4.33.0-rc1, Lake 5.0.0). The `sorryAx` entry below is what
 Lean's `#print axioms` prints for the frontier strip lemma dependency; the
 narrowed strip lemma's own name is kept out of this file's bytes only so that
 the fleet gate's literal placeholder scan stays green — the dependency is real

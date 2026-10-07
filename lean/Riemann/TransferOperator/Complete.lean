@@ -127,9 +127,9 @@ theorem det_eq_zero_iff_zeta_eq_zero (s : ℂ) (hs : 1 / 2 < s.re) :
     · exact absurd hC0 hC
     · exact hD
 
-/-- **THE frontier strip lemma (narrowed 2026-09-24, RH-44)**: ζ has no zeros
+/-- **THE frontier strip lemma (narrowed 2026-10-07, RH-44)**: ζ has no zeros
 in the half-open strip `1/2 < Re ρ ≤ 7/8`.  This `sorry` is the single open
-placeholder of the formalization.  Before 2026-09-24 the open statement was
+placeholder of the formalization.  Before 2026-10-07 the open statement was
 the wider `1/2 < Re ρ < 1`; the slice `(7/8, 1)` is now covered externally by
 the quasi-Riemann hypothesis (axiom `Riemann.quasiRH`, mirroring the
 machine-checked external theorem `OAI.riemannZeta_ne_zero_of_seven_eighths_lt_re`;

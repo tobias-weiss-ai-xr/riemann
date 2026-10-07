@@ -1,6 +1,6 @@
 # Recon: the OpenAI math release (`../math`) — what it contains and what it means for us
 
-Recon date: 2026-09-24. Source: `../math` (sibling of this repo), README +
+Recon date: 2026-10-07. Source: `../math` (sibling of this repo), README +
 CONTENTS.md + `lean/` tree inspected directly.
 
 ## What it is

@@ -138,7 +138,7 @@ see `AxiomAudit.lean`).
 ## 3. THE FRONTIER — the honest research step
 
 ```lean
--- Complete.lean (RH-44, 2026-09-24): the frontier sorry is now the NARROW strip
+-- Complete.lean (RH-44, 2026-10-07): the frontier sorry is now the NARROW strip
 theorem no_zeros_half_to_seven_eighths (ρ : ℂ) (hρ : riemannZeta ρ = 0)
     (hRe : 1 / 2 < ρ.re ∧ ρ.re ≤ 7 / 8) : False := by
   sorry
@@ -152,14 +152,14 @@ theorem no_zeros_right_half_plane (ρ : ℂ) (hρ : riemannZeta ρ = 0)
 ```
 
 **The single open `sorry` now covers only the half-open strip (1/2, 7/8]**
-(RH-44, 2026-09-24): the slice (7/8, 1) is closed by the axiom `Riemann.quasiRH`
+(RH-44, 2026-10-07): the slice (7/8, 1) is closed by the axiom `Riemann.quasiRH`
 (`QuasiRH.lean`), which mirrors the externally machine-checked quasi-Riemann
 hypothesis `OAI.riemannZeta_ne_zero_of_seven_eighths_lt_re` (OpenAI math
 release, family 003; our 4.33.0-rc1 toolchain cannot compile that 4.34.1
 library, hence axiom-with-provenance rather than port — §3d below,
 research/OAI_MATH_RECON.md).  `#print axioms` now bills the wide strip lemma
 as `[propext, sorryAx, Classical.choice, Quot.sound, Riemann.quasiRH]`
-(AxiomAudit.lean, re-recorded 2026-09-24): two non-classical inputs — one
+(AxiomAudit.lean, re-recorded 2026-10-07): two non-classical inputs — one
 external-but-proven, one the narrow open strip.
 
 ### 3a. `no_zeros_right_half_plane` is EQUIVALENT to the RH hard half
@@ -615,7 +615,7 @@ set-membership subtype, not the `↑` coercion; `hy` from
 `equicontinuous_transferSummand` takes the unit-ball SUBTYPE element
 directly (`hy f`, not `hy f.1`).
 
-### 3d. External anchor (2026-09-24, recon of the OpenAI math release): the slice Re s > 7/8 is a formalized theorem
+### 3d. External anchor (2026-10-07, recon of the OpenAI math release): the slice Re s > 7/8 is a formalized theorem
 
 The external `../math` repository (722 manuscripts, 372 families, Lean 4.34.1 /
 mathlib @ d13f23b) proves and formalizes the **quasi-Riemann hypothesis**:
