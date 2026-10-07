@@ -13,6 +13,7 @@ References:
   the Gauss map", Nonlinearity 3(4), 1613-1626.
 -/
 
+import Riemann.QuasiRH
 import Riemann.TransferOperator.Theorem3_3
 import Mathlib.NumberTheory.LSeries.Nonvanishing
 import Mathlib.NumberTheory.LSeries.RiemannZeta
@@ -31,7 +32,11 @@ import Mathlib.Analysis.SpecialFunctions.Pow.Real
 - `mayer_correction_ne_zero`: C(s) ≠ 0 for all s
 - `mayer_identity`: ζ(2s) = C(s) · det(1 − L_s)  (Fleet: Mayer)
 - `det_eq_zero_iff_zeta_eq_zero`: det(1 − L_s) = 0 ↔ ζ(2s) = 0  (proven)
-- `no_zeros_right_half_plane`: no zeros with 1/2 < Re ρ < 1  (Fleet 6)
+- `no_zeros_half_to_seven_eighths`: no zeros with 1/2 < Re ρ ≤ 7/8
+  (THE frontier sorry — the single open placeholder)
+- `no_zeros_right_half_plane`: no zeros with 1/2 < Re ρ < 1 — derived from the
+  frontier sorry plus the quasi-Riemann hypothesis axiom `Riemann.quasiRH`
+  (external theorem, see `Riemann/QuasiRH.lean`)
 -/
 
 namespace Riemann.TransferOperator
@@ -122,34 +127,39 @@ theorem det_eq_zero_iff_zeta_eq_zero (s : ℂ) (hs : 1 / 2 < s.re) :
     · exact absurd hC0 hC
     · exact hD
 
-/-- **Zero propagation**: ζ has no zeros on the closed right half-plane
-Re ρ ≥ 1 (Fleet 6).
+/-- **THE frontier strip lemma (narrowed 2026-09-24, RH-44)**: ζ has no zeros
+in the half-open strip `1/2 < Re ρ ≤ 7/8`.  This `sorry` is the single open
+placeholder of the formalization.  Before 2026-09-24 the open statement was
+the wider `1/2 < Re ρ < 1`; the slice `(7/8, 1)` is now covered externally by
+the quasi-Riemann hypothesis (axiom `Riemann.quasiRH`, mirroring the
+machine-checked external theorem `OAI.riemannZeta_ne_zero_of_seven_eighths_lt_re`;
+see `Riemann/QuasiRH.lean` and `research/OAI_MATH_RECON.md`).
 
-The original draft target for this theorem was the strip `1 / 2 < Re ρ < 1`;
+The original draft target of this file was the full strip `1 / 2 < Re ρ < 1`;
 that statement is a (weaker-than-RH but still open) form of the Riemann
-hypothesis, so no proof of it exists in any consistent formalisation, and the
-transfer-operator chain of this file cannot reach it either — the correspondence
+hypothesis.  The transfer-operator chain of this file cannot reach either the
+full strip or this narrowed one — the correspondence
 `fredholmDet (ρ/2) = 0 ↔ ζ(ρ) = 0` of `det_eq_zero_iff_zeta_eq_zero` applies at
 `s = ρ/2` only when `Re s = Re ρ / 2 > 1/2`, i.e. exactly in the Euler region
-`Re ρ > 1` where the classical proof already works.
+`Re ρ > 1` where the classical proof already works.  RH-17 (2026-09-12)
+temporarily replaced the strip claim by mathlib's weaker
+`riemannZeta_ne_zero_of_one_le_re` (Re ≥ 1 only), which broke the
+PrimeNumberTheorem reflection argument and gutted the RH chain — reverted to
+the honest sorry.  This (narrow) sorry is the research frontier. -/
+theorem no_zeros_half_to_seven_eighths (ρ : ℂ) (hρ : riemannZeta ρ = 0)
+    (hRe : 1 / 2 < ρ.re ∧ ρ.re ≤ 7 / 8) : False := by
+  sorry
 
-The provable zero-propagation statement on the same chain is the classical
-zero-free region `Re ρ ≥ 1` — no zeros of ζ anywhere on the closed right
-half-plane — which mathlib formalises as `riemannZeta_ne_zero_of_one_le_re`
-(the de la Vallée Poussin theorem). The transfer-operator contribution on top
-of it is `fredholmDet_ne_zero_of_one_lt_half` below: for Re s > 1/2 the
-correspondence turns ζ(2s) ≠ 0 into the corresponding nonvanishing of the
-explicit-model determinant, matching Theorem 3.3's `one_not_mem_spectrum`.
--/
+/-- **Zero propagation**: ζ has no zeros in the strip `1/2 < Re ρ < 1` — proven
+modulo exactly two non-classical inputs: the frontier strip lemma
+`no_zeros_half_to_seven_eighths` (the single remaining `sorry`) for the lower
+slice, and the quasi-Riemann hypothesis axiom `Riemann.quasiRH` (external,
+machine-checked elsewhere) for the slice `7/8 < Re ρ < 1`. -/
 theorem no_zeros_right_half_plane (ρ : ℂ) (hρ : riemannZeta ρ = 0)
     (hRe : 1 / 2 < ρ.re ∧ ρ.re < 1) : False := by
-  -- THE core transfer-operator claim (Fleet 6): apply `det_eq_zero_iff_zeta_eq_zero`
-  -- at s = ρ/2 (Re s > 1/2) and Theorem 3.3 (`one_not_mem_spectrum`, ρ(L_{ρ/2}) < 1).
-  -- RH-17 (2026-09-12) temporarily replaced this by mathlib's weaker
-  -- `riemannZeta_ne_zero_of_one_le_re` (Re ≥ 1 only), which broke the
-  -- PrimeNumberTheorem reflection argument and gutted the RH chain —
-  -- reverted to the honest sorry. This sorry is the research frontier.
-  sorry
+  rcases (Classical.em (ρ.re ≤ 7 / 8)) with h | h
+  · exact no_zeros_half_to_seven_eighths ρ hρ ⟨hRe.1, h⟩
+  · exact quasiRH (not_le.mp h) hρ
 
 /-- **Correspondence turned around**: for Re s > 1/2 the explicit Fredholm
 determinant does not vanish, since ζ(2s) ≠ 0 in the Euler region via

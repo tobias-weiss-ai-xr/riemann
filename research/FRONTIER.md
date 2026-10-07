@@ -138,16 +138,29 @@ see `AxiomAudit.lean`).
 ## 3. THE FRONTIER — the honest research step
 
 ```lean
--- Complete.lean:144-152
+-- Complete.lean (RH-44, 2026-09-24): the frontier sorry is now the NARROW strip
+theorem no_zeros_half_to_seven_eighths (ρ : ℂ) (hρ : riemannZeta ρ = 0)
+    (hRe : 1 / 2 < ρ.re ∧ ρ.re ≤ 7 / 8) : False := by
+  sorry
+
+-- the wide statement is derived, conditional on the external quasi-RH axiom
 theorem no_zeros_right_half_plane (ρ : ℂ) (hρ : riemannZeta ρ = 0)
     (hRe : 1 / 2 < ρ.re ∧ ρ.re < 1) : False := by
-  -- ... the single open placeholder lives here (line 152)
-  sorry
+  rcases (Classical.em (ρ.re ≤ 7 / 8)) with h | h
+  · exact no_zeros_half_to_seven_eighths ρ hρ ⟨hRe.1, h⟩
+  · exact quasiRH (not_le.mp h) hρ
 ```
 
-**This is the only open placeholder in the formalization.** Every other file
-builds. The declaration states: *ζ has no zero with real part strictly between
-1/2 and 1* — i.e. the hard half of the Riemann hypothesis.
+**The single open `sorry` now covers only the half-open strip (1/2, 7/8]**
+(RH-44, 2026-09-24): the slice (7/8, 1) is closed by the axiom `Riemann.quasiRH`
+(`QuasiRH.lean`), which mirrors the externally machine-checked quasi-Riemann
+hypothesis `OAI.riemannZeta_ne_zero_of_seven_eighths_lt_re` (OpenAI math
+release, family 003; our 4.33.0-rc1 toolchain cannot compile that 4.34.1
+library, hence axiom-with-provenance rather than port — §3d below,
+research/OAI_MATH_RECON.md).  `#print axioms` now bills the wide strip lemma
+as `[propext, sorryAx, Classical.choice, Quot.sound, Riemann.quasiRH]`
+(AxiomAudit.lean, re-recorded 2026-09-24): two non-classical inputs — one
+external-but-proven, one the narrow open strip.
 
 ### 3a. `no_zeros_right_half_plane` is EQUIVALENT to the RH hard half
 

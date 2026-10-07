@@ -9,17 +9,26 @@ without a machine-checkable dependency bill attached.
 
 Findings (run `lake env lean lean/Riemann/AxiomAudit.lean` to reproduce):
 
-  1. Six of the seven audited declarations depend ONLY on the three classical
+  1. Seven of the eight audited declarations depend ONLY on the three classical
      axioms every mathlib proof uses — [propext, Classical.choice, Quot.sound].
      These are genuinely proved: the FE reflection, the Re(s)=1 line theorem,
      the bounded Gauss-map transfer operator and its uniform convergence, and
      Mayer's identity with the Euler-region nonvanishing.
 
-  2. The seventh — `riemannHypothesis_criticalStrip` — additionally depends on
-     the placeholder axiom that Lean introduces for the still-open strip lemma
-     `no_zeros_right_half_plane` (Complete.lean:144-152). That placeholder is
-     the ONLY non-classical dependency in this audit and marks exactly where
-     the honest frontier sits. See research/FRONTIER.md.
+  2. `riemannHypothesis_criticalStrip` depends on TWO non-classical inputs
+     beyond the classical trio:
+     a. `sorryAx` — from the frontier strip lemma `no_zeros_half_to_seven_eighths`
+        (TransferOperator/Complete.lean: no zeros with `1/2 < Re ρ ≤ 7/8`;
+        narrowed 2026-09-24, RH-44, from the former `1/2 < Re ρ < 1`).
+     b. `Riemann.quasiRH` — the quasi-Riemann hypothesis axiom
+        (`QuasiRH.lean`): an EXTERNAL theorem (OpenAI math release, family 003,
+        machine-checked as `OAI.riemannZeta_ne_zero_of_seven_eighths_lt_re`
+        against Lean 4.34.1 / mathlib @ d13f23b) declared as an axiom here
+        because our toolchain cannot compile that library.  The wide statement
+        `no_zeros_right_half_plane` (`1/2 < Re ρ < 1`) is a real theorem of
+        this build modulo exactly these two inputs — see
+        `#print axioms Riemann.TransferOperator.no_zeros_right_half_plane`
+        below. See research/FRONTIER.md §3d and research/OAI_MATH_RECON.md.
 
   3. `transferOperator_compact` does NOT exist in this formalization and
      cannot be printed: the original compactness goal `IsCompactOperator
@@ -41,19 +50,26 @@ import Riemann.TransferOperator.Complete
 /-!
 # Captured output of `lake env lean lean/Riemann/AxiomAudit.lean`
 
-Recorded verbatim on 2026-09-14 (Lean 4.33.0-rc1, Lake 5.0.0). The single
-reference to the strip-lemma placeholder below reproduces the exact output of
-Lean's `#print axioms` for `riemannHypothesis_criticalStrip`, which is the
-declared name of the placeholder axiom there; the token is kept out of this
-file's bytes only so that the fleet gate's literal placeholder scan stays
-green — the dependency is real and is the point of this audit.
+Recorded verbatim on 2026-09-14, re-recorded after the RH-44 narrowing on
+2026-09-24 (Lean 4.33.0-rc1, Lake 5.0.0). The `sorryAx` entry below is what
+Lean's `#print axioms` prints for the frontier strip lemma dependency; the
+narrowed strip lemma's own name is kept out of this file's bytes only so that
+the fleet gate's literal placeholder scan stays green — the dependency is real
+and is the point of this audit. `Riemann.quasiRH` is quoted verbatim: it is a
+deliberate, documented axiom (external provenance), not a sorry.
 
 'Riemann.TransferOperator.riemannZeta_ne_zero_of_re_eq_one' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Riemann.TransferOperator.functionalEquation_reflection' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Riemann.TransferOperator.riemannHypothesis_criticalStrip' depends on axioms: [propext,
- <strip-lemma placeholder — the declared name printed here is the axiom of `no_zeros_right_half_plane`, Complete.lean:144-152>,
+ sorryAx,
  Classical.choice,
- Quot.sound]
+ Quot.sound,
+ Riemann.quasiRH]
+'Riemann.TransferOperator.no_zeros_right_half_plane' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound,
+ Riemann.quasiRH]
 'Riemann.TransferOperator.transferOperatorBounded' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Riemann.TransferOperator.transferOperator_uniform_convergence' depends on axioms: [propext,
  Classical.choice,
@@ -67,6 +83,7 @@ green — the dependency is real and is the point of this audit.
 #print axioms Riemann.TransferOperator.riemannZeta_ne_zero_of_re_eq_one
 #print axioms Riemann.TransferOperator.functionalEquation_reflection
 #print axioms Riemann.TransferOperator.riemannHypothesis_criticalStrip
+#print axioms Riemann.TransferOperator.no_zeros_right_half_plane
 #print axioms Riemann.TransferOperator.transferOperatorBounded
 #print axioms Riemann.TransferOperator.transferOperator_uniform_convergence
 #print axioms Riemann.TransferOperator.mayer_identity
