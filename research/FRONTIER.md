@@ -641,6 +641,17 @@ detector certificate).  Consequences for the honesty boundary here:
 - Not ported: toolchain mismatch (4.34.1 vs our 4.33.0-rc1), DirichletL is
   ~70 files with its own dependency patches; vendor-not — cite instead.
   Recon note: `research/OAI_MATH_RECON.md`.
+- **Independently audited (2026-10-07)**: their `Nonvanishing` chain rebuilt
+  from source on our host in their pinned toolchain (7061/7061 jobs green);
+  all three load-bearing theorems bill exactly
+  `[propext, Classical.choice, Quot.sound]` — no `sorryAx`, no custom axioms,
+  no `native_decide`/`unsafe` anywhere in the subtree; comparator signature
+  matches byte-for-byte. Our `quasiRH` axiom is trust-by-proof-term, not
+  trust-by-provenance. Audit note: `research/QUASI_RH_CERT_AUDIT.md`.
+- Numerical extension: λ₂ certified in our pipeline (λ₂ ∈ [0.090576,
+  0.103287] from 2000 on-line zeros; closed form 1 + γ − γ² − 2γ₁ − 2 ln 2
+  − ln π + π²/8 = 0.092345735… inside; λ₂ > λ₁ by 0.0692500…). Lean
+  formalization still gated on mathlib Stieltjes constants.
 
 ---
 
