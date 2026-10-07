@@ -602,6 +602,33 @@ set-membership subtype, not the `↑` coercion; `hy` from
 `equicontinuous_transferSummand` takes the unit-ball SUBTYPE element
 directly (`hy f`, not `hy f.1`).
 
+### 3d. External anchor (2026-09-24, recon of the OpenAI math release): the slice Re s > 7/8 is a formalized theorem
+
+The external `../math` repository (722 manuscripts, 372 families, Lean 4.34.1 /
+mathlib @ d13f23b) proves and formalizes the **quasi-Riemann hypothesis**:
+ζ and every Dirichlet L-function are zero-free for Re s > 7/8 (principal pole
+at s = 1 excepted), uniformly over all moduli, plus uniform exclusion of
+Landau–Siegel zeros (1−β ≥ c/log q).  Declaration:
+`OAI.riemannZeta_ne_zero_of_seven_eighths_lt_re`
+(`OAI/NumberTheory/DirichletL/Nonvanishing.lean`, backed by a certified-band
+detector certificate).  Consequences for the honesty boundary here:
+
+- Our open placeholder `no_zeros_right_half_plane` only needs to cover
+  **(1/2, 7/8]** — the slice above 7/8 is closed externally, not by us.  This
+  is a narrowing, not a closure: our frontier statement remains as-is.
+- Our certified spectral-radius probes (ρ(L_{σ+it}) < 1 at σ ≥ 0.51, |t| ≥ 1)
+  already probe numerical territory ~0.3 deeper than the externally proven
+  half-plane; the proven frontier is no longer the binding constraint on
+  what remains open.
+- Methodology cross-validation: their proof is the same pattern as our
+  RT3-LC-EXACT / certified_spectral_radius work — a finite certified object
+  (bands, explicit constants) + a Lean theorem that the certificate implies
+  the analytic statement.  Two independent formal pipelines using certified
+  numerical certificates for zeta statements is a sanity check on the method.
+- Not ported: toolchain mismatch (4.34.1 vs our 4.33.0-rc1), DirichletL is
+  ~70 files with its own dependency patches; vendor-not — cite instead.
+  Recon note: `research/OAI_MATH_RECON.md`.
+
 ---
 
 ## 4. One-line summary
