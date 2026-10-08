@@ -169,3 +169,10 @@ lean/.lake/
 data/rh_viz_data.js
 .tf-worktrees/
 .tf-state/
+
+# ── Housekeeping 2026-10-08 ─────────────────────────────────
+# root scratch scripts (same convention as scripts/_*.py)
+/_*.sh
+/_*.py
+# EPIC-19P generated outputs (exp19p_enclosure.py)
+data/experiment19p/
