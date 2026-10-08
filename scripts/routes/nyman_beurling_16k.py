@@ -56,7 +56,13 @@ def fast_assemble(n: int, log=print) -> dict:
         parts.append(np.arange(1.0, int(((1.0 + P) * k) // c) + 2.0) * (c / k))
     u = np.concatenate(parts)
     del parts
-    u = np.unique(u[(u >= 1.0) & (u <= 1.0 + P)])
+    # float-noise dedup: breakpoints t*(c/k1) and t'*(c/k2) that coincide as
+    # rationals differ by ~1 ULP (3.6e-12 at these magnitudes) after the
+    # arange*(c/k) construction, inflating u to ~268M pieces at n=16384 and
+    # phase 1 to ~10 h.  Rounding at 1e-9 collapses ULP duplicates (true
+    # distinct breakpoints are >= 1/c^2 ~ 3.7e-9 apart; merged-gap error
+    # ~ w_p*gap ~ 1e-13, gated by verify()).
+    u = np.unique(np.round(u[(u >= 1.0) & (u <= 1.0 + P)], 9))
     mids = 0.5 * (u[1:] + u[:-1])
     w = (digamma(u[1:] / P) - digamma(u[:-1] / P)) / P
     del u
