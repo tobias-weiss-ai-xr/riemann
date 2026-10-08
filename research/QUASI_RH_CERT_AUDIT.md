@@ -101,12 +101,60 @@ constant). Gates, all PASS:
 - **(c)** independent high-precision series check (central finite difference
   of `log ξ(1/(1−z)) + log 2` at h = 10⁻⁶): error 1.8e-13 ✓
 
+## Part 5 — numerical extension: λ₃ certified (pipeline scales)
+
+The ledger now covers the first **three** Keiper coefficients. New script:
+`scripts/routes/li_lambda3_certified.py` (data: `data/routes/rt_lc_lambda3.json`).
+
+Method — identical sandwich machinery at n = 3: each conjugate pair
+contributes `2(1 − cos(3θ_k)) ≥ 0` to λ₃, tail bound with n² = 9; K = 2000
+on-line zeros (γ_K = 2515.29):
+
+    λ₃ ∈ [S_K(3), S_K(3) + T_K(3)] = [0.203657877722, 0.232256593171]
+
+Closed form — **derived, not recalled**: PSLQ identification at 80 dps
+against basis {1, γ, γ², γ³, γ₁, γγ₁, γ₂, ln 2, ln π, π², ζ(3)}, then
+confirmed three independent ways (OEIS A104540; derivative route
+λ₃ = ½·d³/ds³[s² ln ξ(s)]|₁, error 5.0e-51; Keiper generating-function
+third difference, error 1.7e-10):
+
+    λ₃ = 1 + (3/2)γ − 3γ² + γ³ − 6γ₁ + 3γγ₁ + (3/2)γ₂
+         − 3 ln 2 − (3/2) ln π + (3/8)π² − (7/8)ζ(3)
+       = 0.20763892055432480…
+
+with γ₂ = −0.0096903631928723… (second Stieltjes constant) and
+ζ(3) = 1.2020569031595942853… (Apéry). Gates, all PASS:
+
+- **(a)** closed form ∈ certified interval ✓
+- **(b)** λ₃ > λ₂ = 0.115293185326… > 0 ✓, and the two certified sandwiches
+  are disjoint ✓
+- **(c)** series check (5-point central third difference of
+  `log ξ(1/(1−z)) + log 2`): error 1.7e-10 ✓
+- **(d)** derivative route at 80 dps: error 5.0e-51 ✓
+- **(e)** Lean-witness box check with exact `fractions.Fraction` arithmetic:
+  under the same box reasoning the Lean proof uses (γ ∈ (0.5604, 0.594),
+  the γ-atoms jointly bounded by monotone-cubic endpoint identities,
+  γγ₁ boxed by constants, π² ∈ (3.1415², 3.1416²), ln 2 and ln π at the
+  certified decimals), the decimal closed form lies in [0.159594, 0.296349]
+  ⊃ (0.15, 0.3), and λ₃ − λ₂ ≥ 0.088616 > 0 ✓
+
+Lean formalization **is done**: γ₂ and ζ(3) enter `Riemann.LiCriterion.lean`
+as certified decimals `stieltjes2Certified` / `zeta3Certified` (no axiom);
+`liLambda3_mem : λ₃ ∈ (0.15, 0.3)` and `liLambda2_lt_liLambda3 : λ₂ < λ₃` are
+machine-checked. The γ-atoms γ³ − 3γ² + (3/2)γ (and the difference-cubic
+γ³ − 2γ² + γ/2) are bounded JOINTLY by monotonicity endpoint identities
+(`cubicQ0_gt_endpoint`, `cubicQ0_lt_endpoint`) — the same concavity-product
+pattern that certified λ₂, one degree higher. Axiom audit: classical trio
+only (`propext, Classical.choice, Quot.sound`) across all nine new
+declarations.
+
 ## Bottom line
 
 1. `Riemann.quasiRH` is no longer trust-by-provenance only: the external
    chain is **independently rebuilt and axiom-audited** on our host.
-2. Our own certified Li chain now covers λ₁ **and** λ₂ with a positive
-   λ₂ − λ₁ margin — the beginning of a certified Keiper-coefficient ledger.
+2. Our own certified Li chain now covers λ₁, λ₂ **and** λ₃ with positive
+   margins λ₂ − λ₁ = 0.0693 and λ₃ − λ₂ = 0.1153 — a certified,
+   strictly-increasing Keiper-coefficient ledger to n = 3.
 3. Lean formalization of λ₂ **is done**: γ₁ enters `Riemann.LiCriterion.lean`
    as the certified decimal `stieltjes1Certified` (no axiom — same pattern
    as all numerical certificates in this repo); the closed form is

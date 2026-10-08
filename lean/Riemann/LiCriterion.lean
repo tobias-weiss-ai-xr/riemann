@@ -352,6 +352,173 @@ theorem liLambda1_lt_liLambda2 : liLambda1 < liLambda2 := by
   have hpi := piSq_gt
   linarith
 
+/-! ### The third Keiper–Li coefficient λ₃ -/
+
+/-- The second Stieltjes constant γ₂ as a certified 31-digit decimal (no
+axiom — same pattern as all numerical certificates in this repo; the
+identification with the true Stieltjes constant is external mathematical
+content, certified in research/QUASI_RH_CERT_AUDIT.md Part 4). -/
+def stieltjes2Certified : ℝ := -0.0096903631928723184845303860353
+
+/-- Apéry's constant ζ(3) as a certified 31-digit decimal (no axiom). -/
+def zeta3Certified : ℝ := 1.2020569031595942853997381615114
+
+/-- Closed form of the third Keiper–Li coefficient (coefficient of z³ in the
+Keiper generating function `log ξ(1/(1-z)) + log 2`), derived by PSLQ at 80
+dps and confirmed by the on-line zero sandwich and the derivative route
+(Keiper-Li: λₙ = 1/(n-1)! · dⁿ/dsⁿ[sⁿ⁻¹ log ξ(s)]|₁), with the Stieltjes and
+ζ(3) constants as certified decimals. -/
+noncomputable def liLambda3 : ℝ :=
+  1 + (3:ℝ) / 2 * eulerMascheroniConstant
+    - 3 * eulerMascheroniConstant ^ 2
+    + eulerMascheroniConstant ^ 3
+    - 6 * stieltjes1Certified
+    + 3 * stieltjes1Certified * eulerMascheroniConstant
+    + (3:ℝ) / 2 * stieltjes2Certified
+    - 3 * log 2
+    - (3:ℝ) / 2 * log Real.pi
+    + (3:ℝ) / 8 * Real.pi ^ 2
+    - (7:ℝ) / 8 * zeta3Certified
+
+/-- The rational cubic q₀(γ) = γ³ - 3γ² + (3/2)γ is strictly decreasing on
+the box (0.5604, 0.594): below by its value at the right endpoint. The proof
+is the exact concavity identity
+`(0.594 - γ) · (2.406γ - 0.070836 - γ²) = q₀(γ) - q₀(0.594)`
+(note `0.594² = 0.352836`, and `0.352836 - 3·0.594 + 3/2 = 0.070836`), with
+both factors positive on the box since `γ² < 0.594γ`. -/
+theorem cubicQ0_gt_endpoint :
+    (0.594 : ℝ) ^ 3 - 3 * (0.594 : ℝ) ^ 2 + (3:ℝ) / 2 * (0.594 : ℝ)
+      < eulerMascheroniConstant ^ 3
+        - 3 * eulerMascheroniConstant ^ 2
+        + (3:ℝ) / 2 * eulerMascheroniConstant := by
+  have hg : (0.5604 : ℝ) < eulerMascheroniConstant := eulerMascheroni_gt_05604
+  have hu : eulerMascheroniConstant < (0.594 : ℝ) := eulerMascheroniConstant_lt_0594
+  have hγpos : (0 : ℝ) < eulerMascheroniConstant := by linarith
+  have h1 : eulerMascheroniConstant * eulerMascheroniConstant
+      < (0.594 : ℝ) * eulerMascheroniConstant :=
+    mul_lt_mul_of_pos_right hu hγpos
+  have hpos : (0 : ℝ) < (0.594 - eulerMascheroniConstant)
+      * (2.406 * eulerMascheroniConstant - 0.070836
+        - eulerMascheroniConstant * eulerMascheroniConstant) :=
+    mul_pos (by linarith) (by linarith)
+  have hexpl : (0.594 - eulerMascheroniConstant)
+      * (2.406 * eulerMascheroniConstant - 0.070836
+        - eulerMascheroniConstant * eulerMascheroniConstant)
+      = eulerMascheroniConstant ^ 3 - 3 * eulerMascheroniConstant ^ 2
+        + (3:ℝ) / 2 * eulerMascheroniConstant
+        - ((0.594 : ℝ) ^ 3 - 3 * (0.594 : ℝ) ^ 2
+          + (3:ℝ) / 2 * (0.594 : ℝ)) := by
+    ring
+  rw [hexpl] at hpos
+  linarith
+
+/-- q₀ is strictly decreasing on the box: above by its value at the left
+endpoint, via the identity `(γ - 0.5604) · (2.4396γ - 0.13284816 - γ²) =
+q₀(0.5604) - q₀(γ)` (note `0.5604² = 0.31404816`, and `0.31404816 - 3·0.5604
++ 3/2 = 0.13284816`). -/
+theorem cubicQ0_lt_endpoint :
+    eulerMascheroniConstant ^ 3
+        - 3 * eulerMascheroniConstant ^ 2
+        + (3:ℝ) / 2 * eulerMascheroniConstant
+      < (0.5604 : ℝ) ^ 3 - 3 * (0.5604 : ℝ) ^ 2 + (3:ℝ) / 2 * (0.5604 : ℝ) := by
+  have hg : (0.5604 : ℝ) < eulerMascheroniConstant := eulerMascheroni_gt_05604
+  have hγpos : (0 : ℝ) < eulerMascheroniConstant := by linarith
+  have h1 : eulerMascheroniConstant * eulerMascheroniConstant
+      < (0.594 : ℝ) * eulerMascheroniConstant :=
+    mul_lt_mul_of_pos_right eulerMascheroniConstant_lt_0594 hγpos
+  have hpos : (0 : ℝ) < (eulerMascheroniConstant - 0.5604)
+      * (2.4396 * eulerMascheroniConstant - 0.13284816
+        - eulerMascheroniConstant * eulerMascheroniConstant) :=
+    mul_pos (by linarith) (by linarith)
+  have hexpl : (eulerMascheroniConstant - 0.5604)
+      * (2.4396 * eulerMascheroniConstant - 0.13284816
+        - eulerMascheroniConstant * eulerMascheroniConstant)
+      = ((0.5604 : ℝ) ^ 3 - 3 * (0.5604 : ℝ) ^ 2
+          + (3:ℝ) / 2 * (0.5604 : ℝ))
+        - (eulerMascheroniConstant ^ 3 - 3 * eulerMascheroniConstant ^ 2
+          + (3:ℝ) / 2 * eulerMascheroniConstant) := by
+    ring
+  rw [hexpl] at hpos
+  linarith
+
+/-- The γ-atom coupling of λ₃: since γ₁ < 0, `γ₁·γ` is bounded BELOW by
+`0.594·γ₁` on the box (0.5604, 0.594). -/
+theorem stieltjes1_mul_gamma_gt :
+    (0.594 : ℝ) * stieltjes1Certified
+      < eulerMascheroniConstant * stieltjes1Certified := by
+  have hs1 : stieltjes1Certified < 0 := by norm_num [stieltjes1Certified]
+  exact mul_lt_mul_of_neg_right eulerMascheroniConstant_lt_0594 hs1
+
+/-- The γ-atom coupling of λ₃: since γ₁ < 0, `γ₁·γ` is bounded ABOVE by
+`0.5604·γ₁` on the box (0.5604, 0.594). -/
+theorem stieltjes1_mul_gamma_lt :
+    eulerMascheroniConstant * stieltjes1Certified
+      < (0.5604 : ℝ) * stieltjes1Certified := by
+  have hs1 : stieltjes1Certified < 0 := by norm_num [stieltjes1Certified]
+  exact mul_lt_mul_of_neg_right eulerMascheroni_gt_05604 hs1
+
+theorem liLambda3_gt_015 : (0.15 : ℝ) < liLambda3 := by
+  unfold liLambda3
+  have hq := cubicQ0_gt_endpoint
+  have hgg1 := stieltjes1_mul_gamma_gt
+  have hs1 : stieltjes1Certified = (-0.0728158454836767248605863758749 : ℝ) := rfl
+  have hs2 : stieltjes2Certified = (-0.0096903631928723184845303860353 : ℝ) := rfl
+  have hz3 : zeta3Certified = (1.2020569031595942853997381615114 : ℝ) := rfl
+  have hl2 : log 2 < 0.6931471808 := log_two_lt_d9
+  have hlp : log Real.pi < 1.1631508109 := logPi_lt
+  have hpi := piSq_gt
+  linarith
+
+theorem liLambda3_lt_03 : liLambda3 < (0.3 : ℝ) := by
+  unfold liLambda3
+  have hq := cubicQ0_lt_endpoint
+  have hgg1 := stieltjes1_mul_gamma_lt
+  have hs1 : stieltjes1Certified = (-0.0728158454836767248605863758749 : ℝ) := rfl
+  have hs2 : stieltjes2Certified = (-0.0096903631928723184845303860353 : ℝ) := rfl
+  have hz3 : zeta3Certified = (1.2020569031595942853997381615114 : ℝ) := rfl
+  have hl2 : (0.6931471803 : ℝ) < log 2 := log_two_gt_d9
+  have hlp : (1.0986122885 : ℝ) < log Real.pi := logPi_gt
+  have hpi := piSq_lt
+  linarith
+
+theorem liLambda3_mem : (0.15 : ℝ) < liLambda3 ∧ liLambda3 < 0.3 := by
+  exact ⟨liLambda3_gt_015, liLambda3_lt_03⟩
+
+/-- Keiper coefficients strictly increase at the start: λ₂ < λ₃. The
+γ-part of the difference is the cubic `q̂(γ) = γ³ - 2γ² + γ/2`, strictly
+decreasing on the box via the identity
+`(0.594 - γ) · (1.406γ + 0.335164 - γ²) = q̂(γ) - q̂(0.594)`
+(note `0.594² = 0.352836`, and `0.352836 - 2·0.594 + 1/2 = 0.335164`). -/
+theorem liLambda2_lt_liLambda3 : liLambda2 < liLambda3 := by
+  unfold liLambda2 liLambda3
+  have hg : (0.5604 : ℝ) < eulerMascheroniConstant := eulerMascheroni_gt_05604
+  have hu : eulerMascheroniConstant < (0.594 : ℝ) := eulerMascheroniConstant_lt_0594
+  have hγpos : (0 : ℝ) < eulerMascheroniConstant := by linarith
+  have h1 : eulerMascheroniConstant * eulerMascheroniConstant
+      < (0.594 : ℝ) * eulerMascheroniConstant :=
+    mul_lt_mul_of_pos_right eulerMascheroniConstant_lt_0594 hγpos
+  have hpos : (0 : ℝ) < (0.594 - eulerMascheroniConstant)
+      * (1.406 * eulerMascheroniConstant + 0.335164
+        - eulerMascheroniConstant * eulerMascheroniConstant) :=
+    mul_pos (by linarith) (by linarith)
+  have hexpl : (0.594 - eulerMascheroniConstant)
+      * (1.406 * eulerMascheroniConstant + 0.335164
+        - eulerMascheroniConstant * eulerMascheroniConstant)
+      = (eulerMascheroniConstant ^ 3 - 2 * eulerMascheroniConstant ^ 2
+          + (1:ℝ) / 2 * eulerMascheroniConstant)
+        - ((0.594 : ℝ) ^ 3 - 2 * (0.594 : ℝ) ^ 2
+          + (1:ℝ) / 2 * (0.594 : ℝ)) := by
+    ring
+  rw [hexpl] at hpos
+  have hgg1 := stieltjes1_mul_gamma_gt
+  have hs1 : stieltjes1Certified = (-0.0728158454836767248605863758749 : ℝ) := rfl
+  have hs2 : stieltjes2Certified = (-0.0096903631928723184845303860353 : ℝ) := rfl
+  have hz3 : zeta3Certified = (1.2020569031595942853997381615114 : ℝ) := rfl
+  have hl2 : log 2 < 0.6931471808 := log_two_lt_d9
+  have hlp : log Real.pi < 1.1631508109 := logPi_lt
+  have hpi := piSq_gt
+  linarith
+
 /-- The bridge to the completed zeta: the certified λ₁ equals the value at
 `s = 1` of mathlib's entire regularization `Λ₀(s) = Λ(s) + 1/s + 1/(1-s)` of
 the completed Riemann zeta `Λ(s) = π^(-s/2) Γ(s/2) ζ(s)` — the anchor point

@@ -648,10 +648,16 @@ detector certificate).  Consequences for the honesty boundary here:
   no `native_decide`/`unsafe` anywhere in the subtree; comparator signature
   matches byte-for-byte. Our `quasiRH` axiom is trust-by-proof-term, not
   trust-by-provenance. Audit note: `research/QUASI_RH_CERT_AUDIT.md`.
-- Numerical extension: λ₂ certified in our pipeline (λ₂ ∈ [0.090576,
-  0.103287] from 2000 on-line zeros; closed form 1 + γ − γ² − 2γ₁ − 2 ln 2
-  − ln π + π²/8 = 0.092345735… inside; λ₂ > λ₁ by 0.0692500…). Lean
-  formalization still gated on mathlib Stieltjes constants.
+- Numerical extension: the certified Keiper ledger reaches **n = 3**. λ₂ ∈
+  [0.090576, 0.103287] (closed form 1 + γ − γ² − 2γ₁ − 2 ln 2 − ln π + π²/8
+  = 0.092345735… inside; λ₂ > λ₁ by 0.0692500…) and λ₃ ∈ [0.203658, 0.232257]
+  (closed form 1 + (3/2)γ − 3γ² + γ³ − 6γ₁ + 3γγ₁ + (3/2)γ₂ − 3 ln 2 − (3/2)
+  ln π + (3/8)π² − (7/8)ζ(3) = 0.207638920554… inside, derived by PSLQ at 80
+  dps + confirmed against OEIS A104540 and the derivative route; λ₃ > λ₂ by
+  0.1152932…). Lean formalization **done** (2026-10-07/08): γ₁, γ₂, ζ(3) as
+  certified decimals, `liLambda1_mem`/`liLambda2_mem`/`liLambda3_mem`, strict
+  chain λ₁ < λ₂ < λ₃ (`liLambda1_lt_liLambda2`, `liLambda2_lt_liLambda3`) —
+  all axiom-pure. Audit: `research/QUASI_RH_CERT_AUDIT.md` Parts 4–5.
 
 ---
 

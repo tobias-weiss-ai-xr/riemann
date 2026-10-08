@@ -33,7 +33,10 @@ The project formalizes:
    bridge to the completed zeta (`liLambda1_eq_completedZeta0`); extended to the
    second Keiper–Li coefficient λ₂ ∈ (0.07, 0.15) via the certified decimal γ₁
    (`stieltjes1Certified`, no axiom) and `λ₁ < λ₂` (`liLambda2_mem`,
-   `liLambda1_lt_liLambda2`)
+   `liLambda1_lt_liLambda2`); extended to the third coefficient λ₃ ∈ (0.15, 0.3)
+   via the certified decimals γ₂ and ζ(3) (`stieltjes2Certified`,
+   `zeta3Certified`, no axiom), `λ₂ < λ₃` (`liLambda3_mem`,
+   `liLambda2_lt_liLambda3`)
 
 ## Running
 
