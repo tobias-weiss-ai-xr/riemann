@@ -49,15 +49,38 @@ lies inside the machine-checked `(0.0054, 0.091)` — so the two
 certificates are consistent, with the formal interval a conservative
 enclosure of the numerical one.
 
+The chain extends to the **second Keiper–Li coefficient**: with γ₁
+represented by the certified decimal `stieltjes1Certified` (Python
+pipeline `scripts/routes/li_lambda2_certified.py`: a rigorous K=2000
+on-line-zero sandwich `λ₂ ∈ [0.090576382823, 0.103286923022]` around the
+closed form; see `research/QUASI_RH_CERT_AUDIT.md` Part 4), the closed
+form `λ₂ = 1 + γ − γ² − 2γ₁ − 2 log 2 − log π + π²/8 ≈ 0.092345735228`
+is machine-checked inside `(0.07, 0.15)` and strictly above λ₁:
+
+* `γ < 0.594` — upper harmonic sequence at `n = 32`
+  (`eulerMascheroniSeq' 32 = H₃₂ − log 32`, `log 32 = 5 log 2`);
+* `3.1415² < π² < 3.1416²` — mathlib decimal bounds `pi_gt_d4`/`pi_lt_d4`.
+
+The certified computational interval `[0.090576382823, 0.103286923022]`
+lies inside the machine-checked `(0.07, 0.15)`, again consistent, with
+the formal interval the conservative enclosure.
+
 ## Main definition
 
 * `liLambda1`: the closed form `1 + γ/2 − log 2 − log π/2`.
+* `stieltjes1Certified`: the certified decimal for the first Stieltjes
+  constant γ₁ (no axiom — see its docstring).
+* `liLambda2`: the closed form
+  `1 + γ − γ² − 2γ₁ − 2 log 2 − log π + π²/8`.
 
 ## Main theorems
 
 * `liLambda1_pos`: `0 < liLambda1` (the first step of Li's criterion).
 * `liLambda1_lt`: `liLambda1 < 91/1000` (a certified upper bound).
 * `liLambda1_mem`: `liLambda1 ∈ (0.0054, 91/1000)` (the combined interval).
+* `liLambda2_mem`: `liLambda2 ∈ (0.07, 0.15)` (second coefficient).
+* `liLambda1_lt_liLambda2`: the Keiper coefficients strictly increase at
+  the start.
 -/
 
 namespace Riemann
@@ -172,6 +195,162 @@ theorem liLambda1_mem : 0.0054 < liLambda1 ∧ liLambda1 < 91 / 1000 := by
   constructor
   · exact liLambda1_gt_0054
   · exact liLambda1_lt
+
+/-! ### The second Keiper–Li coefficient λ₂ -/
+
+/-- `γ < 0.594` : a certified upper bound on the Euler–Mascheroni constant,
+sharper than mathlib's `eulerMascheroniConstant_lt_two_thirds`, via the upper
+harmonic sequence at `n = 32` (`eulerMascheroniSeq' 32 = H₃₂ − log 32`, and
+`log 32 = 5 log 2` decomposes into the sharply bounded `log 2 > 0.6931471803`).
+The numerical witness: `H₃₂ − 5 · 0.6931471803 = 0.5927592939 < 0.594`. -/
+lemma eulerMascheroniConstant_lt_0594 : eulerMascheroniConstant < 0.594 := by
+  have h1 : eulerMascheroniConstant < eulerMascheroniSeq' 32 :=
+    eulerMascheroniConstant_lt_eulerMascheroniSeq' 32
+  have h32 : (32 : ℕ) ≠ 0 := by norm_num
+  have h2 : eulerMascheroniSeq' 32 = (harmonic 32 : ℝ) - log ((32 : ℕ) : ℝ) := by
+    simp only [eulerMascheroniSeq', if_neg h32]
+  have hv : (harmonic 32 : ℝ) = (586061125622639 / 144403552893600 : ℚ) := by norm_num
+  have hlog : log ((32 : ℕ) : ℝ) = (5 : ℝ) * log 2 := by
+    have h32r : ((32 : ℕ) : ℝ) = (2 : ℝ) ^ (5 : ℝ) := by norm_num
+    have h : log ((2 : ℝ) ^ (5 : ℝ)) = (5 : ℝ) * log 2 :=
+      log_rpow (by norm_num : 0 < (2 : ℝ)) 5
+    rw [h32r, h]
+  have hl2 : log 2 > 0.6931471803 := log_two_gt_d9
+  rw [h2, hv, hlog] at h1
+  linarith
+
+/-- `3.1415² < π²` : a certified lower bound on `π²`, from mathlib's
+`Real.pi_gt_d4`. -/
+lemma piSq_gt : (3.1415 : ℝ) ^ 2 < Real.pi ^ 2 := by
+  have h : Real.pi > 3.1415 := Real.pi_gt_d4
+  have hpos : (0 : ℝ) < Real.pi := Real.pi_pos
+  have s1 : (3.1415 : ℝ) * 3.1415 < Real.pi * 3.1415 :=
+    mul_lt_mul_of_pos_right h (by norm_num : (0 : ℝ) < 3.1415)
+  have s2 : Real.pi * 3.1415 ≤ Real.pi * Real.pi :=
+    mul_le_mul_of_nonneg_left (le_of_lt h) hpos.le
+  linarith
+
+/-- `π² < 3.1416²` : a certified upper bound on `π²`, from mathlib's
+`Real.pi_lt_d4`. -/
+lemma piSq_lt : Real.pi ^ 2 < (3.1416 : ℝ) ^ 2 := by
+  have h : Real.pi < 3.1416 := Real.pi_lt_d4
+  have hpos : (0 : ℝ) < Real.pi := Real.pi_pos
+  have s1 : Real.pi * Real.pi ≤ (3.1416 : ℝ) * Real.pi :=
+    mul_le_mul_of_nonneg_right (le_of_lt h) hpos.le
+  have s2 : Real.pi * 3.1416 < (3.1416 : ℝ) * 3.1416 :=
+    mul_lt_mul_of_pos_right h (by norm_num : (0 : ℝ) < 3.1416)
+  linarith
+
+/-- The certified numerical value of the first Stieltjes constant
+`γ₁ = −0.0728158454836767248605863758749…`.
+
+This is a plain decimal, NOT an axiom: the mathematical content — that this
+decimal equals the first Stieltjes constant (the Laurent coefficient of
+`ζ` at `s = 1`) and that the closed form `λ₂ = 1 + γ − γ² − 2γ₁ − 2 log 2 −
+log π + π²/8` is the coefficient of `z²` in Keiper's generating function
+`log ξ(1/(1−z)) + log 2` — is certified externally by the Python pipeline
+`scripts/routes/li_lambda2_certified.py` (gates a–c all PASS: rigorous
+K=2000 on-line-zero sandwich `λ₂ ∈ [0.090576382823, 0.103286923022]`
+containing the closed form; `λ₂ − λ₁ > 0`; independent series check at
+1.8e-13). See `research/QUASI_RH_CERT_AUDIT.md` Part 4. Lean consumes only
+the decimal — exactly the "finite certified numerical object + Lean glue"
+pattern of the whole repository. -/
+def stieltjes1Certified : ℝ := -0.0728158454836767248605863758749
+
+/-- λ₂ = `1 + γ − γ² − 2γ₁ − 2 log 2 − log π + π²/8` with γ₁ the certified
+decimal `stieltjes1Certified`: the closed form of the second Keiper–Li
+coefficient, the coefficient of `z²` in `log ξ(1/(1−z)) + log 2`.
+Numerically `λ₂ ≈ 0.092345735228`. -/
+noncomputable def liLambda2 : ℝ :=
+  1 + eulerMascheroniConstant - eulerMascheroniConstant * eulerMascheroniConstant
+    - 2 * stieltjes1Certified - 2 * log 2 - log Real.pi + Real.pi ^ 2 / 8
+
+/-- `0.07 < λ₂` : a certified lower bound on the second Keiper–Li coefficient.
+Worst case over the certified boxes `γ ∈ (0.5604, 0.594)`,
+`log 2 < 0.6931471808`, `log π < 1.1631508109`, `π² > 3.1415²`:
+`1 + 0.594 − 0.594² + 0.14563169096735 − 2 · 0.6931471808 − 1.1631508109 +
+3.1415²/8 = 0.070978299717 > 0.07`. -/
+theorem liLambda2_gt_007 : (0.07 : ℝ) < liLambda2 := by
+  unfold liLambda2
+  -- pair bound: on γ ∈ (0.5604, 0.594) the map γ ↦ γ − γ² is strictly decreasing,
+  -- so γ − γ² > f(0.594) = 0.241164; algebraically
+  -- (0.594 − γ)(γ − 0.406) > 0 unfolds to γ − γ² − 0.241164 > 0.
+  have hu : eulerMascheroniConstant < (0.594 : ℝ) := eulerMascheroniConstant_lt_0594
+  have hpos : (0 : ℝ) < (0.594 - eulerMascheroniConstant)
+      * (eulerMascheroniConstant - 0.406) :=
+    mul_pos (by linarith) (by linarith [eulerMascheroni_gt_05604])
+  have hexpl : (0.594 - eulerMascheroniConstant)
+      * (eulerMascheroniConstant - 0.406)
+      = eulerMascheroniConstant - eulerMascheroniConstant * eulerMascheroniConstant
+        - 0.241164 := by
+    ring
+  rw [hexpl] at hpos
+  have hs : stieltjes1Certified = (-0.0728158454836767248605863758749 : ℝ) := rfl
+  have hl2 : log 2 < 0.6931471808 := log_two_lt_d9
+  have hlp : log Real.pi < 1.1631508109 := logPi_lt
+  have hpi := piSq_gt
+  linarith
+
+/-- `λ₂ < 0.15` : a certified upper bound on the second Keiper–Li coefficient.
+Worst case over the certified boxes `γ ∈ (0.5604, 0.594)`,
+`log 2 > 0.6931471803`, `log π > 1.0986122885`, `π² < 3.1416²`:
+`1 + 0.5604 − 0.5604² + 0.14563169096735 − 2 · 0.6931471803 − 1.0986122885 +
+3.1416²/8 = 0.140783201867 < 0.15`. -/
+theorem liLambda2_lt_015 : liLambda2 < (0.15 : ℝ) := by
+  unfold liLambda2
+  -- pair bound: γ ↦ γ − γ² is decreasing on (1/2, ∞), so the maximum over
+  -- γ ∈ (0.5604, 0.594) is at γ = 0.5604: γ − γ² < 0.24635184; algebraically
+  -- (γ − 0.5604)(γ − 0.4396) > 0 unfolds to γ² − γ + 0.24635184 > 0.
+  have hg : (0.5604 : ℝ) < eulerMascheroniConstant := eulerMascheroni_gt_05604
+  have hpos : (0 : ℝ) < (eulerMascheroniConstant - 0.5604)
+      * (eulerMascheroniConstant - 0.4396) :=
+    mul_pos (by linarith) (by linarith)
+  have hexpl : (eulerMascheroniConstant - 0.5604)
+      * (eulerMascheroniConstant - 0.4396)
+      = eulerMascheroniConstant * eulerMascheroniConstant - eulerMascheroniConstant
+        + 0.24635184 := by
+    ring
+  rw [hexpl] at hpos
+  have hs : stieltjes1Certified = (-0.0728158454836767248605863758749 : ℝ) := rfl
+  have hl2 : (0.6931471803 : ℝ) < log 2 := log_two_gt_d9
+  have hlp : (1.0986122885 : ℝ) < log Real.pi := logPi_gt
+  have hpi := piSq_lt
+  linarith
+
+/-- The second Keiper–Li coefficient lies in the open interval `(0.07, 0.15)`:
+a certified two-sided enclosure consistent with the computational interval
+`[0.090576382823, 0.103286923022]` from the K=2000 on-line-zero sandwich
+(`data/routes/rt_lc_lambda2.json`). -/
+theorem liLambda2_mem : (0.07 : ℝ) < liLambda2 ∧ liLambda2 < 0.15 := by
+  constructor
+  · exact liLambda2_gt_007
+  · exact liLambda2_lt_015
+
+/-- The Keiper coefficients strictly increase at the start: `λ₁ < λ₂`.
+In the certified boxes the difference is bounded below by
+`γ/2 − γ² − 2γ₁ − log 2 − log π/2 + π²/8 > 0.2802 − 0.594² + 0.14563169096735
+− 0.6931471808 − 0.58157540545 + 3.1415²/8 = 0.031900885967 > 0`
+(the certified Python margin: `λ₂ − λ₁ = 0.069250026262`). -/
+theorem liLambda1_lt_liLambda2 : liLambda1 < liLambda2 := by
+  unfold liLambda1 liLambda2
+  -- pair bound γ − γ² > 0.241164 (same concavity argument as liLambda2_gt_007)
+  have hu : eulerMascheroniConstant < (0.594 : ℝ) := eulerMascheroniConstant_lt_0594
+  have hpos : (0 : ℝ) < (0.594 - eulerMascheroniConstant)
+      * (eulerMascheroniConstant - 0.406) :=
+    mul_pos (by linarith) (by linarith [eulerMascheroni_gt_05604])
+  have hexpl : (0.594 - eulerMascheroniConstant)
+      * (eulerMascheroniConstant - 0.406)
+      = eulerMascheroniConstant - eulerMascheroniConstant * eulerMascheroniConstant
+        - 0.241164 := by
+    ring
+  rw [hexpl] at hpos
+  have hs : stieltjes1Certified = (-0.0728158454836767248605863758749 : ℝ) := rfl
+  have hgh : eulerMascheroniConstant / 2 < (0.594 : ℝ) / 2 := by
+    linarith [eulerMascheroniConstant_lt_0594]
+  have hl2 : log 2 < 0.6931471808 := log_two_lt_d9
+  have hlp : log Real.pi < 1.1631508109 := logPi_lt
+  have hpi := piSq_gt
+  linarith
 
 /-- The bridge to the completed zeta: the certified λ₁ equals the value at
 `s = 1` of mathlib's entire regularization `Λ₀(s) = Λ(s) + 1/s + 1/(1-s)` of

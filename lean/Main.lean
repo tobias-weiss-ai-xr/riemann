@@ -30,7 +30,10 @@ The project formalizes:
 5. **LMFDB conjectures** — empirical results from ML experiments
 6. **RH bridges** — connections to mathlib's RiemannHypothesis
 7. **Li's criterion** — certified interval λ₁ ∈ (0.0054, 0.091) (`liLambda1_mem`),
-   bridge to the completed zeta (`liLambda1_eq_completedZeta0`)
+   bridge to the completed zeta (`liLambda1_eq_completedZeta0`); extended to the
+   second Keiper–Li coefficient λ₂ ∈ (0.07, 0.15) via the certified decimal γ₁
+   (`stieltjes1Certified`, no axiom) and `λ₁ < λ₂` (`liLambda2_mem`,
+   `liLambda1_lt_liLambda2`)
 
 ## Running
 

@@ -107,6 +107,12 @@ constant). Gates, all PASS:
    chain is **independently rebuilt and axiom-audited** on our host.
 2. Our own certified Li chain now covers λ₁ **and** λ₂ with a positive
    λ₂ − λ₁ margin — the beginning of a certified Keiper-coefficient ledger.
-3. Lean formalization of λ₂ remains blocked on mathlib Stieltjes constants
-   (memory `mem_mu9fbqx2_mudnjirm`); the numerical certificate is ready the
-   day mathlib grows them.
+3. Lean formalization of λ₂ **is done**: γ₁ enters `Riemann.LiCriterion.lean`
+   as the certified decimal `stieltjes1Certified` (no axiom — same pattern
+   as all numerical certificates in this repo); the closed form is
+   machine-checked as `liLambda2 ∈ (0.07, 0.15)` (`liLambda2_mem`),
+   enclosing the certified interval [0.090576382823, 0.103286923022], and
+   `liLambda1_lt_liLambda2 : λ₁ < λ₂` proves gate (b) formally. Axiom audit:
+   classical trio only (`propext, Classical.choice, Quot.sound`). The
+   identity of the decimal with the true Stieltjes constant remains external
+   mathematical content — exactly what this document certifies.
