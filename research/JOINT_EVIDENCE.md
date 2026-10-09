@@ -89,6 +89,15 @@ assembler from RT2-NB; 9-point power-law fit over a 256× range).
   cond(G) = 5.04e7, **10-point power law εₙ ≈ 0.4355·n^−0.8539** — the
   accelerating decay holds at 512× in n.  (The O(pieces·n²) original would
   need ~5e15 FLOPs ≈ 40 h; the fit had extrapolated ε₈₁₉₂ ≈ 2.0e-4 — hit.)
+- **n = 16384 reached (RT-NB-16K)** with the same assembler
+  (`nyman_beurling_16k.py`, run on the 1blu VPS, 28.2 h): pieces = 172M,
+  verify/selftest clean as at 8K.  Result: **ε₁₆₃₈₄ = 9.790e-5** (< 10⁻³ ✓,
+  0.0565% of ‖f‖²), min_eig = 7.34e-6 > 0, cond(G) = 2.05e8, **11-point
+  power law εₙ ≈ 0.4516·n^−0.8614** — β accelerates again
+  (−0.8539 over 10 sizes → −0.8614 over 11), and the successive ratio
+  ε₈₁₉₂/ε₁₆₃₈₄ = 1.90 (was 1.854): the per-step decay keeps steepening, the
+  direction Baez–Duarte's criterion demands.  (The 8K fit predicted
+  ε₁₆₃₈₄ ≈ 1.04e-4 — hit.)
 
 ## Cross-route consistency
 
@@ -96,8 +105,9 @@ Three independent equivalences now show *quantitative* agreement with RH:
 
 1. **Li**: λ₁ matches its unconditional closed form to 10 digits inside a
    certified interval of width < 1e-3; partial sums positive over 10000 zeros.
-2. **Nyman–Beurling**: εₙ decays with a stable exponent over 512× in n
-   (β = −0.854 across 10 sizes up to n = 8192), the behaviour predicted on RH.
+2. **Nyman–Beurling**: εₙ decays with a stable exponent over 1024× in n
+   (β = −0.8614 across 11 sizes up to n = 16384, still steepening), the
+   behaviour predicted on RH.
 3. **Spectral radius**: ρ(L_{σ+it}) < 1 is *certified* in 44 probes at
    σ ≥ 0.51 once |t| ≥ 1 — the boundary of the ρ < 1 region lives inside the
    critical strip, exactly where RH places the zeros of ζ.
