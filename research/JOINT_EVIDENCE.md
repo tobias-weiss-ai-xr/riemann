@@ -98,6 +98,11 @@ assembler from RT2-NB; 9-point power-law fit over a 256× range).
   ε₈₁₉₂/ε₁₆₃₈₄ = 1.90 (was 1.854): the per-step decay keeps steepening, the
   direction Baez–Duarte's criterion demands.  (The 8K fit predicted
   ε₁₆₃₈₄ ≈ 1.04e-4 — hit.)
+  Post-analysis (`research/NB16K_EXPONENT_DRIFT.md`): the apparent power law
+  is really **εₙ ≈ 0.257·n⁻¹·(ln n)^−0.84** (ΔAIC = 52 over the pure power;
+  leading exponent 1.008 ± 0.005 ≡ 1) — the "accelerating β" is the log
+  factor.  Predictions for NB-32K: ε₃₂₇₆₈ ≈ 5.2–5.8e-5.  Secondary laws:
+  λ_min(Gₙ) ≈ 0.150·n^−1.034±0.007, cond ≈ n².
 
 ## Cross-route consistency
 
