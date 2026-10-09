@@ -10,6 +10,7 @@ import Riemann.FriedliRatio
 import Riemann.LMFDBConjectures
 import Riemann.RiemannHypothesis
 import Riemann.LiCriterion
+import Riemann.NymanBeurling
 import Riemann.GoldbachBridge
 
 open Riemann
@@ -37,6 +38,13 @@ The project formalizes:
    via the certified decimals γ₂ and ζ(3) (`stieltjes2Certified`,
    `zeta3Certified`, no axiom), `λ₂ < λ₃` (`liLambda3_mem`,
    `liLambda2_lt_liLambda3`)
+8. **Nyman–Beurling density** — the Báez-Duarte criterion
+   (`baezDuarte`, axiom) plus the certified rational certificate table of the
+   measured εₙ chain n = 16 … 16384 (`nbCertRows`, gate PASS at 16K:
+   ε₁₆₃₈₄ = 9.79e-5), machine-checked log-law containment
+   (`nbCertChecksTrue`: εₙ ≈ 0.257·n⁻¹·(ln n)^0.84 over 1024× in n),
+   strict decay (`nbCertStrictlyDecreasing`) and the 1.90 successive ratio
+   (`nbRatio8192To16384Gt185`)
 
 ## Running
 
@@ -59,6 +67,7 @@ def main : IO Unit := do
   IO.println "  ✓ LMFDBConjectures.lean — Empirical ML conjectures"
   IO.println "  ✓ RiemannHypothesis.lean — Bridge to mathlib's RH"
   IO.println "  ✓ GoldbachBridge.lean — Granville's RH ↔ averaged Goldbach"
+  IO.println "  ✓ NymanBeurling.lean — Báez-Duarte density criterion + certified 16K chain"
   IO.println ""
   IO.println "The Riemann hypothesis (RiemannHypothesis) is already"
   IO.println "defined in mathlib as a Prop. The goal of this project"

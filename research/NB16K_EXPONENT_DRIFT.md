@@ -18,21 +18,23 @@ exponent**. Weighting all 11 points on log-scale and comparing nested models:
 | model | form | rms (ln) | AIC |
 |---|---|---:|---:|
 | M1 pure power | εₙ = A·n^(−β) | 5.6e-2 | −59.3 |
-| **M2 power × log** | εₙ = A·n^(−b)·(ln n)^(−d) | **4.8e-3** | **−111.4** |
+| **M2 power × log** | εₙ = A·n^(−b)·(ln n)^(+d) | **4.8e-3** | **−111.4** |
 | M3 log-linear/n | εₙ = (a + b·ln n)/n | 0.9% rel | — |
 
 M2 beats M1 by **ΔAIC = 52** — decisive — with
 
-    εₙ ≈ 0.2566 · n^(−1.0078 ± 0.0045) · (ln n)^(−0.840 ± 0.025)
+    εₙ ≈ 0.2566 · n^(−1.0078 ± 0.0045) · (ln n)^(+0.840 ± 0.025)
 
 The leading exponent is **statistically indistinguishable from exactly 1**
-(t = 1.7). M3 agrees: n·εₙ ≈ 0.121 + 0.169·ln n (rises 0.589 → 1.604 across
-the chain, near-linearly in ln n).
+(t = 1.7); the logarithmic factor sits in the *numerator*. M3 agrees:
+n·εₙ ≈ 0.121 + 0.169·ln n (rises 0.589 → 1.604 across the chain,
+near-linearly in ln n).
 
 **Reading**: over 1024× in n the NB density on the grid aₖ = k/(n+1) decays
-like **n⁻¹ × slowly-varying logarithmic factor**, not like n^−0.86. The
-apparent "β accelerating from −0.73 to −0.93" is the logarithmic factor
-revealing itself as n grows.
+like **n⁻¹ × (ln n)^+0.84** — not like n^−0.86. Local exponent of this law:
+κ(n) = b − d/ln n = 1.0078 − 0.840/ln n, i.e. 0.76 at n = 32 rising to 0.92
+at n = 16384 — matching the measured local exponents (0.726 → 0.928). The
+"accelerating β" is the arithmetic log factor thinning out relative to n⁻¹.
 
 ## 2. Local exponents (successive doublings)
 
@@ -85,6 +87,14 @@ structure of K(i,j) is the analytic opening for an O(n²·polylog) assembly.)
 - Single grid scheme (aₖ = k/(n+1)); other Baez–Duarte dilations (dyadic rₖ)
   may show different constants, same structural test applies.
 
-**Bottom line**: quote εₙ ≈ 0.257·n⁻¹·(ln n)^−0.84 (or equivalently
+**Bottom line**: quote εₙ ≈ 0.257·n⁻¹·(ln n)^+0.84 (or equivalently
 n·εₙ ≈ 0.121 + 0.169·ln n), not β = −0.8614. The chain's "acceleration" is
 the log factor, and the next doubling should land at ε₃₂ₖ ≈ 5.2–5.8e-5.
+
+---
+*Correction (2026-10-09, same day): an earlier version of this note printed
+the log factor with the wrong sign — (ln n)^−0.84 instead of +0.84. The
+certified-rational containment check written for the Lean module
+(`Riemann/NymanBeurling.lean`) caught it: the flipped model is 5× off at
+n = 16. The AIC table, prediction table, and κ(n) = b − d/ln n reading were
+always computed with the correct sign and are unchanged.*

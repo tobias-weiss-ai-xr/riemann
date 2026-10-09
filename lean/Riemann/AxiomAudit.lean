@@ -29,6 +29,13 @@ Findings (run `lake env lean lean/Riemann/AxiomAudit.lean` to reproduce):
         this build modulo exactly these two inputs — see
         `#print axioms Riemann.TransferOperator.no_zeros_right_half_plane`
         below. See research/FRONTIER.md §3d and research/OAI_MATH_RECON.md.
+     c. `Riemann.baezDuarte` — the Báez-Duarte density criterion axiom
+        (`NymanBeurling.lean`, added 2026-10-09): an EXTERNAL theorem
+        (Báez-Duarte, Atti Lincei 14, 2003 + arXiv:math/0505453) declared as
+        an axiom: RH ↔ `nbDensity N → 0` (co-Poisson integer-dilation form).
+        Provenance and the scheme-honesty note live in the module header.
+        The certificate table `nbCertRows` in the same module is axiom-free
+        (native_decide over exported rationals).
 
   3. `transferOperator_compact` does NOT exist in this formalization and
      cannot be printed: the original compactness goal `IsCompactOperator
