@@ -1,0 +1,583 @@
+{
+  "metadata": {
+    "experiment": "QEC-01",
+    "mc_shots": 2000
+  },
+  "codes": {
+    "repetition-5": {
+      "n_qubits": 5,
+      "n_z_checks": 4,
+      "n_x_checks": 0,
+      "syndrome_graph_Z": {
+        "n_nodes": 4,
+        "n_edges": 3,
+        "degree_min": 1,
+        "degree_max": 2,
+        "degree_avg": 1.5,
+        "is_regular": false,
+        "eigenvalues_desc_first10": [
+          1.61803,
+          0.61803,
+          -0.61803,
+          -1.61803
+        ],
+        "second_largest_adjacency": 0.61803,
+        "spectral_gap_adjacency": 1.38197,
+        "normalized_laplacian_gap": 0.5,
+        "cheeger_bound_h": 0.25,
+        "ramanujan_bound": 2.0,
+        "max_abs_nontrivial": 1.61803,
+        "ramanujan_ratio": 0.80902,
+        "is_ramanujan": true,
+        "girth": 0
+      },
+      "syndrome_graph_X": {},
+      "tanner_graph": {
+        "n_nodes": 9,
+        "n_edges": 8,
+        "degree_min": 1,
+        "degree_max": 2,
+        "degree_avg": 1.778,
+        "is_regular": false,
+        "eigenvalues_desc_first10": [
+          1.90211,
+          1.61803,
+          1.17557,
+          0.61803,
+          0.0,
+          -0.61803,
+          -1.17557,
+          -1.61803,
+          -1.90211
+        ],
+        "second_largest_adjacency": 1.61803,
+        "spectral_gap_adjacency": 0.38197,
+        "normalized_laplacian_gap": 0.07612,
+        "cheeger_bound_h": 0.03806,
+        "ramanujan_bound": 2.0,
+        "max_abs_nontrivial": 1.90211,
+        "ramanujan_ratio": 0.95106,
+        "is_ramanujan": true,
+        "girth": 0
+      }
+    },
+    "toric-d2": {
+      "n_qubits": 8,
+      "n_z_checks": 4,
+      "n_x_checks": 4,
+      "syndrome_graph_Z": {
+        "n_nodes": 4,
+        "n_edges": 4,
+        "degree_min": 2,
+        "degree_max": 2,
+        "degree_avg": 2.0,
+        "is_regular": true,
+        "eigenvalues_desc_first10": [
+          2.0,
+          0.0,
+          -0.0,
+          -2.0
+        ],
+        "second_largest_adjacency": 0.0,
+        "spectral_gap_adjacency": 2.0,
+        "normalized_laplacian_gap": 1.0,
+        "cheeger_bound_h": 0.5,
+        "ramanujan_bound": 2.0,
+        "max_abs_nontrivial": 0.0,
+        "ramanujan_ratio": 0.0,
+        "is_ramanujan": true,
+        "girth": 4
+      },
+      "syndrome_graph_X": {
+        "n_nodes": 4,
+        "n_edges": 4,
+        "degree_min": 2,
+        "degree_max": 2,
+        "degree_avg": 2.0,
+        "is_regular": true,
+        "eigenvalues_desc_first10": [
+          2.0,
+          0.0,
+          -0.0,
+          -2.0
+        ],
+        "second_largest_adjacency": 0.0,
+        "spectral_gap_adjacency": 2.0,
+        "normalized_laplacian_gap": 1.0,
+        "cheeger_bound_h": 0.5,
+        "ramanujan_bound": 2.0,
+        "max_abs_nontrivial": 0.0,
+        "ramanujan_ratio": 0.0,
+        "is_ramanujan": true,
+        "girth": 4
+      },
+      "tanner_graph": {
+        "n_nodes": 16,
+        "n_edges": 32,
+        "degree_min": 4,
+        "degree_max": 4,
+        "degree_avg": 4.0,
+        "is_regular": true,
+        "eigenvalues_desc_first10": [
+          4.0,
+          2.0,
+          2.0,
+          2.0,
+          2.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          -0.0
+        ],
+        "second_largest_adjacency": 2.0,
+        "spectral_gap_adjacency": 2.0,
+        "normalized_laplacian_gap": 0.5,
+        "cheeger_bound_h": 0.25,
+        "ramanujan_bound": 3.4641,
+        "max_abs_nontrivial": 2.0,
+        "ramanujan_ratio": 0.57735,
+        "is_ramanujan": true,
+        "girth": 4
+      }
+    },
+    "toric-d3": {
+      "n_qubits": 18,
+      "n_z_checks": 9,
+      "n_x_checks": 9,
+      "syndrome_graph_Z": {
+        "n_nodes": 9,
+        "n_edges": 18,
+        "degree_min": 4,
+        "degree_max": 4,
+        "degree_avg": 4.0,
+        "is_regular": true,
+        "eigenvalues_desc_first10": [
+          4.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          -2.0,
+          -2.0,
+          -2.0,
+          -2.0
+        ],
+        "second_largest_adjacency": 1.0,
+        "spectral_gap_adjacency": 3.0,
+        "normalized_laplacian_gap": 0.75,
+        "cheeger_bound_h": 0.375,
+        "ramanujan_bound": 3.4641,
+        "max_abs_nontrivial": 2.0,
+        "ramanujan_ratio": 0.57735,
+        "is_ramanujan": true,
+        "girth": 3
+      },
+      "syndrome_graph_X": {
+        "n_nodes": 9,
+        "n_edges": 18,
+        "degree_min": 4,
+        "degree_max": 4,
+        "degree_avg": 4.0,
+        "is_regular": true,
+        "eigenvalues_desc_first10": [
+          4.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          -2.0,
+          -2.0,
+          -2.0,
+          -2.0
+        ],
+        "second_largest_adjacency": 1.0,
+        "spectral_gap_adjacency": 3.0,
+        "normalized_laplacian_gap": 0.75,
+        "cheeger_bound_h": 0.375,
+        "ramanujan_bound": 3.4641,
+        "max_abs_nontrivial": 2.0,
+        "ramanujan_ratio": 0.57735,
+        "is_ramanujan": true,
+        "girth": 3
+      },
+      "tanner_graph": {
+        "n_nodes": 36,
+        "n_edges": 72,
+        "degree_min": 4,
+        "degree_max": 4,
+        "degree_avg": 4.0,
+        "is_regular": true,
+        "eigenvalues_desc_first10": [
+          4.0,
+          3.0,
+          3.0,
+          3.0,
+          3.0,
+          2.0,
+          2.0,
+          2.0,
+          2.0,
+          1.0
+        ],
+        "second_largest_adjacency": 3.0,
+        "spectral_gap_adjacency": 1.0,
+        "normalized_laplacian_gap": 0.25,
+        "cheeger_bound_h": 0.125,
+        "ramanujan_bound": 3.4641,
+        "max_abs_nontrivial": 3.0,
+        "ramanujan_ratio": 0.86603,
+        "is_ramanujan": true,
+        "girth": 4
+      }
+    },
+    "toric-d4": {
+      "n_qubits": 32,
+      "n_z_checks": 16,
+      "n_x_checks": 16,
+      "syndrome_graph_Z": {
+        "n_nodes": 16,
+        "n_edges": 32,
+        "degree_min": 4,
+        "degree_max": 4,
+        "degree_avg": 4.0,
+        "is_regular": true,
+        "eigenvalues_desc_first10": [
+          4.0,
+          2.0,
+          2.0,
+          2.0,
+          2.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          -0.0
+        ],
+        "second_largest_adjacency": 2.0,
+        "spectral_gap_adjacency": 2.0,
+        "normalized_laplacian_gap": 0.5,
+        "cheeger_bound_h": 0.25,
+        "ramanujan_bound": 3.4641,
+        "max_abs_nontrivial": 2.0,
+        "ramanujan_ratio": 0.57735,
+        "is_ramanujan": true,
+        "girth": 4
+      },
+      "syndrome_graph_X": {
+        "n_nodes": 16,
+        "n_edges": 32,
+        "degree_min": 4,
+        "degree_max": 4,
+        "degree_avg": 4.0,
+        "is_regular": true,
+        "eigenvalues_desc_first10": [
+          4.0,
+          2.0,
+          2.0,
+          2.0,
+          2.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          -0.0
+        ],
+        "second_largest_adjacency": 2.0,
+        "spectral_gap_adjacency": 2.0,
+        "normalized_laplacian_gap": 0.5,
+        "cheeger_bound_h": 0.25,
+        "ramanujan_bound": 3.4641,
+        "max_abs_nontrivial": 2.0,
+        "ramanujan_ratio": 0.57735,
+        "is_ramanujan": true,
+        "girth": 4
+      },
+      "tanner_graph": {
+        "n_nodes": 64,
+        "n_edges": 128,
+        "degree_min": 4,
+        "degree_max": 4,
+        "degree_avg": 4.0,
+        "is_regular": true,
+        "eigenvalues_desc_first10": [
+          4.0,
+          3.41421,
+          3.41421,
+          3.41421,
+          3.41421,
+          2.82843,
+          2.82843,
+          2.82843,
+          2.82843,
+          2.0
+        ],
+        "second_largest_adjacency": 3.41421,
+        "spectral_gap_adjacency": 0.58579,
+        "normalized_laplacian_gap": 0.14645,
+        "cheeger_bound_h": 0.07322,
+        "ramanujan_bound": 3.4641,
+        "max_abs_nontrivial": 3.41421,
+        "ramanujan_ratio": 0.9856,
+        "is_ramanujan": true,
+        "girth": 4
+      }
+    },
+    "steane-7": {
+      "n_qubits": 7,
+      "n_z_checks": 3,
+      "n_x_checks": 3,
+      "syndrome_graph_Z": {
+        "n_nodes": 3,
+        "n_edges": 3,
+        "degree_min": 2,
+        "degree_max": 2,
+        "degree_avg": 2.0,
+        "is_regular": true,
+        "eigenvalues_desc_first10": [
+          2.0,
+          -1.0,
+          -1.0
+        ],
+        "second_largest_adjacency": -1.0,
+        "spectral_gap_adjacency": 1.0,
+        "normalized_laplacian_gap": 1.5,
+        "cheeger_bound_h": 0.75,
+        "ramanujan_bound": 2.0,
+        "max_abs_nontrivial": 1.0,
+        "ramanujan_ratio": 0.5,
+        "is_ramanujan": true,
+        "girth": 3
+      },
+      "syndrome_graph_X": {
+        "n_nodes": 3,
+        "n_edges": 3,
+        "degree_min": 2,
+        "degree_max": 2,
+        "degree_avg": 2.0,
+        "is_regular": true,
+        "eigenvalues_desc_first10": [
+          2.0,
+          -1.0,
+          -1.0
+        ],
+        "second_largest_adjacency": -1.0,
+        "spectral_gap_adjacency": 1.0,
+        "normalized_laplacian_gap": 1.5,
+        "cheeger_bound_h": 0.75,
+        "ramanujan_bound": 2.0,
+        "max_abs_nontrivial": 1.0,
+        "ramanujan_ratio": 0.5,
+        "is_ramanujan": true,
+        "girth": 3
+      },
+      "tanner_graph": {
+        "n_nodes": 13,
+        "n_edges": 24,
+        "degree_min": 2,
+        "degree_max": 6,
+        "degree_avg": 3.692,
+        "is_regular": false,
+        "eigenvalues_desc_first10": [
+          4.0,
+          2.0,
+          2.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          -0.0,
+          -0.0,
+          -0.0
+        ],
+        "second_largest_adjacency": 2.0,
+        "spectral_gap_adjacency": 4.0,
+        "normalized_laplacian_gap": 0.38763,
+        "cheeger_bound_h": 0.19381,
+        "ramanujan_bound": 4.47214,
+        "max_abs_nontrivial": 4.0,
+        "ramanujan_ratio": 0.89443,
+        "is_ramanujan": true,
+        "girth": 4
+      }
+    }
+  },
+  "mc_decode": {
+    "repetition-5": {
+      "physical_rates": [
+        0.03,
+        0.05,
+        0.08,
+        0.1,
+        0.15
+      ],
+      "logical_failure": [
+        0.0,
+        0.001,
+        0.0055,
+        0.011,
+        0.025
+      ]
+    },
+    "toric-d2": {
+      "physical_rates": [
+        0.03,
+        0.05,
+        0.08,
+        0.1,
+        0.15
+      ],
+      "logical_failure": [
+        0.207,
+        0.334,
+        0.474,
+        0.555,
+        0.727
+      ]
+    },
+    "toric-d3": {
+      "physical_rates": [
+        0.03,
+        0.05,
+        0.08,
+        0.1,
+        0.15
+      ],
+      "logical_failure": [
+        0.059,
+        0.1355,
+        0.286,
+        0.3775,
+        0.5885
+      ]
+    }
+  },
+  "toric_ramanujan_scaling": [
+    {
+      "d": 2,
+      "n_nodes": 4,
+      "lambda2_adjacency": 0.0,
+      "ramanujan_bound": 2.0,
+      "ramanujan_ratio": 0.0,
+      "is_ramanujan": true,
+      "normalized_laplacian_gap": 1.0
+    },
+    {
+      "d": 3,
+      "n_nodes": 9,
+      "lambda2_adjacency": 1.0,
+      "ramanujan_bound": 3.4641,
+      "ramanujan_ratio": 0.57735,
+      "is_ramanujan": true,
+      "normalized_laplacian_gap": 0.75
+    },
+    {
+      "d": 4,
+      "n_nodes": 16,
+      "lambda2_adjacency": 2.0,
+      "ramanujan_bound": 3.4641,
+      "ramanujan_ratio": 0.57735,
+      "is_ramanujan": true,
+      "normalized_laplacian_gap": 0.5
+    },
+    {
+      "d": 5,
+      "n_nodes": 25,
+      "lambda2_adjacency": 2.61803,
+      "ramanujan_bound": 3.4641,
+      "ramanujan_ratio": 0.93417,
+      "is_ramanujan": true,
+      "normalized_laplacian_gap": 0.34549
+    },
+    {
+      "d": 6,
+      "n_nodes": 36,
+      "lambda2_adjacency": 3.0,
+      "ramanujan_bound": 3.4641,
+      "ramanujan_ratio": 0.86603,
+      "is_ramanujan": true,
+      "normalized_laplacian_gap": 0.25
+    },
+    {
+      "d": 7,
+      "n_nodes": 49,
+      "lambda2_adjacency": 3.24698,
+      "ramanujan_bound": 3.4641,
+      "ramanujan_ratio": 1.04035,
+      "is_ramanujan": false,
+      "normalized_laplacian_gap": 0.18826
+    },
+    {
+      "d": 8,
+      "n_nodes": 64,
+      "lambda2_adjacency": 3.41421,
+      "ramanujan_bound": 3.4641,
+      "ramanujan_ratio": 0.9856,
+      "is_ramanujan": true,
+      "normalized_laplacian_gap": 0.14645
+    },
+    {
+      "d": 9,
+      "n_nodes": 81,
+      "lambda2_adjacency": 3.53209,
+      "ramanujan_bound": 3.4641,
+      "ramanujan_ratio": 1.08506,
+      "is_ramanujan": false,
+      "normalized_laplacian_gap": 0.11698
+    },
+    {
+      "d": 10,
+      "n_nodes": 100,
+      "lambda2_adjacency": 3.61803,
+      "ramanujan_bound": 3.4641,
+      "ramanujan_ratio": 1.04444,
+      "is_ramanujan": false,
+      "normalized_laplacian_gap": 0.09549
+    },
+    {
+      "d": 11,
+      "n_nodes": 121,
+      "lambda2_adjacency": 3.68251,
+      "ramanujan_bound": 3.4641,
+      "ramanujan_ratio": 1.10793,
+      "is_ramanujan": false,
+      "normalized_laplacian_gap": 0.07937
+    },
+    {
+      "d": 12,
+      "n_nodes": 144,
+      "lambda2_adjacency": 3.73205,
+      "ramanujan_bound": 3.4641,
+      "ramanujan_ratio": 1.07735,
+      "is_ramanujan": false,
+      "normalized_laplacian_gap": 0.06699
+    },
+    {
+      "d": 13,
+      "n_nodes": 169,
+      "lambda2_adjacency": 3.77091,
+      "ramanujan_bound": 3.4641,
+      "ramanujan_ratio": 1.12115,
+      "is_ramanujan": false,
+      "normalized_laplacian_gap": 0.05727
+    },
+    {
+      "d": 14,
+      "n_nodes": 196,
+      "lambda2_adjacency": 3.80194,
+      "ramanujan_bound": 3.4641,
+      "ramanujan_ratio": 1.09752,
+      "is_ramanujan": false,
+      "normalized_laplacian_gap": 0.04952
+    },
+    {
+      "d": 15,
+      "n_nodes": 225,
+      "lambda2_adjacency": 3.82709,
+      "ramanujan_bound": 3.4641,
+      "ramanujan_ratio": 1.12947,
+      "is_ramanujan": false,
+      "normalized_laplacian_gap": 0.04323
+    }
+  ]
+}
