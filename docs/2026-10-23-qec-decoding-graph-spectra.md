@@ -81,9 +81,9 @@ Monte-Carlo BP logical-failure rates:
 
 | code | gap_norm | p=0.03 | p=0.10 | p=0.15 |
 |---|---|---|---|---|
-| repetition-5 | 0.50 | 0.000 | 0.011 | 0.025 |
-| toric-d3 | 0.75 | 0.059 | 0.378 | 0.589 |
-| toric-d2 | 1.00 | 0.207 | 0.555 | 0.727 |
+| repetition-5 | 0.50 | 0.000 | 0.011 | 0.026 |
+| toric-d3 | 0.75 | 0.052 | 0.389 | 0.578 |
+| toric-d2 | 1.00 | 0.207 | 0.561 | 0.725 |
 
 A naive gap-only hypothesis ("bigger gap → better decode") fails: repetition
 has the *smallest* gap but by far the best logical failure rate, because its
@@ -107,8 +107,10 @@ uv run --no-project --with numpy python scripts/qec_decoding_graph_spectra.py --
 uv run --no-project --with numpy --with matplotlib python scripts/qec_ramanujan_figure.py
 ```
 
-All results deterministic (`--seed 42`). CSS condition Hx·Hzᵀ = 0 mod 2 is
-asserted per code.
+All results deterministic (independent RNG stream per (code, p): seed =
+`base + 1000·p_index + code_index`; default base 42). Each failure rate is a
+separate 2,000-shot MC sample; the Ramanujan flag is only reported for
+d-regular graphs. CSS condition Hx·Hzᵀ = 0 mod 2 is asserted per code.
 
 ## Status
 

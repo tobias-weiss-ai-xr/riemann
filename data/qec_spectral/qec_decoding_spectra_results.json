@@ -28,7 +28,7 @@
         "ramanujan_bound": 2.0,
         "max_abs_nontrivial": 1.61803,
         "ramanujan_ratio": 0.80902,
-        "is_ramanujan": true,
+        "is_ramanujan": false,
         "girth": 0
       },
       "syndrome_graph_X": {},
@@ -57,7 +57,7 @@
         "ramanujan_bound": 2.0,
         "max_abs_nontrivial": 1.90211,
         "ramanujan_ratio": 0.95106,
-        "is_ramanujan": true,
+        "is_ramanujan": false,
         "girth": 0
       }
     },
@@ -397,7 +397,7 @@
         "ramanujan_bound": 4.47214,
         "max_abs_nontrivial": 4.0,
         "ramanujan_ratio": 0.89443,
-        "is_ramanujan": true,
+        "is_ramanujan": false,
         "girth": 4
       }
     }
@@ -413,10 +413,10 @@
       ],
       "logical_failure": [
         0.0,
-        0.001,
+        0.0,
         0.0055,
         0.011,
-        0.025
+        0.0255
       ]
     },
     "toric-d2": {
@@ -429,10 +429,10 @@
       ],
       "logical_failure": [
         0.207,
-        0.334,
-        0.474,
-        0.555,
-        0.727
+        0.3275,
+        0.513,
+        0.5605,
+        0.7245
       ]
     },
     "toric-d3": {
@@ -444,11 +444,11 @@
         0.15
       ],
       "logical_failure": [
-        0.059,
-        0.1355,
-        0.286,
-        0.3775,
-        0.5885
+        0.052,
+        0.126,
+        0.2825,
+        0.3885,
+        0.578
       ]
     }
   },

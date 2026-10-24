@@ -16,9 +16,9 @@ is whether the *spectral gap / expansion* of the decoding graph predicts decoder
 behaviour — the same local-vs-global question riemann's Cayley graphs (SL(2,F_p))
 raise for spectral prediction of number-theoretic objects.
 
-Here we construct the Tanner + syndrome graphs of a family of small quantum codes
-(toric Z_d^2, Steane, Shor, 5-qubit, repetition), compute their spectra with the
-same spectral-gap conventions as compute_eigenvalues.py, and run a real
+Here we construct the Tanner + syndrome graphs of a small family of CSS codes
+(toric Z_d^2 for d=2..15, Steane [[7,1,3]], repetition-5), compute their spectra
+with the same spectral-gap conventions as compute_eigenvalues.py, and run a real
 belief-propagation (BP) decoder at several physical error rates to measure the
 correlation between expansion and logical-error suppression.
 
@@ -161,7 +161,6 @@ def spectral_stats(adj: np.ndarray) -> dict:
     gap_norm = float(nz[0]) if len(nz) > 0 else 0.0
 
     # adjacency gap & Ramanujan-style ratio
-    nontriv = evals[np.abs(evals - dmax) > 1e-6] if dmax > 0 else evals
     second_largest = float(evals[1]) if n > 1 else 0.0
     spectral_gap = float(dmax - np.abs(second_largest)) if n > 1 else 0.0
 
@@ -171,11 +170,15 @@ def spectral_stats(adj: np.ndarray) -> dict:
 
     # Ramanujan criterion: d-regular, every eigenvalue EXCEPT ±d must satisfy
     # |λ| ≤ 2√(d-1). (Same ratio riemann computes for SL(2,F_p) Cayley graphs.)
+    is_regular_graph = bool(n > 0 and dmin == dmax)
     ramanujan_bound = 2.0 * np.sqrt(max(dmax - 1, 0.0)) if dmax >= 1 else 0.0
     nontriv = [float(x) for x in evals if abs(abs(x) - dmax) > 1e-6 and abs(abs(x) - dmin) > 1e-6]
     max_abs_nontriv = max((abs(x) for x in nontriv), default=0.0)
     ramanujan_ratio = (max_abs_nontriv / ramanujan_bound) if ramanujan_bound > 0 else float("inf")
-    is_ramanujan = bool(n > 0 and ramanujan_bound > 0 and ramanujan_ratio <= 1.0 + 1e-10)
+    # Ramanujan criterion is ONLY defined for d-regular graphs; report the flag only then.
+    is_ramanujan = bool(
+        n > 0 and is_regular_graph and ramanujan_bound > 0 and ramanujan_ratio <= 1.0 + 1e-10
+    )
 
     # girth (shortest cycle) via BFS
     girth = compute_girth(adj)
@@ -310,7 +313,11 @@ def mod2_rowspace_membership(v: np.ndarray, rows: np.ndarray) -> bool:
 
 
 def run_mc(Hz, Hx, p, shots, iters=12, seed=42):
-    """Monte-Carlo logical failure rate of BP decoder at physical error rate p."""
+    """Monte-Carlo logical failure rate of BP decoder at physical error rate p.
+
+    Each call seeds a fresh RNG from `seed` so that every (code, p) pair draws
+    independent samples (a shared stream would couple the five per-p rates).
+    """
     rng = np.random.default_rng(seed)
     n_q = Hz.shape[1]
     fails = 0
@@ -380,23 +387,26 @@ def main():
 
     # MC decode experiments on small, CSS codes
     mc_codes = {}
+    codes_so_far = 0
     for name in ("repetition-5", "toric-d2", "toric-d3"):
         Hx, Hz, _ = CODES[name]()
         mc_codes[name] = {"physical_rates": [], "logical_failure": []}
-        for p in (0.03, 0.05, 0.08, 0.10, 0.15):
-            fl = run_mc(Hz, Hx, p, args.mc, seed=args.seed)
+        for i, p in enumerate((0.03, 0.05, 0.08, 0.10, 0.15)):
+            fl = run_mc(Hz, Hx, p, args.mc, seed=args.seed + 1000 * i + codes_so_far)
             mc_codes[name]["physical_rates"].append(p)
             mc_codes[name]["logical_failure"].append(round(fl, 5))
             print(
                 f"  MC {name} p={p}: logical failure {fl:.4f} "
                 f"(gap_norm={results['codes'][name]['syndrome_graph_Z']['normalized_laplacian_gap']})"
             )
+        codes_so_far += 1
     results["mc_decode"] = mc_codes
 
-    # Ramanujan/expansion scaling for toric syndrome graphs across d —
-    # the Z_syndrome graph of the toric code IS the Cayley graph C(Z_d^2, ±e1, ±e2);
-    # its spectrum is λ = 4 - 2cos(2πk/d) - 2cos(2πl/d) (hmm: analytic form below),
-    # and λ2 = 4cos(2π/d). Compare against the Ramanujan bound 2√3.
+    # Ramanujan/expansion scaling for toric syndrome graphs across d.
+    # Z-syndrome graph of toric Z_d^2 = Cayley graph C(Z_d^2, ±e1, ±e2) (d >= 3);
+    # adjacency spectrum: λ(a,b) = 2cos(2πa/d) + 2cos(2πb/d), so
+    # λ2 = 2 + 2cos(2π/d) — the +1,-1 nearest-neighbour lattice direction.
+    # Compare against the Ramanujan bound 2√3 for this 4-regular graph.
     toric_scaling = []
     for d in range(2, 16):
         Hx, Hz, _ = toric_code(d)
